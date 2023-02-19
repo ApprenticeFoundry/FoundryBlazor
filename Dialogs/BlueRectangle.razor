@@ -1,0 +1,20 @@
+@using Radzen
+
+@inherits BlueRectangleDialog
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12 p-3">
+            <RadzenCard>
+
+                @* <div class="col-6 text-start align-middle pt-4 pl-5">
+                    <h4 class="my-4">Choose background color</h4>
+                    <RadzenColorPicker @bind-Value=@color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton Change=@OnChange />
+                </div> *@
+                <RadzenButton Click="@((args) => Cancel())" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"
+                    Text="Cancel" Style="width: 120px" Class="me-1" />
+                <RadzenButton Click="@((args) => Save())" Variant="Variant.Flat" Text="OK" Style="width: 120px" />
+            </RadzenCard>
+        </div>
+    </div>
+</div>

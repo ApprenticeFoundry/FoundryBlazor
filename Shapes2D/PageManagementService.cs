@@ -1,0 +1,359 @@
+
+using System.Drawing;
+using Blazor.Extensions.Canvas.Canvas2D;
+
+using FoundryBlazor.Extensions;
+using IoBTMessage.Models;
+
+namespace FoundryBlazor.Shape;
+
+public interface IPageManagement: IRender
+{
+
+    List<FoGlyph2D> FindShapes(string GlyphId);
+    List<FoGlyph2D> ExtractShapes(string GlyphId);
+    List<FoGlyph2D> FindGlyph(Rectangle rect);
+    List<FoGlyph2D> AllObjects();
+    FoRealPage2D CurrentPage();
+    FoRealPage2D SetCurrentPage(FoRealPage2D page);
+    FoRealPage2D AddPage(FoRealPage2D page);
+
+    List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
+    List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
+    List<IFoMenu> CollectMenus(List<IFoMenu> list);
+    void RefreshHitTesting(FoPanZoomWindow window);
+    bool ToggleHitTestRender();
+
+    void ClearAll();
+
+    int PageCount();
+    int ShapeCount();
+
+    FoPage2D SetPageSizeInches(double width, double height);
+    FoPage2D SetPageLandscape();
+    FoPage2D SetPagePortrait();   
+
+
+    List<FoGlyph2D> Selections();
+    void PageMoveBy(int dx, int dy);
+    void SelectionsMoveBy(int dx, int dy);
+    void SelectionsRotateBy(double da);
+    void SelectionsZoomBy(double factor);
+    T Add<T>(T value) where T : FoGlyph2D;
+    T Duplicate<T>(T value) where T : FoGlyph2D;
+    U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
+    T? GroupSelected<T>() where T : FoGroup2D;
+    U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
+}
+
+
+public class PageManagementService : IPageManagement
+{
+
+    private bool RenderHitTestTree = false;
+    private FoRealPage2D _activePage { get; set; }
+    private readonly FoCollection<FoRealPage2D> _pages = new();
+    private readonly IHitTestService _hitTestService;
+    private readonly ISelectionService _selectService;
+    private readonly IScaledDrawingHelpers _helper;
+
+    public PageManagementService(
+        IHitTestService hit,
+        IScaledDrawingHelpers help,
+        ISelectionService sel)
+    {
+        _hitTestService = hit;
+        _selectService = sel;
+        _helper = help;
+
+        _activePage = new FoRealPage2D("RealPage-1", 100, 200, "#D3D3D3", help)
+        {
+            IsActive = true
+        };
+
+        AddPage(_activePage);
+    }
+
+
+
+    public int PageCount()
+    {
+        return 1;
+    }
+
+    public int ShapeCount()
+    {
+        return CurrentPage().AllMembers().Count;
+    }
+
+    public FoPage2D SetPageSizeInches(double width, double height)
+    {
+        _helper.SetPageSizeInches(width, height);
+
+        var page = CurrentPage();
+        _helper.SetPageDefaults(page);
+        return page;
+    }
+    public FoPage2D SetPageLandscape()
+    {
+        var page = CurrentPage();
+        _helper.SetPageLandscape();
+        _helper.SetPageDefaults(page);
+        return page;
+    }
+    public FoPage2D SetPagePortrait()
+    {
+        var page = CurrentPage();
+        _helper.SetPagePortrait();
+        _helper.SetPageDefaults(page);
+        return page;
+    }
+    public void ClearAll()
+    {
+        FoGlyph2D.ResetHitTesting = true;
+        CurrentPage().ClearAll();
+    }
+
+    public bool ToggleHitTestRender()
+    {
+        FoGlyph2D.ResetHitTesting = true;
+        RenderHitTestTree = !RenderHitTestTree;
+        return RenderHitTestTree;
+    }
+    public void RefreshHitTesting(FoPanZoomWindow window)
+    {
+        _hitTestService.RefreshTree(CurrentPage());
+        if (window != null)
+            _hitTestService.Insert(window);
+    }
+
+
+    public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        _pages.Values().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
+        return list;
+    }
+
+    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
+    {
+        CurrentPage().GetMembers<FoMenu2D>()?.ForEach(item =>
+        {
+            list.Add(item);
+        });
+        return list;
+    }   
+    public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    {
+        _pages.Values().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
+        return list;
+    }
+
+    public List<FoGlyph2D> ExtractShapes(string GlyphId)
+    {
+        return CurrentPage().ExtractShapes(GlyphId);
+    }
+
+    public List<FoGlyph2D> FindShapes(string GlyphId)
+    {
+        return CurrentPage().FindShapes(GlyphId);
+    }
+
+    public List<FoGlyph2D> FindGlyph(Rectangle rect)
+    {
+        return _hitTestService.FindGlyph(rect);
+    }
+
+    public List<FoGlyph2D> AllObjects()
+    {
+        return _hitTestService.AllShapesEverywhere();
+    }
+
+
+    public T Add<T>(T value) where T : FoGlyph2D
+    {
+        var found = _activePage.Add(value);
+        _hitTestService.Insert(value);
+        return found;
+
+    }
+
+    public FoRealPage2D CurrentPage()
+    {
+        if (_activePage == null)
+        {
+            var found = _pages.Values().Where(page => page.IsActive).FirstOrDefault();
+            if (found == null)
+            {
+                found = new FoRealPage2D("Page-1", 1000, 500, "#D3D3D3", _helper);
+                AddPage(found);
+            }
+            _activePage = found;
+            _activePage.IsActive = true;
+        }
+
+        return _activePage;
+    }
+    public FoRealPage2D SetCurrentPage(FoRealPage2D page)
+    {
+        _activePage = page;
+        _pages.Values().ForEach(item => item.IsActive = false);
+        _activePage.IsActive = true;
+        return _activePage!;
+    }
+
+    public FoRealPage2D AddPage(FoRealPage2D page)
+    {
+        var found = _pages.Values().Where(item => item == page).FirstOrDefault();
+        if (found == null)
+            _pages.Add(page);
+        return page;
+    }
+
+    public T Duplicate<T>(T value) where T : FoGlyph2D
+    {
+        var body = StorageHelpers.Dehydrate<T>(value, false);
+        var shape = StorageHelpers.Hydrate<T>(body, false);
+
+        shape!.Name = "";
+        shape!.GlyphId = "";
+
+        //SRS write a method to duplicate actions
+        shape.ShapeDraw = value.ShapeDraw;
+        shape.DoOnOpenCreate = value.DoOnOpenCreate;
+        shape.DoOnOpenEdit = value.DoOnOpenEdit;
+
+        return Add<T>(shape);
+    }
+
+    public U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D
+    {
+        var body = StorageHelpers.Dehydrate<T>(value, false);
+        var shape = StorageHelpers.Hydrate<U>(body, false);
+
+        shape!.Name = "";
+        shape!.GlyphId = "";
+
+        return Add<U>(shape);
+    }
+
+
+
+    public List<FoGlyph2D> Selections()
+    {
+        return _selectService.Selections();
+    }
+
+    public void PageMoveBy(int dx, int dy)
+    {
+        var page = CurrentPage();
+        page.MoveBy(dx, dy);
+        page.Smash();
+    }
+
+    public void SelectionsMoveBy(int dx, int dy)
+    {
+        _selectService.MoveBy(dx, dy);
+    }
+
+    public void SelectionsRotateBy(double da)
+    {
+        _selectService.RotateBy(da);
+    }
+
+    public void SelectionsZoomBy(double factor)
+    {
+        _selectService.ZoomBy(factor);
+    }
+
+    public T? UngroupSelected<T>() where T : FoGroup2D
+    {
+        return null;
+    }
+
+    public T? GroupSelected<T>() where T : FoGroup2D
+    {
+        var first = _selectService.Selections().FirstOrDefault();
+        if (first == null) return null;
+
+        $"GroupSelected {first}".WriteLine(ConsoleColor.White);
+
+        if (Activator.CreateInstance(typeof(T)) is not T group) return null;
+
+        Rectangle rect = first.Rect();
+        _selectService.Selections().ForEach(item =>
+        {
+            rect = Rectangle.Union(rect, item.Rect());
+            //$"Rect {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.White);
+        });
+
+        group.ResizeTo(rect.Width, rect.Height);
+        var pt = group.PinLocation();
+        group.MoveTo(rect.X + pt.X, rect.Y + pt.Y);
+        this.Add<T>(group);
+
+        group.CaptureSelectedShapes<FoShape1D>(CurrentPage());
+        group.CaptureSelectedShapes<FoGroup2D>(CurrentPage());
+        group.CaptureSelectedShapes<FoShape2D>(CurrentPage());
+        group.CaptureSelectedShapes<FoText2D>(CurrentPage());
+
+        _selectService.ClearAll();
+        return group;
+    }
+
+    public void ClearMenu2D<U>(string name) where U : FoMenu2D
+    {
+        var menu = CurrentPage().Find<U>(name);
+        menu?.Clear();
+    }
+
+    public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
+    {
+        var menu = CurrentPage().Find<U>(name);
+        if (menu == null)
+        {
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            this.Add<U>(menu!);
+        }
+        if ( clear )
+            menu?.Clear();
+
+        foreach (KeyValuePair<string, Action> item in actions)
+        {
+            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+                menu?.Add<T>(shape);
+        }
+
+        menu!.LayoutHorizontal();
+
+        return menu!;
+    }
+
+
+
+
+    public async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
+    {
+        var page = CurrentPage();
+
+        //await page.RenderNoItems(ctx, tick++);
+        await page.RenderDetailed(ctx, tick++, deep);
+
+        if ( RenderHitTestTree )
+            await _hitTestService.RenderTree(ctx);
+
+        return true;
+    }
+
+    public async Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region)
+    {
+        var page = CurrentPage();
+        await page.RenderConcise(ctx, scale, region);
+
+        if ( RenderHitTestTree )
+            await _hitTestService.RenderTree(ctx);
+            
+        return true;
+    }
+
+
+}

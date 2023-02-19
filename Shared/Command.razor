@@ -1,0 +1,19 @@
+@inherits CommandManager
+@using FoundryBlazor.Shape
+
+<RadzenCard Class="flex pr-3">
+    @foreach (var cmds in GetAllCommands())
+    {
+        @foreach (var button in cmds.Buttons())
+        {
+            <RadzenButton Text="@button.DisplayText()" Click="@button.ClickAction()" ButtonStyle="ButtonStyle.Info"></RadzenButton>
+        }
+    }
+
+    @* <RadzenButton Click=@(args => OnClick("Primary button")) Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Click=@(args => OnClick("Secondary button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Click=@(args => OnClick("Info button")) Text="Info" ButtonStyle="ButtonStyle.Info" />
+        <RadzenButton Click=@(args => OnClick("Success button ")) Text="Success" ButtonStyle="ButtonStyle.Success" />
+        <RadzenButton Click=@(args => OnClick("Warning button ")) Text="Warning" ButtonStyle="ButtonStyle.Warning" />
+        <RadzenButton Click=@(args => OnClick("Danger button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" /> *@
+</RadzenCard>

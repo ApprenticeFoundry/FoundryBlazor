@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None  Include="wwwroot\js\CanvasHelper.js" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
+    <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
+    <PackageReference Include="BlazorThreeJS" Version="0.0.0.21" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    <PackageReference Include="Radzen.Blazor" Version="4.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="IoBTMessageLibrary">
+      <HintPath>otherdlls\IoBTMessageLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="IoBTModuleLibrary">
+      <HintPath>otherdlls\IoBTModuleLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+
+
+</Project>

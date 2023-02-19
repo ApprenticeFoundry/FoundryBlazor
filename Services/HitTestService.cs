@@ -1,0 +1,130 @@
+
+using System.Drawing;
+using Blazor.Extensions.Canvas.Canvas2D;
+using IoBTMessage.Models;
+
+namespace FoundryBlazor.Shape;
+
+public interface IHitTestService
+{
+    bool Insert(FoGlyph2D glyph);
+    bool InsertRange(List<FoGlyph2D> list);
+    List<FoGlyph2D> FindGlyph(Rectangle rect);
+    List<FoGlyph2D> AllShapesEverywhere();
+    List<FoGlyph2D> RefreshTree(FoPage2D page);
+    Task RenderTree(Canvas2DContext ctx);
+}
+
+public class HitTestService : IHitTestService
+{
+    private FoPage2D Page { get; set; } 
+    private QuadTree<FoGlyph2D> Tree { get; set; }
+
+    private readonly List<Rectangle> PreviousSearches = new();
+    private readonly IScaledDrawingHelpers _helper;
+    private readonly IPanZoomService _panzoom;
+    public HitTestService(IScaledDrawingHelpers helper, IPanZoomService panzoom)
+    {
+        _helper = helper;
+        _panzoom = panzoom;
+        Page = new FoPage2D("dummy","White");
+        Tree = new QuadTree<FoGlyph2D>(Rect());
+    }  
+
+    public Rectangle Rect()
+    {
+        //make sure any shape on the canvas is in the hittest
+        var canvas = _helper.Rect();
+        canvas = _panzoom.AntiScaleRect(canvas);
+        return canvas;
+    }
+    public List<FoGlyph2D> RefreshTree(FoPage2D page)
+    {
+        Page = page;
+        Tree = new QuadTree<FoGlyph2D>(Rect());
+
+        //Page.GetMembers<FoShape1D>()?.ForEach(child => Tree.Insert(child));
+        //Page.GetMembers<FoConnector1D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoGroup2D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoShape2D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
+
+        Page.GetMembers<FoText2D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoImage2D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoVideo2D>()?.ForEach(child => Tree.Insert(child));
+
+        Page.GetMembers<FoCompound2D>()?.ForEach(child => Tree.Insert(child));
+        Page.GetMembers<FoDragTarget2D>()?.ForEach(child => Tree.Insert(child));
+
+        // Page.Members<FoButton2D>().ForEach(child => Tree.Insert(child));
+        //Page.Members<FoMenu2D>().ForEach(child => Tree.Insert(child));
+
+        //$"Refresh Tree {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
+        return AllShapesEverywhere();
+    }
+
+    public bool InsertRange(List<FoGlyph2D> list)
+    {
+        if ( Tree != null)
+            list.ForEach(child => Tree.Insert(child));
+        return Tree != null;
+    }
+
+    public bool Insert(FoGlyph2D glyph)
+    {
+        Tree?.Insert(glyph);
+        return Tree != null;
+    }
+
+    public List<FoGlyph2D> FindGlyph(Rectangle rect)
+    {
+        if ( PreviousSearches.Count > 10)
+        {
+            PreviousSearches.RemoveRange(0, 6);
+        }
+        PreviousSearches.Add(rect);
+        //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+
+        List<FoGlyph2D> list = new();
+        Tree?.GetObjects(rect, ref list);
+        //$"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
+
+        // PreviousSearches.ForEach(rect =>
+        // {
+        //     $"=> Searches {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+        // });
+        return list;
+    }
+
+    public List<FoGlyph2D> AllShapesEverywhere()
+    {
+        List<FoGlyph2D> list = new();
+        Tree?.GetAllObjects(ref list);
+        return list;
+    }
+
+    public async Task RenderTree(Canvas2DContext ctx)
+    {
+        //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
+
+        await ctx.SaveAsync();
+
+        await ctx.SetLineWidthAsync(4);
+        await ctx.SetLineDashAsync(new float[] { 20, 20 });
+        await ctx.SetStrokeStyleAsync("Cyan");
+        await Tree.Render(ctx, true);
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetLineDashAsync(Array.Empty<float>());
+        await ctx.SetStrokeStyleAsync("Blue");
+        PreviousSearches.ForEach(async rect =>
+        {
+            //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+            await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+        });
+
+        await ctx.RestoreAsync();
+    }
+
+
+}

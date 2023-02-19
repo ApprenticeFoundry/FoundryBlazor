@@ -1,0 +1,16 @@
+@inherits ImageUploaderDialog
+
+<div class="container-fluid">
+    <div class="row">
+    <div class="container-fluid mt-2">
+        <RadzenCard>
+            <RadzenUpload Multiple="false" Accept="image/png,image/jpg" Url="api/Image/UploadSave" Progress=@(args =>
+                OnProgress(args, "Single Image")) Complete=@(args=> OnComplete(args)) name="file" class="w-100" />
+
+            <RadzenButton Click="@((args) => Cancel())" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"
+                    Text="Cancel" Style="width: 120px" Class="me-1" />
+            <RadzenButton Click="@((args) => Save())" Variant="Variant.Flat" Text="OK" Style="width: 120px" />
+        </RadzenCard>
+    </div>
+    </div>
+</div>
