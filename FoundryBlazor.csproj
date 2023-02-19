@@ -14,9 +14,6 @@
   </ItemGroup>
 
 
-  <ItemGroup>
-    <None  Include="wwwroot\js\CanvasHelper.js" />
-  </ItemGroup>
 
 
   <ItemGroup>
