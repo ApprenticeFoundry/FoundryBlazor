@@ -6,7 +6,7 @@
 
 const fileInputContainer = getFileInputContainer();
 /*This is called from the Blazor component's Initialize method*/
-export function initRenderJS(instance) {
+function initRenderJS(instance) {
     // instance is the Blazor component dotnet reference
     window.theInstance = instance;
 
@@ -292,3 +292,5 @@ window.CanvasFileInput = {
     ShowFileInput: showFileInput,
     HideFileInput: hideFileInput,
 };
+
+window.initRenderJS = initRenderJS;
