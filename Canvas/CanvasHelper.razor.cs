@@ -127,17 +127,8 @@ namespace FoundryBlazor.Canvas
         /// <returns></returns>
         public async Task Initialize()
         {
-            // We need to specify the .js file path relative to this code
-            _moduleTask = new(() => _jsRuntime!.InvokeAsync<IJSObjectReference>("import", "/js/CanvasHelper.js").AsTask());
-
-            // Load the module
-            var module = await _moduleTask.Value;
-
             // Initialize
-            await module.InvokeVoidAsync("initRenderJS", DotNetObjectReference.Create(this));
-
-            // Dispose the module
-            await module.DisposeAsync();
+            await _jsRuntime!.InvokeVoidAsync("initRenderJS", DotNetObjectReference.Create(this));
         }
 
 

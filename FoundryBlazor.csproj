@@ -7,12 +7,9 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
-
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
 
 
 
@@ -33,7 +30,4 @@
       <HintPath>otherdlls\IoBTModuleLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-
-
 </Project>
