@@ -13,7 +13,7 @@ public class CommandManager : ComponentBase
     [Inject] public IWorkspace? Workspace { get; init; }
     [Inject] public IDTARSolution? DTARSolution { get; set; }
 
-    public List<FoCommand2D> AllCommands = new();
+    public List<IFoCommand> AllCommands = new();
 
 
     // protected override async Task OnInitializedAsync()
@@ -23,14 +23,14 @@ public class CommandManager : ComponentBase
     //     await base.OnInitializedAsync();
     // }
 
-    public List<FoCommand2D> GetAllCommands()
+    public List<IFoCommand> GetAllCommands()
     {
-        if (FoWorkspace.RefreshCommands)
+        if (FoWorkspace.RefreshCommands && Workspace != null)
         {
             AllCommands.Clear();
-            var commands = Workspace?.GetAllCommands();
+            AllCommands = Workspace.CollectCommands(AllCommands);
 
-            Workspace?.GetAllCommands().ForEach(item => AllCommands.Add(item) );
+            //Workspace?.GetAllCommands().ForEach(item => AllCommands.Add(item) );
 
 
             // AllCommands.ForEach(obj =>

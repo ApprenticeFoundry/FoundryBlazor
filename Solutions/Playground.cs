@@ -1,27 +1,23 @@
 
-using FoundryBlazor.Shape;
-using Radzen;
-
-using Microsoft.JSInterop;
-using FoundryBlazor.Dialogs;
-using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Canvas;
+using FoundryBlazor.Dialogs;
+using FoundryBlazor.Shape;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Radzen;
 
 namespace FoundryBlazor.Solutions;
 
 
-public class Playgroundxxx
+public class Playground : FoWorkPiece
 {
-    private IDrawing Drawing { get; set; }
-    private DialogService Dialog { get; set; }
 
-    public Playground(IDrawing drawing, DialogService dialog)
+    public Playground(IWorkspace space, DialogService dialog, IJSRuntime js): base(space,dialog,js)
     {
-        (Drawing, Dialog) = (drawing, dialog);
     }
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public override void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
-        Drawing.EstablishMenu<FoMenu2D>("Testing", new Dictionary<string, Action>()
+        Workspace.GetDrawing()?.EstablishMenu<FoMenu2D>("Testing", new Dictionary<string, Action>()
         {
 
             { "Capture", () => CreateCapturePlayground()},
@@ -37,12 +33,15 @@ public class Playgroundxxx
     }
     private void CreateCapturePlayground()
     {
-        var s3 = Drawing.AddShape(new FoShape2D(100, 100, "Cyan"));
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
+
+        var s3 = drawing.AddShape(new FoShape2D(100, 100, "Cyan"));
         s3.MoveTo(800, 200);
-        var s4 = Drawing.AddShape(new FoShape2D(50, 50, "Green"));
+        var s4 = drawing.AddShape(new FoShape2D(50, 50, "Green"));
         s4.MoveTo(10, 10);
 
-        Drawing.CurrentPage().ExtractWhere<FoShape2D>(child => child == s4);
+        drawing.CurrentPage().ExtractWhere<FoShape2D>(child => child == s4);
         s3.CaptureShape<FoShape2D>(s4, false);
 
         //SendShapeCreated<FoShape2D>(s3);
@@ -51,7 +50,10 @@ public class Playgroundxxx
 
     private void CreateGroupShape()
     {
-        var c1 = Drawing.AddShape<FoGroup2D>(new FoGroup2D("", 100, 100, "Cyan")).MoveTo(1200, 90) as FoGroup2D;
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
+
+        var c1 = drawing.AddShape<FoGroup2D>(new FoGroup2D("", 100, 100, "Cyan")).MoveTo(1200, 90) as FoGroup2D;
         c1?.Add<FoShape2D>(new FoShape2D(20, 30, "Red"));
         c1?.Add<FoShape2D>(new FoShape2D(20, 30, "Green")).MoveTo(30, 20);
         c1?.CaptureShape<FoShape2D>(new FoShape2D(20, 30, "Blue")).MoveTo(100, 90);
@@ -63,21 +65,23 @@ public class Playgroundxxx
 
     private void CreateGluePlayground()
     {
-        var s1 = Drawing.AddShape(new FoShape2D(200, 100, "Green"));
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
+
+        var s1 = drawing.AddShape(new FoShape2D(200, 100, "Green"));
         s1.MoveTo(200, 200);
 
-
-        var s2 = Drawing.AddShape(new FoShape2D(200, 100, "Orange"));
+        var s2 = drawing.AddShape(new FoShape2D(200, 100, "Orange"));
         s2.MoveTo(800, 400);
 
-        var s3 = Drawing.AddShape(new FoShape2D(200, 100, "Blue"));
+        var s3 = drawing.AddShape(new FoShape2D(200, 100, "Blue"));
         s3.MoveTo(800, 200);
 
         var yyy = new FoShape1D(s1, s2, 10, "Red");
-        var wire2 = Drawing.AddShape(yyy);
+        var wire2 = drawing.AddShape(yyy);
 
         var xxx = new FoShape1D(s1, s3, 10, "Yellow");
-        var wire1 = Drawing.AddShape(xxx);
+        var wire1 = drawing.AddShape(xxx);
 
         // SendShapeCreated<FoShape2D>(s2);
         // SendShapeCreated<FoShape2D>(s1);
@@ -88,8 +92,10 @@ public class Playgroundxxx
 
     private void CreateGroupPlayground()
     {
-        var radius = 100;
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
 
+        var radius = 100;
         int cnt = 0;
         for (int i = 0; i <= 360; i += 30)
         {
@@ -99,7 +105,7 @@ public class Playgroundxxx
             var shape = new FoShape2D(30, 30, "Cyan");
             shape.MoveTo(x, y);
             shape.ShapeDraw = (cnt++ % 3 == 0) ? shape.DrawCircle : shape.DrawRect;
-            Drawing.AddShape<FoShape2D>(shape);
+            drawing.AddShape<FoShape2D>(shape);
             //SendShapeCreated<FoShape2D>(shape);
         }
     }
@@ -135,17 +141,23 @@ public class Playgroundxxx
     // }
     private void CreateLinePlayground()
     {
-        Drawing.AddShape(new FoConnector1D(200, 200, 400, 400, "Red"));
-        Drawing.AddShape(new FoConnector1D(200, 400, 400, 600, "Blue"));
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
+
+        drawing.AddShape(new FoConnector1D(200, 200, 400, 400, "Red"));
+        drawing.AddShape(new FoConnector1D(200, 400, 400, 600, "Blue"));
     }
+    
     public void SideDialog()
     {
+        var drawing = Workspace.GetDrawing();
+        if ( drawing == null) return;
 
-        Drawing.SetDoCreate((CanvasMouseArgs args) =>
+        drawing?.SetDoCreate((CanvasMouseArgs args) =>
         {
             var shape = new FoShape2D(150, 100, "Blue");
             shape.MoveTo(args.OffsetX, args.OffsetY);
-            Drawing.AddShape<FoShape2D>(shape);
+            drawing.AddShape<FoShape2D>(shape);
 
             shape.DoOnOpenCreate = shape.DoOnOpenEdit = async (target) =>
             {
@@ -156,7 +168,7 @@ public class Playgroundxxx
                         //SendToast(UserToast.Success("Created"));
                     }},
                     { "OnCancel", () => {
-                        Drawing.ExtractShapes(target.GlyphId);
+                        drawing.ExtractShapes(target.GlyphId);
                     }}
                 };
                 var options = new SideDialogOptions() { CloseDialogOnOverlayClick = false, Position = DialogPosition.Right, ShowMask = false };

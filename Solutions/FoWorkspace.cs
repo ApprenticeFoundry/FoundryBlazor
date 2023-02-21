@@ -8,12 +8,16 @@ using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using System.Collections.Generic;
 
 namespace FoundryBlazor.Solutions;
 
 public enum ViewStyle { None, View2D, View3D }
 public enum InputStyle { None, Drawing, FileDrop }
-public interface IWorkspace
+
+
+
+public interface IWorkspace: IWorkPiece
 {
     Task InitializedAsync(string defaultHubURI);
     IDrawing? GetDrawing();
@@ -24,18 +28,19 @@ public interface IWorkspace
     bool IsViewStyle2D();
     bool IsViewStyle3D();
 
-    List<FoCommand2D> GetAllCommands();
-    void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl);
     FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
-    void CreateMenus(IJSRuntime js, NavigationManager nav);
+
     FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
+    List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
+
+    private ViewStyle viewStyle = ViewStyle.View2D;
+    public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
     public D2D_UserToast UserToast = new();
     public D2D_UserMove? UserLocation { get; set; }
@@ -45,8 +50,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     private IArena? ActiveArena { get; init; }
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
-    private ViewStyle viewStyle = ViewStyle.View2D;
-    public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
+
     private readonly string panID;
     private IToast Toast { get; set; }
     private ComponentBus PubSub { get; set; }
@@ -108,6 +112,12 @@ public class FoWorkspace : FoComponent, IWorkspace
         return ActiveArena;
     }
 
+    public List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece)
+    {
+        Add<FoWorkPiece>(piece);
+        return Members<FoWorkPiece>();
+    }
+
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
@@ -117,6 +127,8 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         if ( !IsViewStyle2D())
             GetArena()?.CollectMenus(list);
+
+        Members<FoWorkPiece>().ForEach( item => item.CollectMenus(list));
 
         return list;
     }
@@ -135,6 +147,8 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
             { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
         }, true);
+
+        Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
     }
 
     public List<FoCommand2D> GetAllCommands()
@@ -381,5 +395,10 @@ public class FoWorkspace : FoComponent, IWorkspace
         return msg;
     }
 
-
+    public List<IFoCommand> CollectCommands(List<IFoCommand> list)
+    {
+        GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));
+        Members<FoWorkPiece>().ForEach(item => item.CollectCommands(list));
+        return list;
+    }
 }

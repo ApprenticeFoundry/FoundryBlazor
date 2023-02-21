@@ -10,19 +10,14 @@ using Radzen;
 namespace FoundryBlazor.Solutions;
 
 
-public class Stencil
+public class Stencil : FoWorkPiece
 {
-    private IWorkspace Workspace { get; set; }
-    private DialogService Dialog { get; set; }
-    private IJSRuntime jsRuntime { get; set; }
-    public Stencil(IWorkspace space, DialogService dialog, IJSRuntime js)
+
+    public Stencil(IWorkspace space, DialogService dialog, IJSRuntime js): base(space,dialog,js)
     {
-        Workspace = space;
-        Dialog = dialog;
-        jsRuntime = js;
     }  
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public override void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
 
         Workspace.GetDrawing()?.EstablishMenu<FoMenu2D>("Create", new Dictionary<string, Action>()
@@ -169,7 +164,7 @@ public class Stencil
                  ImageUrl = r1.url,
                  ScaleX = 2.0,
                  ScaleY = 2.0,
-                 JsRuntime = jsRuntime
+                 JsRuntime = JsRuntime
              };
              shape.MoveTo(args.OffsetX, args.OffsetY);
              Workspace.GetDrawing()?.AddShape<FoVideo2D>(shape);
