@@ -1,14 +1,15 @@
-using FoundryBlazor.Canvas;
+using System.Collections.Generic;
 using BlazorComponentBus;
+using FoundryBlazor.Canvas;
+using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using FoundryBlazor.Extensions;
 using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System.Collections.Generic;
 using Radzen;
 
 namespace FoundryBlazor.Solutions;
@@ -35,6 +36,9 @@ public interface IWorkspace: IWorkPiece
 
     List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
     List<FoWorkPiece> EstablishWorkPiece<T>() where T : FoWorkPiece;
+
+   Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
+
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -58,6 +62,8 @@ public class FoWorkspace : FoComponent, IWorkspace
     private ComponentBus PubSub { get; set; }
     private DialogService Dialog { get; set; }
     private IJSRuntime JsRuntime { get; set; }
+
+    public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
 
 
     public FoWorkspace (
@@ -84,11 +90,14 @@ public class FoWorkspace : FoComponent, IWorkspace
         var names = new MockDataGenerator();
         panID = names.GenerateName();
 
-
-
         $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
     }
 
+    public async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
+    {
+        await OnFileDrop.Invoke(file, args);
+        await Task.CompletedTask;
+    }
 
     public async Task InitializedAsync(string defaultHubURI)
     {

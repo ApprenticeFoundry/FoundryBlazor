@@ -9,9 +9,9 @@ using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 
 using BlazorComponentBus;
-using FoundryBlazor.Model;
+
 using FoundryBlazor.PubSub;
-using FoundryBlazor.Services;
+
 using FoundryBlazor.Shared;
 using IoBTMessage.Models;
 using FoundryBlazor.Extensions;
@@ -42,7 +42,7 @@ public class FoArena3D : FoGlyph3D, IArena
     private IToast Toast { get; set; }
     private ICommand Command { get; set; }
     private IJSRuntime JsRuntime { get; set; }
-    private IRestAPIServiceDTAR DTARRestService { get; set; }
+    //private IRestAPIServiceDTAR DTARRestService { get; set; }
     private ISceneManagement SceneManager { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
@@ -64,14 +64,12 @@ public class FoArena3D : FoGlyph3D, IArena
     public FoArena3D(
         ICommand cmd,
         IToast toast,
-        IRestAPIServiceDTAR rest,
         ISceneManagement sceneManagement,
         ComponentBus pubSub,
         IJSRuntime jsRuntime)
     {
         Command = cmd;
         Toast = toast;
-        DTARRestService = rest;
         SceneManager = sceneManagement;
         JsRuntime = jsRuntime;
         PubSub = pubSub;

@@ -75,7 +75,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
             Task.Run(async () =>
             {
                 await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
-                //await DTARSolution!.DropFileCreateShape(InputFile, MouseArgs);
+                await Workspace!.DropFileCreateShape(InputFile, MouseArgs);
                 InputFile = null;
                 IsUploading = false;
             });

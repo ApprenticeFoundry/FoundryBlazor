@@ -68,7 +68,7 @@ function getFileInputContainer() {
 /*This is called whenever we have requested an animation frame*/
 function renderJS(timeStamp) {
     // Call the blazor component's [JSInvokable] RenderInBlazor method
-    theInstance.invokeMethodAsync('RenderInBlazor', timeStamp);
+    theInstance.invokeMethodAsync('RenderInBlazor');
     // request another animation frame
     window.requestAnimationFrame(renderJS);
 }

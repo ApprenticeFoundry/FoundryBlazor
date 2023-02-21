@@ -148,7 +148,7 @@ namespace FoundryBlazor.Canvas
 
 
         [JSInvokable]
-        public async ValueTask RenderInBlazor(float timeStamp)
+        public async ValueTask RenderInBlazor()
         {
             // calculate frames per second
             double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
