@@ -11,7 +11,7 @@ public class CommandManager : ComponentBase
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
-    [Inject] public IDTARSolution? DTARSolution { get; set; }
+    //[Inject] public IDTARSolution? DTARSolution { get; set; }
 
     public List<IFoCommand> AllCommands = new();
 

@@ -100,8 +100,8 @@ public class ShapeConnecting :  ShapeHovering
                 //link this in the model and force a new layout
                 var msg = new AttachAssetFileEvent()
                 {
-                    AssetFile = (FoHero2D)selectedShape,
-                    Target = (FoHero2D)found
+                    AssetFile = (FoGlyph2D)selectedShape,
+                    Target = (FoGlyph2D)found
                 };
                 pubsub?.Publish<AttachAssetFileEvent>(msg);
                 return true;

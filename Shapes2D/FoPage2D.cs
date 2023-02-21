@@ -44,7 +44,7 @@ public class FoPage2D : FoGlyph2D
     {
         GetSlot<FoShape2D>()?.Flush();
         GetSlot<FoShape1D>()?.Flush();
-        GetSlot<FoHero2D>()?.Flush();
+        //GetSlot<FoHero2D>()?.Flush();
 
         GetSlot<FoConnector1D>()?.Flush();
         GetSlot<FoText2D>()?.Flush();
@@ -77,8 +77,8 @@ public class FoPage2D : FoGlyph2D
         if (Image2D != null) result.AddRange(Image2D);
 
 
-        var Hero2D = FindWhere<FoHero2D>(child => child.GlyphId == GlyphId);
-        if (Hero2D != null) result.AddRange(Hero2D);
+        //var Hero2D = FindWhere<FoHero2D>(child => child.GlyphId == GlyphId);
+        //if (Hero2D != null) result.AddRange(Hero2D);
 
         var IDragTarget2D = FindWhere<FoDragTarget2D>(child => child.GlyphId == GlyphId);
         if (IDragTarget2D != null) result.AddRange(IDragTarget2D);
@@ -108,8 +108,8 @@ public class FoPage2D : FoGlyph2D
         var Image2D = ExtractWhere<FoImage2D>(child => child.GlyphId == GlyphId);
         if (Image2D != null) result.AddRange(Image2D);
 
-        var Hero2D = ExtractWhere<FoHero2D>(child => child.GlyphId == GlyphId);
-        if (Hero2D != null) result.AddRange(Hero2D);
+        // var Hero2D = ExtractWhere<FoHero2D>(child => child.GlyphId == GlyphId);
+        // if (Hero2D != null) result.AddRange(Hero2D);
 
         var DragTarget2D = ExtractWhere<FoDragTarget2D>(child => child.GlyphId == GlyphId);
         if (DragTarget2D != null) result.AddRange(DragTarget2D);
@@ -132,8 +132,9 @@ public class FoPage2D : FoGlyph2D
         GetMembers<FoVideo2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         GetMembers<FoGroup2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-          GetMembers<FoText2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        GetMembers<FoText2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        
+        //GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
 
         // Members<FoMenu2D>().ForEach(async child => await child.Render(ctx, tick, deep));
         GetMembers<FoCompound2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
@@ -158,10 +159,10 @@ public class FoPage2D : FoGlyph2D
         GetMembers<FoImage2D>()?.ForEach(child => child.ComputeShouldRender(region));
         GetMembers<FoVideo2D>()?.ForEach(child => child.ComputeShouldRender(region));
         GetMembers<FoGroup2D>()?.ForEach(child => child.ComputeShouldRender(region));
-        GetMembers<FoHero2D>()?.ForEach(child => child.ComputeShouldRender(region));
         GetMembers<FoShape2D>()?.ForEach(child => child.ComputeShouldRender(region));
         GetMembers<FoText2D>()?.ForEach(child => child.ComputeShouldRender(region));
-        GetMembers<FoHero2D>()?.ForEach(child => child.ComputeShouldRender(region));
-        return true;
+ 
+        //GetMembers<FoHero2D>()?.ForEach(child => child.ComputeShouldRender(region));
+         return true;
     }
 }

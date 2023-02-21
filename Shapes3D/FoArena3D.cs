@@ -49,7 +49,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     private Viewer? Viewer3D { get; set; }
     private ComponentBus PubSub { get; set; }
-    public DTARSolution? AllWorlds { get; set; }
+    //public DTARSolution? AllWorlds { get; set; }
 
     public ViewerSettings settings = new()
     {

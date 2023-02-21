@@ -116,7 +116,7 @@ public class FoRealPage2D : FoPage2D
         //$"REC {region.X} {region.Y} {region.Width} {region.Height} ---".WriteLine(ConsoleColor.Blue);
 
         //only render members inside the region
-        GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderConcise(ctx, scale, region));
+        //GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderConcise(ctx, scale, region));
    
         // draw the current window
         await ctx.SetStrokeStyleAsync("Black");
@@ -167,7 +167,8 @@ public class FoRealPage2D : FoPage2D
         GetMembers<FoGroup2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         GetMembers<FoText2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        
+        //GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
           
         // Members<FoMenu2D>().ForEach(async child => await child.Render(ctx, tick, deep));
         GetMembers<FoCompound2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
