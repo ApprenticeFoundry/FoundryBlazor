@@ -10,7 +10,7 @@ using FoundryBlazor.Canvas;
 namespace FoundryBlazor.Solutions;
 
 
-public class Playground
+public class Playgroundxxx
 {
     private IDrawing Drawing { get; set; }
     private DialogService Dialog { get; set; }
