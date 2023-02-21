@@ -35,7 +35,7 @@ public interface IWorkspace: IWorkPiece
     FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
     List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
-    List<FoWorkPiece> EstablishWorkPiece<T>() where T : FoWorkPiece;
+    FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece;
 
    Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
@@ -136,10 +136,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return Members<FoWorkPiece>();
     }
 
-    public List<FoWorkPiece> EstablishWorkPiece<T>() where T : FoWorkPiece
+    public FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece
     {
         var piece = Activator.CreateInstance(typeof(T), this, Dialog, JsRuntime) as T;
-        return AddWorkPiece(piece!);
+        AddWorkPiece(piece!);
+        return piece!;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
