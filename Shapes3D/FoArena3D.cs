@@ -24,6 +24,7 @@ namespace FoundryBlazor.Shape;
 public interface IArena
 {
     Scene GetScene();
+    Scene InitScene();
     ViewerSettings GetSettings();
     void RefreshUI();
     void SetViewer(Viewer viewer);
@@ -83,6 +84,20 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public Scene GetScene()
     {
+        return SceneManager.CurrentScene().GetScene();
+    }
+    public Scene InitScene()
+    {
+        var scene = this.GetScene();
+        if (scene != null)
+        {
+            scene.Add(new AmbientLight());
+            scene.Add(new PointLight()
+            {
+                Position = new Vector3(1, 3, 0)
+            });
+        }
+
         return SceneManager.CurrentScene().GetScene();
     }
     public ViewerSettings GetSettings()
@@ -192,7 +207,7 @@ public class FoArena3D : FoGlyph3D, IArena
         Task.Run(async () =>
         {
             await RenderToScene(world);
-            await Task.Delay(1000);
+            // await Task.Delay(1000);
             // RefreshUI();
             await Viewer3D!.UpdateScene();
         });
@@ -205,13 +220,6 @@ public class FoArena3D : FoGlyph3D, IArena
 
         var scene = GetScene();
         await Viewer3D!.ClearSceneAsync();
-
-        scene.Add(new AmbientLight());
-        scene.Add(new PointLight()
-        {
-            Position = new Vector3(1, 3, 0)
-        });
-
 
         world.platforms?.ForEach(platform =>
         {
