@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using System.Collections.Generic;
+using Radzen;
 
 namespace FoundryBlazor.Solutions;
 
@@ -33,6 +34,7 @@ public interface IWorkspace: IWorkPiece
     FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
     List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
+    List<FoWorkPiece> EstablishWorkPiece<T>() where T : FoWorkPiece;
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -54,15 +56,18 @@ public class FoWorkspace : FoComponent, IWorkspace
     private readonly string panID;
     private IToast Toast { get; set; }
     private ComponentBus PubSub { get; set; }
+    private DialogService Dialog { get; set; }
+    private IJSRuntime JsRuntime { get; set; }
 
 
-
-    public FoWorkspace(
+    public FoWorkspace (
         IToast toast,
         ICommand command,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
+        IJSRuntime js,
+        DialogService dialog,
         ComponentBus pubSub
         )
     {
@@ -73,6 +78,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         ActiveArena = arena;
         PubSub = pubSub;
         PanZoom = panzoom;
+        Dialog = dialog;
+        JsRuntime = js;
 
         var names = new MockDataGenerator();
         panID = names.GenerateName();
@@ -118,6 +125,12 @@ public class FoWorkspace : FoComponent, IWorkspace
         return Members<FoWorkPiece>();
     }
 
+    public List<FoWorkPiece> EstablishWorkPiece<T>() where T : FoWorkPiece
+    {
+        var piece = Activator.CreateInstance(typeof(T), this, Dialog, JsRuntime) as T;
+        return AddWorkPiece(piece!);
+    }
+
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
@@ -151,11 +164,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
     }
 
-    public List<FoCommand2D> GetAllCommands()
-    {
-        var list = this.Members<FoCommand2D>();
-        return list;
-    }
+
     public FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D
     {
         var commandBar = Find<FoCommand2D>(name);

@@ -388,7 +388,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         //BoidSimulation?.Advance();
 
-        //Animations.Update((float)0.033);
+        FoGlyph2D.Animations.Update((float)0.033);
 
         var wasDirty = FoGlyph2D.ResetHitTesting;
         RefreshHitTest_IfDirty();
