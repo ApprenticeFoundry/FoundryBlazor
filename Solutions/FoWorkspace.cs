@@ -163,7 +163,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return result!;
     }
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
         EstablishMenu<FoMenu2D>("View", new Dictionary<string, Action>()
         {
@@ -196,7 +196,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return commandBar!;
     }
 
-    public void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
     {
 
         var OpenDTAR = async () =>
