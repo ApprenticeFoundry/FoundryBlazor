@@ -54,7 +54,7 @@ public class Stencil : FoWorkPiece
                     }}
                 };
                 var options = new DialogOptions() { Resizable = true, Draggable = true, CloseDialogOnOverlayClick = true };
-                await Dialog.OpenAsync<BlueRectangle>("Create Square", parmas, options);
+                await Dialog.OpenAsync<BlueRectangleDialog>("Create Square", parmas, options);
             };
 
             shape.OpenCreate();
@@ -84,7 +84,7 @@ public class Stencil : FoWorkPiece
                     }}
                 };
                 var options = new DialogOptions() { Resizable = true, Draggable = true, CloseDialogOnOverlayClick = true };
-                await Dialog.OpenAsync<TextRectangle>("Create Text", parmas, options);
+                await Dialog.OpenAsync<TextRectangleDialog>("Create Text", parmas, options);
             };
 
             shape.OpenCreate();
@@ -117,7 +117,7 @@ public class Stencil : FoWorkPiece
 
             Task.Run(async () =>
             {
-                await Dialog.OpenAsync<ImageUploader>("Upload Image", parmas, options);
+                await Dialog.OpenAsync<ImageUploaderDialog>("Upload Image", parmas, options);
             });
 
         });
