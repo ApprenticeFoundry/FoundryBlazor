@@ -107,7 +107,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {InteractionStyle.ShapeSelection, new ShapeSelection(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeDragging, new ShapeDragging(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeResizing, new ShapeResizing(this, pubSub, panzoom, select, manager, hittest)},
-            //{InteractionStyle.ShapeConnecting, new ShapeConnecting(this, pubSub, panzoom, select, manager, hittest)},
+            {InteractionStyle.ShapeConnecting, new ShapeConnecting(this, pubSub, panzoom, select, manager, hittest)},
            //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
         };
 

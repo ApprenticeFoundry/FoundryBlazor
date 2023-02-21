@@ -1,8 +1,8 @@
 
 
 namespace FoundryBlazor.Shape;
-public class AttachAssetFileEvent
+public class AttachAssetFileEvent<T> where T : FoGlyph2D
 {
-    public  FoGlyph2D AssetFile { get; set; }
-    public  FoGlyph2D Target { get; set; }
+    public  T AssetFile { get; set; }
+    public  T Target { get; set; }
 }
