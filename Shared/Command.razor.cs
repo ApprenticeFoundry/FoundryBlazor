@@ -1,7 +1,5 @@
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
-using FoundryBlazor.Model;
-using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
@@ -11,7 +9,7 @@ public class CommandManager : ComponentBase
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
-    //[Inject] public IDTARSolution? DTARSolution { get; set; }
+
 
     public List<IFoCommand> AllCommands = new();
 

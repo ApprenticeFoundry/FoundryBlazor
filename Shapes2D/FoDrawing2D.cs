@@ -57,7 +57,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
-    public BoidField? BoidSimulation { get; set; }
+    //public BoidField? BoidSimulation { get; set; }
     //public MoSimulation? EdgeSimulation { get; set; }
 
     private FoPanZoomWindow? _panZoomWindow { get; set; }
