@@ -1,9 +1,8 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using BlazorComponentBus;
-
 using IoBTMessage.Models;
 
 
@@ -14,8 +13,10 @@ public class ShapeConnecting :  ShapeHovering
 {
     private bool isConnecting = false;
 
+    public Type SourceType { get; set; } = typeof(FoGlyph2D);
+    public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
-    public ShapeConnecting(
+    public ShapeConnecting (
             FoDrawing2D draw,
             ComponentBus pub,
             IPanZoomService panzoom,
@@ -74,7 +75,7 @@ public class ShapeConnecting :  ShapeHovering
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
-        var heros = findings!.Where(item => item is FoHero2D);
+        var heros = findings!.Where(item => item.GetType() == SourceType);
         var targets = heros.Where(item => item.Tag.Matches(nameof(DT_AssetFile)));
         return targets.ToList(); 
     }
@@ -82,7 +83,7 @@ public class ShapeConnecting :  ShapeHovering
     private List<FoGlyph2D> ValidDropTargets(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
-        var heros = findings!.Where(item => item is FoHero2D);
+        var heros = findings!.Where(item => item.GetType() == SourceType);
         var targets = heros.Where(item => !item.Tag.Matches(nameof(DT_AssetFile)));
         return targets.ToList(); 
     }
@@ -99,12 +100,12 @@ public class ShapeConnecting :  ShapeHovering
             if ( found != null)
             {
                 //link this in the model and force a new layout
-                var msg = new AttachAssetFileEvent<FoHero2D>()
+                var msg = new AttachAssetFileEvent<FoGlyph2D>()
                 {
-                    AssetFile = (FoHero2D)selectedShape,
-                    Target = (FoHero2D)found
+                    AssetFile = (FoGlyph2D)selectedShape,
+                    Target = (FoGlyph2D)found
                 };
-                pubsub?.Publish<AttachAssetFileEvent<FoHero2D>>(msg);
+                pubsub?.Publish<AttachAssetFileEvent<FoGlyph2D>>(msg);
                 return true;
             }
         }
