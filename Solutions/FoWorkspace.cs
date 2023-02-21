@@ -84,6 +84,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         var names = new MockDataGenerator();
         panID = names.GenerateName();
 
+
+
         $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
     }
 
