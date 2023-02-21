@@ -1,17 +1,14 @@
 
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using BlazorBoids;
 
 using BlazorComponentBus;
 using FoundryBlazor.Message;
 
 using FoundryBlazor.Solutions;
-using IoBTMessage.Models;
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen;
 using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
