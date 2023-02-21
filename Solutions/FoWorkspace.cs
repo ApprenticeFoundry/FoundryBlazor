@@ -45,23 +45,23 @@ public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
 
-    private ViewStyle viewStyle = ViewStyle.View2D;
+    protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
     public D2D_UserToast UserToast = new();
     public D2D_UserMove? UserLocation { get; set; }
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
 
-    private IDrawing? ActiveDrawing { get; init; }
-    private IArena? ActiveArena { get; init; }
+    protected IDrawing? ActiveDrawing { get; init; }
+    protected IArena? ActiveArena { get; init; }
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
 
     private readonly string panID;
-    private IToast Toast { get; set; }
-    private ComponentBus PubSub { get; set; }
-    private DialogService Dialog { get; set; }
-    private IJSRuntime JsRuntime { get; set; }
+    protected IToast Toast { get; set; }
+    protected ComponentBus PubSub { get; set; }
+    protected DialogService Dialog { get; set; }
+    protected IJSRuntime JsRuntime { get; set; }
 
     public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
 
@@ -93,7 +93,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
     }
 
-    public async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
+    public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
     {
         await OnFileDrop.Invoke(file, args);
         await Task.CompletedTask;
