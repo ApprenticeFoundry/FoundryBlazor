@@ -1,4 +1,4 @@
-using BlazorThreeJS.Events;
+
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
@@ -6,12 +6,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
-using FoundryBlazor.Services;
-using FoundryBlazor.Shared;
-using IoBTMessage.Models;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using FoundryBlazor;
+
 
 namespace FoundryBlazor.Shape;
 

@@ -1,7 +1,7 @@
 
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -47,7 +47,7 @@ public class HitTestService : IHitTestService
         //Page.GetMembers<FoConnector1D>()?.ForEach(child => Tree.Insert(child));
         Page.GetMembers<FoGroup2D>()?.ForEach(child => Tree.Insert(child));
         Page.GetMembers<FoShape2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
+        //Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
 
         Page.GetMembers<FoText2D>()?.ForEach(child => Tree.Insert(child));
         Page.GetMembers<FoImage2D>()?.ForEach(child => Tree.Insert(child));

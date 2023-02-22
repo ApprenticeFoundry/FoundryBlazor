@@ -20,7 +20,7 @@ namespace FoundryBlazor.Canvas
         /// <summary>
         /// JS Interop module used to call JavaScript
         /// </summary>
-        private Lazy<Task<IJSObjectReference>>? _moduleTask;
+        //private Lazy<Task<IJSObjectReference>>? _moduleTask;
 
         /// <summary>
         /// Used to calculate the frames per second
@@ -148,7 +148,7 @@ namespace FoundryBlazor.Canvas
 
 
         [JSInvokable]
-        public async ValueTask RenderInBlazor(float timeStamp)
+        public async ValueTask RenderInBlazor()
         {
             // calculate frames per second
             double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;

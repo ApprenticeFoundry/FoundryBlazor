@@ -1,7 +1,7 @@
 
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using IoBTMessage.Models;
+
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
@@ -12,7 +12,7 @@ public static class LayoutRules
     {
         BoxLayoutStyle.Horizontal,
         BoxLayoutStyle.Horizontal,
-        BoxLayoutStyle.HorizontalStacked,
+        BoxLayoutStyle.Horizontal,
         BoxLayoutStyle.Horizontal,
         BoxLayoutStyle.HorizontalStacked,
         BoxLayoutStyle.Horizontal,
@@ -31,7 +31,9 @@ public static class LayoutRules
     public static List<LineLayoutStyle> LineLayout { get; set; } = new()
     {
         LineLayoutStyle.Straight,
-        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.Straight,
+        LineLayoutStyle.Straight,
+        LineLayoutStyle.Straight,
         LineLayoutStyle.VerticalFirst,
     };
 };
