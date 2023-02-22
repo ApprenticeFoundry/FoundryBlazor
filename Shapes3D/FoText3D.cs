@@ -1,17 +1,17 @@
+using BlazorThreeJS.Labels;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
-using BlazorThreeJS.Labels;
-
 
 namespace FoundryBlazor.Shape;
 
 public class FoText3D : FoGlyph3D
 {
+    public string platformName { get; set; } = "";
 
     public string? Text { get; set; }
     public List<string>? Details { get; set; }
-    public FoVector3? Position { get; set; }
+    public FoVector3D? Position { get; set; }
 
     public FoText3D(string name) : base(name)
     {
@@ -19,7 +19,12 @@ public class FoText3D : FoGlyph3D
     public FoText3D(string name, string color) : base(name, color)
     {
     }
-
+    public FoText3D CreateTextAt(string text, double x, double y, double z)
+    {
+        Position = new FoVector3D(x, y, z);
+        Text = text;
+        return this;
+    }
     // public override BufferGeometry GetGeometry()
     // {
     //     if (Label == null) return base.GetGeometry();
@@ -30,7 +35,7 @@ public class FoText3D : FoGlyph3D
     //     return result;
     // }
 
-    public override FoVector3 GetPosition()
+    public override FoVector3D GetPosition()
     {
         if (Position == null) return base.GetPosition();
 
@@ -41,7 +46,15 @@ public class FoText3D : FoGlyph3D
     {
         var text = Text ?? "LabelText";
         //only in BlazorThreeJS
-        var label = new LabelText(text) { Color = "Yellow", Position = GetPosition() };
+        var label = new LabelText(text) { 
+            Color = "Yellow", 
+            //SRS Fix this Position = GetPosition() 
+        };
         ctx.Add(label);
+    }
+
+    internal FoText3D CreateTextAt(string text, double xLoc, double yLoc, double zLoc, string units)
+    {
+        throw new NotImplementedException();
     }
 }

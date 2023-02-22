@@ -12,6 +12,8 @@ namespace FoundryBlazor.Shape;
 
 public class FoGlyph3D : FoComponent
 {
+    public string uniqueGuid { get; set; } = "";
+    public string platformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
 
@@ -48,9 +50,9 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual FoVector3 GetPosition()
+    public virtual FoVector3D GetPosition()
     {
-        var result = new FoVector3(0F, 0F, 0F);
+        var result = new FoVector3D(0, 0, 0);
         return result;
     }
 
@@ -59,7 +61,7 @@ public class FoGlyph3D : FoComponent
         var result = new Mesh
         {
             Geometry = GetGeometry(viewer),
-            Position = GetPosition(),
+           //SRS Fix this Position = GetPosition(),
             Material = GetMaterial()
         };
         return result;

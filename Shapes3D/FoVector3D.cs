@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FoundryBlazor.Shapes3D;
+namespace FoundryBlazor.Shape;
 
-public class FoVector3
+public class FoVector3D
 {
     public string units = "m";
     public double X = 0;
     public double Y = 0;
     public double Z = 0;
 
-    public FoVector3()
+    public FoVector3D()
     {
     }
-
+    public FoVector3D(double xLoc, double yLoc, double zLoc)
+    {
+        this.X = xLoc;
+        this.Y = yLoc;
+        this.Z = zLoc;
+    }
 
     public double distanceXZ()
     {
@@ -28,7 +33,7 @@ public class FoVector3
     }
 
 
-    public FoVector3 copyFrom(FoVector3 pos)
+    public FoVector3D copyFrom(FoVector3D pos)
     {
         this.units = pos.units;
         this.X = pos.X;
@@ -37,7 +42,7 @@ public class FoVector3
 
         return this;
     }
-    public FoVector3 Loc(double xLoc, double yLoc, double zLoc, string units = "m")
+    public FoVector3D Loc(double xLoc, double yLoc, double zLoc, string units = "m")
     {
         this.units = units;
         this.X = xLoc;

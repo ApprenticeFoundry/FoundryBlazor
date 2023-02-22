@@ -6,223 +6,111 @@ namespace FoundryBlazor.Shape;
 
 	public class FoGroup3D : FoGlyph3D
 	{
-		public UDTO_Position position;
-		public BoundingBox boundingBox;
-		public HighResOffset offset;
+
+    	public FoVector3D position { get; set; }
+		public FoVector3D boundingBox { get; set; }
+		public FoVector3D offset { get; set; }
 
 
-		private readonly Dictionary<string, object> _lookup = new Dictionary<string, object>();
+		private readonly Dictionary<string, object> _lookup = new ();
 
-
-		public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoGroup3D():base()
 		{
-			this.name = name;
-			boundingBox = new BoundingBox()
+			CreateLookup<FoShape3D>();
+			CreateLookup<FoText3D>();
+			CreateLookup<FoDatum3D>();
+			CreateLookup<FoRelationship3D>();
+		}
+
+		public List<FoGroup3D> platforms => Members<FoGroup3D>();
+		public List<FoShape3D> bodies => Members<FoShape3D>();
+		public List<FoText3D> labels => Members<FoText3D>();
+		public List<FoRelationship3D> relationships => Members<FoRelationship3D>();
+
+    public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		{
+			this.Name = name;
+			boundingBox = new FoVector3D()
 			{
 				units = units,
-				width = width,
-				height = height,
-				depth = depth,
+				X = width,
+				Y = height,
+				Z = depth,
 			};
-			position = new UDTO_Position();
-			offset = new HighResOffset();
+			position = new FoVector3D();
+			offset = new FoVector3D();
 			return this;
 		}
 
 
 
-		public T CreateUsingDTBASE<T>(DT_Base obj) where T : FoGlyph3D
+		public T CreateUsingDTBASE<T>(FoGlyph3D obj) where T : FoGlyph3D
 		{
-			return CreateUsing<T>(obj.name, obj.guid);
+			return CreateUsing<T>(obj.Name, obj.uniqueGuid);
 		}
 
-		public UDTO_Body CreateCylinder(DT_Base obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
-			var result = CreateUsingDTBASE<UDTO_Body>(obj);
-			return result.CreateCylinder(obj.name, width, height, depth, units);
+			var result = CreateUsingDTBASE<FoShape3D>(obj);
+			return result.CreateCylinder(obj.Name, width, height, depth, units);
 		}	
 
-		public UDTO_Body CreateBlock(DT_Base obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoShape3D CreateBlock(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
-			var result = CreateUsingDTBASE<UDTO_Body>(obj);
-			return result.CreateBox(obj.name, width, height, depth, units);
+			var result = CreateUsingDTBASE<FoShape3D>(obj);
+			return result.CreateBox(obj.Name, width, height, depth, units);
 		}		
 
-		public UDTO_Body CreateSphere(DT_Base obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
-		{
-			var result = CreateUsingDTBASE<UDTO_Body>(obj);
-			return result.CreateSphere(obj.name, width, height, depth, units);
-		}	
+		//public FoShape3D CreateSphere(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		//{
+		//	var result = CreateUsingDTBASE<FoShape3D>(obj);
+		//	return result.CreateSphere(obj.Name, width, height, depth, units);
+		//}	
 
-		public UDTO_Body CreateGlb(DT_Base obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoShape3D CreateGlb(FoGlyph3D obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
-			var result = CreateUsingDTBASE<UDTO_Body>(obj);
+			var result = CreateUsingDTBASE<FoShape3D>(obj);
 			return result.CreateGlb(url, width, height, depth, units);
 		}
 
-		public UDTO_Label CreateLabel(DT_Base obj, string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
+		public FoText3D CreateLabel(FoGlyph3D obj, string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
 		{
-			var result = CreateUsingDTBASE<UDTO_Label>(obj);
+			var result = CreateUsingDTBASE<FoText3D>(obj);
 			return result.CreateTextAt(text, xLoc, yLoc, zLoc, units);
 		}
 
-#if UNITY
-		public List<UDTO_Body> bodies;
-#else
-		public List<UDTO_Body> bodies
-		{
-			get
-			{
-				return FindList<UDTO_Body>();
-			}
-			set
-			{
-				if (value != null)
-					value.ForEach(item => AddRefreshOrDelete<UDTO_Body>(item, false));
-				else
-					ClearLookup<UDTO_Body>();
-			}
-		}
-
-
-#endif
 
 
 
 
-#if UNITY
-		public List<UDTO_Label> labels;
-#else
-		public List<UDTO_Label> labels
-		{
-			get
-			{
-				return FindList<UDTO_Label>();
-			}
-			set
-			{
-				if (value != null)
-					value.ForEach(item => AddRefreshOrDelete<UDTO_Label>(item, false));
-				else
-					ClearLookup<UDTO_Label>();
-			}
-		}
-#endif
-
-#if UNITY
-		public List<UDTO_Datum> datums;
-#else
-		public List<UDTO_Datum> datums
-		{
-			get
-			{
-				return FindList<UDTO_Datum>();
-			}
-			set
-			{
-				if (value != null)
-					value.ForEach(item => AddRefreshOrDelete<UDTO_Datum>(item, false));
-				else
-					ClearLookup<UDTO_Datum>();
-			}
-		}
-#endif
 
 
-#if UNITY
-		public List<UDTO_Relationship> relationships;
-#else
-		public List<UDTO_Relationship> relationships
-		{
-			get
-			{
-				return FindList<UDTO_Relationship>();
-			}
-			set
-			{
-				if (value != null)
-					value.ForEach(item => AddRefreshOrDelete<UDTO_Relationship>(item, false));
-				else
-					ClearLookup<UDTO_Relationship>();
-			}
-		}
-#endif
-
-		public void Merge(FoGroup3D platform)
-		{
-			if (platform.position != null)
-			{
-				this.position = platform.position;
-			}
-			if (platform.boundingBox != null)
-			{
-				this.boundingBox = platform.boundingBox;
-			}
-			if (platform.offset != null)
-			{
-				this.offset = platform.offset;
-			}
-
-			platform.bodies.ForEach(body =>
-			{
-				AddRefreshOrDelete<UDTO_Body>(body);
-			});
-			platform.bodies = null;
-
-			platform.labels.ForEach(label =>
-			{
-				AddRefreshOrDelete<UDTO_Label>(label);
-			});
-			platform.labels = null;
-
-			platform.datums.ForEach(datum =>
-			{
-				AddRefreshOrDelete<UDTO_Datum>(datum);
-			});
-			platform.datums = null;
-
-			platform.relationships.ForEach(relationship =>
-			{
-				AddRefreshOrDelete<UDTO_Relationship>(relationship);
-			});
-			platform.relationships = null;
-		}
 
 
-		public FoGroup3D SetPositionTo(UDTO_Position loc)
+
+
+
+
+		public FoGroup3D SetPositionTo(FoVector3D loc)
 		{
 			position = loc;
 			return this;
 		}
 
-		public FoGroup3D()
-		{
-			CreateLookup<UDTO_Body>();
-			CreateLookup<UDTO_Label>();
-			CreateLookup<UDTO_Datum>();
-			CreateLookup<UDTO_Relationship>();
 
-			uniqueGuid = Guid.NewGuid().ToString();
-			type = UDTO_Base.asTopic<FoGroup3D>();
-		}
 
 		public FoGroup3D Flush()
 		{
-			ClearLookup<UDTO_Body>();
-			ClearLookup<UDTO_Label>();
-			ClearLookup<UDTO_Datum>();
-			ClearLookup<UDTO_Relationship>();
+			ClearLookup<FoShape3D>();
+			ClearLookup<FoText3D>();
+			ClearLookup<FoDatum3D>();
+			ClearLookup<FoRelationship3D>();
 			return this;
 		}
 
-		public FoGroup3D AsShallowCopy()
-		{
-			var result = (FoGroup3D)this.MemberwiseClone();
-			result.Flush();
-			return result;
-		}
 
-		public U RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : UDTO_Relationship
+
+		public U RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
 		{
 			var tag = $"{source.uniqueGuid}:{name}";
 			var relationship = Find<U>(tag);
@@ -239,7 +127,7 @@ namespace FoundryBlazor.Shape;
 			return relationship;
 		}
 
-		public U UnrelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : UDTO_Relationship
+		public U UnrelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
 		{
 			var tag = $"{source.uniqueGuid}:{name}";
 			var relationship = Find<U>(tag);
@@ -275,21 +163,15 @@ namespace FoundryBlazor.Shape;
 		private T CreateItem<T>(string name) where T : FoGlyph3D
 		{
 			var found = Activator.CreateInstance<T>() as T;
-			found.name = name;
-			found.panID = panID;
+			found.Name = name;
 			found.platformName = platformName;
 			found.uniqueGuid = Guid.NewGuid().ToString();
 			return found;
 		}
 
-		public T Find<T>(string name) where T : FoGlyph3D
-		{
-			var dict = FindLookup<T>();
-			dict.TryGetValue(name, out T found);
-			return found;
-		}
 
-		public T CreateUsing<T>(string name, string guid = null) where T : FoGlyph3D
+
+		public T CreateUsing<T>(string name, string? guid = null) where T : FoGlyph3D
 		{
 			var found = FindOrCreate<T>(name,true);
 			if ( guid != null) 
@@ -311,35 +193,7 @@ namespace FoundryBlazor.Shape;
 			return found;
 		}
 
-		public T Add<T>(T obj) where T : FoGlyph3D
-		{
-			var dict = FindLookup<T>();
-			var key = obj.name;
-			dict[key] = obj;
-			return obj;
-		}
-		public T AddRefreshOrDelete<T>(T obj, bool delete = false) where T : FoGlyph3D
-		{
-			var key = obj.name;
-			var dict = FindLookup<T>();
-			if (dict.TryGetValue(key, out T found))
-			{
-				if (delete)
-				{
-					dict.Remove(key);
-				}
-				else
-				{
-					found.CopyFrom(obj);
-				}
-			}
-			else if (!delete)
-			{
-				dict[key] = obj;
-				found = obj;
-			}
-			return found;
-		}
+
 
 	}
 
