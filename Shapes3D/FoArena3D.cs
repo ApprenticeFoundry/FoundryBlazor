@@ -196,43 +196,6 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public DT_World3D MakeFakeWorld()
-    {
-        var platform = new UDTO_Platform()
-        {
-            uniqueGuid = Guid.NewGuid().ToString(),
-            platformName = "RonTest",
-            name = "RonTest"
-        };
-        platform.EstablishBox("Platform", 1, 1, 1);
-
-        var largeBlock = platform.CreateUsing<UDTO_Body>("LargeBlock").CreateBox("Large", 3, 1, 2);
-        largeBlock.position = new HighResPosition();
-
-        var smallBlock = platform.CreateUsing<UDTO_Body>("SmallBlock").CreateBox("SmallBlock", 1.5, .5, 1);
-        smallBlock.position = new HighResPosition()
-        {
-            xLoc = -2.25,  //might need to changes sign
-            yLoc = 0.75,
-            zLoc = 1.5,
-            xAng = Math.PI / 180 * 0,
-        };
-
-        platform.CreateUsing<UDTO_Label>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0)
-            .position = new HighResPosition();
-
-
-        var world = new DT_World3D()
-        {
-            title = "Sample world",
-            description = "First test of Canvas 3D"
-        };
-        world.FillWorldFromPlatform(platform);
-
-
-        return world;
-    }
-
     public void RenderWorld(DT_World3D? world)
     {
         if (world == null) return;
