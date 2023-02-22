@@ -48,9 +48,9 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual Vector3 GetPosition()
+    public virtual FoVector3 GetPosition()
     {
-        var result = new Vector3(0F, 0F, 0F);
+        var result = new FoVector3(0F, 0F, 0F);
         return result;
     }
 

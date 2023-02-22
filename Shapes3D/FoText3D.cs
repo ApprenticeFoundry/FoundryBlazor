@@ -2,14 +2,16 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Labels;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
 public class FoText3D : FoGlyph3D
 {
 
-    public UDTO_Label? Label { get; set; }
+    public string? Text { get; set; }
+    public List<string>? Details { get; set; }
+    public FoVector3? Position { get; set; }
 
     public FoText3D(string name) : base(name)
     {
@@ -28,17 +30,16 @@ public class FoText3D : FoGlyph3D
     //     return result;
     // }
 
-    public override Vector3 GetPosition()
+    public override FoVector3 GetPosition()
     {
-        if (Label == null) return base.GetPosition();
+        if (Position == null) return base.GetPosition();
 
-        var pos = Label.position;
-        var result = new Vector3((float)pos.xLoc, (float)pos.yLoc, (float)pos.zLoc);
+        var result = Position;
         return result;
     }
     public override void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
     {
-        var text = Label?.text ?? "Our Canvas Text";
+        var text = Text ?? "LabelText";
         //only in BlazorThreeJS
         var label = new LabelText(text) { Color = "Yellow", Position = GetPosition() };
         ctx.Add(label);

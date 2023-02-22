@@ -9,13 +9,18 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
 public class FoShape3D : FoGlyph3D
 {
-    public UDTO_Body? Body { get; set; }
+    public string? Symbol { get; set; }
+    public string? Type { get; set; }
+    public FoVector3? Position { get; set; }
+    public FoVector3? Rotation { get; set; }
+    public FoVector3? Origin { get; set; }
+    public FoVector3? BoundingBox { get; set; }
 
     public FoShape3D(string name) : base(name)
     {
@@ -36,24 +41,24 @@ public class FoShape3D : FoGlyph3D
     //     Cylinder: this.makeCylinder3D.bind(this)
     // };
 
-    private BufferGeometry NotImplemented(UDTO_Body body)
+    private BufferGeometry NotImplemented()
     {
-        $"symbol [{body.symbol}] Body type [{body.type}] NotImplemented".WriteLine();
+        $"symbol [{Symbol}] Body type [{Type}] NotImplemented".WriteLine();
         return (BufferGeometry)(new BoxGeometry(1F, 1F, 1F));
     }
 
-    private BufferGeometry Box(UDTO_Body body)
+    private BufferGeometry Box()
     {
-        var box = body.boundingBox;
-        return (BufferGeometry)(new BoxGeometry((float)box.width, (float)box.height, (float)box.depth));
+        var box = BoundingBox ?? new FoVector3(1,1,1);
+        return (BufferGeometry)(new BoxGeometry((float)box.X, (float)box.Y, (float)box.depth));
     }
-    private BufferGeometry Cylinder(UDTO_Body body)
+    private BufferGeometry Cylinder()
     {
-        var box = body.boundingBox;
+        var box = BoundingBox ?? new FoVector3(1,1,1);
         return (BufferGeometry)(new CylinderGeometry(radiusTop: (float)box.width / 2, height: (float)box.height, radialSegments: 16));
     }
 
-    private BufferGeometry Glb(Viewer viewer, UDTO_Body body)
+    private BufferGeometry Glb(Viewer viewer)
     {
 
         var url = body.symbol.Replace("http", "https");
@@ -67,7 +72,7 @@ public class FoShape3D : FoGlyph3D
         {
             Format = Import3DFormats.Gltf,
             FileURL = url,
-            Position = new Vector3((float)pos.xLoc, (float)pos.yLoc, (float)pos.zLoc)
+            Position = pos
         };
 
         Task.Run(async () =>
@@ -77,7 +82,7 @@ public class FoShape3D : FoGlyph3D
             $"GLB guid [{guid}] ".WriteLine();
         });
 
-        var box = body.boundingBox;
+        var box = BoundingBox ?? new FoVector3(1,1,1);
         return (BufferGeometry)(new BoxGeometry((float)0, (float)0, (float)0));
     }
 
@@ -102,10 +107,10 @@ public class FoShape3D : FoGlyph3D
 
         var result = Body.type switch
         {
-            "Box" => Box(Body),
-            "Cylinder" => Cylinder(Body),
-            "Glb" => Glb(viewer, Body),
-            _ => NotImplemented(Body)
+            "Box" => Box(),
+            "Cylinder" => Cylinder(),
+            "Glb" => Glb(viewer),
+            _ => NotImplemented()
         };
 
         return result;
