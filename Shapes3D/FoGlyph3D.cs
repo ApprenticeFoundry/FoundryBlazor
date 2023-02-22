@@ -61,7 +61,7 @@ public class FoGlyph3D : FoComponent
         var result = new Mesh
         {
             Geometry = GetGeometry(viewer),
-           //SRS Fix this Position = GetPosition(),
+            Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
         return result;

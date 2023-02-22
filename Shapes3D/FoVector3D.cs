@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+using BlazorThreeJS.Maths;
 namespace FoundryBlazor.Shape;
 
 public class FoVector3D
@@ -20,6 +16,11 @@ public class FoVector3D
         this.X = xLoc;
         this.Y = yLoc;
         this.Z = zLoc;
+    }
+
+    public Vector3 AsVector3()
+    {
+        return new Vector3(X, Y, Z);
     }
 
     public double distanceXZ()

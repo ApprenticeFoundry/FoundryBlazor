@@ -75,8 +75,8 @@ public class FoArena3D : FoGlyph3D, IArena
         JsRuntime = jsRuntime;
         PubSub = pubSub;
 
-        // var world = MakeWorld();
-        // RenderWorld(world);
+        var world = MakeWorld();
+        RenderWorld(world);
 
         // FillScene();
     }
@@ -211,10 +211,15 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public async Task RenderToScene(FoWorld3D? world)
     {
+        $"world={world}".WriteInfo();
         if (world == null) return;
 
         var scene = GetScene();
+        $"scene={scene}".WriteInfo();
         await Viewer3D!.ClearSceneAsync();
+        $"cleared scene".WriteInfo();
+
+        $"Platforms Count={world.platforms.Count}".WriteInfo();
 
         world.platforms?.ForEach(platform =>
         {

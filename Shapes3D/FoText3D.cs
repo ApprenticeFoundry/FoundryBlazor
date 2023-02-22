@@ -13,6 +13,9 @@ public class FoText3D : FoGlyph3D
     public List<string>? Details { get; set; }
     public FoVector3D? Position { get; set; }
 
+    public FoText3D() : base()
+    {
+    }
     public FoText3D(string name) : base(name)
     {
     }
@@ -46,9 +49,10 @@ public class FoText3D : FoGlyph3D
     {
         var text = Text ?? "LabelText";
         //only in BlazorThreeJS
-        var label = new LabelText(text) { 
-            Color = "Yellow", 
-            //SRS Fix this Position = GetPosition() 
+        var label = new LabelText(text)
+        {
+            Color = "Yellow",
+            Position = GetPosition().AsVector3()
         };
         ctx.Add(label);
     }

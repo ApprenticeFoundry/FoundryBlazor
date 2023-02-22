@@ -2,10 +2,9 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
 using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Scenes;
-
+using BlazorThreeJS.Maths;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
@@ -23,6 +22,9 @@ public class FoShape3D : FoGlyph3D
     public FoVector3D? Origin { get; set; }
     public FoVector3D? BoundingBox { get; set; }
 
+    public FoShape3D() : base()
+    {
+    }
     public FoShape3D(string name) : base(name)
     {
     }
@@ -56,7 +58,7 @@ public class FoShape3D : FoGlyph3D
 
 
 
-    public FoShape3D CreateBox(string name, double width, double height, double depth, string units="m")
+    public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
     {
         BoundingBox = new FoVector3D(width, height, depth)
         {
@@ -78,7 +80,7 @@ public class FoShape3D : FoGlyph3D
 
     private BufferGeometry Cylinder()
     {
-        var box = BoundingBox ?? new FoVector3D(1,1,1);
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
         return (BufferGeometry)(new CylinderGeometry(radiusTop: (float)box.X / 2, height: (float)box.Y, radialSegments: 16));
     }
 
@@ -95,7 +97,7 @@ public class FoShape3D : FoGlyph3D
         {
             Format = Import3DFormats.Gltf,
             FileURL = url ?? "",
-            //SRS Fix this Position = Position
+            Position = Position?.AsVector3() ?? new Vector3()
         };
 
         Task.Run(async () =>
@@ -105,7 +107,7 @@ public class FoShape3D : FoGlyph3D
             $"GLB guid [{guid}] ".WriteLine();
         });
 
-        var box = BoundingBox ?? new FoVector3D(1,1,1);
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
         return (BufferGeometry)(new BoxGeometry((float)0, (float)0, (float)0));
     }
 
