@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,6 @@
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
     <PackageReference Include="BlazorThreeJS" Version="0.0.0.24" />
     <PackageReference Include="IoBTMessageLibrary" Version="7.9.0" />
-    <PackageReference Include="IoBTModuleLibrary" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.7.1" />
