@@ -43,14 +43,14 @@ public class FoArena3D : FoGlyph3D, IArena
     private IToast Toast { get; set; }
     private ICommand Command { get; set; }
     private IJSRuntime JsRuntime { get; set; }
-    //private IRestAPIServiceDTAR DTARRestService { get; set; }
+
     private ISceneManagement SceneManager { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
     private Viewer? Viewer3D { get; set; }
     private ComponentBus PubSub { get; set; }
-    //public DTARSolution? AllWorlds { get; set; }
+
 
     public ViewerSettings settings = new()
     {
@@ -159,7 +159,7 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public DT_World3D MakeWorld()
+    public DT_World3D MakeFakeWorld()
     {
         var platform = new UDTO_Platform()
         {
@@ -206,11 +206,9 @@ public class FoArena3D : FoGlyph3D, IArena
         Task.Run(async () =>
         {
             await RenderToScene(world);
-            // await Task.Delay(1000);
-            // RefreshUI();
             await Viewer3D!.UpdateScene();
         });
-        // RefreshUI();
+
     }
 
     public async Task RenderToScene(DT_World3D? world)
