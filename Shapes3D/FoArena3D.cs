@@ -159,7 +159,7 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public DT_World3D MakeFakeWorld()
+    public DT_World3D MakeWorld()
     {
         var platform = new UDTO_Platform()
         {
