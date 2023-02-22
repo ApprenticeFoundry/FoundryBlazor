@@ -2,7 +2,7 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 public class FoRealPage2D : FoPage2D

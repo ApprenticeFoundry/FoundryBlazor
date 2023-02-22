@@ -1,7 +1,7 @@
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
-using IoBTMessage.Models;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;

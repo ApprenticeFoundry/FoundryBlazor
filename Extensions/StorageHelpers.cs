@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using IoBTMessage.Models;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -105,25 +105,7 @@ public static class StorageHelpers
         return result!;
     }
 
-    public static ContextWrapper<T> HydrateWrapper<T>(string target, bool includeFields) where T : class
-    {
-        using var stream = new MemoryStream();
-        using var writer = new Utf8JsonWriter(stream);
-        var node = JsonNode.Parse(target);
-        node?.WriteTo(writer);
-        writer.Flush();
 
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Deserialize<ContextWrapper<T>>(stream.ToArray(), options) as ContextWrapper<T>;
-
-        return result!;
-    }
 
 
 

@@ -13,11 +13,12 @@ using BlazorComponentBus;
 using FoundryBlazor.PubSub;
 
 using FoundryBlazor.Shared;
-using IoBTMessage.Models;
+
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FoundryBlazor.Canvas;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 

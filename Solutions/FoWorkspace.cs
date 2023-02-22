@@ -5,7 +5,7 @@ using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using IoBTMessage.Models;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -44,7 +44,7 @@ public interface IWorkspace: IWorkPiece
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
-
+    public string PanID { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
@@ -57,7 +57,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
 
-    private readonly string panID;
+
     protected IToast Toast { get; set; }
     protected ComponentBus PubSub { get; set; }
     protected DialogService Dialog { get; set; }
@@ -86,11 +86,6 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
-
-        var names = new MockDataGenerator();
-        panID = names.GenerateName();
-
-        $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
     }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
@@ -117,7 +112,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public string GetPanID()
     {
-        return panID;
+        return PanID;
     }
 
     public IDrawing? GetDrawing()
@@ -284,7 +279,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, panID);
+        Command.SetHub(hub, PanID);
 
         hub.Closed += async (error) =>
        {
@@ -366,7 +361,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var destroy = new D2D_Destroy()
         {
-            PanID = panID,
+            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name
         };
@@ -380,7 +375,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var move = new D2D_Move()
         {
-            PanID = panID,
+            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name,
             PinX = shape.PinX,
@@ -410,7 +405,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         Task.Run(async () =>
         {
-            msg.PanID = this.panID;
+            msg.PanID = this.PanID;
             await Command.Send(msg);
         });
         return msg;

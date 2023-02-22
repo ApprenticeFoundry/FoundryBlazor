@@ -26,8 +26,8 @@
     <Reference Include="IoBTMessageLibrary">
       <HintPath>otherdlls\IoBTMessageLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="IoBTModuleLibrary">
+    <!-- <Reference Include="IoBTModuleLibrary">
       <HintPath>otherdlls\IoBTModuleLibrary.dll</HintPath>
-    </Reference>
+    </Reference> -->
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
 
 
 namespace FoundryBlazor.Shape;
@@ -76,15 +76,15 @@ public class ShapeConnecting :  ShapeHovering
     {
         var findings = pageManager?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
-        var targets = heros.Where(item => item.Tag.Matches(nameof(DT_AssetFile)));
+        var targets = heros.Where(item => item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 
     }
 
-    private List<FoGlyph2D> ValidDropTargets(Rectangle rect)
+    private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
-        var targets = heros.Where(item => !item.Tag.Matches(nameof(DT_AssetFile)));
+        var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 
     }
 
@@ -94,7 +94,7 @@ public class ShapeConnecting :  ShapeHovering
         {
             isConnecting = false;
             var over = panZoomService.HitRectStart(args);
-            var findings = ValidDropTargets(over);
+            var findings = ValidDropTarget(over);
             var found = findings!.Where(item => item != selectedShape).FirstOrDefault();
 
             if ( found != null)
@@ -122,7 +122,7 @@ public class ShapeConnecting :  ShapeHovering
         }
 
         var over = panZoomService.HitRectStart(args);
-        var found = ValidDropTargets(over);
+        var found = ValidDropTarget(over);
 
         lastHover?.ForEach(child => child.HoverDraw = null);
 

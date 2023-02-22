@@ -2,7 +2,7 @@ using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
 using Unglide;
 
 namespace FoundryBlazor.Shape;
