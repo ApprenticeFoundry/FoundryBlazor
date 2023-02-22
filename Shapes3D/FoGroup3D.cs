@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FoundryBlazor.Shape;
 
-	public class UDTO_Platform : FoGlyph3D
+	public class FoGroup3D : FoGlyph3D
 	{
 		public UDTO_Position position;
 		public BoundingBox boundingBox;
@@ -14,7 +14,7 @@ namespace FoundryBlazor.Shape;
 		private readonly Dictionary<string, object> _lookup = new Dictionary<string, object>();
 
 
-		public UDTO_Platform EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
 			this.name = name;
 			boundingBox = new BoundingBox()
@@ -31,7 +31,7 @@ namespace FoundryBlazor.Shape;
 
 
 
-		public T CreateUsingDTBASE<T>(DT_Base obj) where T : UDTO_3D
+		public T CreateUsingDTBASE<T>(DT_Base obj) where T : FoGlyph3D
 		{
 			return CreateUsing<T>(obj.name, obj.guid);
 		}
@@ -148,7 +148,7 @@ namespace FoundryBlazor.Shape;
 		}
 #endif
 
-		public void Merge(UDTO_Platform platform)
+		public void Merge(FoGroup3D platform)
 		{
 			if (platform.position != null)
 			{
@@ -189,13 +189,13 @@ namespace FoundryBlazor.Shape;
 		}
 
 
-		public UDTO_Platform SetPositionTo(UDTO_Position loc)
+		public FoGroup3D SetPositionTo(UDTO_Position loc)
 		{
 			position = loc;
 			return this;
 		}
 
-		public UDTO_Platform()
+		public FoGroup3D()
 		{
 			CreateLookup<UDTO_Body>();
 			CreateLookup<UDTO_Label>();
@@ -203,10 +203,10 @@ namespace FoundryBlazor.Shape;
 			CreateLookup<UDTO_Relationship>();
 
 			uniqueGuid = Guid.NewGuid().ToString();
-			type = UDTO_Base.asTopic<UDTO_Platform>();
+			type = UDTO_Base.asTopic<FoGroup3D>();
 		}
 
-		public UDTO_Platform Flush()
+		public FoGroup3D Flush()
 		{
 			ClearLookup<UDTO_Body>();
 			ClearLookup<UDTO_Label>();
@@ -215,14 +215,14 @@ namespace FoundryBlazor.Shape;
 			return this;
 		}
 
-		public UDTO_Platform AsShallowCopy()
+		public FoGroup3D AsShallowCopy()
 		{
-			var result = (UDTO_Platform)this.MemberwiseClone();
+			var result = (FoGroup3D)this.MemberwiseClone();
 			result.Flush();
 			return result;
 		}
 
-		public U RelateMembers<U>(UDTO_3D source, string name, UDTO_3D target) where U : UDTO_Relationship
+		public U RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : UDTO_Relationship
 		{
 			var tag = $"{source.uniqueGuid}:{name}";
 			var relationship = Find<U>(tag);
@@ -239,7 +239,7 @@ namespace FoundryBlazor.Shape;
 			return relationship;
 		}
 
-		public U UnrelateMembers<U>(UDTO_3D source, string name, UDTO_3D target) where U : UDTO_Relationship
+		public U UnrelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : UDTO_Relationship
 		{
 			var tag = $"{source.uniqueGuid}:{name}";
 			var relationship = Find<U>(tag);
@@ -248,31 +248,31 @@ namespace FoundryBlazor.Shape;
 			return relationship;
 		}
 
-		private Dictionary<string, T> CreateLookup<T>() where T : UDTO_3D
+		private Dictionary<string, T> CreateLookup<T>() where T : FoGlyph3D
 		{
 			var result = new Dictionary<string, T>();
 			_lookup.Add(typeof(T).Name, result);
 			return result;
 		}
-		private Dictionary<string, T> FindLookup<T>() where T : UDTO_3D
+		private Dictionary<string, T> FindLookup<T>() where T : FoGlyph3D
 		{
 			var result = _lookup[typeof(T).Name] as Dictionary<string, T>;
 			return result;
 		}
 
-		public List<T> FindList<T>() where T : UDTO_3D
+		public List<T> FindList<T>() where T : FoGlyph3D
 		{
 			var lookup = FindLookup<T>();
 			return lookup.Values.ToList();
 		}
 
-		private void ClearLookup<T>() where T : UDTO_3D
+		private void ClearLookup<T>() where T : FoGlyph3D
 		{
 			var result = FindLookup<T>();
 			result.Clear();
 		}
 
-		private T CreateItem<T>(string name) where T : UDTO_3D
+		private T CreateItem<T>(string name) where T : FoGlyph3D
 		{
 			var found = Activator.CreateInstance<T>() as T;
 			found.name = name;
@@ -282,14 +282,14 @@ namespace FoundryBlazor.Shape;
 			return found;
 		}
 
-		public T Find<T>(string name) where T : UDTO_3D
+		public T Find<T>(string name) where T : FoGlyph3D
 		{
 			var dict = FindLookup<T>();
 			dict.TryGetValue(name, out T found);
 			return found;
 		}
 
-		public T CreateUsing<T>(string name, string guid = null) where T : UDTO_3D
+		public T CreateUsing<T>(string name, string guid = null) where T : FoGlyph3D
 		{
 			var found = FindOrCreate<T>(name,true);
 			if ( guid != null) 
@@ -300,7 +300,7 @@ namespace FoundryBlazor.Shape;
 			return found;
 		}
 
-		public T FindOrCreate<T>(string name, bool create = false) where T : UDTO_3D
+		public T FindOrCreate<T>(string name, bool create = false) where T : FoGlyph3D
 		{
 			var dict = FindLookup<T>();
 			if (!dict.TryGetValue(name, out T found) && create)
@@ -311,14 +311,14 @@ namespace FoundryBlazor.Shape;
 			return found;
 		}
 
-		public T Add<T>(T obj) where T : UDTO_3D
+		public T Add<T>(T obj) where T : FoGlyph3D
 		{
 			var dict = FindLookup<T>();
 			var key = obj.name;
 			dict[key] = obj;
 			return obj;
 		}
-		public T AddRefreshOrDelete<T>(T obj, bool delete = false) where T : UDTO_3D
+		public T AddRefreshOrDelete<T>(T obj, bool delete = false) where T : FoGlyph3D
 		{
 			var key = obj.name;
 			var dict = FindLookup<T>();

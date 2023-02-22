@@ -31,8 +31,8 @@ public interface IArena
     void SetViewer(Viewer viewer);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    void RenderWorld(DT_World3D? world);
-    DT_World3D MakeWorld();
+    void RenderWorld(FoWorld3D? world);
+    FoWorld3D MakeWorld();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -159,9 +159,9 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public DT_World3D MakeWorld()
+    public FoWorld3D MakeWorld()
     {
-        var platform = new UDTO_Platform()
+        var platform = new FoGroup3D()
         {
             uniqueGuid = Guid.NewGuid().ToString(),
             platformName = "RonTest",
@@ -185,7 +185,7 @@ public class FoArena3D : FoGlyph3D, IArena
             .position = new HighResPosition();
 
 
-        var world = new DT_World3D()
+        var world = new FoWorld3D()
         {
             title = "Sample world",
             description = "First test of Canvas 3D"
@@ -196,7 +196,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public void RenderWorld(DT_World3D? world)
+    public void RenderWorld(FoWorld3D? world)
     {
         if (world == null) return;
         world.FillPlatforms();
@@ -211,7 +211,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     }
 
-    public async Task RenderToScene(DT_World3D? world)
+    public async Task RenderToScene(FoWorld3D? world)
     {
         if (world == null) return;
 

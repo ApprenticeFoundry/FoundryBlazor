@@ -4,36 +4,25 @@ using System.Linq;
 using IoBTMessage.Extensions;
 
 
+namespace FoundryBlazor.Shape;
 
-namespace IoBTMessage.Models
-{
 
-	public class DO_World3D : DO_Hero
-	{
-		public string systemName { get; set; }
-
-		public List<SPEC_Platform> platforms { get; set; } = new List<SPEC_Platform>();
-		public List<SPEC_Body> bodies { get; set; } = new List<SPEC_Body>();
-		public List<SPEC_Label> labels { get; set; } = new List<SPEC_Label>();
-		public List<SPEC_Relationship> relationships { get; set; } = new List<SPEC_Relationship>();
-	}
-
-	public class DT_World3D : DT_Hero, ISystem
+	public class FoWorld3D : FoGlyph3D
 	{
 		public string systemName;
 
-		public List<UDTO_Platform> platforms = new List<UDTO_Platform>();
+		public List<FoGroup3D> platforms = new List<FoGroup3D>();
 		public List<UDTO_Body> bodies = new List<UDTO_Body>();
 		public List<UDTO_Label> labels = new List<UDTO_Label>();
-		public List<UDTO_Relationship> relationships = new List<UDTO_Relationship>();
+		public List<FoRelationship3D> relationships = new List<FoRelationship3D>();
 
-		public DT_World3D()
+		public FoWorld3D()
 		{
 		}
 
-		public DT_World3D ShallowCopy()
+		public FoWorld3D ShallowCopy()
 		{
-			var result = (DT_World3D)this.MemberwiseClone();
+			var result = (FoWorld3D)this.MemberwiseClone();
 			result.platforms = null;
 			result.bodies = null;
 			result.labels = null;
@@ -42,7 +31,7 @@ namespace IoBTMessage.Models
 			return result;
 		}
 
-		public T Find<T>(string name) where T : UDTO_3D
+		public T Find<T>(string name) where T : FoGlyph3D
 		{
 			if (typeof(T).Name.Matches(nameof(UDTO_Body)))
 				return bodies?.FirstOrDefault(item => item.name.Matches(name)) as T;
@@ -50,13 +39,13 @@ namespace IoBTMessage.Models
 			if (typeof(T).Name.Matches(nameof(UDTO_Label)))
 				return labels?.FirstOrDefault(item => item.name.Matches(name)) as T;
 
-			if (typeof(T).Name.Matches(nameof(UDTO_Platform)))
+			if (typeof(T).Name.Matches(nameof(FoGroup3D)))
 				return platforms?.FirstOrDefault(item => item.name.Matches(name)) as T;
 
 			return null;
 		}
 
-		public T FindReferenceDesignation<T>(string name) where T : UDTO_3D
+		public T FindReferenceDesignation<T>(string name) where T : FoGlyph3D
 		{
 			if (typeof(T).Name.Matches(nameof(UDTO_Body)))
 				return bodies?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
@@ -64,19 +53,19 @@ namespace IoBTMessage.Models
 			if (typeof(T).Name.Matches(nameof(UDTO_Label)))
 				return labels?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
 
-			if (typeof(T).Name.Matches(nameof(UDTO_Platform)))
+			if (typeof(T).Name.Matches(nameof(FoGroup3D)))
 				return platforms?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
 
 			return null;
 		}
 
-		public DT_World3D FlushPlatforms()
+		public FoWorld3D FlushPlatforms()
 		{
 			platforms.ForEach(platform => platform.Flush());
 			return this;
 		}
 
-		public List<UDTO_Platform> FillPlatforms()
+		public List<FoGroup3D> FillPlatforms()
 		{
 			platforms.ForEach(platform =>
 			{
@@ -93,7 +82,7 @@ namespace IoBTMessage.Models
 			return this.platforms;
 		}
 
-		public DT_World3D FillWorldFromPlatform(UDTO_Platform platform)
+		public FoWorld3D FillWorldFromPlatform(FoGroup3D platform)
 		{
 			platforms.Add(platform);
 			bodies.AddRange(platform.bodies);
@@ -102,7 +91,7 @@ namespace IoBTMessage.Models
 			return RemoveDuplicates();
 		}
 
-		public DT_World3D FillWorldFromWorld(DT_World3D world)
+		public FoWorld3D FillWorldFromWorld(FoWorld3D world)
 		{
 			platforms.AddRange(world.platforms);
 			bodies.AddRange(world.bodies);
@@ -111,7 +100,7 @@ namespace IoBTMessage.Models
 			return RemoveDuplicates();
 		}
 
-		public DT_World3D RemoveDuplicates()
+		public FoWorld3D RemoveDuplicates()
 		{
 			platforms = platforms.DistinctBy(i => i.uniqueGuid).ToList();
 			bodies = bodies.DistinctBy(i => i.uniqueGuid).ToList();
@@ -125,4 +114,3 @@ namespace IoBTMessage.Models
 			return this;
 		}
 	}
-}
