@@ -9,15 +9,16 @@ using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 
 using BlazorComponentBus;
-using FoundryBlazor.Model;
+
 using FoundryBlazor.PubSub;
-using FoundryBlazor.Services;
+
 using FoundryBlazor.Shared;
-using IoBTMessage.Models;
+
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FoundryBlazor.Canvas;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 
@@ -42,14 +43,14 @@ public class FoArena3D : FoGlyph3D, IArena
     private IToast Toast { get; set; }
     private ICommand Command { get; set; }
     private IJSRuntime JsRuntime { get; set; }
-    private IRestAPIServiceDTAR DTARRestService { get; set; }
+
     private ISceneManagement SceneManager { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
     private Viewer? Viewer3D { get; set; }
     private ComponentBus PubSub { get; set; }
-    public DTARSolution? AllWorlds { get; set; }
+
 
     public ViewerSettings settings = new()
     {
@@ -64,14 +65,12 @@ public class FoArena3D : FoGlyph3D, IArena
     public FoArena3D(
         ICommand cmd,
         IToast toast,
-        IRestAPIServiceDTAR rest,
         ISceneManagement sceneManagement,
         ComponentBus pubSub,
         IJSRuntime jsRuntime)
     {
         Command = cmd;
         Toast = toast;
-        DTARRestService = rest;
         SceneManager = sceneManagement;
         JsRuntime = jsRuntime;
         PubSub = pubSub;
@@ -160,7 +159,7 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public DT_World3D MakeWorld()
+    public DT_World3D MakeFakeWorld()
     {
         var platform = new UDTO_Platform()
         {
@@ -207,11 +206,9 @@ public class FoArena3D : FoGlyph3D, IArena
         Task.Run(async () =>
         {
             await RenderToScene(world);
-            // await Task.Delay(1000);
-            // RefreshUI();
             await Viewer3D!.UpdateScene();
         });
-        // RefreshUI();
+
     }
 
     public async Task RenderToScene(DT_World3D? world)

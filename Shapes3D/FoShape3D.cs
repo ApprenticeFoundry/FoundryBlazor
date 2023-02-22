@@ -5,10 +5,11 @@ using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Scenes;
-using IoBTMessage.Models;
+
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 

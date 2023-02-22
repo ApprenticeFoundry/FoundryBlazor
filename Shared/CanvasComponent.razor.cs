@@ -1,14 +1,11 @@
-using System.Drawing;
 using Blazor.Extensions;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using FoundryBlazor.Model;
 
 using FoundryBlazor.Solutions;
-using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -18,7 +15,6 @@ namespace FoundryBlazor.Shared;
 public class CanvasComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
-    [Inject] public IDTARSolution? DTARSolution { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     private int tick = 0;
@@ -76,7 +72,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
             Task.Run(async () =>
             {
                 await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
-                await DTARSolution!.DropFileCreateShape(InputFile, MouseArgs);
+                await Workspace!.DropFileCreateShape(InputFile, MouseArgs);
                 InputFile = null;
                 IsUploading = false;
             });

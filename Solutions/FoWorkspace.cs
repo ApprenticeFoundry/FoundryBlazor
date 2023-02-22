@@ -1,14 +1,16 @@
-using FoundryBlazor.Canvas;
+using System.Collections.Generic;
 using BlazorComponentBus;
+using FoundryBlazor.Canvas;
+using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System.Collections.Generic;
+using Radzen;
 
 namespace FoundryBlazor.Solutions;
 
@@ -33,36 +35,45 @@ public interface IWorkspace: IWorkPiece
     FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
     List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
+    FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece;
+
+   Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
+
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
-
-    private ViewStyle viewStyle = ViewStyle.View2D;
+    public string PanID { get; set; } = "";
+    protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
     public D2D_UserToast UserToast = new();
     public D2D_UserMove? UserLocation { get; set; }
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
 
-    private IDrawing? ActiveDrawing { get; init; }
-    private IArena? ActiveArena { get; init; }
+    protected IDrawing? ActiveDrawing { get; init; }
+    protected IArena? ActiveArena { get; init; }
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
 
-    private readonly string panID;
-    private IToast Toast { get; set; }
-    private ComponentBus PubSub { get; set; }
+
+    protected IToast Toast { get; set; }
+    protected ComponentBus PubSub { get; set; }
+    protected DialogService Dialog { get; set; }
+    protected IJSRuntime JsRuntime { get; set; }
+
+    public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
 
 
-
-    public FoWorkspace(
+    public FoWorkspace (
         IToast toast,
         ICommand command,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
+        IJSRuntime js,
+        DialogService dialog,
         ComponentBus pubSub
         )
     {
@@ -73,13 +84,15 @@ public class FoWorkspace : FoComponent, IWorkspace
         ActiveArena = arena;
         PubSub = pubSub;
         PanZoom = panzoom;
-
-        var names = new MockDataGenerator();
-        panID = names.GenerateName();
-
-        $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
+        Dialog = dialog;
+        JsRuntime = js;
     }
 
+    public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
+    {
+        await OnFileDrop.Invoke(file, args);
+        await Task.CompletedTask;
+    }
 
     public async Task InitializedAsync(string defaultHubURI)
     {
@@ -99,7 +112,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public string GetPanID()
     {
-        return panID;
+        return PanID;
     }
 
     public IDrawing? GetDrawing()
@@ -116,6 +129,13 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         Add<FoWorkPiece>(piece);
         return Members<FoWorkPiece>();
+    }
+
+    public FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece
+    {
+        var piece = Activator.CreateInstance(typeof(T), this, Dialog, JsRuntime) as T;
+        AddWorkPiece(piece!);
+        return piece!;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
@@ -139,7 +159,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return result!;
     }
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
         EstablishMenu<FoMenu2D>("View", new Dictionary<string, Action>()
         {
@@ -151,11 +171,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
     }
 
-    public List<FoCommand2D> GetAllCommands()
-    {
-        var list = this.Members<FoCommand2D>();
-        return list;
-    }
+
     public FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D
     {
         var commandBar = Find<FoCommand2D>(name);
@@ -176,7 +192,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return commandBar!;
     }
 
-    public void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
     {
 
         var OpenDTAR = async () =>
@@ -263,7 +279,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, panID);
+        Command.SetHub(hub, PanID);
 
         hub.Closed += async (error) =>
        {
@@ -345,7 +361,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var destroy = new D2D_Destroy()
         {
-            PanID = panID,
+            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name
         };
@@ -359,7 +375,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var move = new D2D_Move()
         {
-            PanID = panID,
+            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name,
             PinX = shape.PinX,
@@ -389,7 +405,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         Task.Run(async () =>
         {
-            msg.PanID = this.panID;
+            msg.PanID = this.PanID;
             await Command.Send(msg);
         });
         return msg;

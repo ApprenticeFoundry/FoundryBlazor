@@ -1,17 +1,14 @@
 
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using BlazorBoids;
 
 using BlazorComponentBus;
 using FoundryBlazor.Message;
 
 using FoundryBlazor.Solutions;
-using IoBTMessage.Models;
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen;
 using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
@@ -57,7 +54,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
-    public BoidField? BoidSimulation { get; set; }
+    //public BoidField? BoidSimulation { get; set; }
     //public MoSimulation? EdgeSimulation { get; set; }
 
     private FoPanZoomWindow? _panZoomWindow { get; set; }
@@ -388,7 +385,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         //BoidSimulation?.Advance();
 
-        //Animations.Update((float)0.033);
+        FoGlyph2D.Animations.Update((float)0.033);
 
         var wasDirty = FoGlyph2D.ResetHitTesting;
         RefreshHitTest_IfDirty();

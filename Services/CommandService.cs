@@ -1,10 +1,8 @@
 
-using BlazorBoids;
+
 using FoundryBlazor.Extensions;
-using FoundryBlazor.Hubs;
 using FoundryBlazor.Message;
 using FoundryBlazor.Persistence;
-using IoBTMessage.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -125,8 +123,8 @@ public class CommandService : ICommand
         else if (create.PayloadType.Matches("FoText2D"))
             return StorageHelpers.Hydrate<FoText2D>(create.Payload, false);
 
-        else if (create.PayloadType.Matches("Boid"))
-            return StorageHelpers.Hydrate<Boid>(create.Payload, false);
+        // else if (create.PayloadType.Matches("Boid"))
+        //     return StorageHelpers.Hydrate<Boid>(create.Payload, false);
 
         return null;
     }
