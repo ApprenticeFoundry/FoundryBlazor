@@ -18,7 +18,7 @@ using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FoundryBlazor.Canvas;
-
+using System.Runtime.CompilerServices;
 
 namespace FoundryBlazor.Shape;
 
@@ -26,13 +26,16 @@ public interface IArena
 {
     Scene GetScene();
     Scene InitScene();
+    Task ClearViewer3D();
     ViewerSettings GetSettings();
+
     void RefreshUI();
     void SetViewer(Viewer viewer);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    FoWorld3D MakeWorld();
+    void RenderPlatformToScene(FoGroup3D? platform);
+    FoGroup3D MakeTestPlatform();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -74,11 +77,6 @@ public class FoArena3D : FoGlyph3D, IArena
         SceneManager = sceneManagement;
         JsRuntime = jsRuntime;
         PubSub = pubSub;
-
-        var world = MakeWorld();
-        RenderWorld(world);
-
-        // FillScene();
     }
 
     public Scene GetScene()
@@ -99,6 +97,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
         return SceneManager.CurrentScene().GetScene();
     }
+
+    public async Task ClearViewer3D()
+    {
+        if (Viewer3D != null)
+            await Viewer3D.ClearSceneAsync();
+    }
+
     public ViewerSettings GetSettings()
     {
         return settings;
@@ -159,7 +164,7 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public FoWorld3D MakeWorld()
+    public FoGroup3D MakeTestPlatform()
     {
         var platform = new FoGroup3D()
         {
@@ -184,14 +189,7 @@ public class FoArena3D : FoGlyph3D, IArena
             .Position = new FoVector3D();
 
 
-        var world = new FoWorld3D()
-        {
-            Name = "Sample world"
-        };
-        world.FillWorldFromPlatform(platform);
-
-
-        return world;
+        return platform;
     }
 
     public void RenderWorld(FoWorld3D? world)
@@ -203,40 +201,64 @@ public class FoArena3D : FoGlyph3D, IArena
 
         Task.Run(async () =>
         {
-            await RenderToScene(world);
+            await RenderWorldToScene(world);
             await Viewer3D!.UpdateScene();
         });
 
     }
 
-    public async Task RenderToScene(FoWorld3D? world)
+
+
+    public async Task RenderWorldToScene(FoWorld3D? world)
     {
         $"world={world}".WriteInfo();
-        if (world == null) return;
+        if (world == null || Viewer3D == null)
+        {
+            $"world is empty or viewer is not preent".WriteError();
+            return;
+        }
 
         var scene = GetScene();
         $"scene={scene}".WriteInfo();
-        await Viewer3D!.ClearSceneAsync();
+
+        await ClearViewer3D();
         $"cleared scene".WriteInfo();
 
-        $"Platforms Count={world.platforms.Count}".WriteInfo();
+        $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
 
-        world.platforms?.ForEach(platform =>
+        world.Platforms()?.ForEach(RenderPlatformToScene);
+    }
+
+    public void RenderPlatformToScene(FoGroup3D? platform)
+    {
+        $"platform={platform}".WriteInfo();
+        if (platform == null || Viewer3D == null)
         {
+            $"platform is empty or viewer is not present".WriteError();
+            return;
+        }
 
-            platform.Members<FoShape3D>()?.ForEach(body =>
-            {
-                $"RenderToScene Body {body.Name}".WriteLine(ConsoleColor.Blue);
-                body.Render(Viewer3D!, scene, 0, 0);
-            });
+        var scene = GetScene();
+        $"scene={scene}".WriteInfo();
 
-            platform.Members<FoText3D>()?.ForEach(label =>
-            {
-                $"RenderToScene Label {label.Name}".WriteLine(ConsoleColor.Blue);
-                label.Render(Viewer3D!, scene, 0, 0);
-            });
+
+        platform.Bodies()?.ForEach(body =>
+        {
+            $"RenderPlatformToScene Body {body.Name}".WriteInfo();
+            body.Render(Viewer3D!, scene, 0, 0);
         });
 
+        platform.Labels()?.ForEach(label =>
+        {
+            $"RenderPlatformToScene Label {label.Name}".WriteInfo();
+            label.Render(Viewer3D!, scene, 0, 0);
+        });
+
+        platform.Datums()?.ForEach(datum =>
+        {
+            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+            datum.Render(Viewer3D!, scene, 0, 0);
+        });
 
     }
 
@@ -391,5 +413,6 @@ public class FoArena3D : FoGlyph3D, IArena
             }
         });
     }
+
 
 }

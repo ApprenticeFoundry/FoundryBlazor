@@ -7,6 +7,7 @@ using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Settings;
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -26,6 +27,11 @@ public class FoGlyph3D : FoComponent
     public FoGlyph3D(string name, string color) : base(name)
     {
         Color = color;
+    }
+
+    public bool IsSamePlatform(FoGlyph3D obj)
+    {
+        return platformName.Matches(obj.platformName);
     }
 
     public virtual void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)

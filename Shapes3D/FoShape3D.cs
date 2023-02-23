@@ -8,12 +8,12 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
+using System.Xml.Linq;
 
 namespace FoundryBlazor.Shape;
 
 public class FoShape3D : FoGlyph3D
 {
-    public string platformName { get; set; } = "";
 
     public string? Symbol { get; set; }
     public string? Type { get; set; }
@@ -44,6 +44,53 @@ public class FoShape3D : FoGlyph3D
     //     Cylinder: this.makeCylinder3D.bind(this)
     // };
 
+
+
+
+
+    public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
+    {
+        Type = "Box";
+        BoundingBox = new FoVector3D(width, height, depth)
+        {
+            units = units
+        };
+        Name = name;
+        return this;
+    }
+    public FoShape3D CreateCylinder(string name, double width, double height, double depth, string units = "m")
+    {
+        Type = "Cylinder";
+        BoundingBox = new FoVector3D(width, height, depth)
+        {
+            units = units
+        };
+        Name = name;
+        return this;
+    }
+
+    public FoShape3D CreateGlb(string url, double width, double height, double depth, string units = "m")
+    {
+        Type = "Glb";
+        BoundingBox = new FoVector3D(width, height, depth)
+        {
+            units = units
+        };
+        Symbol = url;
+        return this;
+    }
+
+    public FoShape3D CreateSphere(string name, double width, double height, double depth, string units = "m")
+    {
+        Type = "Sphere";
+        BoundingBox = new FoVector3D(width, height, depth)
+        {
+            units = units
+        };
+        Name = name;
+        return this;
+    }
+
     private BufferGeometry NotImplemented()
     {
         $"symbol [{Symbol}] Body type [{Type}] NotImplemented".WriteLine();
@@ -56,32 +103,16 @@ public class FoShape3D : FoGlyph3D
         return (BufferGeometry)(new BoxGeometry((float)box.X, (float)box.Y, (float)box.Z));
     }
 
-
-
-    public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
-    {
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
-        Name = name;
-        return this;
-    }
-    public FoShape3D CreateCylinder(string name, double width, double height, double depth, string units = "m")
-    {
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
-        Name = name;
-        return this;
-    }
-
-
     private BufferGeometry Cylinder()
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new CylinderGeometry(radiusTop: (float)box.X / 2, height: (float)box.Y, radialSegments: 16));
+        return (BufferGeometry)(new CylinderGeometry(radiusTop: (float)box.X / 2, radiusBottom: (float)box.X / 2, height: (float)box.Y));
+    }
+
+    private BufferGeometry Sphere()
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        return (BufferGeometry)(new SphereGeometry(radius: (float)box.X / 2));
     }
 
     private BufferGeometry Glb(Viewer viewer)
@@ -107,8 +138,7 @@ public class FoShape3D : FoGlyph3D
             $"GLB guid [{guid}] ".WriteLine();
         });
 
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new BoxGeometry((float)0, (float)0, (float)0));
+        return Box();
     }
 
     public override MeshStandardMaterial GetMaterial()
@@ -133,6 +163,7 @@ public class FoShape3D : FoGlyph3D
         {
             "Box" => Box(),
             "Cylinder" => Cylinder(),
+            "Sphere" => Sphere(),
             "Glb" => Glb(viewer),
             _ => NotImplemented()
         };
@@ -150,8 +181,5 @@ public class FoShape3D : FoGlyph3D
         ctx.Add(mesh);
     }
 
-    internal FoShape3D CreateGlb(string url, double width, double height, double depth, string units)
-    {
-        throw new NotImplementedException();
-    }
+  
 }

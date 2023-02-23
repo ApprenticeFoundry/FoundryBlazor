@@ -101,8 +101,9 @@ public class FoCollection<T> where T : FoBase
         return extraction;
     }
 
-    public void Flush()
+    public FoCollection<T> Flush()
     {
         members.Clear();
+        return this;
     }
 }
