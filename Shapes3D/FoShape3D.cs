@@ -9,14 +9,16 @@ using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
 using BlazorThreeJS.Labels;
+using static System.Formats.Asn1.AsnWriter;
+using BlazorThreeJS.Objects;
 
 namespace FoundryBlazor.Shape;
 
 public class FoShape3D : FoGlyph3D
 {
 
-    public string? Symbol { get; set; }
-    public string? Type { get; set; }
+    public string Symbol { get; set; } = "";
+    public string Type { get; set; } = "";
     public FoVector3D? Position { get; set; }
     public FoVector3D? Rotation { get; set; }
     public FoVector3D? Origin { get; set; }
@@ -33,18 +35,6 @@ public class FoShape3D : FoGlyph3D
     }
 
     //https://BlazorThreeJS.com/reference/Index.html
-
-    //  private bodyMeshDict: Record<string, Function> = {
-    //     Glb: this.makeGlbFile3D.bind(this),
-    //     Stub: this.makeStub3D.bind(this), //this should be a simple transform node
-    //     Box: this.makeBox3D.bind(this),
-    //     Sphere: this.makeSphere3D.bind(this),
-    //     Boid: this.makeBoid3D.bind(this),
-    //     Boundry: this.makeBoundry3D.bind(this),
-    //     Cylinder: this.makeCylinder3D.bind(this)
-    // };
-
-
 
 
 
@@ -120,37 +110,31 @@ public class FoShape3D : FoGlyph3D
         return (BufferGeometry)(new SphereGeometry(radius: box.X / 2));
     }
 
-    private BufferGeometry Glb(Viewer viewer)
+    private BufferGeometry Glb()
+    {
+
+   
+        return Point();
+    }
+
+    private void PreRenderGlb(Viewer viewer, Import3DFormats format)
     {
 
         var url = Symbol?.Replace("http", "https");
 
-        // var url = "https://rondtar.azurewebsites.net/storage/StaticFiles/2503172_FWD_TAILCONE_SHELL.glb";
-
-        // var url = "https://threejs.org/examples/models/fbx/Samba%20Dancing.fbx";
-
         var settings = new ImportSettings
         {
-            Format = Import3DFormats.Gltf,
+            Format = format,
             FileURL = url ?? "",
             Position = Position?.AsVector3() ?? new Vector3()
         };
 
         Task.Run(async () =>
         {
-            // var text = "Loading ...";
-            // var label = new LabelText(text)
-            // {
-            //     Color = "Yellow",
-            //     Position = GetPosition().AsVector3()
-            // };
-
-            $"GLB symbol [{url}] ".WriteLine();
+            $"PreRenderGlb symbol [{url}] ".WriteLine();
             var guid = await viewer.Import3DModelAsync(settings);
-            $"GLB guid [{guid}] ".WriteLine();
+            $"PreRenderGlb guid [{guid}] ".WriteLine();
         });
-
-        return Point();
     }
 
     public override MeshStandardMaterial GetMaterial()
@@ -166,12 +150,12 @@ public class FoShape3D : FoGlyph3D
         return result;
     }
 
-    public override BufferGeometry GetGeometry(Viewer viewer)
+    public override BufferGeometry GetGeometry()
     {
         var box = BoundingBox ?? new FoVector3D(0, 0, 0);
         $"GetGeometry {box.X}, {box.Y}, {box.Z}".WriteInfo();
 
-        if (Type == null) return base.GetGeometry(viewer);
+        if (Type == null) return base.GetGeometry();
         $"GetGeometry Type={Type}".WriteInfo();
 
         var result = Type switch
@@ -179,7 +163,7 @@ public class FoShape3D : FoGlyph3D
             "Box" => Box(),
             "Cylinder" => Cylinder(),
             "Sphere" => Sphere(),
-            "Glb" => Glb(viewer),
+            "Glb" => Glb(),
             _ => NotImplemented()
         };
 
@@ -190,9 +174,26 @@ public class FoShape3D : FoGlyph3D
         if (Position == null) return base.GetPosition();
         return Position;
     }
-    public override void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
+
+
+    public override void PreRender(Viewer viewer, bool deep = true)
     {
-        var mesh = GetMesh(viewer);
+        if ((bool)(Type.Matches("Glb")))
+            PreRenderGlb(viewer, Import3DFormats.Gltf);
+
+    }
+
+    public override void Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+        if ((bool)(Type.Matches("Glb")))
+            return;
+
+        var mesh = new Mesh
+        {
+            Geometry = GetGeometry(),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
         ctx.Add(mesh);
     }
 

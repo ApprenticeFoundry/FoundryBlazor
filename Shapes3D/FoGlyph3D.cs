@@ -34,10 +34,12 @@ public class FoGlyph3D : FoComponent
         return PlatformName.Matches(obj.PlatformName);
     }
 
-    public virtual void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
+    public virtual void PreRender(Viewer viewer, bool deep = true)
     {
-        var mesh = GetMesh(viewer);
-        ctx.Add(mesh);
+    }
+
+    public virtual void Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
     }
 
 
@@ -50,7 +52,7 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual BufferGeometry GetGeometry(Viewer viewer)
+    public virtual BufferGeometry GetGeometry()
     {
         var result = new BoxGeometry(1F, 2F, 3F);
         return result;
@@ -62,14 +64,4 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual Mesh GetMesh(Viewer viewer)
-    {
-        var result = new Mesh
-        {
-            Geometry = GetGeometry(viewer),
-            Position = GetPosition().AsVector3(),
-            Material = GetMaterial()
-        };
-        return result;
-    }
 }

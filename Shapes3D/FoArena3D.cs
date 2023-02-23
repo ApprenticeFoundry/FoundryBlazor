@@ -32,8 +32,8 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    void RenderPlatformToScene(FoGroup3D? platform);
-    FoGroup3D MakeTestPlatform();
+
+    FoGroup3D MakeAndRenderTestPlatform();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -154,7 +154,7 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public FoGroup3D MakeTestPlatform()
+    public FoGroup3D MakeAndRenderTestPlatform()
     {
         var platform = new FoGroup3D()
         {
@@ -179,6 +179,7 @@ public class FoArena3D : FoGlyph3D, IArena
             .Position = new FoVector3D();
 
 
+        RenderPlatformToScene(platform);
         return platform;
     }
 
@@ -191,6 +192,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         Task.Run(async () =>
         {
+            PreRenderWorld(world);
             await RenderWorldToScene(world);
             await Viewer3D!.UpdateScene();
         });
@@ -202,7 +204,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public async Task RenderWorldToScene(FoWorld3D? world)
     {
         $"world={world}".WriteInfo();
-        if (world == null || Viewer3D == null)
+        if (world == null)
         {
             $"world is empty or viewer is not preent".WriteError();
             return;
@@ -222,6 +224,51 @@ public class FoArena3D : FoGlyph3D, IArena
     public void RenderPlatformToScene(FoGroup3D? platform)
     {
         $"platform={platform}".WriteInfo();
+        if (platform == null)
+        {
+            $"platform is empty or viewer is not present".WriteError();
+            return;
+        }
+
+        var scene = GetScene();
+        $"scene={scene}".WriteInfo();
+
+
+        platform.Bodies()?.ForEach(body =>
+        {
+            $"RenderPlatformToScene Body {body.Name}".WriteInfo();
+            body.Render(scene, 0, 0);
+        });
+
+        platform.Labels()?.ForEach(label =>
+        {
+            $"RenderPlatformToScene Label {label.Name}".WriteInfo();
+            label.Render(scene, 0, 0);
+        });
+
+        platform.Datums()?.ForEach(datum =>
+        {
+            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+            datum.Render(scene, 0, 0);
+        });
+
+    }
+
+    public void PreRenderWorld(FoWorld3D? world)
+    {
+        $"world={world}".WriteInfo();
+        if (world == null || Viewer3D == null)
+        {
+            $"world is empty or viewer is not preent".WriteError();
+            return;
+        }
+
+        world.Platforms()?.ForEach(PreRenderPlatform);
+    }
+
+    public void PreRenderPlatform(FoGroup3D? platform)
+    {
+        $"platform={platform}".WriteInfo();
         if (platform == null || Viewer3D == null)
         {
             $"platform is empty or viewer is not present".WriteError();
@@ -235,21 +282,8 @@ public class FoArena3D : FoGlyph3D, IArena
         platform.Bodies()?.ForEach(body =>
         {
             $"RenderPlatformToScene Body {body.Name}".WriteInfo();
-            body.Render(Viewer3D!, scene, 0, 0);
+            body.PreRender(Viewer3D!);
         });
-
-        platform.Labels()?.ForEach(label =>
-        {
-            $"RenderPlatformToScene Label {label.Name}".WriteInfo();
-            label.Render(Viewer3D!, scene, 0, 0);
-        });
-
-        platform.Datums()?.ForEach(datum =>
-        {
-            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
-            datum.Render(Viewer3D!, scene, 0, 0);
-        });
-
     }
 
     public void FillScene()

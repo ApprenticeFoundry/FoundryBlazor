@@ -44,7 +44,7 @@ public class FoText3D : FoGlyph3D
         var result = Position;
         return result;
     }
-    public override void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
+    public override void Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         var text = Text ?? "LabelText";
         //only in BlazorThreeJS
