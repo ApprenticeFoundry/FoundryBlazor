@@ -168,8 +168,8 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         var platform = new FoGroup3D()
         {
-            uniqueGuid = Guid.NewGuid().ToString(),
-            platformName = "RonTest",
+            UniqueGuid = Guid.NewGuid().ToString(),
+            PlatformName = "RonTest",
             Name = "RonTest"
         };
         platform.EstablishBox("Platform", 1, 1, 1);

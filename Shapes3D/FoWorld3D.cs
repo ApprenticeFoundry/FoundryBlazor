@@ -123,19 +123,19 @@ public class FoWorld3D : FoGlyph3D
         //labels = labels.DistinctBy(i => i.uniqueGuid).ToList();
         //relationships = relationships.DistinctBy(i => i.uniqueGuid).ToList();
 
-        var platforms = Platforms()?.GroupBy(i => i.uniqueGuid).Select(g => g.First()).ToList();
+        var platforms = Platforms()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
         GetSlot<FoGroup3D>()?.Flush().AddRange(platforms);
 
-        var bodies = Bodies()?.GroupBy(i => i.uniqueGuid).Select(g => g.First()).ToList();
+        var bodies = Bodies()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
         GetSlot<FoShape3D>()?.Flush().AddRange(bodies);
 
-        var labels = Labels()?.GroupBy(i => i.uniqueGuid).Select(g => g.First()).ToList();
+        var labels = Labels()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
         GetSlot<FoText3D>()?.Flush().AddRange(labels); 
         
-        var datums = Datums()?.GroupBy(i => i.uniqueGuid).Select(g => g.First()).ToList();
+        var datums = Datums()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
         GetSlot<FoDatum3D>()?.Flush().AddRange(datums); 
         
-        var relationships = Relationships()?.GroupBy(i => i.uniqueGuid).Select(g => g.First()).ToList();
+        var relationships = Relationships()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
         GetSlot<FoRelationship3D>()?.Flush().AddRange(relationships); 
         
         return this;

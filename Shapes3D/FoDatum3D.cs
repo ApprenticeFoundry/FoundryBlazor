@@ -4,7 +4,6 @@ using System.Reflection.Emit;
 namespace FoundryBlazor.Shape;
 	public class FoDatum3D : FoGlyph3D
 	{
-		public string platformName { get; set; } = "";
 
 		public string shape { get; set; }
 		public string text { get; set; }

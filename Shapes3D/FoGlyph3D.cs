@@ -13,8 +13,8 @@ namespace FoundryBlazor.Shape;
 
 public class FoGlyph3D : FoComponent
 {
-    public string uniqueGuid { get; set; } = "";
-    public string platformName { get; set; } = "";
+    public string UniqueGuid { get; set; } = "";
+    public string PlatformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
 
@@ -31,7 +31,7 @@ public class FoGlyph3D : FoComponent
 
     public bool IsSamePlatform(FoGlyph3D obj)
     {
-        return platformName.Matches(obj.platformName);
+        return PlatformName.Matches(obj.PlatformName);
     }
 
     public virtual void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)

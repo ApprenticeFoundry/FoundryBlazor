@@ -7,12 +7,10 @@ namespace FoundryBlazor.Shape;
 public class FoGroup3D : FoGlyph3D
 {
 
-    public FoVector3D? position { get; set; }
-    public FoVector3D? boundingBox { get; set; }
-    public FoVector3D? offset { get; set; }
+    public FoVector3D? Position { get; set; }
+    public FoVector3D? BoundingBox { get; set; }
+    public FoVector3D? Offset { get; set; }
 
-
-    private readonly Dictionary<string, object> _lookup = new();
 
     public FoGroup3D() : base()
     {
@@ -45,15 +43,15 @@ public class FoGroup3D : FoGlyph3D
     public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
     {
         this.Name = name;
-        boundingBox = new FoVector3D()
+        BoundingBox = new FoVector3D()
         {
             units = units,
             X = width,
             Y = height,
             Z = depth,
         };
-        position = new FoVector3D();
-        offset = new FoVector3D();
+        Position = new FoVector3D();
+        Offset = new FoVector3D();
         return this;
     }
 
@@ -61,7 +59,7 @@ public class FoGroup3D : FoGlyph3D
 
     public T CreateUsingDTBASE<T>(FoGlyph3D obj) where T : FoGlyph3D
     {
-        return CreateUsing<T>(obj.Name, obj.uniqueGuid);
+        return CreateUsing<T>(obj.Name, obj.UniqueGuid);
     }
 
     public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
@@ -97,7 +95,7 @@ public class FoGroup3D : FoGlyph3D
 
     public FoGroup3D SetPositionTo(FoVector3D loc)
     {
-        position = loc;
+        Position = loc;
         return this;
     }
 
@@ -117,16 +115,16 @@ public class FoGroup3D : FoGlyph3D
 
     public U RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
     {
-        var tag = $"{source.uniqueGuid}:{name}";
+        var tag = $"{source.UniqueGuid}:{name}";
         var relationship = Find<U>(tag);
         if (relationship == null)
         {
             relationship = FindOrCreate<U>(tag, true);
-            relationship.Build(source.uniqueGuid, name, target.uniqueGuid);
+            relationship.Build(source.UniqueGuid, name, target.UniqueGuid);
         }
         else
         {
-            relationship.Relate(target.uniqueGuid);
+            relationship.Relate(target.UniqueGuid);
         }
 
         return relationship;
@@ -134,9 +132,9 @@ public class FoGroup3D : FoGlyph3D
 
     public U? UnrelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
     {
-        var tag = $"{source.uniqueGuid}:{name}";
+        var tag = $"{source.UniqueGuid}:{name}";
         var relationship = Find<U>(tag);
-        relationship?.Unrelate(target.uniqueGuid);
+        relationship?.Unrelate(target.UniqueGuid);
 
         return relationship;
     }
@@ -148,8 +146,8 @@ public class FoGroup3D : FoGlyph3D
     {
         var found = Activator.CreateInstance<T>() as T;
         found.Name = name;
-        found.platformName = platformName;
-        found.uniqueGuid = Guid.NewGuid().ToString();
+        found.PlatformName = PlatformName;
+        found.UniqueGuid = Guid.NewGuid().ToString();
         return found;
     }
 
@@ -159,7 +157,7 @@ public class FoGroup3D : FoGlyph3D
     {
         var found = FindOrCreate<T>(name, true);
         if (!string.IsNullOrEmpty(guid) )
-            found!.uniqueGuid = guid;
+            found!.UniqueGuid = guid;
 
         return found!;
     }

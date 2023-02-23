@@ -7,7 +7,6 @@ namespace FoundryBlazor.Shape;
 
 public class FoText3D : FoGlyph3D
 {
-    public string platformName { get; set; } = "";
 
     public string? Text { get; set; }
     public List<string>? Details { get; set; }
