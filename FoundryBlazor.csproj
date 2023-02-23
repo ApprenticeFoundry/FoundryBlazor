@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
-    <PackageReference Include="BlazorThreeJS" Version="0.0.4" />
+    <PackageReference Include="BlazorThreeJS" Version="0.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.7.1" />
