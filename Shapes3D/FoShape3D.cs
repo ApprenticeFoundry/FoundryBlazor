@@ -8,7 +8,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
 using FoundryBlazor.Extensions;
-using System.Xml.Linq;
+using BlazorThreeJS.Labels;
 
 namespace FoundryBlazor.Shape;
 
@@ -103,6 +103,11 @@ public class FoShape3D : FoGlyph3D
         return (BufferGeometry)(new BoxGeometry(box.X, box.Y, box.Z));
     }
 
+    public BufferGeometry Point()
+    {
+        return (BufferGeometry)(new BoxGeometry(0, 0, 0));
+    }
+
     private BufferGeometry Cylinder()
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
@@ -133,12 +138,19 @@ public class FoShape3D : FoGlyph3D
 
         Task.Run(async () =>
         {
+            // var text = "Loading ...";
+            // var label = new LabelText(text)
+            // {
+            //     Color = "Yellow",
+            //     Position = GetPosition().AsVector3()
+            // };
+
             $"GLB symbol [{url}] ".WriteLine();
             var guid = await viewer.Import3DModelAsync(settings);
             $"GLB guid [{guid}] ".WriteLine();
         });
 
-        return Box();
+        return Point();
     }
 
     public override MeshStandardMaterial GetMaterial()
@@ -156,8 +168,11 @@ public class FoShape3D : FoGlyph3D
 
     public override BufferGeometry GetGeometry(Viewer viewer)
     {
-        if (Type == null) return base.GetGeometry(viewer);
+        var box = BoundingBox ?? new FoVector3D(0, 0, 0);
+        $"GetGeometry {box.X}, {box.Y}, {box.Z}".WriteInfo();
 
+        if (Type == null) return base.GetGeometry(viewer);
+        $"GetGeometry Type={Type}".WriteInfo();
 
         var result = Type switch
         {
@@ -181,5 +196,5 @@ public class FoShape3D : FoGlyph3D
         ctx.Add(mesh);
     }
 
-  
+
 }
