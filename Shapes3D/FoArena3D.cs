@@ -1,4 +1,3 @@
-using BlazorThreeJS.Events;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
@@ -18,7 +17,6 @@ using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FoundryBlazor.Canvas;
-using System.Runtime.CompilerServices;
 
 namespace FoundryBlazor.Shape;
 
@@ -43,10 +41,6 @@ public interface IArena
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
-    private IToast Toast { get; set; }
-    private ICommand Command { get; set; }
-    private IJSRuntime JsRuntime { get; set; }
-
     private ISceneManagement SceneManager { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
@@ -66,16 +60,10 @@ public class FoArena3D : FoGlyph3D, IArena
     };
 
     public FoArena3D(
-        ICommand cmd,
-        IToast toast,
         ISceneManagement sceneManagement,
-        ComponentBus pubSub,
-        IJSRuntime jsRuntime)
+        ComponentBus pubSub)
     {
-        Command = cmd;
-        Toast = toast;
         SceneManager = sceneManagement;
-        JsRuntime = jsRuntime;
         PubSub = pubSub;
     }
 
@@ -127,13 +115,15 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
-        //var plan = "ProcessPlan";
-        //ProcessPlan = new DTAR_Drawing(DTARRestService, PageManager, this, ActiveScene, PubSub);
-        //EstablishMenu<FoMenu2D>(plan, ProcessPlan.ProcessMenuItems(plan, js), true);
-
-        // var name = "World";
-        // AllWorlds = new DTARSolution(DTARRestService, null, this);
-        // EstablishMenu<FoMenu3D>(name, AllWorlds.WorldMenuItems(name, js), true);
+        EstablishMenu<FoMenu3D>("Main", new Dictionary<string, Action>()
+        {
+            //{ "Clear", () => PageManager?.ClearAll()},
+            //{ "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
+            //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
+            //{ "Save", () => Command?.Save()},
+            //{ "Restore", () => Command?.Restore()},
+            //{ "Pan Zoom", () => TogglePanZoomWindow()},
+        }, true);
 
     }
 

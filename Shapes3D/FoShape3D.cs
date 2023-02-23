@@ -94,25 +94,25 @@ public class FoShape3D : FoGlyph3D
     private BufferGeometry NotImplemented()
     {
         $"symbol [{Symbol}] Body type [{Type}] NotImplemented".WriteLine();
-        return (BufferGeometry)(new BoxGeometry(1F, 1F, 1F));
+        return (BufferGeometry)(new BoxGeometry(0, 0, 0));
     }
 
     public BufferGeometry Box()
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new BoxGeometry((float)box.X, (float)box.Y, (float)box.Z));
+        return (BufferGeometry)(new BoxGeometry(box.X, box.Y, box.Z));
     }
 
     private BufferGeometry Cylinder()
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new CylinderGeometry(radiusTop: (float)box.X / 2, radiusBottom: (float)box.X / 2, height: (float)box.Y));
+        return (BufferGeometry)(new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y));
     }
 
     private BufferGeometry Sphere()
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new SphereGeometry(radius: (float)box.X / 2));
+        return (BufferGeometry)(new SphereGeometry(radius: box.X / 2));
     }
 
     private BufferGeometry Glb(Viewer viewer)

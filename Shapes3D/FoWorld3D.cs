@@ -84,13 +84,13 @@ public class FoWorld3D : FoGlyph3D
         {
             platform.Flush();
 
-            Bodies()?.Where(obj => obj.IsSamePlatform(this))
+            Bodies()?.Where(obj => obj.IsSamePlatform(platform))
                     .Select(obj => platform.Add<FoShape3D>(obj)).ToList();
 
-            Labels()?.Where(obj => obj.IsSamePlatform(this))
+            Labels()?.Where(obj => obj.IsSamePlatform(platform))
                     .Select(obj => platform.Add<FoText3D>(obj)).ToList();
 
-            Datums()?.Where(obj => obj.IsSamePlatform(this))
+            Datums()?.Where(obj => obj.IsSamePlatform(platform))
                     .Select(obj => platform.Add<FoDatum3D>(obj)).ToList();
         });
         return Platforms();
