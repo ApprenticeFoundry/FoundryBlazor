@@ -1,23 +1,33 @@
+using BlazorThreeJS.Labels;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
-using BlazorThreeJS.Labels;
-using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 
 public class FoText3D : FoGlyph3D
 {
+    public string platformName { get; set; } = "";
 
-    public UDTO_Label? Label { get; set; }
+    public string? Text { get; set; }
+    public List<string>? Details { get; set; }
+    public FoVector3D? Position { get; set; }
 
+    public FoText3D() : base()
+    {
+    }
     public FoText3D(string name) : base(name)
     {
     }
     public FoText3D(string name, string color) : base(name, color)
     {
     }
-
+    public FoText3D CreateTextAt(string text, double x, double y, double z)
+    {
+        Position = new FoVector3D(x, y, z);
+        Text = text;
+        return this;
+    }
     // public override BufferGeometry GetGeometry()
     // {
     //     if (Label == null) return base.GetGeometry();
@@ -28,19 +38,27 @@ public class FoText3D : FoGlyph3D
     //     return result;
     // }
 
-    public override Vector3 GetPosition()
+    public override FoVector3D GetPosition()
     {
-        if (Label == null) return base.GetPosition();
+        if (Position == null) return base.GetPosition();
 
-        var pos = Label.position;
-        var result = new Vector3((float)pos.xLoc, (float)pos.yLoc, (float)pos.zLoc);
+        var result = Position;
         return result;
     }
     public override void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
     {
-        var text = Label?.text ?? "Our Canvas Text";
+        var text = Text ?? "LabelText";
         //only in BlazorThreeJS
-        var label = new LabelText(text) { Color = "Yellow", Position = GetPosition() };
+        var label = new LabelText(text)
+        {
+            Color = "Yellow",
+            Position = GetPosition().AsVector3()
+        };
         ctx.Add(label);
+    }
+
+    internal FoText3D CreateTextAt(string text, double xLoc, double yLoc, double zLoc, string units)
+    {
+        throw new NotImplementedException();
     }
 }

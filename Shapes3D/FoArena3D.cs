@@ -18,7 +18,7 @@ using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using FoundryBlazor.Canvas;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -31,8 +31,8 @@ public interface IArena
     void SetViewer(Viewer viewer);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    void RenderWorld(DT_World3D? world);
-    DT_World3D MakeWorld();
+    void RenderWorld(FoWorld3D? world);
+    FoWorld3D MakeWorld();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -75,8 +75,8 @@ public class FoArena3D : FoGlyph3D, IArena
         JsRuntime = jsRuntime;
         PubSub = pubSub;
 
-        // var world = MakeWorld();
-        // RenderWorld(world);
+        var world = MakeWorld();
+        RenderWorld(world);
 
         // FillScene();
     }
@@ -159,36 +159,34 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
     }
 
-    public DT_World3D MakeWorld()
+    public FoWorld3D MakeWorld()
     {
-        var platform = new UDTO_Platform()
+        var platform = new FoGroup3D()
         {
             uniqueGuid = Guid.NewGuid().ToString(),
             platformName = "RonTest",
-            name = "RonTest"
+            Name = "RonTest"
         };
         platform.EstablishBox("Platform", 1, 1, 1);
 
-        var largeBlock = platform.CreateUsing<UDTO_Body>("LargeBlock").CreateBox("Large", 3, 1, 2);
-        largeBlock.position = new HighResPosition();
+        var largeBlock = platform.CreateUsing<FoShape3D>("LargeBlock").CreateBox("Large", 3, 1, 2);
+        largeBlock.Position = new FoVector3D();
 
-        var smallBlock = platform.CreateUsing<UDTO_Body>("SmallBlock").CreateBox("SmallBlock", 1.5, .5, 1);
-        smallBlock.position = new HighResPosition()
+        var smallBlock = platform.CreateUsing<FoShape3D>("SmallBlock").CreateBox("SmallBlock", 1.5, .5, 1);
+        smallBlock.Position = new FoVector3D()
         {
-            xLoc = -2.25,  //might need to changes sign
-            yLoc = 0.75,
-            zLoc = 1.5,
-            xAng = Math.PI / 180 * 0,
+            X = -2.25,  //might need to changes sign
+            Y = 0.75,
+            Z = 1.5,
         };
 
-        platform.CreateUsing<UDTO_Label>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0)
-            .position = new HighResPosition();
+        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0)
+            .Position = new FoVector3D();
 
 
-        var world = new DT_World3D()
+        var world = new FoWorld3D()
         {
-            title = "Sample world",
-            description = "First test of Canvas 3D"
+            Name = "Sample world"
         };
         world.FillWorldFromPlatform(platform);
 
@@ -196,12 +194,12 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public void RenderWorld(DT_World3D? world)
+    public void RenderWorld(FoWorld3D? world)
     {
         if (world == null) return;
         world.FillPlatforms();
 
-        $"RenderWorld {world.name}".WriteLine(ConsoleColor.Blue);
+        $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
 
         Task.Run(async () =>
         {
@@ -211,36 +209,31 @@ public class FoArena3D : FoGlyph3D, IArena
 
     }
 
-    public async Task RenderToScene(DT_World3D? world)
+    public async Task RenderToScene(FoWorld3D? world)
     {
+        $"world={world}".WriteInfo();
         if (world == null) return;
 
         var scene = GetScene();
+        $"scene={scene}".WriteInfo();
         await Viewer3D!.ClearSceneAsync();
+        $"cleared scene".WriteInfo();
+
+        $"Platforms Count={world.platforms.Count}".WriteInfo();
 
         world.platforms?.ForEach(platform =>
         {
 
-            platform.bodies?.ForEach(body =>
+            platform.Members<FoShape3D>()?.ForEach(body =>
             {
-                $"RenderToScene Body {body.name}".WriteLine(ConsoleColor.Blue);
-                var shape = new FoShape3D(body.name, "Red")
-                {
-                    Body = body
-                };
-
-                shape.Render(Viewer3D!, scene, 0, 0);
+                $"RenderToScene Body {body.Name}".WriteLine(ConsoleColor.Blue);
+                body.Render(Viewer3D!, scene, 0, 0);
             });
 
-            platform.labels?.ForEach(label =>
+            platform.Members<FoText3D>()?.ForEach(label =>
             {
-                $"RenderToScene Label {label.name}".WriteLine(ConsoleColor.Blue);
-                var shape = new FoText3D(label.name, "Yellow")
-                {
-                    Label = label
-                };
-
-                shape.Render(Viewer3D!, scene, 0, 0);
+                $"RenderToScene Label {label.Name}".WriteLine(ConsoleColor.Blue);
+                label.Render(Viewer3D!, scene, 0, 0);
             });
         });
 
