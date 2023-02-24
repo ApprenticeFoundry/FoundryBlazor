@@ -32,6 +32,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
+    void PostRender(Guid guid);
 
     FoGroup3D MakeAndRenderTestPlatform();
 
@@ -438,5 +439,9 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-
+    public void PostRender(Guid guid)
+    {
+        var msg = $"PostRender with guid = {guid}";
+        $"Message = {msg}".WriteInfo();
+    }
 }
