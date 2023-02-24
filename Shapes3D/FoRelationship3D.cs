@@ -4,8 +4,8 @@ namespace FoundryBlazor.Shape;
 
 	public class FoRelationship3D : FoGlyph3D
 	{
-		public string relationship;
-		public string source;
+		public string? Relationship { get; set; }
+    	public string? Source { get; set; }
 		public List<string> sink = new ();
 
 
@@ -16,8 +16,8 @@ namespace FoundryBlazor.Shape;
 
 		public FoRelationship3D Build(string source, string relationship, string target)
 		{
-			this.source = source;
-			this.relationship = relationship;
+			this.Source = source;
+			this.Relationship = relationship;
 			this.sink.Add(target);
 			return this;
 		}

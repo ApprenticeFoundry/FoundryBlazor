@@ -113,14 +113,14 @@ public class FoGroup3D : FoGlyph3D
 
 
 
-    public U RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
+    public U? RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
     {
         var tag = $"{source.UniqueGuid}:{name}";
         var relationship = Find<U>(tag);
         if (relationship == null)
         {
             relationship = FindOrCreate<U>(tag, true);
-            relationship.Build(source.UniqueGuid, name, target.UniqueGuid);
+            relationship?.Build(source.UniqueGuid, name, target.UniqueGuid);
         }
         else
         {

@@ -5,8 +5,8 @@ using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Settings;
+using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
@@ -34,15 +34,6 @@ public class FoGlyph3D : FoComponent
         return PlatformName.Matches(obj.PlatformName);
     }
 
-    public virtual void PreRender(Viewer viewer, bool deep = true)
-    {
-    }
-
-    public virtual void Render(Scene ctx, int tick, double fps, bool deep = true)
-    {
-    }
-
-
     public virtual MeshStandardMaterial GetMaterial()
     {
         var result = new MeshStandardMaterial()
@@ -52,16 +43,28 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual BufferGeometry GetGeometry()
-    {
-        var result = new BoxGeometry(1F, 2F, 3F);
-        return result;
-    }
 
     public virtual FoVector3D GetPosition()
     {
         var result = new FoVector3D(0, 0, 0);
         return result;
     }
+
+
+    public virtual bool PreRender(Viewer viewer, bool deep = true)
+    {
+        return false;
+    }
+
+    public virtual bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+         return false;
+    }
+    public virtual bool PostRender(Scene ctx, Guid guid)
+    {
+         return false;
+    }
+
+
 
 }

@@ -7,9 +7,6 @@ public class FoButton3D : FoText3D, IFoButton
 {
     public Action? OnClick;
 
-    private string text = "";
-    public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
-    public List<string>? Details { get; set; }
 
     public Action ClickAction()
     {
@@ -21,21 +18,7 @@ public class FoButton3D : FoText3D, IFoButton
         return Text;
     }
 
-    protected string CreateDetails(string text)
-    {
-        Details = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-        return text;
-    }
 
-    protected string AssignText(string newValue, string oldValue)
-    {
-        if (newValue != oldValue)
-        {
-            //ComputeResize = true;
-        }
-
-        return newValue;
-    }
 
     public FoButton3D(string command, Action action) : base(command)
     {

@@ -1,16 +1,16 @@
 
 using BlazorThreeJS.Core;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Viewers;
-using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Settings;
 using BlazorThreeJS.Enums;
-using FoundryBlazor.Extensions;
+using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Labels;
-using static System.Formats.Asn1.AsnWriter;
+using BlazorThreeJS.Materials;
+using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
+using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Settings;
+using BlazorThreeJS.Viewers;
+using FoundryBlazor.Extensions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace FoundryBlazor.Shape;
 
@@ -23,6 +23,8 @@ public class FoShape3D : FoGlyph3D
     public FoVector3D? Rotation { get; set; }
     public FoVector3D? Origin { get; set; }
     public FoVector3D? BoundingBox { get; set; }
+
+    public Guid? PromiseGUID  { get; set; }
 
     public FoShape3D() : base()
     {
@@ -81,43 +83,75 @@ public class FoShape3D : FoGlyph3D
         return this;
     }
 
-    private BufferGeometry NotImplemented()
+    private bool NotImplemented(Scene ctx)
     {
-        $"symbol [{Symbol}] Body type [{Type}] NotImplemented".WriteLine();
-        return (BufferGeometry)(new BoxGeometry(0, 0, 0));
+        var message = $"symbol [{Symbol}] Body type [{Type}] NotImplemented";
+        message.WriteLine();
+        var label = new LabelText(message)
+        {
+            Color = "White",
+            Position = GetPosition().AsVector3()
+        };
+        ctx.Add(label);
+        return false;
     }
 
-    public BufferGeometry Box()
-    {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new BoxGeometry(box.X, box.Y, box.Z));
-    }
-
-    public BufferGeometry Point()
-    {
-        return (BufferGeometry)(new BoxGeometry(0, 0, 0));
-    }
-
-    private BufferGeometry Cylinder()
+    public bool Box(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y));
+        var mesh = new Mesh
+        {
+            Geometry = new BoxGeometry(box.X, box.Y, box.Z),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
     }
 
-    private BufferGeometry Sphere()
+    public bool Loading(Scene ctx, string message)
+    {
+        var label = new LabelText(message)
+        {
+            Color = "Yellow",
+            Position = GetPosition().AsVector3()
+        };
+        ctx.Add(label);
+        return true;
+    }
+
+    private bool Cylinder(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        return (BufferGeometry)(new SphereGeometry(radius: box.X / 2));
+        var mesh = new Mesh
+        {
+            Geometry = new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
     }
 
-    private BufferGeometry Glb()
+    private bool Sphere(Scene ctx)
     {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-   
-        return Point();
+        var mesh = new Mesh
+        {
+            Geometry = new SphereGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
     }
 
-    private void PreRenderGlb(Viewer viewer, Import3DFormats format)
+
+ 
+
+
+    private bool PreRenderGlb(Viewer viewer, Import3DFormats format)
     {
 
         var url = Symbol?.Replace("http", "https");
@@ -132,9 +166,21 @@ public class FoShape3D : FoGlyph3D
         Task.Run(async () =>
         {
             $"PreRenderGlb symbol [{url}] ".WriteLine();
-            var guid = await viewer.Import3DModelAsync(settings);
-            $"PreRenderGlb guid [{guid}] ".WriteLine();
+            PromiseGUID = await viewer.Import3DModelAsync(settings);
+            $"PreRenderGlb guid [{PromiseGUID}] ".WriteLine();
         });
+        return true;
+    }
+
+    private bool RenderGlb(Scene ctx, Import3DFormats format)
+    {
+
+        var url = Symbol?.Replace("http", "https");
+
+        Loading(ctx, $"Loading... {url}");
+
+
+        return true;
     }
 
     public override MeshStandardMaterial GetMaterial()
@@ -150,25 +196,7 @@ public class FoShape3D : FoGlyph3D
         return result;
     }
 
-    public override BufferGeometry GetGeometry()
-    {
-        var box = BoundingBox ?? new FoVector3D(0, 0, 0);
-        $"GetGeometry {box.X}, {box.Y}, {box.Z}".WriteInfo();
 
-        if (Type == null) return base.GetGeometry();
-        $"GetGeometry Type={Type}".WriteInfo();
-
-        var result = Type switch
-        {
-            "Box" => Box(),
-            "Cylinder" => Cylinder(),
-            "Sphere" => Sphere(),
-            "Glb" => Glb(),
-            _ => NotImplemented()
-        };
-
-        return result;
-    }
     public override FoVector3D GetPosition()
     {
         if (Position == null) return base.GetPosition();
@@ -176,26 +204,36 @@ public class FoShape3D : FoGlyph3D
     }
 
 
-    public override void PreRender(Viewer viewer, bool deep = true)
+
+   public override bool PreRender(Viewer viewer, bool deep = true)
     {
+        //is symbol ends with ....
         if ((bool)(Type.Matches("Glb")))
-            PreRenderGlb(viewer, Import3DFormats.Gltf);
-
-    }
-
-    public override void Render(Scene ctx, int tick, double fps, bool deep = true)
-    {
-        if ((bool)(Type.Matches("Glb")))
-            return;
-
-        var mesh = new Mesh
         {
-            Geometry = GetGeometry(),
-            Position = GetPosition().AsVector3(),
-            Material = GetMaterial()
-        };
-        ctx.Add(mesh);
+            return PreRenderGlb(viewer, Import3DFormats.Gltf);
+        }
+        return false;
     }
 
+    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+     
+        var result = Type switch
+        {
+            "Box" => Box(ctx),
+            "Cylinder" => Cylinder(ctx),
+            "Sphere" => Sphere(ctx),
+            "Glb" => RenderGlb(ctx, Import3DFormats.Gltf),
+            _ => NotImplemented(ctx)
+        };
+        return result;
+    }
+    public override bool PostRender(Scene ctx, Guid guid)
+    {
+        //add code to remove the 'loading...'  and then 
+        //resolve the guid that was the promise
+        PromiseGUID = null;
+        return true;
+    }
 
 }

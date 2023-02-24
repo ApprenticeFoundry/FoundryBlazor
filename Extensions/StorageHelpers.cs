@@ -44,15 +44,15 @@ public static class StorageHelpers
         return _provider;
     }
 
-    public static string GetMIMEType(this string fileName)
-    {
-        var provider = StorageHelpers.MIMETypeProvider();
-        if (!provider.TryGetContentType(fileName, out string contentType))
-        {
-            contentType = "application/octet-stream";
-        }
-        return contentType;
-    }
+    // public static string GetMIMEType(this string fileName)
+    // {
+    //     var provider = StorageHelpers.MIMETypeProvider();
+    //     if (!provider.TryGetContentType(fileName, out string contentType))
+    //     {
+    //         contentType = "application/octet-stream";
+    //     }
+    //     return contentType;
+    // }
 
     public static async Task<string> ReadAsStringAsync(this IFormFile file)
     {

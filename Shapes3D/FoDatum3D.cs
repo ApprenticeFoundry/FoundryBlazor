@@ -5,11 +5,11 @@ namespace FoundryBlazor.Shape;
 	public class FoDatum3D : FoGlyph3D
 	{
 
-		public string shape { get; set; }
-		public string text { get; set; }
-		public List<string> details { get; set; }
-		public FoVector3D position { get; set; }
-		public FoVector3D boundingBox { get; set; }
+		public string? Shape { get; set; }
+		public string? Text { get; set; }
+		public List<string>? Details { get; set; }
+		public FoVector3D? Position { get; set; }
+		public FoVector3D? BoundingBox { get; set; }
 
 		public FoDatum3D() : base()
 		{
@@ -17,9 +17,9 @@ namespace FoundryBlazor.Shape;
 
 		public FoDatum3D CreateTextAt(string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
 		{
-			this.text = text.Trim();
+			this.Text = text.Trim();
 
-			position = new FoVector3D()
+			Position = new FoVector3D()
 			{
 				units = units,
 				X = xLoc,
@@ -29,12 +29,12 @@ namespace FoundryBlazor.Shape;
 			return this;
 		}
 
-		public FoDatum3D CreateLabelAt(string text, List<string> details = null, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
+		public FoDatum3D CreateLabelAt(string text, List<string>? details = null, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
 		{
-			this.text = text.Trim();
-			this.details = details;
+			this.Text = text.Trim();
+			this.Details = details;
 
-			position = new FoVector3D()
+			Position = new FoVector3D()
 			{
 				units = units,
                 X = xLoc,
@@ -45,20 +45,20 @@ namespace FoundryBlazor.Shape;
 		}
 		public FoDatum3D EstablishBox(double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
-			boundingBox ??= new FoVector3D();
+			BoundingBox ??= new FoVector3D();
 
 
-        	boundingBox.X = width;
-		    boundingBox.Y = height;
-			boundingBox.Z = depth;
-			boundingBox.units = units;
+        	BoundingBox.X = width;
+		    BoundingBox.Y = height;
+			BoundingBox.Z = depth;
+			BoundingBox.units = units;
 
 			return this;
 		}
 
 		public FoDatum3D CreateShape(string shape, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
 		{
-			this.shape = shape;
+			this.Shape = shape;
 			return EstablishBox(width, height, depth, units);
 		}
 	}
