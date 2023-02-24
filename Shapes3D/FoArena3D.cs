@@ -237,13 +237,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.Bodies()?.ForEach(body =>
         {
-            $"RenderPlatformToScene Body {body.Name}".WriteInfo();
+            $"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
             body.Render(scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
-            $"RenderPlatformToScene Label {label.Name}".WriteInfo();
+            $"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
             label.Render(scene, 0, 0);
         });
 
@@ -441,17 +441,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void PostRender(Guid guid)
     {
-        var msg = $"PostRender with guid = {guid}";
-        $"{msg}".WriteInfo();
         var shape = Find<FoShape3D>(guid.ToString());
         if (shape != null)
         {
-            $"Found Shape guid={guid}".WriteInfo();
             Task.Run(async () =>
             {
-                var desiredGuid = shape.LoadingGUID ?? Guid.NewGuid();
-                await Viewer3D!.RemoveByUuidAsync(desiredGuid);
-                await Viewer3D!.UpdateScene();
+                var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
+                await Viewer3D!.RemoveByUuidAsync(removeGuid);
                 shape.PromiseGUID = null;
                 shape.LoadingGUID = null;
             });
