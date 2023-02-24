@@ -51,18 +51,18 @@ public class FoGlyph3D : FoComponent
     }
 
 
-    public virtual bool PreRender(Viewer viewer, bool deep = true)
+    public virtual bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         return false;
     }
 
     public virtual bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-         return false;
+        return false;
     }
     public virtual bool PostRender(Scene ctx, Guid guid)
     {
-         return false;
+        return false;
     }
 
 

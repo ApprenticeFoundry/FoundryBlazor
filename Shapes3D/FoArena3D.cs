@@ -282,8 +282,8 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.Bodies()?.ForEach(body =>
         {
-            $"RenderPlatformToScene Body {body.Name}".WriteInfo();
-            body.PreRender(Viewer3D!);
+            $"PreRenderPlatform Body {body.Name}".WriteInfo();
+            body.PreRender(this, Viewer3D!);
         });
     }
 
@@ -442,6 +442,23 @@ public class FoArena3D : FoGlyph3D, IArena
     public void PostRender(Guid guid)
     {
         var msg = $"PostRender with guid = {guid}";
-        $"Message = {msg}".WriteInfo();
+        $"{msg}".WriteInfo();
+        var shape = Find<FoShape3D>(guid.ToString());
+        if (shape != null)
+        {
+            $"Found Shape guid={guid}".WriteInfo();
+            Task.Run(async () =>
+            {
+                var desiredGuid = shape.LoadingGUID ?? Guid.NewGuid();
+                await Viewer3D!.RemoveByUuidAsync(desiredGuid);
+                await Viewer3D!.UpdateScene();
+                shape.PromiseGUID = null;
+                shape.LoadingGUID = null;
+            });
+        }
+        else
+        {
+            $"Did not find Shape guid={guid}".WriteError();
+        }
     }
 }
