@@ -9,11 +9,11 @@ public interface IFoComponent
 }
 
 
-public class FoComponent: FoBase, IFoComponent
+public class FoComponent : FoBase, IFoComponent
 {
     private Dictionary<string, object> Slots { get; set; } = new();
 
-    public FoComponent(string name=""): base(name)
+    public FoComponent(string name = "") : base(name)
     {
     }
 
@@ -26,8 +26,8 @@ public class FoComponent: FoBase, IFoComponent
     {
         var key = typeof(T).Name;
         var found = Slots.ContainsKey(key) ? Slots[key] : null;
-        if ( found == null ) 
-       {  
+        if (found == null)
+        {
             found = Activator.CreateInstance<FoCollection<T>>();
             Slots.Add(key, found);
         }
@@ -47,23 +47,30 @@ public class FoComponent: FoBase, IFoComponent
         return Slots.ContainsKey(key) ? Slots[key] as FoCollection<T> : null;
     }
 
-    public virtual T Add<T>(T value) where T: FoBase
+    public virtual T Add<T>(T value) where T : FoBase
     {
         var target = Slot<T>();
         target.Add(value);
         return value;
     }
 
-    public virtual T Remove<T>(T value) where T: FoBase
+    public virtual T Add<T>(string key, T value) where T : FoBase
+    {
+        var target = Slot<T>();
+        target.Add(key, value);
+        return value;
+    }
+
+    public virtual T Remove<T>(T value) where T : FoBase
     {
         var target = GetSlot<T>();
         target?.Remove(value);
         return value;
     }
 
-    public virtual bool Remove<T>(string key) where T: FoBase
+    public virtual bool Remove<T>(string key) where T : FoBase
     {
-        if ( Slots.ContainsKey(typeof(T).Name)  )
+        if (Slots.ContainsKey(typeof(T).Name))
         {
             var target = Slot<T>();
             return target.Remove(key);
@@ -73,7 +80,7 @@ public class FoComponent: FoBase, IFoComponent
 
     public virtual T? Find<T>(string key) where T : FoBase
     {
-        if ( Slots.ContainsKey(typeof(T).Name) == false )
+        if (Slots.ContainsKey(typeof(T).Name) == false)
         {
             return null as T;
         }
@@ -108,7 +115,7 @@ public class FoComponent: FoBase, IFoComponent
         return list;
     }
 
-  
+
     public virtual T Establish<T>(string key) where T : FoBase
     {
         FoCollection<T> target = Slot<T>();
@@ -119,5 +126,5 @@ public class FoComponent: FoBase, IFoComponent
             target.Add(key, found);
         }
         return (found as T)!;
-    }  
+    }
 }

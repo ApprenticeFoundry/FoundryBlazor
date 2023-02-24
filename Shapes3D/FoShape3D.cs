@@ -24,7 +24,8 @@ public class FoShape3D : FoGlyph3D
     public FoVector3D? Origin { get; set; }
     public FoVector3D? BoundingBox { get; set; }
 
-    public Guid? PromiseGUID  { get; set; }
+    public Guid? PromiseGUID { get; set; }
+    public Guid? LoadingGUID { get; set; }
 
     public FoShape3D() : base()
     {
@@ -116,6 +117,7 @@ public class FoShape3D : FoGlyph3D
             Color = "Yellow",
             Position = GetPosition().AsVector3()
         };
+        LoadingGUID = label.Uuid;
         ctx.Add(label);
         return true;
     }
@@ -148,10 +150,10 @@ public class FoShape3D : FoGlyph3D
     }
 
 
- 
 
 
-    private bool PreRenderGlb(Viewer viewer, Import3DFormats format)
+
+    private bool PreRenderGlb(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
 
         var url = Symbol?.Replace("http", "https");
@@ -168,6 +170,7 @@ public class FoShape3D : FoGlyph3D
             $"PreRenderGlb symbol [{url}] ".WriteLine();
             PromiseGUID = await viewer.Import3DModelAsync(settings);
             $"PreRenderGlb guid [{PromiseGUID}] ".WriteLine();
+            arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
         });
         return true;
     }
@@ -205,19 +208,19 @@ public class FoShape3D : FoGlyph3D
 
 
 
-   public override bool PreRender(Viewer viewer, bool deep = true)
+    public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         //is symbol ends with ....
         if ((bool)(Type.Matches("Glb")))
         {
-            return PreRenderGlb(viewer, Import3DFormats.Gltf);
+            return PreRenderGlb(arena, viewer, Import3DFormats.Gltf);
         }
         return false;
     }
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-     
+
         var result = Type switch
         {
             "Box" => Box(ctx),
