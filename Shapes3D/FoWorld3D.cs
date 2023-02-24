@@ -84,7 +84,8 @@ public class FoWorld3D : FoGlyph3D
         {
             platform.Flush();
 
-            Bodies()?.Where(obj => obj.IsSamePlatform(platform))
+            //TODO: Why are TextLabels being added to Bodies?  If we can prevent that then we don't need to check obj.Type != null
+            Bodies()?.Where(obj => obj.IsSamePlatform(platform) && obj.Type != null)
                     .Select(obj => platform.Add<FoShape3D>(obj)).ToList();
 
             Labels()?.Where(obj => obj.IsSamePlatform(platform))
@@ -122,25 +123,25 @@ public class FoWorld3D : FoGlyph3D
         //relationships = relationships.DistinctBy(i => i.uniqueGuid).ToList();
 
         var platforms = Platforms()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
-        if ( platforms != null)
+        if (platforms != null)
             GetSlot<FoGroup3D>()?.Flush().AddRange(platforms);
 
         var bodies = Bodies()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
-        if ( bodies != null)
+        if (bodies != null)
             GetSlot<FoShape3D>()?.Flush().AddRange(bodies);
 
         var labels = Labels()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
-        if ( labels != null)
-            GetSlot<FoText3D>()?.Flush().AddRange(labels); 
-        
+        if (labels != null)
+            GetSlot<FoText3D>()?.Flush().AddRange(labels);
+
         var datums = Datums()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
-        if ( datums != null)
-            GetSlot<FoDatum3D>()?.Flush().AddRange(datums); 
-        
+        if (datums != null)
+            GetSlot<FoDatum3D>()?.Flush().AddRange(datums);
+
         var relationships = Relationships()?.GroupBy(i => i.UniqueGuid).Select(g => g.First()).ToList();
-        if ( relationships != null)
-            GetSlot<FoRelationship3D>()?.Flush().AddRange(relationships); 
-        
+        if (relationships != null)
+            GetSlot<FoRelationship3D>()?.Flush().AddRange(relationships);
+
         return this;
     }
 }

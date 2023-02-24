@@ -112,10 +112,12 @@ public class FoShape3D : FoGlyph3D
 
     public bool Loading(Scene ctx, string message)
     {
+        Random rnd = new Random();
+        int y = rnd.Next(-5, 7);
         var label = new LabelText(message)
         {
             Color = "Yellow",
-            Position = GetPosition().AsVector3()
+            Position = new FoVector3D(-3, y, -2).AsVector3()
         };
         LoadingGUID = label.Uuid;
         ctx.Add(label);
@@ -181,6 +183,7 @@ public class FoShape3D : FoGlyph3D
         var url = Symbol?.Replace("http", "https");
 
         Loading(ctx, $"Loading... {url}");
+        // Loading(ctx, $"PH");
 
 
         return true;
@@ -236,6 +239,7 @@ public class FoShape3D : FoGlyph3D
         //add code to remove the 'loading...'  and then 
         //resolve the guid that was the promise
         PromiseGUID = null;
+        LoadingGUID = null;
         return true;
     }
 
