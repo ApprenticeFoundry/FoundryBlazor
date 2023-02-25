@@ -14,9 +14,9 @@ public interface IPageManagement: IRender
     List<FoGlyph2D> ExtractShapes(string GlyphId);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllObjects();
-    FoRealPage2D CurrentPage();
-    FoRealPage2D SetCurrentPage(FoRealPage2D page);
-    FoRealPage2D AddPage(FoRealPage2D page);
+    FoPage2D CurrentPage();
+    FoPage2D SetCurrentPage(FoPage2D page);
+    FoPage2D AddPage(FoPage2D page);
 
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
     List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
@@ -51,8 +51,8 @@ public class PageManagementService : IPageManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoRealPage2D _activePage { get; set; }
-    private readonly FoCollection<FoRealPage2D> _pages = new();
+    private FoPage2D _activePage { get; set; }
+    private readonly FoCollection<FoPage2D> _pages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
     private readonly IScaledDrawingHelpers _helper;
@@ -66,7 +66,7 @@ public class PageManagementService : IPageManagement
         _selectService = sel;
         _helper = help;
 
-        _activePage = new FoRealPage2D("RealPage-1", 100, 200, "#D3D3D3", help)
+        _activePage = new FoPage2D("RealPage-1", 100, 200, "#D3D3D3")
         {
             IsActive = true
         };
@@ -177,14 +177,14 @@ public class PageManagementService : IPageManagement
 
     }
 
-    public FoRealPage2D CurrentPage()
+    public FoPage2D CurrentPage()
     {
         if (_activePage == null)
         {
             var found = _pages.Values().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoRealPage2D("Page-1", 1000, 500, "#D3D3D3", _helper);
+                found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
                 AddPage(found);
             }
             _activePage = found;
@@ -193,7 +193,7 @@ public class PageManagementService : IPageManagement
 
         return _activePage;
     }
-    public FoRealPage2D SetCurrentPage(FoRealPage2D page)
+    public FoPage2D SetCurrentPage(FoPage2D page)
     {
         _activePage = page;
         _pages.Values().ForEach(item => item.IsActive = false);
@@ -201,7 +201,7 @@ public class PageManagementService : IPageManagement
         return _activePage!;
     }
 
-    public FoRealPage2D AddPage(FoRealPage2D page)
+    public FoPage2D AddPage(FoPage2D page)
     {
         var found = _pages.Values().Where(item => item == page).FirstOrDefault();
         if (found == null)

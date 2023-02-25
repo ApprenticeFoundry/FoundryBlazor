@@ -13,7 +13,7 @@ public interface IScaledDrawingHelpers
     Rectangle UserWindow();
     Rectangle SetUserWindow(Size size);
     Rectangle SetUserWindow(Point loc);
-    void SetPageDefaults(FoRealPage2D page);
+    void SetPageDefaults(FoPage2D page);
     double ConvertToPixels(double inches);
     int ToPixels(double inches);
     double ConvertToInches(double pixels);
@@ -107,7 +107,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
         }
     }
 
-    public void SetPageDefaults(FoRealPage2D page)
+    public void SetPageDefaults(FoPage2D page)
     {
         page.PageMargin = this.PageMargin;
         page.PageWidth = this.PageWidth;
