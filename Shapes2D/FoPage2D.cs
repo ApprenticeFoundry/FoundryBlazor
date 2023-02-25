@@ -73,6 +73,11 @@ public class FoPage2D : FoGlyph2D
         return list;
     }
 
+    public void SmashLayers() 
+    {
+        _RenderLayers = null;
+    }
+    
     public List<FoCollection<FoGlyph2D>> Layers()
     {
         if ( _RenderLayers == null)
@@ -255,5 +260,10 @@ public class FoPage2D : FoGlyph2D
 
         await ctx.RestoreAsync();
         return true;
+    }
+
+    internal void SmashLayers()
+    {
+        throw new NotImplementedException();
     }
 }

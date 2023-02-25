@@ -36,7 +36,7 @@ public interface IPageManagement: IRender
 
     List<FoGlyph2D> Selections();
     void PageMoveBy(int dx, int dy);
-    void SelectionsMoveBy(int dx, int dy);
+    void SelectionsMoveByd(int dx, int dy);
     void SelectionsRotateBy(double da);
     void SelectionsZoomBy(double factor);
     T Add<T>(T value) where T : FoGlyph2D;
@@ -167,6 +167,7 @@ public class PageManagementService : IPageManagement
     public T Add<T>(T value) where T : FoGlyph2D
     {
         var found = _activePage.Add(value);
+        _activePage.SmashLayers();
         _hitTestService.Insert(value);
         return found;
 

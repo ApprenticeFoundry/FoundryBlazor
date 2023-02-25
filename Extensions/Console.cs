@@ -52,7 +52,7 @@ public static class ConsoleHelpers
     {
         return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Green);
     }
-    }
+    
 
     public static string WriteLine(this string message, ConsoleColor? color = null)
     {
