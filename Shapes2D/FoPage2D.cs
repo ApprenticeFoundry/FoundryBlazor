@@ -71,6 +71,24 @@ public class FoPage2D : FoGlyph2D
         return list;
     }
 
+    public List<IFoCollection<FoGlyph2D>> Layers()
+    {
+        var result = new List<IFoCollection<FoGlyph2D>>()
+        {
+            SlotInterface<FoShape2D>(),
+            SlotInterface<FoShape1D>(),
+            SlotInterface<FoConnector1D>(),
+            SlotInterface<FoText2D>(),
+            SlotInterface<FoGroup2D>(),
+            SlotInterface<FoImage2D>(),
+            SlotInterface<FoDragTarget2D>(),
+        }.Where(item => item != null).ToList();
+
+        result.ForEach(item => item.Flush());
+
+        return result!;
+    }
+
     public FoPage2D ClearAll()
     {
         GetSlot<FoShape2D>()?.Flush();
@@ -111,8 +129,8 @@ public class FoPage2D : FoGlyph2D
         //var Hero2D = FindWhere<FoHero2D>(child => child.GlyphId == GlyphId);
         //if (Hero2D != null) result.AddRange(Hero2D);
 
-        var IDragTarget2D = FindWhere<FoDragTarget2D>(child => child.GlyphId == GlyphId);
-        if (IDragTarget2D != null) result.AddRange(IDragTarget2D);
+        var DragTarget2D = FindWhere<FoDragTarget2D>(child => child.GlyphId == GlyphId);
+        if (DragTarget2D != null) result.AddRange(DragTarget2D);
 
         return result;
     }

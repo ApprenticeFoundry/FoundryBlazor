@@ -66,7 +66,7 @@ public class PageManagementService : IPageManagement
         _selectService = sel;
         _ScaledDrawing = help;
 
-        CurrentPage();
+        _activePage = CurrentPage();
     }
 
 

@@ -41,6 +41,12 @@ public class FoComponent : FoBase, IFoComponent
         return Slots.ContainsKey(key);
     }
 
+     public IFoCollection? SlotInterface<T>() where T : FoBase
+    {
+        var key = typeof(T).Name;
+        return Slots.ContainsKey(key) ? Slots[key] as IFoCollection : null;
+    }
+
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
     {
         var key = typeof(T).Name;

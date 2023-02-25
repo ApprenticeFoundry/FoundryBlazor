@@ -5,10 +5,15 @@ using System.Linq;
 
 namespace FoundryBlazor;
 
+public interface IFoCollection<T> where T : FoBase 
+{
+    void Flush();
+}
 [System.Serializable]
-public class FoCollection<T> where T : FoBase
+public class FoCollection<T> where T : FoBase, IFoCollection<T>
 {
     public string Key { get; set; }
+    public int Layer { get; set; } = 0;
     private readonly Dictionary<string, T> members = new();
 
     public FoCollection()
