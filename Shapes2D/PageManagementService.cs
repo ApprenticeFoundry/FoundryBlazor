@@ -55,7 +55,7 @@ public class PageManagementService : IPageManagement
     private readonly FoCollection<FoPage2D> _pages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawingHelpers _helper;
+    private readonly IScaledDrawingHelpers _ScaledDrawing;
 
     public PageManagementService(
         IHitTestService hit,
@@ -64,14 +64,9 @@ public class PageManagementService : IPageManagement
     {
         _hitTestService = hit;
         _selectService = sel;
-        _helper = help;
+        _ScaledDrawing = help;
 
-        _activePage = new FoPage2D("RealPage-1", 100, 200, "#D3D3D3")
-        {
-            IsActive = true
-        };
-
-        AddPage(_activePage);
+        CurrentPage();
     }
 
 
@@ -88,24 +83,24 @@ public class PageManagementService : IPageManagement
 
     public FoPage2D SetPageSizeInches(double width, double height)
     {
-        _helper.SetPageSizeInches(width, height);
+        _ScaledDrawing.SetPageSizeInches(width, height);
 
         var page = CurrentPage();
-        _helper.SetPageDefaults(page);
+        _ScaledDrawing.SetPageDefaults(page);
         return page;
     }
     public FoPage2D SetPageLandscape()
     {
         var page = CurrentPage();
-        _helper.SetPageLandscape();
-        _helper.SetPageDefaults(page);
+        _ScaledDrawing.SetPageLandscape();
+        _ScaledDrawing.SetPageDefaults(page);
         return page;
     }
     public FoPage2D SetPagePortrait()
     {
         var page = CurrentPage();
-        _helper.SetPagePortrait();
-        _helper.SetPageDefaults(page);
+        _ScaledDrawing.SetPagePortrait();
+        _ScaledDrawing.SetPageDefaults(page);
         return page;
     }
     public void ClearAll()
@@ -185,6 +180,7 @@ public class PageManagementService : IPageManagement
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
+                found.SetScaledDrawing(_ScaledDrawing);
                 AddPage(found);
             }
             _activePage = found;
