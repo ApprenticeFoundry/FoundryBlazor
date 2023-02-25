@@ -97,19 +97,6 @@ public class FoShape3D : FoGlyph3D
         return false;
     }
 
-    public bool Box(Scene ctx)
-    {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        var mesh = new Mesh
-        {
-            Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-            Position = GetPosition().AsVector3(),
-            Material = GetMaterial()
-        };
-        ctx.Add(mesh);
-        return true;
-    }
-
     public bool Loading(Scene ctx, string message)
     {
         Random rnd = new Random();
@@ -121,6 +108,19 @@ public class FoShape3D : FoGlyph3D
         };
         LoadingGUID = label.Uuid;
         ctx.Add(label);
+        return true;
+    }
+
+    public bool Box(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var mesh = new Mesh
+        {
+            Geometry = new BoxGeometry(box.X, box.Y, box.Z),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
         return true;
     }
 
@@ -152,39 +152,187 @@ public class FoShape3D : FoGlyph3D
     }
 
 
+    private bool Circle(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
+        var mesh = new Mesh
+        {
+            Geometry = new CircleGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }
 
+    private bool Capsule(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-    private bool PreRenderGlb(FoArena3D arena, Viewer viewer, Import3DFormats format)
+        var mesh = new Mesh
+        {
+            Geometry = new CapsuleGeometry(radius: box.X / 2, box.Y),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }
+
+    private bool Cone(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new ConeGeometry(radius: box.X / 2, height: box.Y),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }
+
+    private bool Dodecahedron(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new DodecahedronGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }
+ 
+     private bool Icosahedron(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new IcosahedronGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }  
+
+      private bool Octahedron(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new OctahedronGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }  
+      private bool Tetrahedron(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new TetrahedronGeometry(radius: box.X / 2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }  
+    private bool Plane(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new PlaneGeometry(width: box.X, height: box.Y),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    } 
+
+    private bool Ring(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+
+        var mesh = new Mesh
+        {
+            Geometry = new RingGeometry(innerRadius: box.X/2, outerRadius: box.Y/2),
+            Position = GetPosition().AsVector3(),
+            Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    } 
+
+    public static void FillScene(Scene scene)
     {
 
-        var url = Symbol?.Replace("http", "https");
+        scene.Add(new Mesh
+        {
+            Geometry = new TorusGeometry(radius: 0.6f, tube: 0.4f, radialSegments: 12, tubularSegments: 12),
+            Position = new Vector3(4, 0, -4),
+            Material = new MeshStandardMaterial()
+            {
+                Color = "lightgreen"
+            }
+        });
+        scene.Add(new Mesh
+        {
+            Geometry = new TorusKnotGeometry(radius: 0.6f, tube: 0.1f),
+            Position = new Vector3(-4, 0, -4),
+            Material = new MeshStandardMaterial()
+            {
+                Color = "RosyBrown"
+            }
+        });
+    }
+
+
+    private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
+    {
+        if (!string.IsNullOrEmpty(Symbol)) return false;
+
+        var url = Symbol.Replace("http", "https");
 
         var settings = new ImportSettings
         {
             Format = format,
-            FileURL = url ?? "",
-            Position = Position?.AsVector3() ?? new Vector3()
+            FileURL = url,
+            Position = Position?.AsVector3() ?? new Vector3(),
+            Rotation = Rotation?.AsEuler() ?? new Euler()
         };
 
         Task.Run(async () =>
         {
-            $"PreRenderGlb symbol [{url}] ".WriteLine();
+            $"PreRenderImport symbol [{url}] ".WriteLine();
             PromiseGUID = await viewer.Import3DModelAsync(settings);
-            $"PreRenderGlb guid [{PromiseGUID}] ".WriteLine();
+            $"PreRenderImport guid [{PromiseGUID}] ".WriteLine();
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
         });
         return true;
     }
 
-    private bool RenderGlb(Scene ctx, Import3DFormats format)
+    private bool RenderImport(Scene ctx, Import3DFormats format)
     {
+        if (!string.IsNullOrEmpty(Symbol)) return false;
 
-        var url = Symbol?.Replace("http", "https");
+        var url = Symbol.Replace("http", "https");
+        var last = url.Split('/').Last();
 
-        Loading(ctx, $"Loading... {url}");
+        Loading(ctx, $"Loading... {last}");
         // Loading(ctx, $"PH");
-
 
         return true;
     }
@@ -214,11 +362,17 @@ public class FoShape3D : FoGlyph3D
     public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         //is symbol ends with ....
-        if ((bool)(Type.Matches("Glb")))
+
+        var result = Type switch
         {
-            return PreRenderGlb(arena, viewer, Import3DFormats.Gltf);
-        }
-        return false;
+            "Collada" => PreRenderImport(arena, viewer, Import3DFormats.Collada),
+            "Fbx" => PreRenderImport(arena, viewer, Import3DFormats.Fbx),
+            "Obj" => PreRenderImport(arena, viewer, Import3DFormats.Obj),
+            "Stl" => PreRenderImport(arena, viewer, Import3DFormats.Stl),
+            "Glb" => PreRenderImport(arena, viewer, Import3DFormats.Gltf),
+            _ => false
+        };
+        return result;
     }
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
@@ -229,18 +383,37 @@ public class FoShape3D : FoGlyph3D
             "Box" => Box(ctx),
             "Cylinder" => Cylinder(ctx),
             "Sphere" => Sphere(ctx),
-            "Glb" => RenderGlb(ctx, Import3DFormats.Gltf),
+            "Plane" => Plane(ctx),
+            "Capsule" => Capsule(ctx),
+            "Cone" => Cone(ctx),
+            "Collada" => RenderImport(ctx, Import3DFormats.Collada),
+            "Fbx" => RenderImport(ctx, Import3DFormats.Fbx),
+            "Obj" => RenderImport(ctx, Import3DFormats.Obj),
+            "Stl" => RenderImport(ctx, Import3DFormats.Stl),
+            "Glb" => RenderImport(ctx, Import3DFormats.Gltf),
             _ => NotImplemented(ctx)
         };
         return result;
     }
+
     public override bool PostRender(Scene ctx, Guid guid)
     {
         //add code to remove the 'loading...'  and then 
         //resolve the guid that was the promise
+
+        var result = Type switch
+        {
+            "Collada" => true,
+            "Fbx" => true,
+            "Obj" => true,
+            "Stl" => true,
+            "Glb" => true,
+            _ => false
+        };
+
         PromiseGUID = null;
         LoadingGUID = null;
-        return true;
+        return result;
     }
 
 }

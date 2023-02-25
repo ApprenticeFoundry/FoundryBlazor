@@ -46,7 +46,12 @@ public class FoText3D : FoGlyph3D
         Text = text;
         return this;
     }
-
+    public FoText3D CreateTextAt(string text, double x, double y, double z, string units)
+    {
+        Position = new FoVector3D(x, y, z) { units = units };
+        Text = text;
+        return this;
+    }
 
     public override FoVector3D GetPosition()
     {
@@ -68,8 +73,5 @@ public class FoText3D : FoGlyph3D
         return true;
     }
 
-    internal FoText3D CreateTextAt(string text, double xLoc, double yLoc, double zLoc, string units)
-    {
-        throw new NotImplementedException();
-    }
+
 }

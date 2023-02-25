@@ -23,18 +23,23 @@ public class FoVector3D
         return new Vector3(X, Y, Z);
     }
 
-    public double distanceXZ()
+    public Euler AsEuler()
+    {
+        return new Euler() { X = X, Y = Y, Z = Z, Order = "XYZ" };
+    }
+
+    public double DistanceXZ()
     {
         return Math.Sqrt(this.X * this.X + this.Z * this.Z);
     }
 
-    public double bearingXZ()
+    public double BearingXZ()
     {
         return Math.Atan2(this.X, this.Z);
     }
 
 
-    public FoVector3D copyFrom(FoVector3D pos)
+    public FoVector3D CopyFrom(FoVector3D pos)
     {
         this.units = pos.units;
         this.X = pos.X;
