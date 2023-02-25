@@ -99,7 +99,7 @@ public class FoShape3D : FoGlyph3D
 
     public bool Loading(Scene ctx, string message)
     {
-        Random rnd = new Random();
+        Random rnd = new();
         int y = rnd.Next(-5, 7);
         var label = new LabelText(message)
         {
@@ -119,6 +119,19 @@ public class FoShape3D : FoGlyph3D
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
+        };
+        ctx.Add(mesh);
+        return true;
+    }
+
+    public bool Boundary(Scene ctx)
+    {
+        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var mesh = new Mesh
+        {
+            Geometry = new BoxGeometry(box.X, box.Y, box.Z),
+            Position = GetPosition().AsVector3(),
+            Material = GetWireframe()
         };
         ctx.Add(mesh);
         return true;
@@ -337,6 +350,17 @@ public class FoShape3D : FoGlyph3D
         return true;
     }
 
+
+    public MeshStandardMaterial GetWireframe()
+    {
+        var result = new MeshStandardMaterial()
+        {
+            Color = this.Color,
+            Wireframe = true
+        };
+        return result;
+    }
+
     public override MeshStandardMaterial GetMaterial()
     {
 
@@ -381,6 +405,8 @@ public class FoShape3D : FoGlyph3D
         var result = Type switch
         {
             "Box" => Box(ctx),
+            "Boundary" => Boundary(ctx),
+            "Circle" => Circle(ctx),
             "Cylinder" => Cylinder(ctx),
             "Sphere" => Sphere(ctx),
             "Plane" => Plane(ctx),
