@@ -1,3 +1,5 @@
+using FoundryBlazor.Shape;
+
 namespace FoundryBlazor;
 
 public interface IFoComponent
@@ -41,16 +43,12 @@ public class FoComponent : FoBase, IFoComponent
         return Slots.ContainsKey(key);
     }
 
-     public IFoCollection? SlotInterface<T>() where T : FoBase
-    {
-        var key = typeof(T).Name;
-        return Slots.ContainsKey(key) ? Slots[key] as IFoCollection : null;
-    }
+
 
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
     {
         var key = typeof(T).Name;
-        return Slots.ContainsKey(key) ? Slots[key] as FoCollection<T> : null;
+        return Slots.TryGetValue(key, out object value) ? value as FoCollection<T> : null;
     }
 
     public virtual T Add<T>(T value) where T : FoBase
@@ -121,6 +119,16 @@ public class FoComponent : FoBase, IFoComponent
         return list;
     }
 
+    public List<FoCollection<FoGlyph2D>> AllGlyphSlots()
+    {
+        var list = new List<FoCollection<FoGlyph2D>>();
+        foreach (var item in Slots.Values)
+        {
+            if (item is FoCollection<FoGlyph2D> col)
+                list.Add(col);
+        }
+        return list;
+    }
 
     public virtual T Establish<T>(string key) where T : FoBase
     {

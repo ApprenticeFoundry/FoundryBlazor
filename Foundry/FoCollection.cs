@@ -5,20 +5,36 @@ using System.Linq;
 
 namespace FoundryBlazor;
 
-public interface IFoCollection<T> where T : FoBase 
-{
-    void Flush();
-}
+//public interface IFoCollection 
+//{
+//    int GetLayer();
+//    string GetKey();
+//}
+
 [System.Serializable]
-public class FoCollection<T> where T : FoBase, IFoCollection<T>
+public class FoCollection<T> where T : FoBase
 {
     public string Key { get; set; }
-    public int Layer { get; set; } = 0;
+    protected int Layer { get; set; } = 0;
+
     private readonly Dictionary<string, T> members = new();
 
     public FoCollection()
     {
         Key = typeof(T).Name;
+    }
+
+    public int GetLayer()
+    {
+        return Layer;
+    }
+    public void SetLayer(int layer)
+    {
+        Layer = layer;
+    }
+    public string GetKey()
+    {
+        return Key;
     }
 
     public List<string> Keys()
