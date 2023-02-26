@@ -13,7 +13,7 @@ public interface IFoComponent
 
 public class FoComponent : FoBase, IFoComponent
 {
-    private Dictionary<string, object> Slots { get; set; } = new();
+    private Dictionary<string, IFoCollection> Slots { get; set; } = new();
 
     public FoComponent(string name = "") : base(name)
     {
@@ -48,7 +48,7 @@ public class FoComponent : FoBase, IFoComponent
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
     {
         var key = typeof(T).Name;
-        return Slots.TryGetValue(key, out object value) ? value as FoCollection<T> : null;
+        return Slots.TryGetValue(key, out IFoCollection value) ? value as FoCollection<T> : null;
     }
 
     public virtual T Add<T>(T value) where T : FoBase
@@ -119,14 +119,17 @@ public class FoComponent : FoBase, IFoComponent
         return list;
     }
 
-    public List<FoCollection<FoGlyph2D>> AllGlyphSlots()
+    public List<IFoCollection> AllGlyphSlots()
     {
-        var list = new List<FoCollection<FoGlyph2D>>();
+        var list = new List<IFoCollection>();
         foreach (var item in Slots.Values)
         {
-            if (item is FoCollection<FoGlyph2D> col)
+            if (item is IFoCollection col)
+            {
                 list.Add(col);
+            }
         }
+        list = list.OrderBy(x => x.GetLayer()).ToList();
         return list;
     }
 

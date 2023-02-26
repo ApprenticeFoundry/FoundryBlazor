@@ -5,14 +5,15 @@ using System.Linq;
 
 namespace FoundryBlazor;
 
-//public interface IFoCollection 
-//{
-//    int GetLayer();
-//    string GetKey();
-//}
+public interface IFoCollection 
+{
+   int GetLayer();
+   string GetKey();
+   void Clear();
+}
 
 [System.Serializable]
-public class FoCollection<T> where T : FoBase
+public class FoCollection<T>: IFoCollection where T : FoBase
 {
     public string Key { get; set; }
     protected int Layer { get; set; } = 0;
@@ -122,9 +123,15 @@ public class FoCollection<T> where T : FoBase
         return extraction;
     }
 
-    public FoCollection<T> Flush()
+    public void Clear()
     {
         members.Clear();
+    }
+
+    public FoCollection<T> Flush()
+    {
+        Clear();
         return this;
     }
+
 }

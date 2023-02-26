@@ -14,7 +14,7 @@ public class FoPage2D : FoGlyph2D
     public double PageHeight { get; set; } = 4.0;  //inches
 
     protected IScaledDrawingHelpers? _ScaledDrawing;
-    protected List<FoCollection<FoGlyph2D>>? _RenderLayers;
+    protected List<IFoCollection>? _RenderLayers;
 
 
     public override Rectangle Rect()
@@ -75,27 +75,34 @@ public class FoPage2D : FoGlyph2D
 
     public void SmashLayers() 
     {
+        if ( _RenderLayers != null)
+            $"SmashLayers".WriteInfo(1);
+
         _RenderLayers = null;
     }
-    
-    public List<FoCollection<FoGlyph2D>> Layers()
+
+    public List<IFoCollection> Layers()
     {
         if ( _RenderLayers == null)
         {
+            $"getting Layers".WriteInfo(1);
             _RenderLayers = AllGlyphSlots();
-            _RenderLayers = _RenderLayers.OrderBy(x => x.GetLayer()).ToList();
+
             foreach (var item in _RenderLayers)
             {
                 $"key = {item.GetKey()}".WriteInfo();
             }
+
+            $"getting Layers {_RenderLayers.Count}".WriteInfo(1);
         }
+
 
         return _RenderLayers;
     }
 
     public FoPage2D ClearAll()
     {
-        Layers().ForEach(item => item.Flush());
+        Layers().ForEach(item => item.Clear());
         return this;
     }
 
@@ -103,9 +110,12 @@ public class FoPage2D : FoGlyph2D
     {
         var result = new List<FoGlyph2D>();
         foreach (var item in Layers())
-        {       
-            var found = item.FindWhere(child => child.GlyphId == GlyphId);
-            if (found != null) result.AddRange(found);
+        {
+            if (item is FoCollection<FoGlyph2D> col)
+            {
+                var found = col.FindWhere(child => child.GlyphId == GlyphId);
+                if (found != null) result.AddRange(found);
+            }
         }
         return result;
     }
@@ -114,9 +124,12 @@ public class FoPage2D : FoGlyph2D
     {
         var result = new List<FoGlyph2D>();
         foreach (var item in Layers())
-        {       
-            var found = item.ExtractWhere(child => child.GlyphId == GlyphId);
-            if (found != null) result.AddRange(found);
+        {
+             if ( item is FoCollection<FoGlyph2D> col) 
+             {
+                var found = col.ExtractWhere(child => child.GlyphId == GlyphId);
+                if (found != null) result.AddRange(found);
+             }       
         }
         return result;
     }
@@ -126,7 +139,8 @@ public class FoPage2D : FoGlyph2D
     {
         foreach (var item in Layers())
         {
-            item.Values().ForEach(child => child.ComputeShouldRender(region));
+            if ( item is FoCollection<FoGlyph2D> col) 
+                col.Values().ForEach(child => child.ComputeShouldRender(region));
         }
         return true;
     }
@@ -255,15 +269,18 @@ public class FoPage2D : FoGlyph2D
 
         foreach (var item in Layers())
         {
-            item.Values().ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+            if ( item is FoCollection<FoGlyph2D> col) {
+
+                var values = col.Values();
+                $"RenderDetailed Layer {col.Key} {values.Count}".WriteInfo();
+                if ( values.Count > 0) {
+                    values.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+                }
+            }
         }
 
         await ctx.RestoreAsync();
         return true;
     }
 
-    internal void SmashLayers()
-    {
-        throw new NotImplementedException();
-    }
 }
