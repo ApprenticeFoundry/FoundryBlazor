@@ -1,7 +1,6 @@
 ﻿
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 public class FoPage2D : FoGlyph2D

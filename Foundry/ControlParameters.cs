@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace FoundryBlazor;
+﻿namespace FoundryBlazor;
 
 
 [System.Serializable]

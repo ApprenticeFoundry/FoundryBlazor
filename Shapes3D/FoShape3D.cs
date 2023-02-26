@@ -1,5 +1,3 @@
-
-using BlazorThreeJS.Core;
 using BlazorThreeJS.Enums;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Labels;
@@ -10,7 +8,6 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace FoundryBlazor.Shape;
 

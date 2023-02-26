@@ -1,7 +1,5 @@
 using BlazorThreeJS.Labels;
-using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Viewers;
 
 namespace FoundryBlazor.Shape;
 

@@ -1,4 +1,3 @@
-using System.Drawing;
 using FoundryBlazor.Canvas;
 using BlazorComponentBus;
 

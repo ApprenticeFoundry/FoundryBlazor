@@ -1,9 +1,4 @@
 // this is a tool to load/unload knowledge modules that define projects
-using System.Collections.Generic;
-using System.Linq;
-using FoundryBlazor.Extensions;
-
-
 
 namespace FoundryBlazor.Shape;
 

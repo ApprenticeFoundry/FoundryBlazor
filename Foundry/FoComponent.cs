@@ -1,5 +1,3 @@
-using FoundryBlazor.Shape;
-
 namespace FoundryBlazor;
 
 public interface IFoComponent
@@ -10,36 +8,33 @@ public interface IFoComponent
     List<T> Members<T>() where T : FoBase;
 }
 
-public class SlotGroups<V>: Dictionary<string, FoCollection<V>> where V : FoBase
+public class SlotGroups: Dictionary<string, object>
 {
-    public FoCollection<U> EstablishSlot<U>() where U: V
+    public FoCollection<U> EstablishSlot<U>() where U: FoBase
     {
         var key = typeof(U).Name;
         if ( ContainsKey(key) == false )
         {
             var result = Activator.CreateInstance<FoCollection<U>>();
-            return Add(key, result);
+            Add(key, result);
+            return result;
         }
         return (this[key] as FoCollection<U>)!;
     }
 
-    public FoCollection<U>? FindSlot<U>() where U : V
+    public FoCollection<U>? FindSlot<U>() where U : FoBase
     {
         var key = typeof(U).Name;
         var found = ContainsKey(key) == true ? this[key] : null;
 
         return found as FoCollection<U>;
     }
-    private FoCollection<U> Add<U>(string key, FoCollection<U> found) where U : V
-    {
-        Add(key, found);
-        return found;
-    }
+
 }
 
 public class FoComponent : FoBase, IFoComponent
 {
-    private SlotGroups<FoBase> Slots { get; set; } = new();
+    private SlotGroups Slots { get; set; } = new();
 
     public FoComponent(string name = "") : base(name)
     {

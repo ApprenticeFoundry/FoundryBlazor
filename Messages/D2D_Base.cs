@@ -1,5 +1,3 @@
-using System;
-
 namespace FoundryBlazor.Message;
 
 public class D2D_Base

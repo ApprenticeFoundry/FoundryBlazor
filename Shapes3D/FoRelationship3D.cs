@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 namespace FoundryBlazor.Shape;
 
-	public class FoRelationship3D : FoGlyph3D
+public class FoRelationship3D : FoGlyph3D
 	{
 		public string? Relationship { get; set; }
     	public string? Source { get; set; }

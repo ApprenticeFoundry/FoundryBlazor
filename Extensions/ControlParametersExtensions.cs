@@ -1,5 +1,4 @@
 using System.Reflection;
-using FoundryBlazor;
 
 namespace FoundryBlazor.Extensions;
 

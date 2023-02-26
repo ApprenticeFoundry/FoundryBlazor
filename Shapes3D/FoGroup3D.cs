@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace FoundryBlazor.Shape;
 
 public class FoGroup3D : FoGlyph3D

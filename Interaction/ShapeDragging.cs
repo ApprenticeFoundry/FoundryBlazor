@@ -1,7 +1,5 @@
-using System.Drawing;
 using FoundryBlazor.Canvas;
 using BlazorComponentBus;
-using FoundryBlazor;
 
 namespace FoundryBlazor.Shape;
 

@@ -1,5 +1,4 @@
 using System.Drawing;
-using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 

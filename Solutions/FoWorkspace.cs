@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;

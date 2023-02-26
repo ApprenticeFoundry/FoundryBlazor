@@ -11,8 +11,6 @@ using BlazorComponentBus;
 
 using FoundryBlazor.PubSub;
 
-using FoundryBlazor.Shared;
-
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
