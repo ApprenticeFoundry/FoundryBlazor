@@ -269,13 +269,16 @@ public class FoPage2D : FoGlyph2D
 
         foreach (var item in Layers())
         {
-            if ( item is FoCollection<FoGlyph2D> col) {
+            if ( item is IFoCollection col) {
 
-                var values = col.Values();
-                $"RenderDetailed Layer {col.Key} {values.Count}".WriteInfo();
-                if ( values.Count > 0) {
-                    values.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+                var values = col.AllItem();
+                $"RenderDetailed Layer {col.GetKey()} {values.Count}".WriteInfo();
+                foreach (var shape in values)
+                {
+                    await ((FoGlyph2D)shape).RenderDetailed(ctx, tick, deep);
                 }
+                    
+                
             }
         }
 

@@ -1,4 +1,5 @@
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,9 +8,10 @@ namespace FoundryBlazor;
 
 public interface IFoCollection 
 {
-   int GetLayer();
-   string GetKey();
-   void Clear();
+    int GetLayer();
+    string GetKey();
+    void Clear();
+    IList AllItem();
 }
 
 [System.Serializable]
@@ -41,6 +43,11 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     public List<string> Keys()
     {
         return this.members.Keys.ToList();
+    }
+
+    public IList AllItem()
+    {
+        return this.members.Values.ToList();
     }
 
     public List<T> Values()
