@@ -40,7 +40,7 @@ public interface IPageManagement: IRender
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
     void SelectionsZoomBy(double factor);
-    T AddShape<T>(T value) where T : FoGlyph2D;
+    T? AddShape<T>(T value) where T : FoGlyph2D;
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
@@ -162,10 +162,12 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public T AddShape<T>(T value) where T : FoGlyph2D
+    public T? AddShape<T>(T value) where T : FoGlyph2D
     {
         var found = _activePage.AddShape(value);
-        _hitTestService.Insert(value);
+        if ( found != null)
+            _hitTestService.Insert(value);
+
         return found;
 
     }
@@ -208,15 +210,16 @@ public class PageManagementService : FoComponent, IPageManagement
         var body = StorageHelpers.Dehydrate<T>(value, false);
         var shape = StorageHelpers.Hydrate<T>(body, false);
 
-        shape!.Name = "";
-        shape!.GlyphId = "";
+        shape.Name = "";
+        shape.GlyphId = "";
 
         //SRS write a method to duplicate actions
         shape.ShapeDraw = value.ShapeDraw;
         shape.DoOnOpenCreate = value.DoOnOpenCreate;
         shape.DoOnOpenEdit = value.DoOnOpenEdit;
 
-        return AddShape<T>(shape);
+        AddShape<T>(shape);
+        return shape;
     }
 
     public U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D
@@ -224,10 +227,11 @@ public class PageManagementService : FoComponent, IPageManagement
         var body = StorageHelpers.Dehydrate<T>(value, false);
         var shape = StorageHelpers.Hydrate<U>(body, false);
 
-        shape!.Name = "";
-        shape!.GlyphId = "";
+        shape.Name = "";
+        shape.GlyphId = "";
 
-        return AddShape<U>(shape);
+        AddShape<U>(shape);
+        return shape;
     }
 
 

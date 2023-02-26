@@ -43,23 +43,8 @@ public class HitTestService : IHitTestService
         Page = page;
         Tree = new QuadTree<FoGlyph2D>(Rect());
 
-        //Page.GetMembers<FoShape1D>()?.ForEach(child => Tree.Insert(child));
-        //Page.GetMembers<FoConnector1D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoGroup2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoShape2D>()?.ForEach(child => Tree.Insert(child));
-        //Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
+        Page.InsertShapesToQuadTree(Tree);
 
-        Page.GetMembers<FoText2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoImage2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoVideo2D>()?.ForEach(child => Tree.Insert(child));
-
-        Page.GetMembers<FoCompound2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoDragTarget2D>()?.ForEach(child => Tree.Insert(child));
-
-        // Page.Members<FoButton2D>().ForEach(child => Tree.Insert(child));
-        //Page.Members<FoMenu2D>().ForEach(child => Tree.Insert(child));
-
-        //$"Refresh Tree {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
         return AllShapesEverywhere();
     }
 

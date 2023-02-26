@@ -89,7 +89,7 @@ public class FoPage2D : FoGlyph2D
         return menu!;
     }
 
-    public T AddShape<T>(T value) where T : FoGlyph2D
+    public T? AddShape<T>(T value) where T : FoGlyph2D
     {
 
         if ( value is IShape2D)
@@ -99,13 +99,20 @@ public class FoPage2D : FoGlyph2D
         else
         {
             $"Shape no rendered {value.Name}".WriteError();
-            ShapesHidden.Add(value);          
+            ShapesHidden.Add(value);
+            return null;
         }
 
         return value;
 
     }
 
+
+    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree) 
+    {
+        Shapes1D.ForEach(child => tree.Insert(child)); 
+        Shapes2D.ForEach(child => tree.Insert(child)); 
+    }
 
     public FoPage2D ClearAll()
     {
