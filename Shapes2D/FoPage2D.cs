@@ -271,14 +271,11 @@ public class FoPage2D : FoGlyph2D
         {
             if ( item is IFoCollection col) {
 
-                var values = col.AllItem();
-                $"RenderDetailed Layer {col.GetKey()} {values.Count}".WriteInfo();
-                foreach (var shape in values)
+                //$"RenderDetailed Layer {col.GetKey()} {values.Count}".WriteInfo();
+                foreach (var shape in col.AllItem())
                 {
                     await ((FoGlyph2D)shape).RenderDetailed(ctx, tick, deep);
                 }
-                    
-                
             }
         }
 
