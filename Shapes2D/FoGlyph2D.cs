@@ -253,9 +253,11 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         ContextLink?.Invoke(this, tick);
 
+        
         var mtx = this.GetMatrix();
         //you must use Transform so the context can acumlate the positions
-        await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+        if ( mtx != null)
+            await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
         await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
 
@@ -523,7 +525,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         {
             _matrix = new Matrix2D();
             _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), 0.0, 0.0, LocPinX(this), LocPinY(this));
-            ResetHitTesting = true;
+            //ResetHitTesting = true;
             $"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
         return _matrix;

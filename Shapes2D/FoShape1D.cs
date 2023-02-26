@@ -1,4 +1,5 @@
 using System.Drawing;
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -20,6 +21,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public int FinishX { get { return this.x2; } set { this.x2 = AssignInt(value,x2); } }
     private int y2 = 0;
     public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
+
+    public new int Height { get { return this.height; } set { this.height = value; } }
+    public new int Width { get { return this.width; } set { this.width = value; } }
 
     public override void Smash() 
     {
@@ -112,7 +116,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             _matrix = new Matrix2D();
             var angle = ComputeAngle();
             _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, this.CenterX(), this.CenterY());
-            FoGlyph2D.ResetHitTesting = true;
+            //FoGlyph2D.ResetHitTesting = true;
+            $"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
         return _matrix;
     }
@@ -122,7 +127,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Start_{target.Name}_{Guid.NewGuid().ToString()}");
+        var glue = new FoGlue2D($"Start_{target.Name}_{Guid.NewGuid()}");
         glue.GlueTo(this, target);
         Smash();
         return glue;
@@ -131,7 +136,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Finish_{target.Name}_{Guid.NewGuid().ToString()}");
+        var glue = new FoGlue2D($"Finish_{target.Name}_{Guid.NewGuid()}");
         glue.GlueTo(this, target);
         Smash();
         return glue;
