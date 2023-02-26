@@ -1,4 +1,5 @@
 using BlazorComponentBus;
+using FoundryBlazor.Extensions;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 
@@ -34,15 +35,15 @@ public class MenuManager : ComponentBase
         //     { "New", async () => await OpenNewWindow()},
         // }, false);
 
-        arena?.EstablishMenu<FoMenu3D>("BlazorThreeJS", new Dictionary<string, Action>()
-        {
-            { "Example1", async () => await Navigate("example1")},
-            { "Example2", async () => await Navigate("example2")},
-            { "Example3", async () => await Navigate("example3")},
-            { "Example4", async () => await Navigate("example4")},
-            { "Example5", async () => await Navigate("example5")},
-            { "Viewer 3D", async () => await Navigate("viewer3D")}
-        }, false);
+        //arena?.EstablishMenu<FoMenu3D>("BlazorThreeJS", new Dictionary<string, Action>()
+        //{
+        //    { "Example1", async () => await Navigate("example1")},
+        //    { "Example2", async () => await Navigate("example2")},
+        //    { "Example3", async () => await Navigate("example3")},
+        //    { "Example4", async () => await Navigate("example4")},
+        //    { "Example5", async () => await Navigate("example5")},
+        //    { "Viewer 3D", async () => await Navigate("viewer3D")}
+        //}, false);
 
         await base.OnInitializedAsync();
     }
@@ -76,10 +77,10 @@ public class MenuManager : ComponentBase
             AllMenus.Clear();
             AllMenus = Workspace.CollectMenus(AllMenus);
 
-            // AllMenus.ForEach(item =>
-            // {
-            //     item.Name.WriteLine();
-            // });
+            AllMenus.ForEach(item =>
+            {
+                item.DisplayText().WriteInfo();
+            });
 
             FoPage2D.RefreshMenus = false;
         }

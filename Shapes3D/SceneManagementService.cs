@@ -12,7 +12,7 @@ public interface ISceneManagement
 
     void ClearAll();
     int SceneCount();
-    int ShapeCount();
+
 
 
     T Add<T>(T value) where T : FoGlyph3D;
@@ -57,16 +57,12 @@ public class SceneManagementService : ISceneManagement
         return 1;
     }
 
-    public int ShapeCount()
-    {
-        return CurrentScene().AllMembers().Count;
-    }
 
 
     public void ClearAll()
     {
         FoGlyph2D.ResetHitTesting = true;
-       // CurrentScene().ClearAll();
+        //SRS fix CurrentScene().ClearAll();
     }
 
     public bool ToggleHitTestRender()

@@ -98,12 +98,10 @@ public class FoComponent : FoBase, IFoComponent
     public virtual T? Find<T>(string key) where T : FoBase
     {
         var target = Slots.FindSlot<T>();
-        if (target == null)
-        {
-            return null as T;
-        }
+        if (target == null) return null;
 
-        if (target!.TryGetValue(key, out T? found) == false)
+
+        if (target.TryGetValue(key, out T? found) == false)
         {
             return null;
         }
@@ -122,16 +120,7 @@ public class FoComponent : FoBase, IFoComponent
         return target.Values();
     }
 
-    public virtual List<FoBase> AllMembers()
-    {
-        var list = new List<FoBase>();
-        foreach (var item in Slots.Values)
-        {
-            if (item is FoCollection<FoBase> col)
-                list.AddRange(col.Values());
-        }
-        return list;
-    }
+ 
 
 
     public virtual T Establish<T>(string key) where T : FoBase

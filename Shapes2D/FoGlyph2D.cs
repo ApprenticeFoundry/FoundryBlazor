@@ -45,10 +45,7 @@ public interface IShape2D
     
 }
 
-public interface IShapeControl
-{
-    
-}
+
 
 public class MeasuredText
 {

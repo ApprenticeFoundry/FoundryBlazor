@@ -3,6 +3,7 @@ using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using FoundryBlazor.Extensions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 
 namespace FoundryBlazor.Shape;
@@ -27,7 +28,7 @@ public interface IPageManagement: IRender
     void ClearAll();
 
     int PageCount();
-    int ShapeCount();
+
 
     FoPage2D SetPageSizeInches(double width, double height);
     FoPage2D SetPageLandscape();
@@ -47,12 +48,11 @@ public interface IPageManagement: IRender
 }
 
 
-public class PageManagementService : IPageManagement
+public class PageManagementService : FoComponent, IPageManagement
 {
 
     private bool RenderHitTestTree = false;
     private FoPage2D _activePage { get; set; }
-    private readonly FoCollection<FoPage2D> _pages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
     private readonly IScaledDrawingHelpers _ScaledDrawing;
@@ -76,10 +76,7 @@ public class PageManagementService : IPageManagement
         return 1;
     }
 
-    public int ShapeCount()
-    {
-        return CurrentPage().AllMembers().Count;
-    }
+
 
     public FoPage2D SetPageSizeInches(double width, double height)
     {
@@ -125,13 +122,14 @@ public class PageManagementService : IPageManagement
 
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
-        _pages.Values().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
         return list;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        CurrentPage().GetMembers<FoMenu2D>()?.ForEach(item =>
+        var page = CurrentPage();
+        page.GetMembers<FoMenu2D>()?.ForEach(item =>
         {
             list.Add(item);
         });
@@ -139,7 +137,7 @@ public class PageManagementService : IPageManagement
     }   
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
-        _pages.Values().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
         return list;
     }
 
@@ -176,7 +174,7 @@ public class PageManagementService : IPageManagement
     {
         if (_activePage == null)
         {
-            var found = _pages.Values().Where(page => page.IsActive).FirstOrDefault();
+            var found = Members<FoPage2D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
@@ -192,16 +190,16 @@ public class PageManagementService : IPageManagement
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
         _activePage = page;
-        _pages.Values().ForEach(item => item.IsActive = false);
+        Slot<FoPage2D>().ForEach(item => item.IsActive = false);
         _activePage.IsActive = true;
         return _activePage!;
     }
 
     public FoPage2D AddPage(FoPage2D page)
     {
-        var found = _pages.Values().Where(item => item == page).FirstOrDefault();
+        var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
         if (found == null)
-            _pages.Add(page);
+            Slot<FoPage2D>().Add(page);
         return page;
     }
 
@@ -304,24 +302,18 @@ public class PageManagementService : IPageManagement
 
     public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
     {
-        var menu = CurrentPage().Find<U>(name);
-        if (menu == null)
-        {
-            menu = Activator.CreateInstance(typeof(U), name) as U;
-            this.AddShape<U>(menu!);
-        }
-        if ( clear )
-            menu?.Clear();
+        var page = CurrentPage();
+        var menu = page.EstablishMenu2D<U>(name,clear);
 
         foreach (KeyValuePair<string, Action> item in actions)
         {
             if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
-                menu?.Add<T>(shape);
+                menu.Add<T>(shape);
         }
 
-        menu!.LayoutHorizontal();
+        menu.LayoutHorizontal();
 
-        return menu!;
+        return menu;
     }
 
 

@@ -9,7 +9,7 @@ namespace FoundryBlazor.Shape;
 
 
 
-public class FoMenu2D : FoGlyph2D, IFoMenu, IShapeControl
+public class FoMenu2D : FoGlyph2D, IFoMenu
 {
     private string _layout = "H";
 

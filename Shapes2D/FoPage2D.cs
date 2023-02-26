@@ -1,6 +1,8 @@
 ﻿
 using System.Drawing;
+using System.Xml.Linq;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 public class FoPage2D : FoGlyph2D
@@ -16,7 +18,6 @@ public class FoPage2D : FoGlyph2D
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
-    protected FoCollection<FoGlyph2D> ShapesControl = new();
     protected FoCollection<FoGlyph2D> ShapesHidden = new();
     public override Rectangle Rect()
     {
@@ -70,22 +71,36 @@ public class FoPage2D : FoGlyph2D
         {
             GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<T>(list, deep));
         }
-
         return list;
     }
 
+    public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
+    {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
 
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
 
-        if ( value is IShapeControl)
-            Shapes1D.Add(value);
-        else if ( value is IShape1D)
-            ShapesControl.Add(value);
-        else if ( value is IShape2D)
+        if ( value is IShape2D)
             Shapes2D.Add(value);   
-        else 
+        else if ( value is IShape1D)
+            Shapes1D.Add(value);
+        else
+        {
+            $"Shape no rendered {value.Name}".WriteError();
             ShapesHidden.Add(value);          
+        }
 
         return value;
 
@@ -96,7 +111,6 @@ public class FoPage2D : FoGlyph2D
     {
         Shapes1D.Clear();
         Shapes2D.Clear();
-        ShapesControl.Clear();
         ShapesHidden.Clear();
         return this;
     }
@@ -108,7 +122,7 @@ public class FoPage2D : FoGlyph2D
         var found = Shapes1D.FindWhere(child => child.GlyphId == GlyphId);
         if (found != null) result.AddRange(found);
 
-        found = Shapes1D.FindWhere(child => child.GlyphId == GlyphId);
+        found = Shapes2D.FindWhere(child => child.GlyphId == GlyphId);
         if (found != null) result.AddRange(found);
 
         return result;
@@ -121,7 +135,7 @@ public class FoPage2D : FoGlyph2D
         var found = Shapes1D.ExtractWhere(child => child.GlyphId == GlyphId);
         if (found != null) result.AddRange(found);
 
-        found = Shapes1D.ExtractWhere(child => child.GlyphId == GlyphId);
+        found = Shapes2D.ExtractWhere(child => child.GlyphId == GlyphId);
         if (found != null) result.AddRange(found);
 
 

@@ -259,13 +259,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-
-
-
-
-
-
-
     public FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
     {
         var result = PageManager.EstablishMenu2D<T, FoButton2D>(name, menu, clear);
