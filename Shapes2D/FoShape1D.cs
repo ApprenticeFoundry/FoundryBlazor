@@ -22,6 +22,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     private int y2 = 0;
     public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
 
+    //prevent smashing matrix when height and width are calculated
     public new int Height { get { return this.height; } set { this.height = value; } }
     public new int Width { get { return this.width; } set { this.width = value; } }
 
