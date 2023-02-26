@@ -39,7 +39,7 @@ public interface IPageManagement: IRender
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
     void SelectionsZoomBy(double factor);
-    T Add<T>(T value) where T : FoGlyph2D;
+    T AddShape<T>(T value) where T : FoGlyph2D;
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
@@ -164,10 +164,9 @@ public class PageManagementService : IPageManagement
     }
 
 
-    public T Add<T>(T value) where T : FoGlyph2D
+    public T AddShape<T>(T value) where T : FoGlyph2D
     {
-        var found = _activePage.Add(value);
-        _activePage.SmashLayers();
+        var found = _activePage.AddShape(value);
         _hitTestService.Insert(value);
         return found;
 
@@ -219,7 +218,7 @@ public class PageManagementService : IPageManagement
         shape.DoOnOpenCreate = value.DoOnOpenCreate;
         shape.DoOnOpenEdit = value.DoOnOpenEdit;
 
-        return Add<T>(shape);
+        return AddShape<T>(shape);
     }
 
     public U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D
@@ -230,7 +229,7 @@ public class PageManagementService : IPageManagement
         shape!.Name = "";
         shape!.GlyphId = "";
 
-        return Add<U>(shape);
+        return AddShape<U>(shape);
     }
 
 
@@ -286,7 +285,7 @@ public class PageManagementService : IPageManagement
         group.ResizeTo(rect.Width, rect.Height);
         var pt = group.PinLocation();
         group.MoveTo(rect.X + pt.X, rect.Y + pt.Y);
-        this.Add<T>(group);
+        this.AddShape<T>(group);
 
         group.CaptureSelectedShapes<FoShape1D>(CurrentPage());
         group.CaptureSelectedShapes<FoGroup2D>(CurrentPage());
@@ -309,7 +308,7 @@ public class PageManagementService : IPageManagement
         if (menu == null)
         {
             menu = Activator.CreateInstance(typeof(U), name) as U;
-            this.Add<U>(menu!);
+            this.AddShape<U>(menu!);
         }
         if ( clear )
             menu?.Clear();

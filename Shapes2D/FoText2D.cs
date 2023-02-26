@@ -3,7 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoText2D : FoGlyph2D
+public class FoText2D : FoGlyph2D, IShape2D
 {
     private string text = "";
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }

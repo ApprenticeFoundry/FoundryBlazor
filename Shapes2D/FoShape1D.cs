@@ -11,7 +11,7 @@ public interface IGlueOwner
     public void SetStartTo(FoGlyph2D? target);
 }
 
-public class FoShape1D : FoGlyph2D, IGlueOwner
+public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
     private int x1 = 0;
     public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value,x1); } }

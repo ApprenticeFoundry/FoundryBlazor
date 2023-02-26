@@ -158,7 +158,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
     public V AddShape<V>(V shape) where V : FoGlyph2D
     {
-        return PageManager.Add<V>(shape);
+        return PageManager.AddShape<V>(shape);
     }
 
     public void SetDoCreate(Action<CanvasMouseArgs> action)
@@ -225,10 +225,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return AllVideos;
     }
 
-    public new T Add<T>(T value) where T : FoGlyph2D
-    {
-        return PageManager.Add(value);
-    }
 
 
     public void ResetPanZoom()

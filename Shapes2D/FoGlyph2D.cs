@@ -35,6 +35,21 @@ public interface IRender
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
 }
 
+public interface IShape1D
+{
+
+}
+
+public interface IShape2D
+{
+    
+}
+
+public interface IShapeControl
+{
+    
+}
+
 public class MeasuredText
 {
     public string Text="";

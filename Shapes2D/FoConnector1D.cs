@@ -4,7 +4,7 @@ using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
-public class FoConnector1D : FoGlyph2D, IGlueOwner
+public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
 {
 
     private int x1 = 0;

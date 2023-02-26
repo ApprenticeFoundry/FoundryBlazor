@@ -108,10 +108,10 @@ public class AllEvents : BaseInteraction
 
             dragTarget = new FoDragTarget2D(15, 15, "Yellow");
             dragTarget.MoveTo(SourceShape.PinX, SourceShape.PinY);
-            pageManager?.Add<FoDragTarget2D>(dragTarget);
+            pageManager?.AddShape<FoDragTarget2D>(dragTarget);
 
             var connector = new FoShape1D(SourceShape, dragTarget, 15, dragTarget.Color);
-            pageManager?.Add<FoShape1D>(connector);
+            pageManager?.AddShape<FoShape1D>(connector);
             dragTarget.Connector = connector;
 
             selectionService?.ClearAll();
@@ -166,7 +166,7 @@ public class AllEvents : BaseInteraction
             {
                 target.ApplyLayout = true;  //set this when data is pushed
                 var shapeB = new FoShape1D(selectedShape, TargetShape, 8, "Green");
-                pageManager?.Add<FoShape1D>(shapeB);
+                pageManager?.AddShape<FoShape1D>(shapeB);
                 // var pointer = EdgeSimulation?.ModelConnect(SelectedShape.GlyphId, TargetShape.GlyphId);
                 // pointer?.ApplyExternalMethods(shapeB);
             }

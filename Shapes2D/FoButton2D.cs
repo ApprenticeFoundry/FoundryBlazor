@@ -6,7 +6,7 @@ namespace FoundryBlazor.Shape;
 
 
 
-public class FoButton2D : FoText2D, IFoButton
+public class FoButton2D : FoText2D, IFoButton, IShapeControl
 {
     public Action? OnClick;
     private int countdown = 0;

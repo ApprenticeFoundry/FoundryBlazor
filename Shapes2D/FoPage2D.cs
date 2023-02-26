@@ -14,9 +14,11 @@ public class FoPage2D : FoGlyph2D
     public double PageHeight { get; set; } = 4.0;  //inches
 
     protected IScaledDrawingHelpers? _ScaledDrawing;
-    protected List<IFoCollection>? _RenderLayers;
 
-
+    protected FoCollection<FoGlyph2D> Shapes1D = new();
+    protected FoCollection<FoGlyph2D> Shapes2D = new();
+    protected FoCollection<FoGlyph2D> ShapesControl = new();
+    protected FoCollection<FoGlyph2D> ShapesHidden = new();
     public override Rectangle Rect()
     {
         var pt = new Point(PinX, PinY);
@@ -73,75 +75,65 @@ public class FoPage2D : FoGlyph2D
         return list;
     }
 
-    public void SmashLayers() 
-    {
-        if ( _RenderLayers != null)
-            $"SmashLayers".WriteInfo(1);
 
-        _RenderLayers = null;
+    public T AddShape<T>(T value) where T : FoGlyph2D
+    {
+
+        if ( value is IShapeControl)
+            Shapes1D.Add(value);
+        else if ( value is IShape1D)
+            ShapesControl.Add(value);
+        else if ( value is IShape2D)
+            Shapes2D.Add(value);   
+        else 
+            ShapesHidden.Add(value);          
+
+        return value;
+
     }
 
-    public List<IFoCollection> Layers()
-    {
-        if ( _RenderLayers == null)
-        {
-            $"getting Layers".WriteInfo(1);
-            _RenderLayers = AllGlyphSlots();
-
-            foreach (var item in _RenderLayers)
-            {
-                $"key = {item.GetKey()}".WriteInfo();
-            }
-
-            $"getting Layers {_RenderLayers.Count}".WriteInfo(1);
-        }
-
-
-        return _RenderLayers;
-    }
 
     public FoPage2D ClearAll()
     {
-        Layers().ForEach(item => item.Clear());
+        Shapes1D.Clear();
+        Shapes2D.Clear();
+        ShapesControl.Clear();
+        ShapesHidden.Clear();
         return this;
     }
 
     public List<FoGlyph2D> FindShapes(string GlyphId)
     {
         var result = new List<FoGlyph2D>();
-        foreach (var item in Layers())
-        {
-            if (item is FoCollection<FoGlyph2D> col)
-            {
-                var found = col.FindWhere(child => child.GlyphId == GlyphId);
-                if (found != null) result.AddRange(found);
-            }
-        }
+
+        var found = Shapes1D.FindWhere(child => child.GlyphId == GlyphId);
+        if (found != null) result.AddRange(found);
+
+        found = Shapes1D.FindWhere(child => child.GlyphId == GlyphId);
+        if (found != null) result.AddRange(found);
+
         return result;
     }
 
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         var result = new List<FoGlyph2D>();
-        foreach (var item in Layers())
-        {
-             if ( item is FoCollection<FoGlyph2D> col) 
-             {
-                var found = col.ExtractWhere(child => child.GlyphId == GlyphId);
-                if (found != null) result.AddRange(found);
-             }       
-        }
+
+        var found = Shapes1D.ExtractWhere(child => child.GlyphId == GlyphId);
+        if (found != null) result.AddRange(found);
+
+        found = Shapes1D.ExtractWhere(child => child.GlyphId == GlyphId);
+        if (found != null) result.AddRange(found);
+
+
         return result;
     }
 
 
    public new bool ComputeShouldRender(Rectangle region)
     {
-        foreach (var item in Layers())
-        {
-            if ( item is FoCollection<FoGlyph2D> col) 
-                col.Values().ForEach(child => child.ComputeShouldRender(region));
-        }
+        Shapes1D.ForEach(child => ComputeShouldRender(region));
+        Shapes2D.ForEach(child => ComputeShouldRender(region));
         return true;
     }
 
@@ -221,7 +213,8 @@ public class FoPage2D : FoGlyph2D
         //$"REC {region.X} {region.Y} {region.Width} {region.Height} ---".WriteLine(ConsoleColor.Blue);
 
         //only render members inside the region
-        //GetMembers<FoHero2D>()?.ForEach(async child => await child.RenderConcise(ctx, scale, region));
+
+        Shapes2D.ForEach(async child => await child.RenderConcise(ctx, scale, region));
    
         // draw the current window
         await ctx.SetStrokeStyleAsync("Black");
@@ -267,17 +260,10 @@ public class FoPage2D : FoGlyph2D
 
         //await DrawFancyPin(ctx);
 
-        foreach (var item in Layers())
-        {
-            if ( item is IFoCollection col) {
 
-                //$"RenderDetailed Layer {col.GetKey()} {values.Count}".WriteInfo();
-                foreach (var shape in col.AllItem())
-                {
-                    await ((FoGlyph2D)shape).RenderDetailed(ctx, tick, deep);
-                }
-            }
-        }
+        Shapes1D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        Shapes2D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+
 
         await ctx.RestoreAsync();
         return true;

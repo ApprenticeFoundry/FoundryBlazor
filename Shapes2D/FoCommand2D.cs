@@ -2,7 +2,7 @@
 
 namespace FoundryBlazor.Shape;
 
-public class FoCommand2D : FoGlyph2D, IFoCommand
+public class FoCommand2D : FoGlyph2D, IFoCommand, IShapeControl
 {
     public FoCommand2D(string name) : base(name,10,10,"Grey")
     {
