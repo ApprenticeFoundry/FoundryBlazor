@@ -75,7 +75,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private IBaseInteraction? lastInteraction;
 
 
-    private Stopwatch stopwatch = new();
+    //private Stopwatch stopwatch = new();
     private  bool IsCurrentlyRendering = false;
     private readonly LinkedList<CanvasMouseArgs> MouseArgQueue = new();
     public  void SetCurrentlyRendering(bool value)
@@ -88,7 +88,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if ( value == false) {
             while ( MouseArgQueue.Count > 0 ) {
                 var args = MouseArgQueue.Last();
-                $"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                //$"is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
                 MouseArgQueue.RemoveLast();
             }
@@ -513,7 +513,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 // call IsDefaultTool method on each interaction to
                 // determine what is the right interaction for this case?
                 
-                if ( args.Topic.Matches("ON_MOUSE_DOWN"))
+                if (args.Topic.Matches("ON_MOUSE_DOWN"))
                     SelectInteractionByRuleFor(args);
 
                 var interact = GetInteraction();
@@ -547,14 +547,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {
                 if (IsCurrentlyRendering)
                 {
-                    MouseArgQueue.AddFirst(args);
                     //you should cashe the args to replayed latter
                     //when the UI is not rendering..
-                    // return;
-                    "is rendering ".WriteSuccess(2);
+                    MouseArgQueue.AddFirst(args);
+                } 
+                else 
+                {
+                    //"is rendering ".WriteSuccess(2);
+                    ApplyMouseArgs(args);
                 }
 
-                ApplyMouseArgs(args);
             }
             catch (Exception ex)
             {

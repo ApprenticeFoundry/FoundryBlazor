@@ -54,7 +54,7 @@ public class ShapeResizing : ShapeHovering
         }
 
         isResizingShape = false;
-
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

@@ -1,7 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Canvas;
 using BlazorComponentBus;
+using FoundryBlazor.Canvas;
 
 
 namespace FoundryBlazor.Shape;
@@ -92,12 +92,24 @@ public class ShapeSelection : ShapeHovering
             dragArea = panZoomService.Normalize(dragArea);
 
             var findings = pageManager?.FindGlyph(dragArea);
-            if (findings != null) selectionService?.AddRange(findings);
+            if (findings != null)
+            {
+                //anything that intersects
+                //selectionService?.AddRange(findings);
+                
+                //only findings that are totally inside the fence
+                foreach (var item in findings)
+                {
+                    if ( dragArea.Contains(item.Rect()) )
+                        selectionService?.AddItem(item);  
+                }
+            }
         }
 
-        dragArea = panZoomService.HitRectStart(args);
+        //dragArea = panZoomService.HitRectStart(args);
         isFenceSelecting = false;
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

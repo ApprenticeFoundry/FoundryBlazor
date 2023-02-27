@@ -109,6 +109,7 @@ public class ShapeConnecting :  ShapeHovering
                 return true;
             }
         }
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return false;
     }
     public override bool MouseMove(CanvasMouseArgs args)
