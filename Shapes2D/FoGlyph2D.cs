@@ -487,7 +487,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected int AssignInt(int newValue, int oldValue)
     {
-        if (_matrix != null && Math.Abs(newValue - oldValue) > 5)
+        if (_matrix != null && Math.Abs(newValue - oldValue) > 2)
             Smash();
 
         return newValue;
@@ -495,7 +495,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected double AssignDouble(double newValue, double oldValue)
     {
-        if (_matrix != null && Math.Abs(newValue - oldValue) > 5)
+        if (_matrix != null && Math.Abs(newValue - oldValue) > 2)
             Smash();
 
         return newValue;
@@ -504,6 +504,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public virtual void Smash()
     {
         if ( _matrix == null ) return;
+        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         this._matrix = null;
         this._invMatrix = null;
@@ -513,7 +514,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         {
             if ( !item.HasTarget(this) ) return;
 
-            $"Smash Glue Check {item.Name}  Target {Name}".WriteLine(ConsoleColor.DarkBlue);
+
             item.TargetMoved(this);
         });
     }

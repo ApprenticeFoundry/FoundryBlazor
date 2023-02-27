@@ -1,3 +1,5 @@
+using FoundryBlazor.Extensions;
+
 namespace FoundryBlazor.Shape;
 
 
@@ -18,18 +20,18 @@ public class FoGlue2D : FoBase
     {
         if ( !HasTarget(target) || Target == null) return false;
 
-       //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
 
         if ( Name.StartsWith("Finish") && Source != null )
         {
             Source.SetFinishTo(Target);
-            // $"{Source.Name} SetFinishTo {Target.Name}".WriteLine(ConsoleColor.Blue);
+            $"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
             return true;
         }
         else if ( Name.StartsWith("Start")  && Source != null)
         {
             Source.SetStartTo(Target);
-            //$"{Source.Name} SetStartTo {Target.Name}".WriteLine(ConsoleColor.Blue);
+            $"{Source} SetStartTo {Target.Name}".WriteInfo(4);
             return true;
         }
         return false;
