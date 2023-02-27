@@ -487,7 +487,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected int AssignInt(int newValue, int oldValue)
     {
-        if (_matrix != null && newValue != oldValue)
+        if (_matrix != null && Math.Abs(newValue - oldValue) > 5)
             Smash();
 
         return newValue;
@@ -495,7 +495,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected double AssignDouble(double newValue, double oldValue)
     {
-        if (_matrix != null && newValue != oldValue)
+        if (_matrix != null && Math.Abs(newValue - oldValue) > 5)
             Smash();
 
         return newValue;
