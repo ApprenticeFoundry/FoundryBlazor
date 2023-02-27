@@ -95,6 +95,7 @@ public class ShapeSelection : ShapeHovering
             if (findings != null) selectionService?.AddRange(findings);
         }
 
+        dragArea = panZoomService.HitRectStart(args);
         isFenceSelecting = false;
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
         return true;
@@ -103,15 +104,17 @@ public class ShapeSelection : ShapeHovering
     {
         //SendUserMove(args, true);
 
-        if ( selectionService.Selections().Count > 0 )
+        if (isFenceSelecting)
+        {
+            dragArea = panZoomService.HitRectContinue(args, dragArea);
+        }
+        else if ( selectionService.Selections().Count > 0 )
         {
             dragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.Movement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }
-        else if (isFenceSelecting)
-            dragArea = panZoomService.HitRectContinue(args, dragArea);
         else
             base.MouseMove(args); // this should hover
 

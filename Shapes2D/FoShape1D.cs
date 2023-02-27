@@ -118,7 +118,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             var angle = ComputeAngle();
             _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, this.CenterX(), this.CenterY());
             //FoGlyph2D.ResetHitTesting = true;
-            $"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
+            //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
         return _matrix;
     }

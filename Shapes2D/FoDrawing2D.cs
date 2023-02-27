@@ -371,6 +371,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public async Task RenderDrawing(Canvas2DContext ctx, int tick, double fps)
     {
         //BoidSimulation?.Advance();
+        
 
         FoGlyph2D.Animations.Update((float)0.033);
 
@@ -382,7 +383,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
 
 
-        IsCurrentlyRendering = true;
         await ScaleDrawing.ClearCanvas(ctx);
 
         await ctx.SaveAsync();
@@ -392,7 +392,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
         await ctx.RestoreAsync();
-        IsCurrentlyRendering = false;
+
 
         tick++;
 
@@ -491,11 +491,21 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             try
             {
-                if ( IsCurrentlyRendering ) return;
+                if (IsCurrentlyRendering)
+                {
+                    //you should cashe the args to replayed latter
+                    //when the UI is not rendering..
+                    // return;
+                    "is rendering ".WriteSuccess(2);
+                } else
+                {
+                     //"is NOT rendering ".WriteSuccess(2);
+                }
                 // call IsDefaultTool method on each interaction to
                 // determine what is the right interaction for this case?
-                if ( args.Topic.Matches("ON_MOUSE_DOWN"))
-                    SelectInteractionByRuleFor(args);
+                
+                //if ( args.Topic.Matches("ON_MOUSE_DOWN"))
+                SelectInteractionByRuleFor(args);
 
                 var interact = GetInteraction();
                 

@@ -4,7 +4,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-
+using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -85,13 +85,15 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     {
         if (Ctx == null) return;
 
+        FoDrawing2D.IsCurrentlyRendering = true;
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
         Workspace!.GetDrawing()?.RenderDrawing(Ctx, tick++, fps);
-
+        
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
+        FoDrawing2D.IsCurrentlyRendering = false;
     }
 
     public string FileInputStyle()
