@@ -1,15 +1,13 @@
 
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-
 using BlazorComponentBus;
-using FoundryBlazor.Message;
-
-using FoundryBlazor.Solutions;
+using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Message;
+using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
@@ -49,6 +47,8 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
+
+    public static bool IsCurrentlyRendering { get; set; } = false;
     private InputStyle InputStyle = InputStyle.None;
     public D2D_UserMove? UserLocation { get; set; }
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
@@ -175,8 +175,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 OffsetY = page.FractionY(0.15) + 20
             });
 
-            //var region = ScaleDrawing.UserWindow();
-            //page.ComputeShouldRender(region);
+            var region = ScaleDrawing.UserWindow();
+            page.ComputeShouldRender(region);
         }
         catch (System.Exception ex)
         {
@@ -382,6 +382,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
 
 
+        IsCurrentlyRendering = true;
         await ScaleDrawing.ClearCanvas(ctx);
 
         await ctx.SaveAsync();
@@ -390,15 +391,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await PageManager.RenderDetailed(ctx, tick, true);
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
-
-        // if ( ProcessPlan != null)
-        //     await ProcessPlan.RenderTree(ctx);
-
-        //RenderDetailed(ctx, tick, true);
         await ctx.RestoreAsync();
-        tick++;
+        IsCurrentlyRendering = false;
 
-        //await DrawUserWindow(ctx);
+        tick++;
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
@@ -495,6 +491,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             try
             {
+                if ( IsCurrentlyRendering ) return;
                 // call IsDefaultTool method on each interaction to
                 // determine what is the right interaction for this case?
                 if ( args.Topic.Matches("ON_MOUSE_DOWN"))
