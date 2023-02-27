@@ -102,6 +102,7 @@ public class HitTestService : IHitTestService
         await ctx.SetLineWidthAsync(1);
         await ctx.SetLineDashAsync(Array.Empty<float>());
         await ctx.SetStrokeStyleAsync("Blue");
+
         PreviousSearches.ForEach(async rect =>
         {
             //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);

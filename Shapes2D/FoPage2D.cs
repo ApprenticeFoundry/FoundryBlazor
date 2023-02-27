@@ -152,8 +152,8 @@ public class FoPage2D : FoGlyph2D
 
    public new bool ComputeShouldRender(Rectangle region)
     {
-        Shapes1D.ForEach(child => ComputeShouldRender(region));
-        Shapes2D.ForEach(child => ComputeShouldRender(region));
+        Shapes1D.ForEach(child => child.ComputeShouldRender(region));
+        Shapes2D.ForEach(child => child.ComputeShouldRender(region));
         return true;
     }
 

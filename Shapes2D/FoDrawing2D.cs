@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
@@ -15,7 +16,7 @@ namespace FoundryBlazor.Shape;
 
 public interface IDrawing : IRender
 {
-
+    void SetCurrentlyRendering(bool value);
     void SetCanvasSize(int width, int height);
     Point InchesToPixelsInset(double width, double height);
 
@@ -48,7 +49,6 @@ public interface IDrawing : IRender
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
 
-    public static bool IsCurrentlyRendering { get; set; } = false;
     private InputStyle InputStyle = InputStyle.None;
     public D2D_UserMove? UserLocation { get; set; }
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
@@ -74,6 +74,33 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private InteractionStyle interactionStyle = InteractionStyle.None;
     private IBaseInteraction? lastInteraction;
 
+
+    private Stopwatch stopwatch = new();
+    private  bool IsCurrentlyRendering = false;
+    private readonly LinkedList<CanvasMouseArgs> MouseArgQueue = new();
+    public  void SetCurrentlyRendering(bool value)
+    {
+        if (value)
+        {
+            //stopwatch.Restart();
+        }
+
+        if ( value == false) {
+            while ( MouseArgQueue.Count > 0 ) {
+                var args = MouseArgQueue.Last();
+                $"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                ApplyMouseArgs(args);
+                MouseArgQueue.RemoveLast();
+            }
+        }
+        IsCurrentlyRendering = value;
+        if (!value)
+        {
+            //stopwatch.Stop();
+            //var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
+            //$"render time {stopwatch.Elapsed}  {fps}".WriteInfo();
+        }
+    }
 
     public FoDrawing2D (
         IPanZoomService panzoom,
@@ -479,6 +506,33 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         TestRule(InteractionStyle.ShapeSelection,args);
     }
 
+    private void ApplyMouseArgs(CanvasMouseArgs args)
+    {
+            try
+            {
+                // call IsDefaultTool method on each interaction to
+                // determine what is the right interaction for this case?
+                
+                if ( args.Topic.Matches("ON_MOUSE_DOWN"))
+                    SelectInteractionByRuleFor(args);
+
+                var interact = GetInteraction();
+                
+                var isEventHandled = (args.Topic) switch
+                {
+                    ("ON_MOUSE_DOWN") => interact.MouseDown(args),
+                    ("ON_MOUSE_MOVE") => interact.MouseMove(args),
+                    ("ON_MOUSE_UP") => interact.MouseUp(args),
+                    ("ON_MOUSE_IN") => interact.MouseIn(args),
+                    ("ON_MOUSE_OUT") => interact.MouseOut(args),
+                    _ => false
+                };
+            }
+            catch (Exception ex)
+            {
+                $" {args.Topic} {ex.Message}".WriteLine();
+            }
+    }
 
 
     private void InitSubscriptions()
@@ -493,31 +547,14 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {
                 if (IsCurrentlyRendering)
                 {
+                    MouseArgQueue.AddFirst(args);
                     //you should cashe the args to replayed latter
                     //when the UI is not rendering..
                     // return;
                     "is rendering ".WriteSuccess(2);
-                } else
-                {
-                     //"is NOT rendering ".WriteSuccess(2);
                 }
-                // call IsDefaultTool method on each interaction to
-                // determine what is the right interaction for this case?
-                
-                //if ( args.Topic.Matches("ON_MOUSE_DOWN"))
-                SelectInteractionByRuleFor(args);
 
-                var interact = GetInteraction();
-                
-                var isEventHandled = (args.Topic) switch
-                {
-                    ("ON_MOUSE_DOWN") => interact.MouseDown(args),
-                    ("ON_MOUSE_MOVE") => interact.MouseMove(args),
-                    ("ON_MOUSE_UP") => interact.MouseUp(args),
-                    ("ON_MOUSE_IN") => interact.MouseIn(args),
-                    ("ON_MOUSE_OUT") => interact.MouseOut(args),
-                    _ => false
-                };
+                ApplyMouseArgs(args);
             }
             catch (Exception ex)
             {

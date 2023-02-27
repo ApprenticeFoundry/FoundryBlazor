@@ -85,15 +85,18 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     {
         if (Ctx == null) return;
 
-        FoDrawing2D.IsCurrentlyRendering = true;
+        var drawing = Workspace?.GetDrawing();
+         if (drawing == null) return;
+
+        drawing.SetCurrentlyRendering(true);
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
-        Workspace!.GetDrawing()?.RenderDrawing(Ctx, tick++, fps);
+        await drawing.RenderDrawing(Ctx, tick++, fps);
         
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
-        FoDrawing2D.IsCurrentlyRendering = false;
+        drawing.SetCurrentlyRendering(false);
     }
 
     public string FileInputStyle()
