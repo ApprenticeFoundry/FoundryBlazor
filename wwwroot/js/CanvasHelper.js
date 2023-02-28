@@ -4,7 +4,6 @@
  * https://swharden.com/blog/2021-01-07-blazor-canvas-animated-graphics/
  */
 
-const fileInputContainer = getFileInputContainer();
 /*This is called from the Blazor component's Initialize method*/
 function initRenderJS(instance) {
     // instance is the Blazor component dotnet reference
@@ -276,16 +275,14 @@ function canvasWheelChangeArgs(e) {
 }
 
 function showFileInput() {
-    if (fileInputContainer) {
-        fileInputContainer.style.zIndex = 20;
-    }
+    const fileInputContainer = getFileInputContainer();
+    fileInputContainer.style.zIndex = 20;
 }
 
 function hideFileInput() {
     // We *must* hide file input after file is dropped over chrome
-    if (fileInputContainer) {
-        fileInputContainer.style.zIndex = 0;
-    }
+    const fileInputContainer = getFileInputContainer();
+    fileInputContainer.style.zIndex = 0;
 }
 
 window.CanvasFileInput = {
