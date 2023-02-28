@@ -56,6 +56,8 @@ public class MeasuredText
 
 }
 
+
+
 public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
@@ -310,14 +312,24 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         if ( !IsInRegion (region)) return false;
 
-        await ctx.SaveAsync();
-        await UpdateContext(ctx, 0);
+        try
+        {
+            await ctx.SaveAsync();
+            await UpdateContext(ctx, 0);
 
-        if ( ShouldRender )
-            await ctx.FillRectAsync(0, 0, Width, Height);
-        else
-            await ctx.StrokeRectAsync(0, 0, Width, Height);
-        await ctx.RestoreAsync();
+            if ( ShouldRender )
+                await ctx.FillRectAsync(0, 0, Width, Height);
+            else
+                await ctx.StrokeRectAsync(0, 0, Width, Height);
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+        finally{
+            await ctx.RestoreAsync();
+        }
+
         return true;
     }
 

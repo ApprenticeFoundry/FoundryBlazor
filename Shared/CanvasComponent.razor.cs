@@ -92,7 +92,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
-        await drawing.RenderDrawing(Ctx, tick++, fps);
+       // await drawing.RenderDrawing(Ctx, tick++, fps);
         
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
