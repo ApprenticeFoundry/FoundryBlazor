@@ -88,7 +88,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if ( value == false) {
             while ( MouseArgQueue.Count > 0 ) {
                 var args = MouseArgQueue.Dequeue();
-                $"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                //$"is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }

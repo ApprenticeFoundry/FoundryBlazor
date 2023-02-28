@@ -25,13 +25,13 @@ public class FoGlue2D : FoBase
         if ( Name.StartsWith("Finish") && Source != null )
         {
             Source.SetFinishTo(Target);
-            $"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
+            //$"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
             return true;
         }
         else if ( Name.StartsWith("Start")  && Source != null)
         {
             Source.SetStartTo(Target);
-            $"{Source} SetStartTo {Target.Name}".WriteInfo(4);
+            //$"{Source} SetStartTo {Target.Name}".WriteInfo(4);
             return true;
         }
         return false;

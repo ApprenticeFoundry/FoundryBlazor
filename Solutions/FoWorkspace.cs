@@ -211,7 +211,7 @@ public class FoWorkspace : FoComponent, IWorkspace
                 await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
                 InputStyle = InputStyle.Drawing;
                 await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetDrawingStyle".WriteLine(ConsoleColor.DarkYellow);
+                "SetDrawingStyle".WriteWarning();
             }
             catch { }
         };
@@ -223,7 +223,7 @@ public class FoWorkspace : FoComponent, IWorkspace
                 await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
                 InputStyle = InputStyle.FileDrop;
                 await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetFileDropStyle".WriteLine(ConsoleColor.DarkYellow);
+                "SetFileDropStyle".WriteWarning();
             }
             catch { }
         };

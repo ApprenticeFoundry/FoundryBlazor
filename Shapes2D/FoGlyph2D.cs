@@ -525,8 +525,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         GetMembers<FoGlue2D>()?.ForEach(item =>
         {
             if ( !item.HasTarget(this) ) return;
-
-
             item.TargetMoved(this);
         });
     }
