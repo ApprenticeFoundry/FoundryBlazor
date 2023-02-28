@@ -71,7 +71,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
     private readonly Dictionary<InteractionStyle, IBaseInteraction> interactionLookup;
-    private InteractionStyle interactionStyle = InteractionStyle.None;
+    private InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
     private IBaseInteraction? lastInteraction;
 
 
@@ -122,7 +122,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         interactionLookup = new()
         {
-            {InteractionStyle.None, new BaseInteraction(this, pubSub, panzoom, select, manager, hittest)},
+            {InteractionStyle.ReadOnly, new BaseInteraction(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.PagePanAndZoom, new PagePanAndZoom(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeHovering, new ShapeHovering(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeSelection, new ShapeSelection(this, pubSub, panzoom, select, manager, hittest)},
@@ -139,6 +139,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             //SRS refresh zoom if changed
             ResetPanZoom();
         });
+
+        SetInteraction(InteractionStyle.ShapeHovering);
     }
 
     public void SetInteraction(InteractionStyle style)

@@ -115,6 +115,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     public FoLayoutTree<V>? FindNodeWithName(string name)
     {
+        if (string.IsNullOrEmpty(name)) return null;
 
         if ( _item.Name == name) return this;
         

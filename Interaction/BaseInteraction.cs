@@ -9,7 +9,7 @@ namespace FoundryBlazor.Shape;
 
 public enum InteractionStyle
 {
-    None,
+    ReadOnly,
     PagePanAndZoom,
     ShapeSelection,
     ShapeHovering,

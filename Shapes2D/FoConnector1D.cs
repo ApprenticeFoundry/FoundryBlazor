@@ -21,7 +21,9 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
     public new Func<FoConnector1D, int> LocPinX = (obj) => 0;
     public new Func<FoConnector1D, int> LocPinY = (obj) => 0;
 
-
+    //prevent smashing matrix when height and width are calculated
+    public new int Height { get { return this.height; } set { this.height = value; } }
+    public new int Width { get { return this.width; } set { this.width = value; } }
 
     public Action<Canvas2DContext, FoConnector1D> DrawStraight = async (ctx, obj) =>
     {
@@ -51,6 +53,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetLineWidthAsync(obj.Thickness);
         await ctx.StrokeAsync();
     };
+
     public Action<Canvas2DContext, FoConnector1D> DrawVerticalFirst = async (ctx, obj) =>
     {
         // var angle = (float)obj.ComputeAngle();
@@ -69,6 +72,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetLineWidthAsync(obj.Thickness);
         await ctx.StrokeAsync();
     };
+
     public override void Smash() 
     {
         width  = Dx();
@@ -119,19 +123,23 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         var result = new Rectangle(pt, sz);
         return result;
     }
+
+
     public int Dx() => x2 - x1;
     public int Dy() => y2 - y1;
 
     public int Cx() => (x2 + x1)/2;
     public int Cy() => (y2 + y1)/2;
 
-    public double Distance() { 
+    public double Distance() 
+    { 
         var dx = (double)Dx();
         var dy = (double)Dy();
         return Math.Sqrt(dx * dx + dy * dy);
     }
 
-    public double ComputeAngle() { 
+    public double ComputeAngle() 
+    { 
         var dx = (double)Dx();
         var dy = (double)Dy();
         return Math.Atan2(dy , dx) * 180 / Math.PI;
