@@ -12,7 +12,7 @@ public interface IHitTestService
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
-    Task RenderTree(Canvas2DContext ctx);
+    Task RenderTree(Canvas2DContext ctx, bool showTracks);
 }
 
 public class HitTestService : IHitTestService
@@ -88,7 +88,7 @@ public class HitTestService : IHitTestService
         return list;
     }
 
-    public async Task RenderTree(Canvas2DContext ctx)
+    public async Task RenderTree(Canvas2DContext ctx, bool showTracks)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
@@ -103,11 +103,14 @@ public class HitTestService : IHitTestService
         await ctx.SetLineDashAsync(Array.Empty<float>());
         await ctx.SetStrokeStyleAsync("Blue");
 
-        PreviousSearches.ForEach(async rect =>
+        if (showTracks)
         {
-            //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
-            await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
-        });
+            PreviousSearches.ForEach(async rect =>
+            {
+                //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+                await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+            });
+        }
 
         await ctx.RestoreAsync();
     }

@@ -56,10 +56,10 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     {
         InputFile = e.File;
         $"{InputFile.Name} {InputFile.Size}".WriteLine(ConsoleColor.Green);
-        Task.Run(async () =>
-        {
-            await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
-        });
+        //Task.Run(async () =>
+        //{
+        //    await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
+        //});
 
     }
 
@@ -71,7 +71,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
             $"OnCanvasMouseEvent {MouseArgs.OffsetX} {MouseArgs.OffsetY}".WriteLine(ConsoleColor.Green);
             Task.Run(async () =>
             {
-                await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
+                //await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
                 await Workspace!.DropFileCreateShape(InputFile, MouseArgs);
                 InputFile = null;
                 IsUploading = false;

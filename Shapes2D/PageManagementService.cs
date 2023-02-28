@@ -331,7 +331,7 @@ public class PageManagementService : FoComponent, IPageManagement
         await page.RenderDetailed(ctx, tick++, deep);
 
         if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx);
+            await _hitTestService.RenderTree(ctx,true);
 
         return true;
     }
@@ -342,7 +342,7 @@ public class PageManagementService : FoComponent, IPageManagement
         await page.RenderConcise(ctx, scale, region);
 
         if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx);
+            await _hitTestService.RenderTree(ctx,false);
             
         return true;
     }

@@ -90,7 +90,7 @@ public class FoPanZoomWindow : FoGlyph2D
         var (zoom1, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
         await page.RenderConcise(ctx, zoom, region);
 
-        await _hitTestService.RenderTree(ctx);
+        await _hitTestService.RenderTree(ctx, false);
 
         await ctx.RestoreAsync();
 
@@ -132,7 +132,7 @@ public class FoPanZoomWindow : FoGlyph2D
         //await page.RenderConcise(ctx, zoom, page.Rect());       
         await page.RenderDetailed(ctx, tick, deep);
 
-        await _hitTestService.RenderTree(ctx);
+        await _hitTestService.RenderTree(ctx, true);
         await ctx.RestoreAsync();
     }
 
