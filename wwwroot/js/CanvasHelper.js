@@ -276,7 +276,9 @@ function canvasWheelChangeArgs(e) {
 }
 
 function showFileInputNodeNotFound() {
-    window.alert(`No file input node with id='${fileInputId}' was found in CanvasComponent.`);
+    window.alert(
+        `No file input node with id='${fileInputId}' was found in CanvasComponent.  You will not be able to drop files.`
+    );
 }
 
 function showFileInput() {
@@ -293,8 +295,6 @@ function hideFileInput() {
     const fileInputContainer = getFileInputContainer();
     if (fileInputContainer) {
         fileInputContainer.style.zIndex = 0;
-    } else {
-        showFileInputNodeNotFound();
     }
 }
 
