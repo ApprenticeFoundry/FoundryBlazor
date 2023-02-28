@@ -5,6 +5,7 @@
  */
 
 /*This is called from the Blazor component's Initialize method*/
+const fileInputId = 'fileInputHolder';
 function initRenderJS(instance) {
     // instance is the Blazor component dotnet reference
     window.theInstance = instance;
@@ -60,7 +61,7 @@ function getCanvasNode() {
 // }
 
 function getFileInputContainer() {
-    var node = document.getElementById('fileInputHolder');
+    var node = document.getElementById(fileInputId);
     return node;
 }
 
@@ -274,15 +275,27 @@ function canvasWheelChangeArgs(e) {
     };
 }
 
+function showFileInputNodeNotFound() {
+    window.alert(`No file input node with id='${fileInputId}' was found in CanvasComponent.`);
+}
+
 function showFileInput() {
     const fileInputContainer = getFileInputContainer();
-    fileInputContainer.style.zIndex = 20;
+    if (fileInputContainer) {
+        fileInputContainer.style.zIndex = 20;
+    } else {
+        showFileInputNodeNotFound();
+    }
 }
 
 function hideFileInput() {
     // We *must* hide file input after file is dropped over chrome
     const fileInputContainer = getFileInputContainer();
-    fileInputContainer.style.zIndex = 0;
+    if (fileInputContainer) {
+        fileInputContainer.style.zIndex = 0;
+    } else {
+        showFileInputNodeNotFound();
+    }
 }
 
 window.CanvasFileInput = {
