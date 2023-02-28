@@ -110,7 +110,7 @@ public class FoPage2D : FoGlyph2D
 
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree) 
     {
-        Shapes1D.ForEach(child => tree.Insert(child)); 
+        //Shapes1D.ForEach(child => tree.Insert(child)); 
         Shapes2D.ForEach(child => tree.Insert(child)); 
     }
 
