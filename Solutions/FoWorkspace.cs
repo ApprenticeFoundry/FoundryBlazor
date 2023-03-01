@@ -38,6 +38,8 @@ public interface IWorkspace: IWorkPiece
 
    Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
+    void PreRender(int tick);
+    void PostRender(int tick);
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -85,6 +87,16 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
+    }
+
+    public virtual void PreRender(int tick)
+    {
+
+    }
+
+    public virtual void PostRender(int tick)
+    {
+
     }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)

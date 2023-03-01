@@ -9,6 +9,7 @@ using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shared;
 
@@ -84,19 +85,24 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     public async Task RenderFrame(double fps)
     {
         if (Ctx == null) return;
+        tick++;
+
+        Workspace?.PreRender(tick);
 
         var drawing = Workspace?.GetDrawing();
-         if (drawing == null) return;
+        if (drawing == null) return;
 
         drawing.SetCurrentlyRendering(true);
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
-        await drawing.RenderDrawing(Ctx, tick++, fps);
+        await drawing.RenderDrawing(Ctx, tick, fps);
         
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
         drawing.SetCurrentlyRendering(false);
+
+        Workspace?.PostRender(tick);
     }
 
     public string FileInputStyle()
