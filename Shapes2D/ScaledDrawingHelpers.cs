@@ -12,6 +12,7 @@ public interface IScaledDrawingHelpers
     void SetPageDefaults(FoPage2D page);
     double ConvertToPixels(double inches);
     int ToPixels(double inches);
+    double ToInches(int value);
     double ConvertToInches(double pixels);
     double GetPixelsPerInch();
     Task ClearCanvas(Canvas2DContext ctx);
@@ -121,6 +122,10 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
     public int ToPixels(double inches)
     {
         return (int)(PixelsPerInch * inches);
+    }
+    public double ToInches(int value)
+    {
+        return (double)(value / PixelsPerInch);
     }
     public double ConvertToPixels(double inches)
     {
