@@ -516,7 +516,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public virtual void Smash()
     {
         if ( _matrix == null ) return;
-        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
+        //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         this._matrix = null;
         this._invMatrix = null;
