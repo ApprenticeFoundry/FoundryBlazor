@@ -19,7 +19,7 @@ public interface IDrawing : IRender
     void SetCurrentlyRendering(bool value);
     void SetCanvasSize(int width, int height);
     Point InchesToPixelsInset(double width, double height);
-
+    int ToPixels(double width);
     void CreateMenus(IJSRuntime js, NavigationManager nav);
 
 
@@ -167,6 +167,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Point InchesToPixelsInset(double width, double height)
     {
         return ScaleDrawing.InchesToPixelInset(width, height);
+    }
+
+    public int ToPixels(double width)
+    {
+        return ScaleDrawing.ToPixels(width);
     }
 
     public void SetCanvasSize(int width, int height)
