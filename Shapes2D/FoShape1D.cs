@@ -133,6 +133,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         Smash();
         return glue;
     }
+
     public FoGlue2D? GlueFinishTo(FoGlyph2D? target) 
     {
         if ( target == null) return null;
@@ -146,8 +147,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public void SetStartTo(FoGlyph2D? target) 
     {
         if ( target == null) return;
-        StartX = target.PinX;
-        StartY = target.PinY;
+        StartX = target.AttachX();
+        StartY = target.AttachY();
 
         IsSelected = false;
         Smash();
@@ -160,8 +161,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public void SetFinishTo(FoGlyph2D? target) 
     {
         if ( target == null) return;
-        FinishX = target.PinX;
-        FinishY = target.PinY;
+        FinishX = target.AttachX();
+        FinishY = target.AttachY();
         
         IsSelected = false;
         Smash();

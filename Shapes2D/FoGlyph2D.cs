@@ -68,6 +68,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public bool ShouldRender { get; set; } = true;
     public string Tag { get; set; } = "";
     public string GlyphId { get; set; } = Guid.NewGuid().ToString();
+
     private int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
     private int y = 0;
@@ -92,6 +93,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public int BottomEdge() { return TopEdge() + Height; }
     public int RightEdge() { return  LeftEdge() + Width; }
 
+    public virtual int AttachX() { return PinX; }
+    public virtual int AttachY() { return PinY; }
 
     public Action<FoGlyph2D, int>? ContextLink;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
