@@ -1,4 +1,5 @@
 using System.Drawing;
+using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
@@ -123,7 +124,39 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return _matrix;
     }
 
+    public async Task DrawStart(Canvas2DContext ctx, string color)
+    {
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
 
+        await ctx.SetFillStyleAsync(color);
+        await ctx.ArcAsync(StartX, StartY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+      
+    public async Task DrawFinish(Canvas2DContext ctx, string color)
+    {
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.ArcAsync(FinishX, FinishY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }  
+
+    
     public FoGlue2D? GlueStartTo(FoGlyph2D? target) 
     {
         if ( target == null) return null;
