@@ -147,8 +147,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public void SetStartTo(FoGlyph2D? target) 
     {
         if ( target == null) return;
-        StartX = target.AttachX();
-        StartY = target.AttachY();
+        var pt = target.AttachTo();
+        StartX = pt.X;
+        StartY = pt.Y;
 
         IsSelected = false;
         Smash();
@@ -161,8 +162,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public void SetFinishTo(FoGlyph2D? target) 
     {
         if ( target == null) return;
-        FinishX = target.AttachX();
-        FinishY = target.AttachY();
+        var pt = target.AttachTo();
+        FinishX = pt.X;
+        FinishY = pt.Y;
         
         IsSelected = false;
         Smash();

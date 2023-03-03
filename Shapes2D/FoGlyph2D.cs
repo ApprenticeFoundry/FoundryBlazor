@@ -93,8 +93,10 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public int BottomEdge() { return TopEdge() + Height; }
     public int RightEdge() { return  LeftEdge() + Width; }
 
-    public virtual int AttachX() { return PinX; }
-    public virtual int AttachY() { return PinY; }
+    // public virtual int AttachX() { return PinX; }
+    // public virtual int AttachY() { return PinY; }
+
+    public virtual Point AttachTo() { return new Point(PinX, PinY); }
 
     public Action<FoGlyph2D, int>? ContextLink;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
