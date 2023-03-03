@@ -240,7 +240,11 @@ namespace FoundryBlazor.Shape;
         var pt = new Point((int)X, (int)Y);
         return pt;
     }
-
+    public Point TransformPoint(Point pt) 
+    {
+        return TransformPoint(pt.X,pt.Y);
+    }
+    
     public Point InvertPoint(int x, int y)
     {
         var inv = this.InvertCopy();
