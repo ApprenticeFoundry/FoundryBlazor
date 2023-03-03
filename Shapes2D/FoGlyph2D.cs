@@ -348,18 +348,49 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public virtual async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
-        if ( CannotRender() ) return false;
+        if (CannotRender()) return false;
 
         await ctx.SaveAsync();
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
         await Draw(ctx, tick);
-        if ( !IsSelected )
+        if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
-            
 
-        if ( !string.IsNullOrEmpty(Tag))
+        await DrawTag(ctx);
+
+        PostDraw?.Invoke(ctx, this);
+
+        if (IsSelected)
+            await RenderAsSelected(ctx, tick, deep);
+        
+        if (deep)
+        {
+            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        }
+
+        if (GetMembers<FoGlue2D>()?.Count > 0)
+            await DrawTriangle(ctx, "Black");
+        
+
+        await ctx.RestoreAsync();
+        return true;
+    }
+
+    private async Task RenderAsSelected(Canvas2DContext ctx, int tick, bool deep)
+    {
+        await ctx.SaveAsync();
+        DrawSelected?.Invoke(ctx, this);
+        GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        //await DrawPin(ctx);
+        await ctx.RestoreAsync();
+    }
+
+    private async Task DrawTag(Canvas2DContext ctx)
+    {
+        if (!string.IsNullOrEmpty(Tag))
         {
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
@@ -367,25 +398,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
             await ctx.SetFillStyleAsync("Black");
             await ctx.FillTextAsync(Tag, LeftX() + 2, TopY() + 3);
         }
-
-        PostDraw?.Invoke(ctx, this);
-
-        if (IsSelected)
-        {
-            await ctx.SaveAsync();
-            DrawSelected?.Invoke(ctx, this);
-            GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            //await DrawPin(ctx);
-            await ctx.RestoreAsync();
-        }
-
-        if (deep)
-        {
-            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        }
-        await ctx.RestoreAsync();
-        return true;
     }
 
     public async Task DrawOutline(Canvas2DContext ctx)
@@ -427,6 +439,69 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         await ctx.SetFillStyleAsync("Green");
         await ctx.ArcAsync(cx, cy, 16.0, 0.0, 2 * Math.PI);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+
+
+    public async Task DrawTriangle(Canvas2DContext ctx, string color)
+    {
+        var loc = PinLocation();
+
+
+        int StarWidth = 400;
+        int StarHeight  = 400;
+        int StarCenterX  = loc.X;
+        int StarCenterY  = loc.Y;
+
+        var scaleFactor = Math.Min((double)StarWidth / 400, (double)StarHeight / 400);
+        var starWidth = (int)(400 * scaleFactor);
+        var starHeight = (int)(400 * scaleFactor);
+        var starTop = StarCenterY - starHeight / 2;
+        var starLeft = StarCenterX - starWidth / 2;
+
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.MoveToAsync(starLeft + 200 * scaleFactor, starTop + 100 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 240 * scaleFactor, starTop + 180 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 330 * scaleFactor, starTop + 180 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 260 * scaleFactor, starTop + 230 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 300 * scaleFactor, starTop + 310 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 200 * scaleFactor, starTop + 260 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 100 * scaleFactor, starTop + 310 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 140 * scaleFactor, starTop + 230 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 70  * scaleFactor, starTop + 180 * scaleFactor);
+        await ctx.LineToAsync(starLeft + 160 * scaleFactor, starTop + 180 * scaleFactor);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+
+        public async Task DrawStar(Canvas2DContext ctx, string color)
+    {
+        var loc = PinLocation();
+        var cx = loc.X;
+        var cy = loc.Y;
+        var d = 8;
+
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.MoveToAsync(cx, cy+2*d);
+        await ctx.LineToAsync(cx+d, cy);
+        await ctx.LineToAsync(cx-d, cy);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
