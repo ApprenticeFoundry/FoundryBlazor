@@ -73,13 +73,16 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.StrokeAsync();
     };
 
-    public override void Smash() 
+    public override bool Smash() 
     {
-        width  = Dx();
-        height = Dy();
-        PinX = StartX;
-        PinY = StartY;
-        base.Smash();
+         if ( !base.Smash() ) return false;
+
+        //SRS  where and when does this get calculated...
+        //width  = Dx();
+        //height = Dy();
+        //x = StartX;
+        //y = StartY;
+        return true;
     }
 
     public FoConnector1D() : base()

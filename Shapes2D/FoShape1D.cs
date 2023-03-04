@@ -14,32 +14,34 @@ public interface IGlueOwner
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
-    private int x1 = 0;
+    protected int x1 = 0;
     public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value,x1); } }
-    private int y1 = 0;
+    protected int y1 = 0;
     public int StartY { get { return this.y1; } set { this.y1 = AssignInt(value,y1); } }
-    private int x2 = 0;
+    protected int x2 = 0;
     public int FinishX { get { return this.x2; } set { this.x2 = AssignInt(value,x2); } }
-    private int y2 = 0;
+    protected int y2 = 0;
     public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
 
     //prevent smashing matrix when height and width are calculated
-    public new int Height { get { return this.height; } set { this.height = value; } }
-    public new int Width { get { return this.width; } set { this.width = value; } }
+    // public new int Height { get { return this.height; } set { this.height = value; } }
+    // public new int Width { get { return this.width; } set { this.width = value; } }
 
-    public override void Smash() 
+    public override bool Smash() 
     {
-        Width = (int)Distance();
-        PinX = Cx();
-        PinY = Cy();
-        base.Smash();
+        if ( !base.Smash() ) return false;
+
+        //SRS  where and when does this get calculated...
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
+        return true;
     }
 
     public FoShape1D() : base()
     {
          ShapeDraw = DrawRect;
-        this.Height = 10;
-        Smash();
+        this.height = 10;
     }
 
     public FoShape1D(int x1, int y1, int x2, int y2, int height, string color) : base("", color)
@@ -50,8 +52,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
-        this.Height = height;
-        Smash();
+        this.height = height;
     }
 
 
@@ -62,7 +63,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         this.y1 = start?.PinY ?? 0;
         this.x2 = finish?.PinX ?? 0;
         this.y2 = finish?.PinY ?? 0;
-        this.Height = height;
+        this.height = height;
 
         if ( start != null)
             GlueStartTo(start);

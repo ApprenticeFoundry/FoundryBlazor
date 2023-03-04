@@ -69,9 +69,9 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public string Tag { get; set; } = "";
     public string GlyphId { get; set; } = Guid.NewGuid().ToString();
 
-    private int x = 0;
+    protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
-    private int y = 0;
+    protected int y = 0;
     public int PinY { get { return this.y; } set { this.y = AssignInt(value, y); } }
     protected int width = 0;
     public int Width { get { return this.width; } set { this.width = AssignInt(value, width); } }
@@ -596,26 +596,28 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return newValue;
     }
 
-    public virtual void SmashMembers()
+    public virtual bool SmashMembers()
     {
+        if ( _globalMatrix == null ) return false;
+
         this._globalMatrix = null;
+        GetMembers<FoGlue2D>()?.ForEach(item =>
+        {
+            if ( !item.HasTarget(this) ) return;
+            item.TargetMoved(this);
+        });
+        return true;
     }
-    public virtual void Smash()
+    public virtual bool Smash()
     {
-        if ( _matrix == null ) return;
+        if ( _matrix == null ) return false;
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         ResetHitTesting = true;
         this._matrix = null;
         this._invMatrix = null;
         
-        this.SmashMembers();
-
-        GetMembers<FoGlue2D>()?.ForEach(item =>
-        {
-            if ( !item.HasTarget(this) ) return;
-            item.TargetMoved(this);
-        });
+        return this.SmashMembers();
     }
 
     public virtual Matrix2D GetMatrix()
@@ -639,7 +641,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
             if (parent != null) 
             {
                 _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
-                $"PrePending {Name}".WriteInfo();
+                //$"PrePending {Name}".WriteInfo();
             } else
             {
                  $"No Parent {Name}".WriteInfo(); 
