@@ -84,6 +84,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public string Color { get; set; }
 
+    public Func<FoGlyph2D?> GetParent = () => null;
+
     public Func<FoGlyph2D, int> LocPinX = (obj) => obj.Width / 2;
     public Func<FoGlyph2D, int> LocPinY = (obj) => obj.Height / 2;
     public Func<FoGlyph2D, double> RotationZ = (obj) => obj.Angle;
@@ -109,6 +111,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
+    protected Matrix2D? _globalMatrix;
 
     public FoGlyph2D() : base("")
     {
@@ -449,13 +452,13 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     }
 
 
-    public async Task DrawTriangle(Canvas2DContext ctx, string color)
+    public async Task DrawStar(Canvas2DContext ctx, string color)
     {
         var loc = PinLocation();
 
 
-        int StarWidth = 400;
-        int StarHeight  = 400;
+        int StarWidth = 40;
+        int StarHeight  = 40;
         int StarCenterX  = loc.X;
         int StarCenterY  = loc.Y;
 
@@ -488,7 +491,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.RestoreAsync();
     }
 
-        public async Task DrawStar(Canvas2DContext ctx, string color)
+    public async Task DrawTriangle(Canvas2DContext ctx, string color)
     {
         var loc = PinLocation();
         var cx = loc.X;
@@ -593,14 +596,20 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return newValue;
     }
 
+    public virtual void SmashMembers()
+    {
+        this._globalMatrix = null;
+    }
     public virtual void Smash()
     {
         if ( _matrix == null ) return;
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
+        ResetHitTesting = true;
         this._matrix = null;
         this._invMatrix = null;
-        ResetHitTesting = true;
+        
+        this.SmashMembers();
 
         GetMembers<FoGlue2D>()?.ForEach(item =>
         {
@@ -620,6 +629,29 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         }
         return _matrix;
     }
+
+    public virtual Matrix2D GetGlobalMatrix()
+    {
+        if ( _globalMatrix == null )
+        {
+            _globalMatrix = new Matrix2D(GetMatrix());
+            var parent = GetParent();
+            if (parent != null) 
+            {
+                _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
+                $"PrePending {Name}".WriteInfo();
+            } else
+            {
+                 $"No Parent {Name}".WriteInfo(); 
+            }
+
+        }
+        return _globalMatrix;
+    }
+
+
+
+  
 
     public Matrix2D GetInvMatrix()
     {
