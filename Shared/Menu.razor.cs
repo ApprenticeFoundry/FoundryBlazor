@@ -77,10 +77,10 @@ public class MenuManager : ComponentBase
             AllMenus.Clear();
             AllMenus = Workspace.CollectMenus(AllMenus);
 
-            AllMenus.ForEach(item =>
-            {
-                item.DisplayText().WriteInfo();
-            });
+            // AllMenus.ForEach(item =>
+            // {
+            //     item.DisplayText().WriteInfo();
+            // });
 
             FoPage2D.RefreshMenus = false;
         }

@@ -71,6 +71,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if ( finish != null)    
             GlueFinishTo(finish);
 
+        Smash();   //Forces the glued items to move
     }
 
     public override Rectangle Rect() 
@@ -224,20 +225,24 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return true;
     }
 
-    public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
+    public override async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
-        if (CannotRender()) return false;
-
+        await base.UpdateContext(ctx, tick);
         width = (int)Distance();
         x = Cx();
         y = Cy();
+    }
+
+    public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
+    {
+        if (CannotRender()) return false;
 
         await ctx.SaveAsync();
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
-        //await Draw(ctx, tick);
-        await DrawStraight(ctx, tick);
+        await Draw(ctx, tick);
+        //await DrawStraight(ctx, tick);
         
         if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
@@ -247,7 +252,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-            await RenderAsSelected(ctx, tick, deep);
+            await DrawWhenSelected(ctx, tick, deep);
         
         if (deep)
         {

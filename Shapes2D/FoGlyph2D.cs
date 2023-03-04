@@ -259,6 +259,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         Height = 0;
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
     } 
+
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);
@@ -367,7 +368,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-            await RenderAsSelected(ctx, tick, deep);
+            await DrawWhenSelected(ctx, tick, deep);
         
         if (deep)
         {
@@ -383,7 +384,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return true;
     }
 
-    public async Task RenderAsSelected(Canvas2DContext ctx, int tick, bool deep)
+    public async Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {
         await ctx.SaveAsync();
         DrawSelected?.Invoke(ctx, this);
@@ -463,26 +464,26 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         int StarCenterX  = loc.X;
         int StarCenterY  = loc.Y;
 
-        var scaleFactor = Math.Min((double)StarWidth / 400, (double)StarHeight / 400);
-        var starWidth = (int)(400 * scaleFactor);
-        var starHeight = (int)(400 * scaleFactor);
-        var starTop = StarCenterY - starHeight / 2;
-        var starLeft = StarCenterX - starWidth / 2;
+        var scale = Math.Min((double)StarWidth / 400, (double)StarHeight / 400);
+        var starWidth = (int)(400 * scale);
+        var starHeight = (int)(400 * scale);
+        var top = StarCenterY - starHeight / 2;
+        var left = StarCenterX - starWidth / 2;
 
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.MoveToAsync(starLeft + 200 * scaleFactor, starTop + 100 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 240 * scaleFactor, starTop + 180 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 330 * scaleFactor, starTop + 180 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 260 * scaleFactor, starTop + 230 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 300 * scaleFactor, starTop + 310 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 200 * scaleFactor, starTop + 260 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 100 * scaleFactor, starTop + 310 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 140 * scaleFactor, starTop + 230 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 70  * scaleFactor, starTop + 180 * scaleFactor);
-        await ctx.LineToAsync(starLeft + 160 * scaleFactor, starTop + 180 * scaleFactor);
+        await ctx.MoveToAsync(left + 200 * scale, top + 100 * scale);
+        await ctx.LineToAsync(left + 240 * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 330 * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 260 * scale, top + 230 * scale);
+        await ctx.LineToAsync(left + 300 * scale, top + 310 * scale);
+        await ctx.LineToAsync(left + 200 * scale, top + 260 * scale);
+        await ctx.LineToAsync(left + 100 * scale, top + 310 * scale);
+        await ctx.LineToAsync(left + 140 * scale, top + 230 * scale);
+        await ctx.LineToAsync(left + 70  * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 160 * scale, top + 180 * scale);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -599,7 +600,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public virtual bool SmashMembers()
     {
-        if ( _globalMatrix == null ) return false;
+        //if ( _globalMatrix == null ) return false;
 
         this._globalMatrix = null;
         GetMembers<FoGlue2D>()?.ForEach(item =>
@@ -612,7 +613,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public virtual bool Smash()
     {
         if ( _matrix == null ) return false;
-        //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
+        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         ResetHitTesting = true;
         this._matrix = null;
