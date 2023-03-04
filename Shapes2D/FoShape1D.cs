@@ -118,11 +118,15 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if (_matrix == null) {
             _matrix = new Matrix2D();
             var angle = ComputeAngle();
-            _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, this.CenterX(), this.CenterY());
+            if ( _matrix != null)
+                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, this.CenterX(), this.CenterY());
+            else
+                "Smahing here is IMPOSSABLE".WriteError();
+
             //FoGlyph2D.ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
-        return _matrix;
+        return _matrix!;
     }
 
     public async Task DrawStart(Canvas2DContext ctx, string color)
@@ -204,5 +208,58 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         Smash();
           
         //$"{Name} SetFinishTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+    }
+
+    public async Task<bool> DrawStraight(Canvas2DContext ctx, int tick)
+    {
+        //"DrawStraight".WriteLine();
+        await ctx.BeginPathAsync();
+        await ctx.MoveToAsync(StartX, StartY);
+        await ctx.LineToAsync(FinishX, FinishY);
+        await ctx.ClosePathAsync();
+
+        await ctx.SetStrokeStyleAsync(Color);
+        await ctx.SetLineWidthAsync(Thickness);
+        await ctx.StrokeAsync();
+        return true;
+    }
+
+    public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
+    {
+        if (CannotRender()) return false;
+
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
+
+        await ctx.SaveAsync();
+        await UpdateContext(ctx, tick);
+
+        PreDraw?.Invoke(ctx, this);
+        //await Draw(ctx, tick);
+        await DrawStraight(ctx, tick);
+        
+        if (!IsSelected)
+            HoverDraw?.Invoke(ctx, this);
+
+        await DrawTag(ctx);
+
+        PostDraw?.Invoke(ctx, this);
+
+        if (IsSelected)
+            await RenderAsSelected(ctx, tick, deep);
+        
+        if (deep)
+        {
+            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        }
+
+        if (GetMembers<FoGlue2D>()?.Count > 0)
+            await DrawTriangle(ctx, "Black");
+        
+
+        await ctx.RestoreAsync();
+        return true;
     }
 }

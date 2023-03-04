@@ -266,7 +266,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         
         var mtx = this.GetMatrix();
         //you must use Transform so the context can acumlate the positions
-        await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+        if ( mtx != null)  //this should NEVER be the case unless cleared by another process
+            await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
         await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
 
@@ -382,7 +383,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return true;
     }
 
-    private async Task RenderAsSelected(Canvas2DContext ctx, int tick, bool deep)
+    public async Task RenderAsSelected(Canvas2DContext ctx, int tick, bool deep)
     {
         await ctx.SaveAsync();
         DrawSelected?.Invoke(ctx, this);
@@ -391,7 +392,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.RestoreAsync();
     }
 
-    private async Task DrawTag(Canvas2DContext ctx)
+    public async Task DrawTag(Canvas2DContext ctx)
     {
         if (!string.IsNullOrEmpty(Tag))
         {
