@@ -28,14 +28,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     // public new int Height { get { return this.height; } set { this.height = value; } }
     // public new int Width { get { return this.width; } set { this.width = value; } }
 
-    public override bool Smash(bool force) 
-    {
 
-        if ( !base.Smash(force) ) return false;
-        $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
-
-        return true;
-    }
 
     public FoShape1D() : base()
     {
@@ -82,6 +75,24 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var result = new Rectangle(pt, sz);
         return result;
     }
+
+    private void ComputeGeometry()
+    {
+        //SRS  where and when does this get calculated...
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
+    }
+
+    public override bool Smash(bool force) 
+    {
+
+        if ( !base.Smash(force) ) return false;
+        $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
+
+        return true;
+    }
+
     public int Dx() => x2 - x1;
     public int Dy() => y2 - y1;
 
@@ -123,7 +134,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
                 _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle, 0.0, 0.0, LocPinX(this), LocPinY(this));
                 //_matrix.AppendTransform(Cx(), Cy(), 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, 0, 0);
             else
-                "Smahing here is IMPOSSABLE".WriteError();
+                "GetMatrix here is IMPOSSABLE".WriteError();
 
             //FoGlyph2D.ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
@@ -133,11 +144,22 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public async Task DrawStart(Canvas2DContext ctx, string color)
     {
+                //need to use inverse matrix here 
+        var matrix = GetInvGlobalMatrix();
+        if (matrix == null)
+        {
+            "DrawStraight here is IMPOSSABLE".WriteError();
+            return;
+        }
+
+        var start = matrix.TransformPoint(StartX, StartY);
+
+
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(StartX, StartY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(start.X, start.Y, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -149,18 +171,28 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync("Start",StartX, StartY);
+        await ctx.FillTextAsync("Start",start.X, start.Y);
 
         await ctx.RestoreAsync();
     }
       
     public async Task DrawFinish(Canvas2DContext ctx, string color)
     {
+                //need to use inverse matrix here 
+        var matrix = GetInvGlobalMatrix();
+        if (matrix == null)
+        {
+            "DrawStraight here is IMPOSSABLE".WriteError();
+            return;
+        }
+
+        var finish = matrix.TransformPoint(FinishX, FinishY);
+
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(FinishX, FinishY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(finish.X, finish.Y, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -172,7 +204,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetFillStyleAsync("Black");
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
-        await ctx.FillTextAsync("Finish",FinishX, FinishY);
+        await ctx.FillTextAsync("Finish",finish.X, finish.Y);
 
         await ctx.RestoreAsync();
     }  
@@ -205,10 +237,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         StartX = pt.X;
         StartY = pt.Y;
 
-        //SRS  where and when does this get calculated...
-        width = (int)Distance();
-        x = Cx();
-        y = Cy();
+        ComputeGeometry();
 
         IsSelected = false;
 
@@ -217,29 +246,40 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     
     
-    public void ComputeFinishFor(FoGlyph2D? target) 
+    public void ComputeFinishFor(FoGlyph2D? target)
     {
-        if ( target == null) return;
+        if (target == null) return;
         var pt = target.AttachTo();
         FinishX = pt.X;
         FinishY = pt.Y;
 
-        //SRS  where and when does this get calculated...
-        width = (int)Distance();
-        x = Cx();
-        y = Cy();
+        ComputeGeometry();
 
         IsSelected = false;
-          
+
         $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteLine(ConsoleColor.DarkBlue);
     }
+
+
 
     public async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
     {
         //"DrawStraight".WriteLine();
+
+        //need to use inverse matrix here 
+        var matrix = GetInvMatrix();
+        if (matrix == null)
+        {
+            "DrawStraight here is IMPOSSABLE".WriteError();
+            return false;
+        }
+
+        var start = matrix.TransformPoint(StartX, StartY);
+        var finish = matrix.TransformPoint(FinishX, FinishY);
+
         await ctx.BeginPathAsync();
-        await ctx.MoveToAsync(StartX, StartY);
-        await ctx.LineToAsync(FinishX, FinishY);
+        await ctx.MoveToAsync(start.X, start.Y);
+        await ctx.LineToAsync(finish.X, finish.Y);
         await ctx.ClosePathAsync();
 
         await ctx.SetStrokeStyleAsync(color ?? Color);
@@ -248,13 +288,10 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return true;
     }
 
-    public override async Task UpdateContext(Canvas2DContext ctx, int tick)
-    {
-        await base.UpdateContext(ctx, tick);
-        width = (int)Distance();
-        x = Cx();
-        y = Cy();
-    }
+    // public override async Task UpdateContext(Canvas2DContext ctx, int tick)
+    // {
+    //     await base.UpdateContext(ctx, tick);
+    // }
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {

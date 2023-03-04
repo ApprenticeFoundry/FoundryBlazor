@@ -112,7 +112,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
     protected Matrix2D? _globalMatrix;
-
+    protected Matrix2D? _invGlobalMatrix;
     public FoGlyph2D() : base("")
     {
         PinX = PinY = 0;
@@ -264,7 +264,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         ContextLink?.Invoke(this, tick);
 
-        
         var mtx = this.GetMatrix();
         //you must use Transform so the context can acumlate the positions
         if ( mtx != null)  //this should NEVER be the case unless cleared by another process
@@ -666,6 +665,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         _invMatrix ??= this.GetMatrix().InvertCopy();
         return _invMatrix;
+    }
+
+    public Matrix2D GetInvGlobalMatrix()
+    {
+        _invGlobalMatrix ??= this.GetGlobalMatrix().InvertCopy();
+        return _invGlobalMatrix;
     }
 
     public void UnglueAll()
