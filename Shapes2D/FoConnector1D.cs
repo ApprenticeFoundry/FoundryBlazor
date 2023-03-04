@@ -21,9 +21,9 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
     public new Func<FoConnector1D, int> LocPinX = (obj) => 0;
     public new Func<FoConnector1D, int> LocPinY = (obj) => 0;
 
-    //prevent smashing matrix when height and width are calculated
-    public new int Height { get { return this.height; } set { this.height = value; } }
-    public new int Width { get { return this.width; } set { this.width = value; } }
+    // //prevent smashing matrix when height and width are calculated
+    // public new int Height { get { return this.height; } set { this.height = value; } }
+    // public new int Width { get { return this.width; } set { this.width = value; } }
 
     public Action<Canvas2DContext, FoConnector1D> DrawStraight = async (ctx, obj) =>
     {
@@ -73,9 +73,9 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.StrokeAsync();
     };
 
-    public override bool Smash() 
+    public override bool Smash(bool force) 
     {
-         if ( !base.Smash() ) return false;
+         if ( !base.Smash(force) ) return false;
 
         //SRS  where and when does this get calculated...
         //width  = Dx();
@@ -88,7 +88,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
     public FoConnector1D() : base()
     {
         this.Thickness = 5;
-        Smash();
+        Smash(false);
     }
 
     public FoConnector1D(int x1, int y1, int x2, int y2, string color) : base("", color)
@@ -98,7 +98,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
-        Smash();
+        Smash(false);
     }
 
 
@@ -178,7 +178,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
 
         var glue = new FoGlue2D($"Start_{target.Name}_{Guid.NewGuid()}");
         glue.GlueTo(this, target);
-        Smash();
+        Smash(false);
         return glue;
     }
     public FoGlue2D? GlueFinishTo(FoGlyph2D? target) 
@@ -187,32 +187,32 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
 
         var glue = new FoGlue2D($"Finish_{target.Name}_{Guid.NewGuid()}");
         glue.GlueTo(this, target);
-        Smash();
+        Smash(false);
         return glue;
     }
 
-    public void SetStartTo(FoGlyph2D? target) 
+    public void ComputeStartFor(FoGlyph2D? target) 
     {
         if ( target == null) return;
         StartX = target.PinX;
         StartY = target.PinY;
 
         IsSelected = false;
-        Smash();
+        Smash(false);
 
         //$"{Name} SetStartTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
     }
 
     
     
-    public void SetFinishTo(FoGlyph2D? target) 
+    public void ComputeFinishFor(FoGlyph2D? target) 
     {
         if ( target == null) return;
         FinishX = target.PinX;
         FinishY = target.PinY;
         
         IsSelected = false;
-        Smash();
+        Smash(false);
           
         //$"{Name} SetFinishTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
     }

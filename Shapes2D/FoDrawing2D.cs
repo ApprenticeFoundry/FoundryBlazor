@@ -641,7 +641,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PanZoomService.PanBy(dx, dy);
         UserWindowMovedTo(PanZoomService.Pan());
 
-        _panZoomWindow?.Smash();  //Anit scale and move
+        _panZoomWindow?.Smash(false);  //Anit scale and move
         return true;
     }
 

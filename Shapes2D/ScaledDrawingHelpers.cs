@@ -109,7 +109,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
         page.PageMargin = this.PageMargin;
         page.PageWidth = this.PageWidth;
         page.PageHeight = this.PageHeight;
-        page.Smash();
+        page.Smash(false);
     }
     public string CanvasWH()
     {

@@ -89,6 +89,14 @@ public class FoPage2D : FoGlyph2D
         return menu!;
     }
 
+    public override bool Smash(bool force)
+    {
+        if ( _matrix == null && !force) return false;
+        $"Smashing Page {Name} {GetType().Name}".WriteInfo(2);
+
+        return base.Smash(force);
+    }
+
     public T? AddShape<T>(T value) where T : FoGlyph2D
     {
 

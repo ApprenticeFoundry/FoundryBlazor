@@ -171,7 +171,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         LocPinX = locX;
         LocPinY = locY;
-        Smash();
+        Smash(false);
         return PinLocation();
     }
 
@@ -584,42 +584,47 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected int AssignInt(int newValue, int oldValue)
     {
-        if (_matrix != null && Math.Abs(newValue - oldValue) > 2)
-            Smash();
+        if ( Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
 
         return newValue;
     }
 
     protected double AssignDouble(double newValue, double oldValue)
     {
-        if (_matrix != null && Math.Abs(newValue - oldValue) > 2)
-            Smash();
+        if ( Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
 
         return newValue;
     }
 
-    public virtual bool SmashMembers()
+    public virtual bool SmashParents()
     {
-        //if ( _globalMatrix == null ) return false;
-
+        if ( _globalMatrix == null ) return false;
         this._globalMatrix = null;
-        GetMembers<FoGlue2D>()?.ForEach(item =>
-        {
-            if ( !item.HasTarget(this) ) return;
-            item.TargetMoved(this);
-        });
+
         return true;
     }
-    public virtual bool Smash()
+
+    public virtual bool SmashGlue()
     {
-        if ( _matrix == null ) return false;
+        var list = GetMembers<FoGlue2D>();
+        if ( list == null) return false;
+
+        list.ForEach(item => item.TargetMoved(this));
+        return true;
+    }
+    public virtual bool Smash(bool force)
+    {
+        if ( _matrix == null && !force) return false;
         $"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         ResetHitTesting = true;
         this._matrix = null;
         this._invMatrix = null;
-        
-        return this.SmashMembers();
+
+        SmashParents();
+        return this.SmashGlue();
     }
 
     public virtual Matrix2D GetMatrix()
@@ -666,6 +671,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public void UnglueAll()
     {
         GetMembers<FoGlue2D>()?.ForEach(item => item.UnGlue() );
+        this.SmashGlue();
     }
 
 
@@ -674,12 +680,14 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         //$"adding glue to {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);
         this.Add<FoGlue2D>(glue);
+        this.SmashGlue();
     }
 
     public void RemoveGlue(FoGlue2D glue)
     {
         //$"remove glue from {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);;
         this.Remove<FoGlue2D>(glue);
+        this.SmashGlue();
     }
 
     public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase

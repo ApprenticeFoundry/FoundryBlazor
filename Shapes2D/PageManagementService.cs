@@ -245,7 +245,7 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         var page = CurrentPage();
         page.MoveBy(dx, dy);
-        page.Smash();
+        page.Smash(false);
     }
 
     public void SelectionsMoveBy(int dx, int dy)

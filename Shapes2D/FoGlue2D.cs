@@ -20,17 +20,17 @@ public class FoGlue2D : FoBase
     {
         if ( !HasTarget(target) || Target == null) return false;
 
-        //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        $"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
 
         if ( Name.StartsWith("Finish") && Source != null )
         {
-            Source.SetFinishTo(Target);
+            Source.ComputeFinishFor(Target);
             //$"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
             return true;
         }
         else if ( Name.StartsWith("Start")  && Source != null)
         {
-            Source.SetStartTo(Target);
+            Source.ComputeStartFor(Target);
             //$"{Source} SetStartTo {Target.Name}".WriteInfo(4);
             return true;
         }
@@ -58,6 +58,7 @@ public class FoGlue2D : FoBase
 
         this.Source = null;
         this.Target = null;
+        
 
         return this;
     }

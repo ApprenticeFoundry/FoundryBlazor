@@ -8,12 +8,13 @@ public interface IGlueOwner
 {
     void AddGlue(FoGlue2D glue);
     void RemoveGlue(FoGlue2D glue);
-    public void SetFinishTo(FoGlyph2D? target);
-    public void SetStartTo(FoGlyph2D? target);
+    public void ComputeFinishFor(FoGlyph2D? target);
+    public void ComputeStartFor(FoGlyph2D? target);
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
+    private static int  gluecount = 0; 
     protected int x1 = 0;
     public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value,x1); } }
     protected int y1 = 0;
@@ -27,14 +28,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     // public new int Height { get { return this.height; } set { this.height = value; } }
     // public new int Width { get { return this.width; } set { this.width = value; } }
 
-    public override bool Smash() 
+    public override bool Smash(bool force) 
     {
-        if ( !base.Smash() ) return false;
 
-        //SRS  where and when does this get calculated...
-        width = (int)Distance();
-        x = Cx();
-        y = Cy();
+        if ( !base.Smash(force) ) return false;
+        $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
+
         return true;
     }
 
@@ -71,7 +70,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if ( finish != null)    
             GlueFinishTo(finish);
 
-        Smash();   //Forces the glued items to move
+        //Smash();   //Forces the glued items to move
     }
 
     public override Rectangle Rect() 
@@ -118,9 +117,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if (_matrix == null) {
             _matrix = new Matrix2D();
-            var angle = ComputeAngle();
+            var angle = ComputeAngle() +  RotationZ(this);
+            $"Shape1D {PinX} {PinY} {angle}".WriteError();
             if ( _matrix != null)
-                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, this.CenterX(), this.CenterY());
+                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle, 0.0, 0.0, LocPinX(this), LocPinY(this));
+                //_matrix.AppendTransform(Cx(), Cy(), 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, 0, 0);
             else
                 "Smahing here is IMPOSSABLE".WriteError();
 
@@ -143,6 +144,13 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetStrokeStyleAsync("#003300");
         await ctx.StrokeAsync();
 
+        await ctx.SetTextAlignAsync(TextAlign.Center);
+        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+        var FontSpec = $"normal bold 28px sans-serif";
+        await ctx.SetFontAsync(FontSpec);
+        await ctx.SetFillStyleAsync("Black");
+        await ctx.FillTextAsync("Start",StartX, StartY);
+
         await ctx.RestoreAsync();
     }
       
@@ -159,6 +167,13 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetStrokeStyleAsync("#003300");
         await ctx.StrokeAsync();
 
+        await ctx.SetTextAlignAsync(TextAlign.Center);
+        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+        await ctx.SetFillStyleAsync("Black");
+        var FontSpec = $"normal bold 28px sans-serif";
+        await ctx.SetFontAsync(FontSpec);
+        await ctx.FillTextAsync("Finish",FinishX, FinishY);
+
         await ctx.RestoreAsync();
     }  
 
@@ -167,9 +182,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Start_{target.Name}_{Guid.NewGuid()}");
+        var glue = new FoGlue2D($"Start_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
-        Smash();
+        ComputeStartFor(target);
         return glue;
     }
 
@@ -177,41 +192,49 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Finish_{target.Name}_{Guid.NewGuid()}");
+        var glue = new FoGlue2D($"Finish_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
-        Smash();
+        ComputeFinishFor(target);
         return glue;
     }
 
-    public void SetStartTo(FoGlyph2D? target) 
+    public void ComputeStartFor(FoGlyph2D? target) 
     {
         if ( target == null) return;
         var pt = target.AttachTo();
         StartX = pt.X;
         StartY = pt.Y;
 
-        IsSelected = false;
-        Smash();
+        //SRS  where and when does this get calculated...
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
 
-        //$"{Name} SetStartTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        IsSelected = false;
+
+        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteLine(ConsoleColor.DarkBlue);
     }
 
     
     
-    public void SetFinishTo(FoGlyph2D? target) 
+    public void ComputeFinishFor(FoGlyph2D? target) 
     {
         if ( target == null) return;
         var pt = target.AttachTo();
         FinishX = pt.X;
         FinishY = pt.Y;
-        
+
+        //SRS  where and when does this get calculated...
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
+
         IsSelected = false;
-        Smash();
           
-        //$"{Name} SetFinishTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteLine(ConsoleColor.DarkBlue);
     }
 
-    public async Task<bool> DrawStraight(Canvas2DContext ctx, int tick)
+    public async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
     {
         //"DrawStraight".WriteLine();
         await ctx.BeginPathAsync();
@@ -219,7 +242,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.LineToAsync(FinishX, FinishY);
         await ctx.ClosePathAsync();
 
-        await ctx.SetStrokeStyleAsync(Color);
+        await ctx.SetStrokeStyleAsync(color ?? Color);
         await ctx.SetLineWidthAsync(Thickness);
         await ctx.StrokeAsync();
         return true;
@@ -235,14 +258,14 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
-        if (CannotRender()) return false;
+        //if (CannotRender()) return false;
 
         await ctx.SaveAsync();
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
         await Draw(ctx, tick);
-        //await DrawStraight(ctx, tick);
+        await DrawStraight(ctx, "Red", tick);
         
         if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
