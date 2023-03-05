@@ -238,6 +238,10 @@ namespace FoundryBlazor.Shape;
         var pt = new Point(x, y);
         return pt;
     }
+    public Point NoTransformPoint(Point pt) 
+    {
+        return pt;
+    }
 
     public Point TransformPoint(int x, int y) 
     {

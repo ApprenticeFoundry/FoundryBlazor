@@ -645,7 +645,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         if ( _globalMatrix == null )
         {
-            _globalMatrix = new Matrix2D(GetMatrix());
+            _globalMatrix = GetMatrix().Clone();
             var parent = GetParent();
             if (parent != null) 
             {

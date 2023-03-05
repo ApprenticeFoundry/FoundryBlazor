@@ -295,14 +295,13 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
-        //if (CannotRender()) return false;
+        if (CannotRender()) return false;
 
         await ctx.SaveAsync();
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
         await Draw(ctx, tick);
-        await DrawStraight(ctx, "Red", tick);
         
         if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
@@ -323,6 +322,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if (GetMembers<FoGlue2D>()?.Count > 0)
             await DrawTriangle(ctx, "Black");
         
+        await DrawStraight(ctx, "Red", tick);
+        await DrawStart(ctx, "Blue");
+        await DrawFinish(ctx, "Cyan");
 
         await ctx.RestoreAsync();
         return true;
