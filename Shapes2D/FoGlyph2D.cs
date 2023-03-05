@@ -99,7 +99,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     // public virtual int AttachY() { return PinY; }
 
     public virtual Point AttachTo() 
-    { 
+    {
+        $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
         return new Point(PinX, PinY); 
     }
 
@@ -661,6 +662,25 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     }
 
 
+    public Matrix2D GlobalMatrixComputeTest(FoGlyph2D  source, int level, string path)
+    {
+        $"{path} Source {source.Name}: {source.PinX} {source.PinY}".WriteSuccess(level);
+        var point = GetMatrix().TransformPoint(source.PinX,source.PinY);
+        $"{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
+        _globalMatrix = GetMatrix().Clone();
+            var parent = GetParent();
+            if (parent != null) 
+            {
+                _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
+                $"PrePending {Name} to parent {parent.Name}".WriteInfo();
+            } else
+            {
+                 $"No Parent {Name}".WriteInfo(); 
+            }
+
+        }
+        return _globalMatrix;
+    }
 
   
 
