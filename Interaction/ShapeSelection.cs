@@ -58,7 +58,9 @@ public class ShapeSelection : ShapeHovering
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
 
-        var hitShape = findings?.LastOrDefault(); 
+        var hitShape = findings?.LastOrDefault();
+        hitShape?.OnClick(ClickStyle.MouseDown);
+        
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); 
         if ( hitShape != null) 
         {

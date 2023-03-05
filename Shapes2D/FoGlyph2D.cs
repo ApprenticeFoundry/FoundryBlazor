@@ -24,6 +24,14 @@ public enum LineLayoutStyle
     HorizontalFirst = 3,
 }
 
+public enum ClickStyle
+{
+    None,
+    MouseDown,
+    MouseUp,
+    DoubleClick
+}
+
 public interface IHasRectangle
 {
     Rectangle Rect();
@@ -98,9 +106,14 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     // public virtual int AttachX() { return PinX; }
     // public virtual int AttachY() { return PinY; }
 
+    public virtual void OnClick(ClickStyle style) 
+    {
+    }
+
     public virtual Point AttachTo() 
     {
         $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
+
         return new Point(PinX, PinY); 
     }
 
@@ -662,24 +675,20 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     }
 
 
-    public Matrix2D GlobalMatrixComputeTest(FoGlyph2D  source, int level, string path)
+    public void GlobalMatrixComputeTest(FoGlyph2D  source, Matrix2D mat, int level, string path)
     {
         $"{path} Source {source.Name}: {source.PinX} {source.PinY}".WriteSuccess(level);
-        var point = GetMatrix().TransformPoint(source.PinX,source.PinY);
+        var point = mat.TransformPoint(source.PinX,source.PinY);
         $"{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
-        _globalMatrix = GetMatrix().Clone();
-            var parent = GetParent();
-            if (parent != null) 
-            {
-                _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
-                $"PrePending {Name} to parent {parent.Name}".WriteInfo();
-            } else
-            {
-                 $"No Parent {Name}".WriteInfo(); 
-            }
 
-        }
-        return _globalMatrix;
+        var parent = source.GetParent();
+        if (parent == null) return;
+
+        var newPath = $"{path}.{source.Name}";
+        var pMat = parent.GetMatrix();
+        mat.PrependMatrix(pMat);
+        $"PrePending {Name} to parent {parent.Name}".WriteInfo(level);
+        GlobalMatrixComputeTest(parent, mat, level + 1, newPath);
     }
 
   
