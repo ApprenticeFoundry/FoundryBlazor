@@ -1,5 +1,6 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -191,30 +192,42 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
         return glue;
     }
 
+    public void ComputeGeometry()
+    {
+        //SRS  where and when does this get calculated...
+        width = (int)Distance();
+        x = Cx();
+        y = Cy();
+    }
+
     public void ComputeStartFor(FoGlyph2D? target) 
     {
         if ( target == null) return;
-        StartX = target.PinX;
-        StartY = target.PinY;
+        var pt = target.AttachTo();
+        StartX = pt.X;
+        StartY = pt.Y;
+
+        ComputeGeometry();
 
         IsSelected = false;
-        Smash(false);
 
-        //$"{Name} SetStartTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
     
     
-    public void ComputeFinishFor(FoGlyph2D? target) 
+    public void ComputeFinishFor(FoGlyph2D? target)
     {
-        if ( target == null) return;
-        FinishX = target.PinX;
-        FinishY = target.PinY;
-        
+        if (target == null) return;
+        var pt = target.AttachTo();
+        FinishX = pt.X;
+        FinishY = pt.Y;
+
+        ComputeGeometry();
+
         IsSelected = false;
-        Smash(false);
-          
-        //$"{Name} SetFinishTo {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+
+        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
 

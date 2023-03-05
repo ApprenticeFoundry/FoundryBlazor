@@ -289,8 +289,8 @@ public class FoPage2D : FoGlyph2D
         //await DrawFancyPin(ctx);
 
 
-        Shapes1D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         Shapes2D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        Shapes1D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
 
 
         await ctx.RestoreAsync();

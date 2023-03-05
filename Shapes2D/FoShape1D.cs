@@ -76,7 +76,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return result;
     }
 
-    private void ComputeGeometry()
+    public void ComputeGeometry()
     {
         //SRS  where and when does this get calculated...
         width = (int)Distance();
@@ -241,7 +241,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteLine(ConsoleColor.DarkBlue);
+        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
     
@@ -257,12 +257,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteLine(ConsoleColor.DarkBlue);
+        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
 
 
-    public async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
+    public virtual async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
     {
         //"DrawStraight".WriteLine();
 
