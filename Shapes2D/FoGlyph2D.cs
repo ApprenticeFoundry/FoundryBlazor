@@ -675,20 +675,20 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     }
 
 
-    public void GlobalMatrixComputeTest(FoGlyph2D  source, Matrix2D mat, int level, string path)
+    public void GlobalMatrixComputeTest(FoGlyph2D source, Matrix2D mat, int X, int Y, int level, string path)
     {
-        $"{path} Source {source.Name}: {source.PinX} {source.PinY}".WriteSuccess(level);
-        var point = mat.TransformPoint(source.PinX,source.PinY);
-        $"{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
+        $"{level}]{path} Source {source.Name}: {X} {Y}".WriteSuccess(level);
+        var point = mat.TransformPoint(X,Y);
+        $"{level}]{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
 
         var parent = source.GetParent();
         if (parent == null) return;
 
-        var newPath = $"{path}.{source.Name}";
+        var newPath = $"{parent.Name}.{path}";
         var pMat = parent.GetMatrix();
-        mat.PrependMatrix(pMat);
+        pMat = mat.PrependMatrix(pMat);
         $"PrePending {Name} to parent {parent.Name}".WriteInfo(level);
-        GlobalMatrixComputeTest(parent, mat, level + 1, newPath);
+        GlobalMatrixComputeTest(parent, pMat, X, Y, level + 1, newPath);
     }
 
   
