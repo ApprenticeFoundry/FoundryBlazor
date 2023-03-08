@@ -37,7 +37,7 @@ public class ShapeDragging : ShapeHovering
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
         var hitShape = findings?.LastOrDefault(); 
-        hitShape?.OnClick(ClickStyle.MouseDown);
+        hitShape?.OnShapeClick(ClickStyle.MouseDown);
 
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
 
@@ -60,7 +60,7 @@ public class ShapeDragging : ShapeHovering
     }
     public override bool MouseUp(CanvasMouseArgs args)
     {
-        selectedShape?.OnClick(ClickStyle.MouseUp);
+        selectedShape?.OnShapeClick(ClickStyle.MouseUp);
         isDraggingShapes = false;
         drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;

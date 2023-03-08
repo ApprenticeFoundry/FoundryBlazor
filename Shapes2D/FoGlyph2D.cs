@@ -103,10 +103,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public int BottomEdge() { return TopEdge() + Height; }
     public int RightEdge() { return  LeftEdge() + Width; }
 
-    // public virtual int AttachX() { return PinX; }
-    // public virtual int AttachY() { return PinY; }
-
-    public virtual void OnClick(ClickStyle style) 
+    public virtual void OnShapeClick(ClickStyle style) 
     {
     }
 
