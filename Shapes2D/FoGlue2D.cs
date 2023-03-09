@@ -25,33 +25,26 @@ public class FoGlue2D : FoBase
     public bool TargetMoved(FoGlyph2D target)
     {
         if ( !HasTarget(target) || Target == null) return false;
-        Source
+        return Source?.Smash(false) ?? false;
 
-        //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
+        // //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
 
-        if ( Name.StartsWith("Finish") && Source != null )
-        {
-            Source.ComputeFinishFor(Target);
-            //$"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
-            return true;
-        }
-        else if ( Name.StartsWith("Start")  && Source != null)
-        {
-            Source.ComputeStartFor(Target);
-            //$"{Source} SetStartTo {Target.Name}".WriteInfo(4);
-            return true;
-        }
-        return false;
+        // if ( Name.StartsWith("Finish") && Source != null )
+        // {
+        //     Source.ComputeFinishFor(Target);
+        //     //$"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
+        //     return true;
+        // }
+        // else if ( Name.StartsWith("Start")  && Source != null)
+        // {
+        //     Source.ComputeStartFor(Target);
+        //     //$"{Source} SetStartTo {Target.Name}".WriteInfo(4);
+        //     return true;
+        // }
+        // return false;
     }
 
-    public bool IsStart()
-    {
-        return Name.StartsWith("Start");
-    }
-    public bool IsFinish()
-    {
-        return Name.StartsWith("Finish");
-    }
+
     public FoGlue2D GlueTo(IGlueOwner source, FoGlyph2D target) 
     {
         this.Source = source;

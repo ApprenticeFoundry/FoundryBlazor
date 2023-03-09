@@ -8,9 +8,11 @@ public interface IGlueOwner
 {
     void AddGlue(FoGlue2D glue);
     void RemoveGlue(FoGlue2D glue);
-    void RecomputeGlue();
-    public bool ComputeFinishFor(FoGlyph2D? target);
-    public bool ComputeStartFor(FoGlyph2D? target);
+
+    bool Smash(bool force);
+    //void RecomputeGlue();
+    //public bool ComputeFinishFor(FoGlyph2D? target);
+    //public bool ComputeStartFor(FoGlyph2D? target);
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
@@ -24,10 +26,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public int FinishX { get { return this.x2; } set { this.x2 = AssignInt(value,x2); } }
     protected int y2 = 0;
     public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
-
-    //prevent smashing matrix when height and width are calculated
-    // public new int Height { get { return this.height; } set { this.height = value; } }
-    // public new int Width { get { return this.width; } set { this.width = value; } }
 
 
 
@@ -159,8 +157,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             {
                 var found = glue.Name[..3] switch
                 {
-                    "STA" => source.ComputeFinishFor(target),
-                    "FIN" => source.ComputeStartFor(target),
+                    "STA" => ComputeFinishFor(target),
+                    "FIN" => ComputeStartFor(target),
                     _ => false
                 };
             }
