@@ -108,6 +108,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void SetCurrentlyProcessing(bool value)
     {
+        if (value == false)
+        {
+            while (MouseArgQueue.Count > 0)
+            {
+                var args = MouseArgQueue.Dequeue();
+                //$"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                ApplyMouseArgs(args);
+            }
+        }
         IsCurrentlyProcessing = value;
     }
 
@@ -572,7 +581,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             try
             {
-                if (IsCurrentlyRendering)
+                if (IsCurrentlyRendering || IsCurrentlyProcessing)
                 {
                     //you should cashe the args to replayed latter
                     //when the UI is not rendering..

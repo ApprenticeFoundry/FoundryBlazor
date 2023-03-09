@@ -12,6 +12,12 @@ public class FoGlue2D : FoBase
     {
     }
 
+    public void Deconstruct(out IGlueOwner source, out FoGlyph2D target)
+    {
+        source = Source!;
+        target = Target!;
+    }
+
     public bool HasTarget(FoGlyph2D target)
     {
         return target == Target;
@@ -19,6 +25,7 @@ public class FoGlue2D : FoBase
     public bool TargetMoved(FoGlyph2D target)
     {
         if ( !HasTarget(target) || Target == null) return false;
+        Source
 
         //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
 
@@ -37,8 +44,14 @@ public class FoGlue2D : FoBase
         return false;
     }
 
-
-
+    public bool IsStart()
+    {
+        return Name.StartsWith("Start");
+    }
+    public bool IsFinish()
+    {
+        return Name.StartsWith("Finish");
+    }
     public FoGlue2D GlueTo(IGlueOwner source, FoGlyph2D target) 
     {
         this.Source = source;

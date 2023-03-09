@@ -8,8 +8,9 @@ public interface IGlueOwner
 {
     void AddGlue(FoGlue2D glue);
     void RemoveGlue(FoGlue2D glue);
-    public void ComputeFinishFor(FoGlyph2D? target);
-    public void ComputeStartFor(FoGlyph2D? target);
+    void RecomputeGlue();
+    public bool ComputeFinishFor(FoGlyph2D? target);
+    public bool ComputeStartFor(FoGlyph2D? target);
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
@@ -128,6 +129,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if (_matrix == null) {
             _matrix = new Matrix2D();
+            RecomputeGlue();
+            ComputeGeometry();
             var angle = ComputeAngle() +  RotationZ(this);
             if ( _matrix != null)
             {
@@ -143,6 +146,27 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         }
         return _matrix!;
     }
+
+
+
+    public void RecomputeGlue()
+    {
+
+        GetMembers<FoGlue2D>()?.ForEach(glue =>
+        {
+            var (source, target) = glue;
+            if (source == this && target != null)
+            {
+                var found = glue.Name[..3] switch
+                {
+                    "STA" => source.ComputeFinishFor(target),
+                    "FIN" => source.ComputeStartFor(target),
+                    _ => false
+                };
+            }
+        });
+    }
+
 
     public async Task DrawStart(Canvas2DContext ctx, string color)
     {
@@ -216,9 +240,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Start_{target.Name}_{gluecount++}");
+        var glue = new FoGlue2D($"START_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
-        ComputeStartFor(target);
+        Smash(false);
         return glue;
     }
 
@@ -226,40 +250,38 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( target == null) return null;
 
-        var glue = new FoGlue2D($"Finish_{target.Name}_{gluecount++}");
+        var glue = new FoGlue2D($"FINISH_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
-        ComputeFinishFor(target);
+        Smash(false);
         return glue;
     }
 
-    public void ComputeStartFor(FoGlyph2D? target) 
+    public bool ComputeStartFor(FoGlyph2D? target) 
     {
-        if ( target == null) return;
+        if ( target == null) return false;
         var pt = target.AttachTo();
         StartX = pt.X;
         StartY = pt.Y;
 
-        ComputeGeometry();
-
         IsSelected = false;
+        return true;
 
-      //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
+        //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
     
     
-    public void ComputeFinishFor(FoGlyph2D? target)
+    public bool ComputeFinishFor(FoGlyph2D? target)
     {
-        if (target == null) return;
+        if (target == null) return false;
         var pt = target.AttachTo();
         FinishX = pt.X;
         FinishY = pt.Y;
 
-        ComputeGeometry();
-
         IsSelected = false;
+        return true;
 
-       // $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
+        // $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
 
