@@ -92,7 +92,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public string Color { get; set; }
 
-    public Func<FoGlyph2D?> GetParent = () => null;
+    //public Func<FoGlyph2D?> GetParent = () => null;
 
     public Func<FoGlyph2D, int> LocPinX = (obj) => obj.Width / 2;
     public Func<FoGlyph2D, int> LocPinY = (obj) => obj.Height / 2;
@@ -652,41 +652,41 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return _matrix;
     }
 
-    public virtual Matrix2D GetGlobalMatrix()
-    {
-        if ( _globalMatrix == null )
-        {
-            _globalMatrix = GetMatrix().Clone();
-            var parent = GetParent();
-            if (parent != null) 
-            {
-                _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
-                $"PrePending {Name} to parent {parent.Name}".WriteInfo();
-            } else
-            {
-                 $"No Parent {Name}".WriteInfo(); 
-            }
+    // public virtual Matrix2D GetGlobalMatrix()
+    // {
+    //     if ( _globalMatrix == null )
+    //     {
+    //         _globalMatrix = GetMatrix().Clone();
+    //         var parent = GetParent();
+    //         if (parent != null) 
+    //         {
+    //             _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
+    //             $"PrePending {Name} to parent {parent.Name}".WriteInfo();
+    //         } else
+    //         {
+    //              $"No Parent {Name}".WriteInfo(); 
+    //         }
 
-        }
-        return _globalMatrix;
-    }
+    //     }
+    //     return _globalMatrix;
+    // }
 
 
-    public void GlobalMatrixComputeTest(FoGlyph2D source, Matrix2D mat, int X, int Y, int level, string path)
-    {
-        $"{level}]{path} Source {source.Name}: {X} {Y}".WriteSuccess(level);
-        var point = mat.TransformPoint(X,Y);
-        $"{level}]{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
+    // public void GlobalMatrixComputeTest(FoGlyph2D source, Matrix2D mat, int X, int Y, int level, string path)
+    // {
+    //     $"{level}]{path} Source {source.Name}: {X} {Y}".WriteSuccess(level);
+    //     var point = mat.TransformPoint(X,Y);
+    //     $"{level}]{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
 
-        var parent = source.GetParent();
-        if (parent == null) return;
+    //     var parent = source.GetParent();
+    //     if (parent == null) return;
 
-        var newPath = $"{parent.Name}.{path}";
-        var pMat = parent.GetMatrix();
-        pMat = mat.PrependMatrix(pMat);
-        $"PrePending {Name} to parent {parent.Name}".WriteInfo(level);
-        GlobalMatrixComputeTest(parent, pMat, X, Y, level + 1, newPath);
-    }
+    //     var newPath = $"{parent.Name}.{path}";
+    //     var pMat = parent.GetMatrix();
+    //     pMat = mat.PrependMatrix(pMat);
+    //     $"PrePending {Name} to parent {parent.Name}".WriteInfo(level);
+    //     GlobalMatrixComputeTest(parent, pMat, X, Y, level + 1, newPath);
+    // }
 
   
 
@@ -696,11 +696,11 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return _invMatrix;
     }
 
-    public Matrix2D GetInvGlobalMatrix()
-    {
-        _invGlobalMatrix ??= this.GetGlobalMatrix().InvertCopy();
-        return _invGlobalMatrix;
-    }
+    // public Matrix2D GetInvGlobalMatrix()
+    // {
+    //     _invGlobalMatrix ??= this.GetGlobalMatrix().InvertCopy();
+    //     return _invGlobalMatrix;
+    // }
 
     public void UnglueAll()
     {

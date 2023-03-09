@@ -145,7 +145,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public async Task DrawStart(Canvas2DContext ctx, string color)
     {
                 //need to use inverse matrix here 
-        var matrix = GetInvGlobalMatrix();
+        var matrix = GetInvMatrix();
         if (matrix == null)
         {
             "DrawStraight here is IMPOSSABLE".WriteError();
@@ -179,7 +179,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public async Task DrawFinish(Canvas2DContext ctx, string color)
     {
                 //need to use inverse matrix here 
-        var matrix = GetInvGlobalMatrix();
+        var matrix = GetInvMatrix();
         if (matrix == null)
         {
             "DrawStraight here is IMPOSSABLE".WriteError();
