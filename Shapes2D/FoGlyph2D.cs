@@ -624,7 +624,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         var list = GetMembers<FoGlue2D>();
         if ( list == null) return false;
-        $"Smashing Glue {Name} {GetType().Name}".WriteInfo(2);
+        //$"Smashing Glue {Name} {GetType().Name}".WriteInfo(2);
 
         list.ForEach(item => item.TargetMoved(this));
         return true;
@@ -633,7 +633,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public virtual bool Smash(bool force)
     {
         if ( _matrix == null && !force) return false;
-        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
+        //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         ResetHitTesting = true;
         this._matrix = null;

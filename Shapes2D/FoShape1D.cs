@@ -27,7 +27,40 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     protected int y2 = 0;
     public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
 
+    private double rotation = 0;
+    public float AntiRotation { get { return (float) (-1.0 * this.rotation * Matrix2D.DEG_TO_RAD); }  }
 
+    protected Point? startPT;
+    protected Point? finishPT;
+    public Point Start()
+    {
+        if ( startPT == null )
+        {
+            var matrix = GetInvMatrix();
+            if (matrix == null)
+            {
+                "Point Start() IMPOSSABLE".WriteError();
+                return new Point();
+            }
+
+            startPT = matrix.TransformPoint(StartX, StartY);
+        }
+        return (Point)startPT;
+    }
+    public Point Finish()
+    {
+        if ( finishPT == null )
+        {
+            var matrix = GetInvMatrix();
+            if (matrix == null)
+            {
+                "Point Finish() IMPOSSABLE".WriteError();
+                return new Point();
+            } 
+            finishPT = matrix.TransformPoint(FinishX, FinishY);
+        }
+        return (Point)finishPT;
+    }
 
     public FoShape1D() : base()
     {
@@ -61,54 +94,34 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         if ( finish != null)    
             GlueFinishTo(finish);
-
-        //Smash();   //Forces the glued items to move
     }
 
     public override Rectangle Rect() 
     {
         var d = Height / 2;
-        var loc = PinLocation();
-        var pt = GetMatrix().TransformPoint(loc.X-d, loc.Y-d);
         var sz = new Size(Height, Height);
+        var loc = PinLocation();
+        var matrix = GetMatrix();
+        var pt = matrix?.TransformPoint(loc.X-d, loc.Y-d) ?? new Point(loc.X, loc.Y);
         var result = new Rectangle(pt, sz);
         return result;
     }
 
-    public void ComputeGeometry()
+
+
+    public override bool Smash(bool force) 
     {
-        //SRS  where and when does this get calculated...
-        width = (int)Distance();
-        x = Cx();
-        y = Cy();
+
+        if ( !base.Smash(force) ) return false;
+        startPT = null;
+        finishPT = null;
+        $"Smashing startPT finishPT  {Name} {GetType().Name}".WriteInfo(3);
+
+        return true;
     }
 
-    // public override bool Smash(bool force) 
-    // {
 
-    //     if ( !base.Smash(force) ) return false;
-    //     $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
 
-    //     return true;
-    // }
-
-    public int Dx() => x2 - x1;
-    public int Dy() => y2 - y1;
-
-    public int Cx() => (x2 + x1)/2;
-    public int Cy() => (y2 + y1)/2;
-
-    public double Distance() { 
-        var dx = (double)Dx();
-        var dy = (double)Dy();
-        return Math.Sqrt(dx * dx + dy * dy);
-    }
-
-    public double ComputeAngle() { 
-        var dx = (double)Dx();
-        var dy = (double)Dy();
-        return Math.Atan2(dy , dx) * 180 / Math.PI;
-    }
 
     public override List<FoHandle2D> GetHandles() 
     {
@@ -126,18 +139,22 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public override Matrix2D GetMatrix() 
     {
         if (_matrix == null) {
-            _matrix = new Matrix2D();
             RecomputeGlue();
-            ComputeGeometry();
-            var angle = ComputeAngle() +  RotationZ(this);
+            var dx = (double)(x2 - x1);
+            var dy = (double)(y2 - y1);
+            x = (x2 + x1) / 2;  //compute PinX in center
+            y = (y2 + y1) / 2; //compute PinY in center
+            width = (int)Math.Sqrt(dx * dx + dy * dy); //compute the length
+            rotation = (Math.Atan2(dy, dx) * Matrix2D.RAD_TO_DEG) + RotationZ(this);
+
+            //$"Shape1D GetMatrix {PinX} {PinY} {angle}".WriteError();
+            _matrix = new Matrix2D();
             if ( _matrix != null)
             {
-                $"Shape1D GetMatrix {PinX} {PinY} {angle}".WriteError();
-                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle, 0.0, 0.0, LocPinX(this), LocPinY(this));
+                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, rotation, 0.0, 0.0, LocPinX(this), LocPinY(this));
             }
-                //_matrix.AppendTransform(Cx(), Cy(), 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, 0, 0);
             else
-                "GetMatrix here is IMPOSSABLE".WriteError();
+                "GetMatrix Shape1D here is IMPOSSABLE".WriteError();
 
             //FoGlyph2D.ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
@@ -149,7 +166,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public void RecomputeGlue()
     {
-
         GetMembers<FoGlue2D>()?.ForEach(glue =>
         {
             var (source, target) = glue;
@@ -157,8 +173,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             {
                 var found = glue.Name[..3] switch
                 {
-                    "STA" => ComputeFinishFor(target),
-                    "FIN" => ComputeStartFor(target),
+                    "STA" => ComputeStartFor(target),
+                    "FIN" => ComputeFinishFor(target),
                     _ => false
                 };
             }
@@ -168,22 +184,14 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public async Task DrawStart(Canvas2DContext ctx, string color)
     {
-                //need to use inverse matrix here 
-        // var matrix = GetInvMatrix();
-        // if (matrix == null)
-        // {
-        //     "DrawStraight here is IMPOSSABLE".WriteError();
-        //     return;
-        // }
-
-        // var start = matrix.TransformPoint(StartX, StartY);
+        var start = Start();
 
 
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(StartX, StartY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(start.X, start.Y, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -195,28 +203,23 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync("Start",StartX, StartY);
+
+        await ctx.RotateAsync(AntiRotation);
+        await ctx.FillTextAsync("Start",start.X, start.Y);
 
         await ctx.RestoreAsync();
     }
       
     public async Task DrawFinish(Canvas2DContext ctx, string color)
     {
-                //need to use inverse matrix here 
-        // var matrix = GetInvMatrix();
-        // if (matrix == null)
-        // {
-        //     "DrawStraight here is IMPOSSABLE".WriteError();
-        //     return;
-        // }
 
-        // var finish = matrix.TransformPoint(FinishX, FinishY);
+        var finish = Finish();
 
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(FinishX, FinishY, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(finish.X, finish.Y, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -228,7 +231,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetFillStyleAsync("Black");
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
-        await ctx.FillTextAsync("Finish",FinishX, FinishY);
+        await ctx.FillTextAsync("Finish",finish.X, finish.Y);
 
         await ctx.RestoreAsync();
     }  
@@ -286,22 +289,13 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public virtual async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
     {
-        //"DrawStraight".WriteLine();
 
-        //need to use inverse matrix here 
-        // var matrix = GetInvMatrix();
-        // if (matrix == null)
-        // {
-        //     "DrawStraight here is IMPOSSABLE".WriteError();
-        //     return false;
-        // }
-
-        // var start = matrix.TransformPoint(StartX, StartY);
-        // var finish = matrix.TransformPoint(FinishX, FinishY);
+        var start = Start();
+        var finish = Finish();
 
         await ctx.BeginPathAsync();
-        await ctx.MoveToAsync(StartX, StartY);
-        await ctx.LineToAsync(FinishX, FinishY);
+        await ctx.MoveToAsync(start.X, start.Y);
+        await ctx.LineToAsync(finish.X, finish.Y);
         await ctx.ClosePathAsync();
 
         await ctx.SetStrokeStyleAsync(color ?? Color);
@@ -310,10 +304,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return true;
     }
 
-    // public override async Task UpdateContext(Canvas2DContext ctx, int tick)
-    // {
-    //     await base.UpdateContext(ctx, tick);
-    // }
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {

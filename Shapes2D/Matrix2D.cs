@@ -25,8 +25,9 @@ namespace FoundryBlazor.Shape;
 
  public class Matrix2D 
  {
-    static readonly double DEG_TO_RAD = Math.PI / 180;
-    //static readonly double TWO_PI = 2.0 * Math.PI;
+    public static readonly double DEG_TO_RAD = Math.PI / 180;
+    public static readonly double RAD_TO_DEG = 180 / Math.PI;
+    public static readonly double TWO_PI = 2.0 * Math.PI;
 
     public double a = 1; //Position (0, 0) in a 3x3 affine transformation matrix.
     public double b = 0; //Position (0, 1) in a 3x3 affine transformation matrix.
