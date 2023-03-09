@@ -84,14 +84,14 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         y = Cy();
     }
 
-    public override bool Smash(bool force) 
-    {
+    // public override bool Smash(bool force) 
+    // {
 
-        if ( !base.Smash(force) ) return false;
-        $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
+    //     if ( !base.Smash(force) ) return false;
+    //     $"Smashing  {Name} {GetType().Name}".WriteInfo(3);
 
-        return true;
-    }
+    //     return true;
+    // }
 
     public int Dx() => x2 - x1;
     public int Dy() => y2 - y1;
@@ -129,9 +129,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if (_matrix == null) {
             _matrix = new Matrix2D();
             var angle = ComputeAngle() +  RotationZ(this);
-            $"Shape1D {PinX} {PinY} {angle}".WriteError();
             if ( _matrix != null)
+            {
+                $"Shape1D GetMatrix {PinX} {PinY} {angle}".WriteError();
                 _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, angle, 0.0, 0.0, LocPinX(this), LocPinY(this));
+            }
                 //_matrix.AppendTransform(Cx(), Cy(), 1.0, 1.0, angle + RotationZ(this), 0.0, 0.0, 0, 0);
             else
                 "GetMatrix here is IMPOSSABLE".WriteError();
@@ -145,21 +147,21 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public async Task DrawStart(Canvas2DContext ctx, string color)
     {
                 //need to use inverse matrix here 
-        var matrix = GetInvMatrix();
-        if (matrix == null)
-        {
-            "DrawStraight here is IMPOSSABLE".WriteError();
-            return;
-        }
+        // var matrix = GetInvMatrix();
+        // if (matrix == null)
+        // {
+        //     "DrawStraight here is IMPOSSABLE".WriteError();
+        //     return;
+        // }
 
-        var start = matrix.TransformPoint(StartX, StartY);
+        // var start = matrix.TransformPoint(StartX, StartY);
 
 
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(start.X, start.Y, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(StartX, StartY, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -171,7 +173,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync("Start",start.X, start.Y);
+        await ctx.FillTextAsync("Start",StartX, StartY);
 
         await ctx.RestoreAsync();
     }
@@ -179,20 +181,20 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public async Task DrawFinish(Canvas2DContext ctx, string color)
     {
                 //need to use inverse matrix here 
-        var matrix = GetInvMatrix();
-        if (matrix == null)
-        {
-            "DrawStraight here is IMPOSSABLE".WriteError();
-            return;
-        }
+        // var matrix = GetInvMatrix();
+        // if (matrix == null)
+        // {
+        //     "DrawStraight here is IMPOSSABLE".WriteError();
+        //     return;
+        // }
 
-        var finish = matrix.TransformPoint(FinishX, FinishY);
+        // var finish = matrix.TransformPoint(FinishX, FinishY);
 
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-        await ctx.ArcAsync(finish.X, finish.Y, 26.0, 0.0, 2 * Math.PI);
+        await ctx.ArcAsync(FinishX, FinishY, 26.0, 0.0, 2 * Math.PI);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -204,7 +206,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetFillStyleAsync("Black");
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
-        await ctx.FillTextAsync("Finish",finish.X, finish.Y);
+        await ctx.FillTextAsync("Finish",FinishX, FinishY);
 
         await ctx.RestoreAsync();
     }  
@@ -241,7 +243,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
+      //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
     
@@ -257,7 +259,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
+       // $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
 
@@ -267,19 +269,19 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         //"DrawStraight".WriteLine();
 
         //need to use inverse matrix here 
-        var matrix = GetInvMatrix();
-        if (matrix == null)
-        {
-            "DrawStraight here is IMPOSSABLE".WriteError();
-            return false;
-        }
+        // var matrix = GetInvMatrix();
+        // if (matrix == null)
+        // {
+        //     "DrawStraight here is IMPOSSABLE".WriteError();
+        //     return false;
+        // }
 
-        var start = matrix.TransformPoint(StartX, StartY);
-        var finish = matrix.TransformPoint(FinishX, FinishY);
+        // var start = matrix.TransformPoint(StartX, StartY);
+        // var finish = matrix.TransformPoint(FinishX, FinishY);
 
         await ctx.BeginPathAsync();
-        await ctx.MoveToAsync(start.X, start.Y);
-        await ctx.LineToAsync(finish.X, finish.Y);
+        await ctx.MoveToAsync(StartX, StartY);
+        await ctx.LineToAsync(FinishX, FinishY);
         await ctx.ClosePathAsync();
 
         await ctx.SetStrokeStyleAsync(color ?? Color);

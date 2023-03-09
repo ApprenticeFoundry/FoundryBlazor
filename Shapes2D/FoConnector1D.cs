@@ -211,7 +211,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
+        //$"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
     
@@ -227,7 +227,7 @@ public class FoConnector1D : FoGlyph2D, IGlueOwner, IShape1D
 
         IsSelected = false;
 
-        $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
+        //$"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
 

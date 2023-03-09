@@ -92,7 +92,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public string Color { get; set; }
 
-    //public Func<FoGlyph2D?> GetParent = () => null;
+    public Func<FoGlyph2D?> GetParent = () => null;
 
     public Func<FoGlyph2D, int> LocPinX = (obj) => obj.Width / 2;
     public Func<FoGlyph2D, int> LocPinY = (obj) => obj.Height / 2;
@@ -107,12 +107,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
     }
 
-    public virtual Point AttachTo() 
-    {
-        $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
 
-        return new Point(PinX, PinY); 
-    }
 
     public Action<FoGlyph2D, int>? ContextLink;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
@@ -125,8 +120,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
-    protected Matrix2D? _globalMatrix;
-    protected Matrix2D? _invGlobalMatrix;
+    //protected Matrix2D? _globalMatrix;
+    //protected Matrix2D? _invGlobalMatrix;
     public FoGlyph2D() : base("")
     {
         PinX = PinY = 0;
@@ -147,6 +142,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         PinX = PinY = 0;
         (Width, Height, Color) = (width, height, color);
         ShapeDraw = DrawRect;
+    }
+
+    public virtual Point AttachTo() 
+    {
+       // $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
+        return new Point(PinX, PinY); 
     }
 
     public static async Task<MeasuredText> ComputeMeasuredText(Canvas2DContext ctx, string Fragment,string FontSize, string Font)
@@ -611,22 +612,24 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return newValue;
     }
 
-    public virtual bool SmashParents()
-    {
-        if ( _globalMatrix == null ) return false;
-        this._globalMatrix = null;
+    // public virtual bool SmashParents()
+    // {
+    //     if ( _globalMatrix == null ) return false;
+    //     this._globalMatrix = null;
 
-        return true;
-    }
+    //     return true;
+    // }
 
     public virtual bool SmashGlue()
     {
         var list = GetMembers<FoGlue2D>();
         if ( list == null) return false;
+        $"Smashing Glue {Name} {GetType().Name}".WriteInfo(2);
 
         list.ForEach(item => item.TargetMoved(this));
         return true;
     }
+    
     public virtual bool Smash(bool force)
     {
         if ( _matrix == null && !force) return false;
@@ -636,7 +639,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         this._matrix = null;
         this._invMatrix = null;
 
-        SmashParents();
         return this.SmashGlue();
     }
 

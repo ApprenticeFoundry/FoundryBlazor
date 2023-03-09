@@ -37,7 +37,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
 
     private Rectangle userWindow  { get; set; } = new Rectangle(0, 0, 1500, 400);
 
-    public double PixelsPerInch { get; set; } = 70;  //pixels per in or SRS machine
+    public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 6.0;  //inches
