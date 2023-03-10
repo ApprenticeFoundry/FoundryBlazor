@@ -290,6 +290,10 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.SetFillStyleAsync(Color);
     }
 
+    public FoHandle2D? FindHandle(string key)
+    {
+        return this.Find<FoHandle2D>(key);
+    }
 
     public virtual List<FoHandle2D>? GetHandles()
     {
@@ -297,6 +301,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
             return this.Members<FoHandle2D>();
         return null;
     }
+
+    public FoConnectionPoint2D? FindConnectionPoint(string key)
+    {
+        return this.Find<FoConnectionPoint2D>(key);
+    }
+
     public virtual List<FoConnectionPoint2D>? GetConnectionPoints()
     {
         if (!this.HasSlot<FoConnectionPoint2D>())

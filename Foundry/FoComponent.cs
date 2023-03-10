@@ -120,8 +120,6 @@ public class FoComponent : FoBase, IFoComponent
         return target.Values();
     }
 
- 
-
 
     public virtual T Establish<T>(string key) where T : FoBase
     {
