@@ -22,26 +22,11 @@ public class FoGlue2D : FoBase
     {
         return target == Target;
     }
+    
     public bool TargetMoved(FoGlyph2D target)
     {
         if ( !HasTarget(target) || Target == null) return false;
         return Source?.Smash(false) ?? false;
-
-        // //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
-
-        // if ( Name.StartsWith("Finish") && Source != null )
-        // {
-        //     Source.ComputeFinishFor(Target);
-        //     //$"{Source} SetFinishTo {Target.Name}".WriteInfo(4);
-        //     return true;
-        // }
-        // else if ( Name.StartsWith("Start")  && Source != null)
-        // {
-        //     Source.ComputeStartFor(Target);
-        //     //$"{Source} SetStartTo {Target.Name}".WriteInfo(4);
-        //     return true;
-        // }
-        // return false;
     }
 
 
@@ -59,6 +44,8 @@ public class FoGlue2D : FoBase
 
     public FoGlue2D UnGlue() 
     {
+        Source?.Smash(false);
+
         Source?.RemoveGlue(this);
         Target?.RemoveGlue(this);
 

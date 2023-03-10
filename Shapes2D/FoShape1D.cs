@@ -17,24 +17,24 @@ public interface IGlueOwner
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
-    private static int  gluecount = 0; 
+    private static int gluecount = 0;
     protected int x1 = 0;
-    public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value,x1); } }
+    public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value, x1); } }
     protected int y1 = 0;
-    public int StartY { get { return this.y1; } set { this.y1 = AssignInt(value,y1); } }
+    public int StartY { get { return this.y1; } set { this.y1 = AssignInt(value, y1); } }
     protected int x2 = 0;
-    public int FinishX { get { return this.x2; } set { this.x2 = AssignInt(value,x2); } }
+    public int FinishX { get { return this.x2; } set { this.x2 = AssignInt(value, x2); } }
     protected int y2 = 0;
-    public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value,y2); } }
+    public int FinishY { get { return this.y2; } set { this.y2 = AssignInt(value, y2); } }
 
     private double rotation = 0;
-    public float AntiRotation { get { return (float) (-1.0 * this.rotation * Matrix2D.DEG_TO_RAD); }  }
+    public float AntiRotation { get { return (float)(-1.0 * this.rotation * Matrix2D.DEG_TO_RAD); } }
 
     protected Point? startPT;
     protected Point? finishPT;
     public Point Start()
     {
-        if ( startPT == null )
+        if (startPT == null)
         {
             var matrix = GetInvMatrix();
             if (matrix == null)
@@ -49,14 +49,14 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     }
     public Point Finish()
     {
-        if ( finishPT == null )
+        if (finishPT == null)
         {
             var matrix = GetInvMatrix();
             if (matrix == null)
             {
                 "Point Finish() IMPOSSABLE".WriteError();
                 return new Point();
-            } 
+            }
             finishPT = matrix.TransformPoint(FinishX, FinishY);
         }
         return (Point)finishPT;
@@ -64,7 +64,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public FoShape1D() : base()
     {
-         ShapeDraw = DrawRect;
+        ShapeDraw = DrawRect;
         this.height = 10;
     }
 
@@ -89,33 +89,39 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         this.y2 = finish?.PinY ?? 0;
         this.height = height;
 
-        if ( start != null)
+        if (start != null)
             GlueStartTo(start);
 
-        if ( finish != null)    
+        if (finish != null)
             GlueFinishTo(finish);
     }
 
-    public override Rectangle Rect() 
+    public override Rectangle Rect()
     {
         var d = Height / 2;
         var sz = new Size(Height, Height);
         var loc = PinLocation();
         var matrix = GetMatrix();
-        var pt = matrix?.TransformPoint(loc.X-d, loc.Y-d) ?? new Point(loc.X, loc.Y);
+        var pt = matrix?.TransformPoint(loc.X - d, loc.Y - d) ?? new Point(loc.X, loc.Y);
         var result = new Rectangle(pt, sz);
         return result;
     }
 
 
 
-    public override bool Smash(bool force) 
+    public override bool Smash(bool force)
     {
-
-        if ( !base.Smash(force) ) return false;
-        startPT = null;
-        finishPT = null;
-        $"Smashing startPT finishPT  {Name} {GetType().Name}".WriteInfo(3);
+        if (!base.Smash(force)) return false;
+        if (startPT != null)
+        {
+            startPT = null;
+            //$"Smashing startPT  {Name} {GetType().Name}".WriteInfo(3);
+        }
+        if (finishPT != null)
+        {
+            finishPT = null;
+            //$"Smashing finishPT  {Name} {GetType().Name}".WriteInfo(3);
+        }
 
         return true;
     }
@@ -123,9 +129,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
 
 
-    public override List<FoHandle2D> GetHandles() 
+    public override List<FoHandle2D> GetHandles()
     {
-        if ( !this.HasSlot<FoHandle2D>()) 
+        if (!this.HasSlot<FoHandle2D>())
         {
             Add<FoHandle2D>(new FoHandle2D("Begin", LeftX(), CenterY(), "Green"));
             Add<FoHandle2D>(new FoHandle2D("Finish", RightX(), CenterY(), "Green"));
@@ -136,9 +142,10 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return result;
     }
 
-    public override Matrix2D GetMatrix() 
+    public override Matrix2D GetMatrix()
     {
-        if (_matrix == null) {
+        if (_matrix == null)
+        {
             RecomputeGlue();
             var dx = (double)(x2 - x1);
             var dy = (double)(y2 - y1);
@@ -149,7 +156,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
             //$"Shape1D GetMatrix {PinX} {PinY} {angle}".WriteError();
             _matrix = new Matrix2D();
-            if ( _matrix != null)
+            if (_matrix != null)
             {
                 _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, rotation, 0.0, 0.0, LocPinX(this), LocPinY(this));
             }
@@ -205,11 +212,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetFillStyleAsync("Black");
 
         await ctx.RotateAsync(AntiRotation);
-        await ctx.FillTextAsync("Start",start.X, start.Y);
+        await ctx.FillTextAsync("Start", start.X, start.Y);
 
         await ctx.RestoreAsync();
     }
-      
+
     public async Task DrawFinish(Canvas2DContext ctx, string color)
     {
 
@@ -231,15 +238,15 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SetFillStyleAsync("Black");
         var FontSpec = $"normal bold 28px sans-serif";
         await ctx.SetFontAsync(FontSpec);
-        await ctx.FillTextAsync("Finish",finish.X, finish.Y);
+        await ctx.FillTextAsync("Finish", finish.X, finish.Y);
 
         await ctx.RestoreAsync();
-    }  
+    }
 
-    
-    public FoGlue2D? GlueStartTo(FoGlyph2D? target) 
+
+    public FoGlue2D? GlueStartTo(FoGlyph2D? target)
     {
-        if ( target == null) return null;
+        if (target == null) return null;
 
         var glue = new FoGlue2D($"START_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
@@ -247,9 +254,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return glue;
     }
 
-    public FoGlue2D? GlueFinishTo(FoGlyph2D? target) 
+    public FoGlue2D? GlueFinishTo(FoGlyph2D? target)
     {
-        if ( target == null) return null;
+        if (target == null) return null;
 
         var glue = new FoGlue2D($"FINISH_{target.Name}_{gluecount++}");
         glue.GlueTo(this, target);
@@ -257,9 +264,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return glue;
     }
 
-    public bool ComputeStartFor(FoGlyph2D? target) 
+    public bool ComputeStartFor(FoGlyph2D? target)
     {
-        if ( target == null) return false;
+        if (target == null) return false;
         var pt = target.AttachTo();
         StartX = pt.X;
         StartY = pt.Y;
@@ -270,8 +277,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
-    
-    
+
+
     public bool ComputeFinishFor(FoGlyph2D? target)
     {
         if (target == null) return false;
@@ -314,7 +321,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         PreDraw?.Invoke(ctx, this);
         await Draw(ctx, tick);
-        
+
         if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
 
@@ -324,7 +331,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         if (IsSelected)
             await DrawWhenSelected(ctx, tick, deep);
-        
+
         if (deep)
         {
             GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
@@ -333,7 +340,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         if (GetMembers<FoGlue2D>()?.Count > 0)
             await DrawTriangle(ctx, "Black");
-        
+
         await DrawStraight(ctx, "Red", tick);
         await DrawStart(ctx, "Blue");
         await DrawFinish(ctx, "Cyan");

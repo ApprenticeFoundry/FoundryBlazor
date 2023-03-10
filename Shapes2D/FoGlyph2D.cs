@@ -75,6 +75,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
     public string Tag { get; set; } = "";
+    public int Level { get; set; } = 0;
     public string GlyphId { get; set; } = Guid.NewGuid().ToString();
 
     protected int x = 0;
@@ -403,6 +404,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.SaveAsync();
         DrawSelected?.Invoke(ctx, this);
         GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        GetConnectionPoints()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         //await DrawPin(ctx);
         await ctx.RestoreAsync();
     }
