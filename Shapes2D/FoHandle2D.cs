@@ -12,7 +12,8 @@ public class FoHandle2D : FoGlyph2D
     }
     public FoHandle2D(string name, int x, int y, string color) : base(name, 20, 20, color)
     {
-        (PinX, PinY) = (x, y);
+        this.x = x;
+        this.y = y;
     }
 
 

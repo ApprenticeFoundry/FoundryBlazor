@@ -125,23 +125,20 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     //protected Matrix2D? _invGlobalMatrix;
     public FoGlyph2D() : base("")
     {
-        PinX = PinY = 0;
-        Width = Height = 0;
         Color = "Green";
         ShapeDraw = DrawRect;
     }
     public FoGlyph2D(string name, string color) : base(name)
     {
-        PinX = PinY = 0;
-        Width = Height = 0;
         Color = color;
         ShapeDraw = DrawRect;
     }
 
     public FoGlyph2D(string name, int width, int height, string color) : base(name)
     {
-        PinX = PinY = 0;
-        (Width, Height, Color) = (width, height, color);
+        this.width = width;
+        this.height = height;
+        Color = color;
         ShapeDraw = DrawRect;
     }
 
@@ -341,6 +338,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         return region.IntersectsWith(Rect());
     }
+
     public virtual async Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region)
     {
         if ( !IsVisible ) return false;
@@ -550,10 +548,10 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.StrokeAsync();
     }
 
-    public void AddToParent<T>(T parent) where T : FoGlyph2D
-    {
-        parent.Add(this);
-    }
+    //public void AddToParent<T>(T parent) where T : FoGlyph2D
+    //{
+    //    parent.Add(this);
+    //}
 
     public Action<Canvas2DContext, FoGlyph2D> DrawRect = async (ctx, obj) =>
     {
@@ -725,7 +723,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public void AddGlue(FoGlue2D glue)
     {
-
         //$"adding glue to {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);
         this.Add<FoGlue2D>(glue);
         this.SmashGlue();

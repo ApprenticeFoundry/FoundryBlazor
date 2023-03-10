@@ -58,10 +58,14 @@ public class FoShape2D : FoGlyph2D, IShape2D
     {
         if ( !this.HasSlot<FoHandle2D>()) 
         {
-            AddHandle2D(new FoHandle2D("UL", LeftX(), TopY(), "Green"));
-            AddHandle2D(new FoHandle2D("UR", RightX(), TopY(), "Green"));
-            AddHandle2D(new FoHandle2D("LL", LeftX(), BottomY(), "Green"));
-            AddHandle2D(new FoHandle2D("LR", RightX(), BottomY(), "Green"));
+            var lx = LeftX();
+            var ty = TopY();
+            var rx = RightX();
+            var by = BottomY();
+            AddHandle2D(new FoHandle2D("UL", lx, ty, "Green"));
+            AddHandle2D(new FoHandle2D("UR", rx, ty, "Green"));
+            AddHandle2D(new FoHandle2D("LL", lx, by, "Green"));
+            AddHandle2D(new FoHandle2D("LR", rx, by, "Green"));
         }
         var result = this.Members<FoHandle2D>();
         return result;
@@ -79,10 +83,16 @@ public class FoShape2D : FoGlyph2D, IShape2D
     {
         if ( !this.HasSlot<FoConnectionPoint2D>()) 
         {
-            AddConnectionPoint2D(new FoConnectionPoint2D("LEFT", LeftX(), CenterY(), "Yellow"));
-            AddConnectionPoint2D(new FoConnectionPoint2D("TOP", CenterX(), TopY(), "Yellow"));
-            AddConnectionPoint2D(new FoConnectionPoint2D("RIGHT", RightX(), CenterY(), "Yellow"));
-            AddConnectionPoint2D(new FoConnectionPoint2D("BOTTOM", CenterX(), BottomY(), "Yellow"));
+            var lx = LeftX();
+            var ty = TopY();
+            var rx = RightX();
+            var by = BottomY();
+            var cx = CenterX();
+            var cy = CenterY();
+            AddConnectionPoint2D(new FoConnectionPoint2D("LEFT", lx, cy, "Yellow"));
+            AddConnectionPoint2D(new FoConnectionPoint2D("TOP", cx, ty, "Yellow"));
+            AddConnectionPoint2D(new FoConnectionPoint2D("RIGHT", rx, cy, "Yellow"));
+            AddConnectionPoint2D(new FoConnectionPoint2D("BOTTOM", cx, by, "Yellow"));
         }
         var result = this.Members<FoConnectionPoint2D>();
         return result;
