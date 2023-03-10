@@ -89,11 +89,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         this.y2 = finish?.PinY ?? 0;
         this.height = height;
 
-        if (start != null)
-            GlueStartTo(start);
+        GlueStartTo(start);
 
-        if (finish != null)
-            GlueFinishTo(finish);
+        GlueFinishTo(finish);
     }
 
     public override Rectangle Rect()
@@ -244,22 +242,24 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     }
 
 
-    public FoGlue2D? GlueStartTo(FoGlyph2D? target)
+    public FoGlue2D? GlueStartTo(FoGlyph2D? target, string child="")
     {
         if (target == null) return null;
+        var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child) ?? target;
 
-        var glue = new FoGlue2D($"START_{target.Name}_{gluecount++}");
-        glue.GlueTo(this, target);
+        var glue = new FoGlue2D($"START_{part.Name}_{gluecount++}");
+        glue.GlueTo(this, part);
         Smash(false);
         return glue;
     }
 
-    public FoGlue2D? GlueFinishTo(FoGlyph2D? target)
+    public FoGlue2D? GlueFinishTo(FoGlyph2D? target, string child="")
     {
         if (target == null) return null;
+        var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child) ?? target;
 
-        var glue = new FoGlue2D($"FINISH_{target.Name}_{gluecount++}");
-        glue.GlueTo(this, target);
+        var glue = new FoGlue2D($"FINISH_{part.Name}_{gluecount++}");
+        glue.GlueTo(this, part);
         Smash(false);
         return glue;
     }
@@ -338,12 +338,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         }
 
-        if (GetMembers<FoGlue2D>()?.Count > 0)
-            await DrawTriangle(ctx, "Black");
+        // if (GetMembers<FoGlue2D>()?.Count > 0)
+        //     await DrawTriangle(ctx, "Black");
 
-        await DrawStraight(ctx, "Red", tick);
-        await DrawStart(ctx, "Blue");
-        await DrawFinish(ctx, "Cyan");
+        // await DrawStraight(ctx, "Red", tick);
+        // await DrawStart(ctx, "Blue");
+        // await DrawFinish(ctx, "Cyan");
 
         await ctx.RestoreAsync();
         return true;

@@ -170,8 +170,8 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
             pageManager.AddShape<U>(shape1D);
 
-            shape1D.GlueStartTo(parent);
-            shape1D.GlueFinishTo(shape);
+            shape1D.GlueStartTo(parent,"BOTTOM");
+            shape1D.GlueFinishTo(shape,"TOP");
             child.ConnectParentChildShapeTree<U>(pageManager, styleList);
         });
 
