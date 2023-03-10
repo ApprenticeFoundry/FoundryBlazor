@@ -153,6 +153,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     public void ConnectParentChildShapeTree<U>(IPageManagement pageManager, List<LineLayoutStyle> styleList) where U : FoConnector1D
     {
         var parent = this.GetShape();
+        parent.GetConnectionPoints();
 
         if (this.level >= styleList.Count) return;
         var style = styleList[this.level];
@@ -161,6 +162,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         this.GetChildren()?.ForEach(child =>
         {
             var shape = child.GetShape();
+            shape.GetConnectionPoints();
             //shape.Tag = $"Node: {child.ComputeName()}";
 
             var shape1D = Activator.CreateInstance<U>();
@@ -169,6 +171,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             shape1D.Color = "Green";
 
             pageManager.AddShape<U>(shape1D);
+  
 
             shape1D.GlueStartTo(parent,"BOTTOM");
             shape1D.GlueFinishTo(shape,"TOP");

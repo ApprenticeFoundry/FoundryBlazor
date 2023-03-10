@@ -289,6 +289,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public FoHandle2D? FindHandle(string key)
     {
+        //GetHandles();
         return this.Find<FoHandle2D>(key);
     }
 
@@ -301,6 +302,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public FoConnectionPoint2D? FindConnectionPoint(string key)
     {
+        //GetConnectionPoints();
         return this.Find<FoConnectionPoint2D>(key);
     }
 
