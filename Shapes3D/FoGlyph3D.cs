@@ -1,11 +1,5 @@
-using BlazorThreeJS.Core;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 

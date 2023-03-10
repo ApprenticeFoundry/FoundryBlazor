@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace FoundryBlazor;
 
 public class UserData

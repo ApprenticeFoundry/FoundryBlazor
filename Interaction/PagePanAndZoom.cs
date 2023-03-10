@@ -1,4 +1,3 @@
-using System.Drawing;
 using FoundryBlazor.Canvas;
 using BlazorComponentBus;
 
@@ -44,6 +43,7 @@ public class PagePanAndZoom : BaseInteraction
     public override bool MouseUp(CanvasMouseArgs args)
     {
         isDraggingPage = false;
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

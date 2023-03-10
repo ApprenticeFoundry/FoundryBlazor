@@ -25,8 +25,9 @@ namespace FoundryBlazor.Shape;
 
  public class Matrix2D 
  {
-    static readonly double DEG_TO_RAD = Math.PI / 180;
-    //static readonly double TWO_PI = 2.0 * Math.PI;
+    public static readonly double DEG_TO_RAD = Math.PI / 180;
+    public static readonly double RAD_TO_DEG = 180 / Math.PI;
+    public static readonly double TWO_PI = 2.0 * Math.PI;
 
     public double a = 1; //Position (0, 0) in a 3x3 affine transformation matrix.
     public double b = 0; //Position (0, 1) in a 3x3 affine transformation matrix.
@@ -233,6 +234,16 @@ namespace FoundryBlazor.Shape;
         return matrix;
     }
 
+    public Point NoTransformPoint(int x, int y) 
+    {
+        var pt = new Point(x, y);
+        return pt;
+    }
+    public Point NoTransformPoint(Point pt) 
+    {
+        return pt;
+    }
+
     public Point TransformPoint(int x, int y) 
     {
         var X = x * this.a + y * this.c + this.tx;
@@ -240,7 +251,11 @@ namespace FoundryBlazor.Shape;
         var pt = new Point((int)X, (int)Y);
         return pt;
     }
-
+    public Point TransformPoint(Point pt) 
+    {
+        return TransformPoint(pt.X,pt.Y);
+    }
+    
     public Point InvertPoint(int x, int y)
     {
         var inv = this.InvertCopy();

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -39,6 +38,8 @@ public interface IWorkspace: IWorkPiece
 
    Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
+    void PreRender(int tick);
+    void PostRender(int tick);
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -86,6 +87,16 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
+    }
+
+    public virtual void PreRender(int tick)
+    {
+
+    }
+
+    public virtual void PostRender(int tick)
+    {
+
     }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
@@ -212,7 +223,7 @@ public class FoWorkspace : FoComponent, IWorkspace
                 await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
                 InputStyle = InputStyle.Drawing;
                 await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetDrawingStyle".WriteLine(ConsoleColor.DarkYellow);
+                "SetDrawingStyle".WriteWarning();
             }
             catch { }
         };
@@ -224,7 +235,7 @@ public class FoWorkspace : FoComponent, IWorkspace
                 await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
                 InputStyle = InputStyle.FileDrop;
                 await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetFileDropStyle".WriteLine(ConsoleColor.DarkYellow);
+                "SetFileDropStyle".WriteWarning();
             }
             catch { }
         };

@@ -1,8 +1,3 @@
-
-using System.Drawing;
-using Blazor.Extensions.Canvas.Canvas2D;
-
-
 namespace FoundryBlazor.Shape;
 
 public interface ISelectionService

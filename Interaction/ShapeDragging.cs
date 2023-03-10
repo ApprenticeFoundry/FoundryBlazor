@@ -1,7 +1,5 @@
-using System.Drawing;
-using FoundryBlazor.Canvas;
 using BlazorComponentBus;
-using FoundryBlazor;
+using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
@@ -24,7 +22,10 @@ public class ShapeDragging : ShapeHovering
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        return selectionService.Selections().Count > 0;
+        var findings = pageManager?.FindGlyph(dragArea);
+        var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
+        return selected != null;
+        //return selectionService.Selections().Count > 0;
     }
 
     public override bool MouseDown(CanvasMouseArgs args)
@@ -36,6 +37,8 @@ public class ShapeDragging : ShapeHovering
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
         var hitShape = findings?.LastOrDefault(); 
+        hitShape?.OnShapeClick(ClickStyle.MouseDown);
+
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
 
         if (selectedShape != null)
@@ -57,7 +60,9 @@ public class ShapeDragging : ShapeHovering
     }
     public override bool MouseUp(CanvasMouseArgs args)
     {
+        selectedShape?.OnShapeClick(ClickStyle.MouseUp);
         isDraggingShapes = false;
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
 

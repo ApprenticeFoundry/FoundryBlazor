@@ -1,7 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Canvas;
 using BlazorComponentBus;
+using FoundryBlazor.Canvas;
 
 
 namespace FoundryBlazor.Shape;
@@ -58,7 +58,9 @@ public class ShapeSelection : ShapeHovering
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
 
-        var hitShape = findings?.LastOrDefault(); 
+        var hitShape = findings?.LastOrDefault();
+        hitShape?.OnShapeClick(ClickStyle.MouseDown);
+        
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); 
         if ( hitShape != null) 
         {
@@ -92,26 +94,41 @@ public class ShapeSelection : ShapeHovering
             dragArea = panZoomService.Normalize(dragArea);
 
             var findings = pageManager?.FindGlyph(dragArea);
-            if (findings != null) selectionService?.AddRange(findings);
+            if (findings != null)
+            {
+                //anything that intersects
+                //selectionService?.AddRange(findings);
+                
+                //only findings that are totally inside the fence
+                foreach (var item in findings)
+                {
+                    if ( dragArea.Contains(item.Rect()) )
+                        selectionService?.AddItem(item);  
+                }
+            }
         }
 
+        //dragArea = panZoomService.HitRectStart(args);
         isFenceSelecting = false;
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
         //SendUserMove(args, true);
 
-        if ( selectionService.Selections().Count > 0 )
+        if (isFenceSelecting)
+        {
+            dragArea = panZoomService.HitRectContinue(args, dragArea);
+        }
+        else if ( selectionService.Selections().Count > 0 )
         {
             dragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.Movement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }
-        else if (isFenceSelecting)
-            dragArea = panZoomService.HitRectContinue(args, dragArea);
         else
             base.MouseMove(args); // this should hover
 

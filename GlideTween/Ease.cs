@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Unglide
+﻿namespace Unglide
 {
     /// <summary>
     /// Static class with useful easer functions that can be used by Tweens.

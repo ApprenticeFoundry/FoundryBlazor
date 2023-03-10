@@ -24,6 +24,14 @@ public enum LineLayoutStyle
     HorizontalFirst = 3,
 }
 
+public enum ClickStyle
+{
+    None,
+    MouseDown,
+    MouseUp,
+    DoubleClick
+}
+
 public interface IHasRectangle
 {
     Rectangle Rect();
@@ -35,6 +43,18 @@ public interface IRender
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
 }
 
+public interface IShape1D
+{
+
+}
+
+public interface IShape2D
+{
+    
+}
+
+
+
 public class MeasuredText
 {
     public string Text="";
@@ -43,6 +63,8 @@ public class MeasuredText
     public bool Failure=false;
 
 }
+
+
 
 public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 {
@@ -53,10 +75,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
     public string Tag { get; set; } = "";
+    public int Level { get; set; } = 0;
     public string GlyphId { get; set; } = Guid.NewGuid().ToString();
-    private int x = 0;
+
+    protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
-    private int y = 0;
+    protected int y = 0;
     public int PinY { get { return this.y; } set { this.y = AssignInt(value, y); } }
     protected int width = 0;
     public int Width { get { return this.width; } set { this.width = AssignInt(value, width); } }
@@ -69,6 +93,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public string Color { get; set; }
 
+    public Func<FoGlyph2D?> GetParent = () => null;
+
     public Func<FoGlyph2D, int> LocPinX = (obj) => obj.Width / 2;
     public Func<FoGlyph2D, int> LocPinY = (obj) => obj.Height / 2;
     public Func<FoGlyph2D, double> RotationZ = (obj) => obj.Angle;
@@ -77,6 +103,11 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public int TopEdge() { return PinY - LocPinY(this); }
     public int BottomEdge() { return TopEdge() + Height; }
     public int RightEdge() { return  LeftEdge() + Width; }
+
+    public virtual void OnShapeClick(ClickStyle style) 
+    {
+    }
+
 
 
     public Action<FoGlyph2D, int>? ContextLink;
@@ -90,7 +121,8 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
-
+    //protected Matrix2D? _globalMatrix;
+    //protected Matrix2D? _invGlobalMatrix;
     public FoGlyph2D() : base("")
     {
         PinX = PinY = 0;
@@ -111,6 +143,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         PinX = PinY = 0;
         (Width, Height, Color) = (width, height, color);
         ShapeDraw = DrawRect;
+    }
+
+    public virtual Point AttachTo() 
+    {
+       // $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
+        return new Point(PinX, PinY); 
     }
 
     public static async Task<MeasuredText> ComputeMeasuredText(Canvas2DContext ctx, string Fragment,string FontSize, string Font)
@@ -149,7 +187,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         LocPinX = locX;
         LocPinY = locY;
-        Smash();
+        Smash(false);
         return PinLocation();
     }
 
@@ -237,13 +275,15 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         Height = 0;
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
     } 
+
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);
 
         var mtx = this.GetMatrix();
         //you must use Transform so the context can acumlate the positions
-        await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+        if ( mtx != null)  //this should NEVER be the case unless cleared by another process
+            await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
         await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
 
@@ -297,14 +337,24 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         if ( !IsInRegion (region)) return false;
 
-        await ctx.SaveAsync();
-        await UpdateContext(ctx, 0);
+        try
+        {
+            await ctx.SaveAsync();
+            await UpdateContext(ctx, 0);
 
-        if ( ShouldRender )
-            await ctx.FillRectAsync(0, 0, Width, Height);
-        else
-            await ctx.StrokeRectAsync(0, 0, Width, Height);
-        await ctx.RestoreAsync();
+            if ( ShouldRender )
+                await ctx.FillRectAsync(0, 0, Width, Height);
+            else
+                await ctx.StrokeRectAsync(0, 0, Width, Height);
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+        finally{
+            await ctx.RestoreAsync();
+        }
+
         return true;
     }
 
@@ -318,18 +368,50 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public virtual async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
-        if ( CannotRender() ) return false;
+        if (CannotRender()) return false;
 
         await ctx.SaveAsync();
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
         await Draw(ctx, tick);
-        if ( !IsSelected )
+        if (!IsSelected)
             HoverDraw?.Invoke(ctx, this);
-            
 
-        if ( !string.IsNullOrEmpty(Tag))
+        await DrawTag(ctx);
+
+        PostDraw?.Invoke(ctx, this);
+
+        if (IsSelected)
+            await DrawWhenSelected(ctx, tick, deep);
+        
+        if (deep)
+        {
+            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        }
+
+        if (GetMembers<FoGlue2D>()?.Count > 0)
+            await DrawTriangle(ctx, "Black");
+        
+
+        await ctx.RestoreAsync();
+        return true;
+    }
+
+    public async Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
+    {
+        await ctx.SaveAsync();
+        DrawSelected?.Invoke(ctx, this);
+        GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        GetConnectionPoints()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        //await DrawPin(ctx);
+        await ctx.RestoreAsync();
+    }
+
+    public async Task DrawTag(Canvas2DContext ctx)
+    {
+        if (!string.IsNullOrEmpty(Tag))
         {
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
@@ -337,25 +419,6 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
             await ctx.SetFillStyleAsync("Black");
             await ctx.FillTextAsync(Tag, LeftX() + 2, TopY() + 3);
         }
-
-        PostDraw?.Invoke(ctx, this);
-
-        if (IsSelected)
-        {
-            await ctx.SaveAsync();
-            DrawSelected?.Invoke(ctx, this);
-            GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            //await DrawPin(ctx);
-            await ctx.RestoreAsync();
-        }
-
-        if (deep)
-        {
-            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        }
-        await ctx.RestoreAsync();
-        return true;
     }
 
     public async Task DrawOutline(Canvas2DContext ctx)
@@ -397,6 +460,69 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         await ctx.SetFillStyleAsync("Green");
         await ctx.ArcAsync(cx, cy, 16.0, 0.0, 2 * Math.PI);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+
+
+    public async Task DrawStar(Canvas2DContext ctx, string color)
+    {
+        var loc = PinLocation();
+
+
+        int StarWidth = 40;
+        int StarHeight  = 40;
+        int StarCenterX  = loc.X;
+        int StarCenterY  = loc.Y;
+
+        var scale = Math.Min((double)StarWidth / 400, (double)StarHeight / 400);
+        var starWidth = (int)(400 * scale);
+        var starHeight = (int)(400 * scale);
+        var top = StarCenterY - starHeight / 2;
+        var left = StarCenterX - starWidth / 2;
+
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.MoveToAsync(left + 200 * scale, top + 100 * scale);
+        await ctx.LineToAsync(left + 240 * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 330 * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 260 * scale, top + 230 * scale);
+        await ctx.LineToAsync(left + 300 * scale, top + 310 * scale);
+        await ctx.LineToAsync(left + 200 * scale, top + 260 * scale);
+        await ctx.LineToAsync(left + 100 * scale, top + 310 * scale);
+        await ctx.LineToAsync(left + 140 * scale, top + 230 * scale);
+        await ctx.LineToAsync(left + 70  * scale, top + 180 * scale);
+        await ctx.LineToAsync(left + 160 * scale, top + 180 * scale);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+
+    public async Task DrawTriangle(Canvas2DContext ctx, string color)
+    {
+        var loc = PinLocation();
+        var cx = loc.X;
+        var cy = loc.Y;
+        var d = 8;
+
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.MoveToAsync(cx, cy+2*d);
+        await ctx.LineToAsync(cx+d, cy);
+        await ctx.LineToAsync(cx-d, cy);
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
@@ -474,35 +600,48 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected int AssignInt(int newValue, int oldValue)
     {
-        if (_matrix != null && newValue != oldValue)
-            Smash();
+        if ( Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
 
         return newValue;
     }
 
     protected double AssignDouble(double newValue, double oldValue)
     {
-        if (_matrix != null && newValue != oldValue)
-            Smash();
+        if ( Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
 
         return newValue;
     }
 
-    public virtual void Smash()
-    {
-        if ( _matrix == null ) return;
+    // public virtual bool SmashParents()
+    // {
+    //     if ( _globalMatrix == null ) return false;
+    //     this._globalMatrix = null;
 
+    //     return true;
+    // }
+
+    public virtual bool SmashGlue()
+    {
+        var list = GetMembers<FoGlue2D>();
+        if ( list == null) return false;
+        //$"Smashing Glue {Name} {GetType().Name}".WriteInfo(2);
+
+        list.ForEach(item => item.TargetMoved(this));
+        return true;
+    }
+    
+    public virtual bool Smash(bool force)
+    {
+        if ( _matrix == null && !force) return false;
+        //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
+
+        ResetHitTesting = true;
         this._matrix = null;
         this._invMatrix = null;
-        ResetHitTesting = true;
 
-        GetMembers<FoGlue2D>()?.ForEach(item =>
-        {
-            if ( !item.HasTarget(this) ) return;
-
-            //$"Smash Glue Check {item.Name}  Target {Name}".WriteLine(ConsoleColor.DarkBlue);
-            item.TargetMoved(this);
-        });
+        return this.SmashGlue();
     }
 
     public virtual Matrix2D GetMatrix()
@@ -511,10 +650,49 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         {
             _matrix = new Matrix2D();
             _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), 0.0, 0.0, LocPinX(this), LocPinY(this));
-            ResetHitTesting = true;
+            //ResetHitTesting = true;
+            //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
         return _matrix;
     }
+
+    // public virtual Matrix2D GetGlobalMatrix()
+    // {
+    //     if ( _globalMatrix == null )
+    //     {
+    //         _globalMatrix = GetMatrix().Clone();
+    //         var parent = GetParent();
+    //         if (parent != null) 
+    //         {
+    //             _globalMatrix.PrependMatrix(parent.GetGlobalMatrix());
+    //             $"PrePending {Name} to parent {parent.Name}".WriteInfo();
+    //         } else
+    //         {
+    //              $"No Parent {Name}".WriteInfo(); 
+    //         }
+
+    //     }
+    //     return _globalMatrix;
+    // }
+
+
+    // public void GlobalMatrixComputeTest(FoGlyph2D source, Matrix2D mat, int X, int Y, int level, string path)
+    // {
+    //     $"{level}]{path} Source {source.Name}: {X} {Y}".WriteSuccess(level);
+    //     var point = mat.TransformPoint(X,Y);
+    //     $"{level}]{path} TForm {source.Name}: {point.X} {point.Y}".WriteSuccess(level);
+
+    //     var parent = source.GetParent();
+    //     if (parent == null) return;
+
+    //     var newPath = $"{parent.Name}.{path}";
+    //     var pMat = parent.GetMatrix();
+    //     pMat = mat.PrependMatrix(pMat);
+    //     $"PrePending {Name} to parent {parent.Name}".WriteInfo(level);
+    //     GlobalMatrixComputeTest(parent, pMat, X, Y, level + 1, newPath);
+    // }
+
+  
 
     public Matrix2D GetInvMatrix()
     {
@@ -522,9 +700,16 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return _invMatrix;
     }
 
+    // public Matrix2D GetInvGlobalMatrix()
+    // {
+    //     _invGlobalMatrix ??= this.GetGlobalMatrix().InvertCopy();
+    //     return _invGlobalMatrix;
+    // }
+
     public void UnglueAll()
     {
         GetMembers<FoGlue2D>()?.ForEach(item => item.UnGlue() );
+        this.SmashGlue();
     }
 
 
@@ -533,12 +718,14 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
         //$"adding glue to {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);
         this.Add<FoGlue2D>(glue);
+        this.SmashGlue();
     }
 
     public void RemoveGlue(FoGlue2D glue)
     {
         //$"remove glue from {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);;
         this.Remove<FoGlue2D>(glue);
+        this.SmashGlue();
     }
 
     public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase

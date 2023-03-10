@@ -4,11 +4,12 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-
+using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shared;
 
@@ -56,10 +57,10 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     {
         InputFile = e.File;
         $"{InputFile.Name} {InputFile.Size}".WriteLine(ConsoleColor.Green);
-        Task.Run(async () =>
-        {
-            await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
-        });
+        //Task.Run(async () =>
+        //{
+        //    await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
+        //});
 
     }
 
@@ -71,7 +72,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
             $"OnCanvasMouseEvent {MouseArgs.OffsetX} {MouseArgs.OffsetY}".WriteLine(ConsoleColor.Green);
             Task.Run(async () =>
             {
-                await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
+                //await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
                 await Workspace!.DropFileCreateShape(InputFile, MouseArgs);
                 InputFile = null;
                 IsUploading = false;
@@ -84,14 +85,24 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     public async Task RenderFrame(double fps)
     {
         if (Ctx == null) return;
+        tick++;
 
+        Workspace?.PreRender(tick);
+
+        var drawing = Workspace?.GetDrawing();
+        if (drawing == null) return;
+
+        drawing.SetCurrentlyRendering(true);
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
-        Workspace!.GetDrawing()?.RenderDrawing(Ctx, tick++, fps);
-
+        await drawing.RenderDrawing(Ctx, tick, fps);
+        
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
+        drawing.SetCurrentlyRendering(false);
+
+        Workspace?.PostRender(tick);
     }
 
     public string FileInputStyle()

@@ -3,8 +3,10 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoText2D : FoGlyph2D
+public class FoText2D : FoGlyph2D, IShape2D
 {
+    public bool ComputeResize { get; set; } = false;
+
     private string text = "";
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
 
@@ -16,7 +18,6 @@ public class FoText2D : FoGlyph2D
 
     public string TextColor { get; set; } = "White";
     public bool IsEditing { get; set; } = false;
-    public bool ComputeResize { get; set; } = false;
 
     public int Margin { get; set; } = 2;
     public List<string>? Details { get; set; }

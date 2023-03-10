@@ -4,7 +4,7 @@ using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
-public class FoCompound2D : FoGlyph2D
+public class FoCompound2D : FoGlyph2D, IShape2D
 {
     public bool ApplyLayout = false;
 

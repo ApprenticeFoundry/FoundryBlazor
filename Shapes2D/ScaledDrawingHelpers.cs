@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
@@ -16,6 +12,7 @@ public interface IScaledDrawingHelpers
     void SetPageDefaults(FoPage2D page);
     double ConvertToPixels(double inches);
     int ToPixels(double inches);
+    double ToInches(int value);
     double ConvertToInches(double pixels);
     double GetPixelsPerInch();
     Task ClearCanvas(Canvas2DContext ctx);
@@ -40,7 +37,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
 
     private Rectangle userWindow  { get; set; } = new Rectangle(0, 0, 1500, 400);
 
-    public double PixelsPerInch { get; set; } = 70;  //pixels per in or SRS machine
+    public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 6.0;  //inches
@@ -112,7 +109,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
         page.PageMargin = this.PageMargin;
         page.PageWidth = this.PageWidth;
         page.PageHeight = this.PageHeight;
-        page.Smash();
+        page.Smash(false);
     }
     public string CanvasWH()
     {
@@ -125,6 +122,10 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
     public int ToPixels(double inches)
     {
         return (int)(PixelsPerInch * inches);
+    }
+    public double ToInches(int value)
+    {
+        return (double)(value / PixelsPerInch);
     }
     public double ConvertToPixels(double inches)
     {

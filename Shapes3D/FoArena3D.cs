@@ -11,8 +11,6 @@ using BlazorComponentBus;
 
 using FoundryBlazor.PubSub;
 
-using FoundryBlazor.Shared;
-
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -237,19 +235,19 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.Bodies()?.ForEach(body =>
         {
-            $"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
+            //$"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
             body.Render(scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
-            $"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
+            //$"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
             label.Render(scene, 0, 0);
         });
 
         platform.Datums()?.ForEach(datum =>
         {
-            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+            //$"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
             datum.Render(scene, 0, 0);
         });
 

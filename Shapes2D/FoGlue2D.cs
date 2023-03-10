@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FoundryBlazor.Extensions;
-
 
 namespace FoundryBlazor.Shape;
 
@@ -17,31 +12,22 @@ public class FoGlue2D : FoBase
     {
     }
 
+    public void Deconstruct(out IGlueOwner source, out FoGlyph2D target)
+    {
+        source = Source!;
+        target = Target!;
+    }
+
     public bool HasTarget(FoGlyph2D target)
     {
         return target == Target;
     }
+    
     public bool TargetMoved(FoGlyph2D target)
     {
         if ( !HasTarget(target) || Target == null) return false;
-
-       //$"{Name} TargetMoved {target.Name}".WriteLine(ConsoleColor.DarkBlue);
-
-        if ( Name.StartsWith("Finish") && Source != null )
-        {
-            Source.SetFinishTo(Target);
-            // $"{Source.Name} SetFinishTo {Target.Name}".WriteLine(ConsoleColor.Blue);
-            return true;
-        }
-        else if ( Name.StartsWith("Start")  && Source != null)
-        {
-            Source.SetStartTo(Target);
-            //$"{Source.Name} SetStartTo {Target.Name}".WriteLine(ConsoleColor.Blue);
-            return true;
-        }
-        return false;
+        return Source?.Smash(false) ?? false;
     }
-
 
 
     public FoGlue2D GlueTo(IGlueOwner source, FoGlyph2D target) 
@@ -58,11 +44,14 @@ public class FoGlue2D : FoBase
 
     public FoGlue2D UnGlue() 
     {
+        Source?.Smash(false);
+
         Source?.RemoveGlue(this);
         Target?.RemoveGlue(this);
 
         this.Source = null;
         this.Target = null;
+        
 
         return this;
     }

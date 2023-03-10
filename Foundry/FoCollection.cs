@@ -1,24 +1,11 @@
-
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
-
 namespace FoundryBlazor;
 
-public interface IFoCollection 
-{
-    int GetLayer();
-    string GetKey();
-    void Clear();
-    IList AllItem();
-}
+
 
 [System.Serializable]
-public class FoCollection<T>: IFoCollection where T : FoBase
+public class FoCollection<T> where T : FoBase
 {
     public string Key { get; set; }
-    protected int Layer { get; set; } = 0;
 
     private readonly Dictionary<string, T> members = new();
 
@@ -27,28 +14,12 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         Key = typeof(T).Name;
     }
 
-    public int GetLayer()
-    {
-        return Layer;
-    }
-    public void SetLayer(int layer)
-    {
-        Layer = layer;
-    }
-    public string GetKey()
-    {
-        return Key;
-    }
 
     public List<string> Keys()
     {
         return this.members.Keys.ToList();
     }
 
-    public IList AllItem()
-    {
-        return this.members.Values.ToList();
-    }
 
     public List<T> Values()
     {
@@ -117,6 +88,13 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         return value;
     }
 
+    public List<T> ForEach(Action<T> applyClause)
+    {
+        var list = Values();
+        list.ForEach(applyClause);
+        return list;
+    }
+
     public List<T> ExtractWhere(Func<T,bool> whereClause)
     {
         var extraction = FindWhere(whereClause);
@@ -140,5 +118,6 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         Clear();
         return this;
     }
+
 
 }

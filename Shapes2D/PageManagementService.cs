@@ -3,6 +3,7 @@ using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using FoundryBlazor.Extensions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 
 namespace FoundryBlazor.Shape;
@@ -27,7 +28,7 @@ public interface IPageManagement: IRender
     void ClearAll();
 
     int PageCount();
-    int ShapeCount();
+
 
     FoPage2D SetPageSizeInches(double width, double height);
     FoPage2D SetPageLandscape();
@@ -39,7 +40,7 @@ public interface IPageManagement: IRender
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
     void SelectionsZoomBy(double factor);
-    T Add<T>(T value) where T : FoGlyph2D;
+    T? AddShape<T>(T value) where T : FoGlyph2D;
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
@@ -47,12 +48,11 @@ public interface IPageManagement: IRender
 }
 
 
-public class PageManagementService : IPageManagement
+public class PageManagementService : FoComponent, IPageManagement
 {
 
     private bool RenderHitTestTree = false;
     private FoPage2D _activePage { get; set; }
-    private readonly FoCollection<FoPage2D> _pages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
     private readonly IScaledDrawingHelpers _ScaledDrawing;
@@ -76,10 +76,7 @@ public class PageManagementService : IPageManagement
         return 1;
     }
 
-    public int ShapeCount()
-    {
-        return CurrentPage().AllMembers().Count;
-    }
+
 
     public FoPage2D SetPageSizeInches(double width, double height)
     {
@@ -125,13 +122,14 @@ public class PageManagementService : IPageManagement
 
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
-        _pages.Values().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
         return list;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        CurrentPage().GetMembers<FoMenu2D>()?.ForEach(item =>
+        var page = CurrentPage();
+        page.GetMembers<FoMenu2D>()?.ForEach(item =>
         {
             list.Add(item);
         });
@@ -139,7 +137,7 @@ public class PageManagementService : IPageManagement
     }   
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
-        _pages.Values().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
         return list;
     }
 
@@ -164,11 +162,12 @@ public class PageManagementService : IPageManagement
     }
 
 
-    public T Add<T>(T value) where T : FoGlyph2D
+    public T? AddShape<T>(T value) where T : FoGlyph2D
     {
-        var found = _activePage.Add(value);
-        _activePage.SmashLayers();
-        _hitTestService.Insert(value);
+        var found = _activePage.AddShape(value);
+        if ( found != null)
+            _hitTestService.Insert(value);
+
         return found;
 
     }
@@ -177,7 +176,7 @@ public class PageManagementService : IPageManagement
     {
         if (_activePage == null)
         {
-            var found = _pages.Values().Where(page => page.IsActive).FirstOrDefault();
+            var found = Members<FoPage2D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
@@ -193,16 +192,16 @@ public class PageManagementService : IPageManagement
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
         _activePage = page;
-        _pages.Values().ForEach(item => item.IsActive = false);
+        Slot<FoPage2D>().ForEach(item => item.IsActive = false);
         _activePage.IsActive = true;
         return _activePage!;
     }
 
     public FoPage2D AddPage(FoPage2D page)
     {
-        var found = _pages.Values().Where(item => item == page).FirstOrDefault();
+        var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
         if (found == null)
-            _pages.Add(page);
+            Slot<FoPage2D>().Add(page);
         return page;
     }
 
@@ -211,15 +210,16 @@ public class PageManagementService : IPageManagement
         var body = StorageHelpers.Dehydrate<T>(value, false);
         var shape = StorageHelpers.Hydrate<T>(body, false);
 
-        shape!.Name = "";
-        shape!.GlyphId = "";
+        shape.Name = "";
+        shape.GlyphId = "";
 
         //SRS write a method to duplicate actions
         shape.ShapeDraw = value.ShapeDraw;
         shape.DoOnOpenCreate = value.DoOnOpenCreate;
         shape.DoOnOpenEdit = value.DoOnOpenEdit;
 
-        return Add<T>(shape);
+        AddShape<T>(shape);
+        return shape;
     }
 
     public U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D
@@ -227,10 +227,11 @@ public class PageManagementService : IPageManagement
         var body = StorageHelpers.Dehydrate<T>(value, false);
         var shape = StorageHelpers.Hydrate<U>(body, false);
 
-        shape!.Name = "";
-        shape!.GlyphId = "";
+        shape.Name = "";
+        shape.GlyphId = "";
 
-        return Add<U>(shape);
+        AddShape<U>(shape);
+        return shape;
     }
 
 
@@ -244,7 +245,7 @@ public class PageManagementService : IPageManagement
     {
         var page = CurrentPage();
         page.MoveBy(dx, dy);
-        page.Smash();
+        page.Smash(false);
     }
 
     public void SelectionsMoveBy(int dx, int dy)
@@ -286,7 +287,7 @@ public class PageManagementService : IPageManagement
         group.ResizeTo(rect.Width, rect.Height);
         var pt = group.PinLocation();
         group.MoveTo(rect.X + pt.X, rect.Y + pt.Y);
-        this.Add<T>(group);
+        this.AddShape<T>(group);
 
         group.CaptureSelectedShapes<FoShape1D>(CurrentPage());
         group.CaptureSelectedShapes<FoGroup2D>(CurrentPage());
@@ -305,24 +306,18 @@ public class PageManagementService : IPageManagement
 
     public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
     {
-        var menu = CurrentPage().Find<U>(name);
-        if (menu == null)
-        {
-            menu = Activator.CreateInstance(typeof(U), name) as U;
-            this.Add<U>(menu!);
-        }
-        if ( clear )
-            menu?.Clear();
+        var page = CurrentPage();
+        var menu = page.EstablishMenu2D<U>(name,clear);
 
         foreach (KeyValuePair<string, Action> item in actions)
         {
             if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
-                menu?.Add<T>(shape);
+                menu.Add<T>(shape);
         }
 
-        menu!.LayoutHorizontal();
+        menu.LayoutHorizontal();
 
-        return menu!;
+        return menu;
     }
 
 
@@ -336,7 +331,7 @@ public class PageManagementService : IPageManagement
         await page.RenderDetailed(ctx, tick++, deep);
 
         if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx);
+            await _hitTestService.RenderTree(ctx,true);
 
         return true;
     }
@@ -347,7 +342,7 @@ public class PageManagementService : IPageManagement
         await page.RenderConcise(ctx, scale, region);
 
         if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx);
+            await _hitTestService.RenderTree(ctx,false);
             
         return true;
     }

@@ -115,6 +115,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     public FoLayoutTree<V>? FindNodeWithName(string name)
     {
+        if (string.IsNullOrEmpty(name)) return null;
 
         if ( _item.Name == name) return this;
         
@@ -167,7 +168,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             shape1D.Thickness = 5;
             shape1D.Color = "Green";
 
-            pageManager.Add<U>(shape1D);
+            pageManager.AddShape<U>(shape1D);
 
             shape1D.GlueStartTo(parent);
             shape1D.GlueFinishTo(shape);

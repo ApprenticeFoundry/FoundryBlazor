@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FoundryBlazor.Extensions
+﻿namespace FoundryBlazor.Extensions
 {
-public static class BasicMath
+    public static class BasicMath
 {
 	public static double toDouble(this string Value)
 	{

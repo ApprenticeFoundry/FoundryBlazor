@@ -1,6 +1,3 @@
-using Blazor.Extensions.Canvas.Canvas2D;
-
-
 namespace FoundryBlazor.Shape;
 
 public class FoButton3D : FoText3D, IFoButton

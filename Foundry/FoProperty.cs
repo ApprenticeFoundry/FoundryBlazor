@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FoundryBlazor;
+﻿namespace FoundryBlazor;
 public class FoProperty : FoBase
 {
     public FoProperty(string name) : base(name)

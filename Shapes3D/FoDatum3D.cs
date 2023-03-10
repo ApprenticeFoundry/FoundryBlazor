@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Reflection.Emit;
-
 namespace FoundryBlazor.Shape;
-	public class FoDatum3D : FoGlyph3D
+public class FoDatum3D : FoGlyph3D
 	{
 
 		public string? Shape { get; set; }

@@ -12,7 +12,7 @@ public interface IHitTestService
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
-    Task RenderTree(Canvas2DContext ctx);
+    Task RenderTree(Canvas2DContext ctx, bool showTracks);
 }
 
 public class HitTestService : IHitTestService
@@ -43,23 +43,8 @@ public class HitTestService : IHitTestService
         Page = page;
         Tree = new QuadTree<FoGlyph2D>(Rect());
 
-        //Page.GetMembers<FoShape1D>()?.ForEach(child => Tree.Insert(child));
-        //Page.GetMembers<FoConnector1D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoGroup2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoShape2D>()?.ForEach(child => Tree.Insert(child));
-        //Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
+        Page.InsertShapesToQuadTree(Tree);
 
-        Page.GetMembers<FoText2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoImage2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoVideo2D>()?.ForEach(child => Tree.Insert(child));
-
-        Page.GetMembers<FoCompound2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoDragTarget2D>()?.ForEach(child => Tree.Insert(child));
-
-        // Page.Members<FoButton2D>().ForEach(child => Tree.Insert(child));
-        //Page.Members<FoMenu2D>().ForEach(child => Tree.Insert(child));
-
-        //$"Refresh Tree {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
         return AllShapesEverywhere();
     }
 
@@ -103,7 +88,7 @@ public class HitTestService : IHitTestService
         return list;
     }
 
-    public async Task RenderTree(Canvas2DContext ctx)
+    public async Task RenderTree(Canvas2DContext ctx, bool showTracks)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
@@ -117,11 +102,15 @@ public class HitTestService : IHitTestService
         await ctx.SetLineWidthAsync(1);
         await ctx.SetLineDashAsync(Array.Empty<float>());
         await ctx.SetStrokeStyleAsync("Blue");
-        PreviousSearches.ForEach(async rect =>
+
+        if (showTracks)
         {
-            //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
-            await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
-        });
+            PreviousSearches.ForEach(async rect =>
+            {
+                //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+                await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+            });
+        }
 
         await ctx.RestoreAsync();
     }
