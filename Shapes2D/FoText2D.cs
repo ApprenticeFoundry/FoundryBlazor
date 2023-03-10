@@ -32,7 +32,7 @@ public class FoText2D : FoGlyph2D, IShape2D
     {
         if (newValue != oldValue)
         {
-            //ComputeResize = true;
+            ComputeResize = true;
         }
 
         return newValue;

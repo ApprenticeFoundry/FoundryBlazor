@@ -46,13 +46,7 @@ public class FoShape2D : FoGlyph2D, IShape2D
         return point;
     }
 
-    public FoHandle2D AddHandle2D(FoHandle2D point)
-    {
-        point.GetParent = () => this;
-        point.Level = Level + 1;
-        Add<FoHandle2D>(point);
-        return point;
-    }
+
 
     public override List<FoHandle2D> GetHandles() 
     {
@@ -71,13 +65,7 @@ public class FoShape2D : FoGlyph2D, IShape2D
         return result;
     }
 
-    public FoConnectionPoint2D AddConnectionPoint2D(FoConnectionPoint2D point)
-    {
-        point.GetParent = () => this;
-        point.Level = Level + 1;
-        Add<FoConnectionPoint2D>(point);
-        return point;
-    }
+
 
     public override List<FoConnectionPoint2D> GetConnectionPoints() 
     {
@@ -100,8 +88,8 @@ public class FoShape2D : FoGlyph2D, IShape2D
 
     public override bool SmashGlue()
     {
-        GetHandles().ForEach(item => item.SmashGlue());
-        GetConnectionPoints().ForEach(item => item.SmashGlue());
+        GetMembers<FoHandle2D>()?.ForEach(item => item.SmashGlue());
+        GetMembers<FoConnectionPoint2D>()?.ForEach(item => item.SmashGlue());
         return base.SmashGlue();
     }
 

@@ -55,34 +55,4 @@
 
 }
 
-static public class IoBTMath
-{
-	public static double toDouble(string Value)
-	{
-		return Value.toDouble();
-	}
-
-	public static int toInteger(string Value)
-	{
-		return Value.toInteger();
-	}
-
-	public static double toRad(this double ang)
-	{
-		return ang * Math.PI / 180;
-	}
-
-	public static double toDeg(this double ang)
-	{
-		return ang * 180 / Math.PI;
-	}
-
-
-    public static double DoubleBetween(this Random rand, double min, double max)
-    {
-        double value = min + (max - min) * rand.NextDouble();
-        return value;
-    }
-}
-
 }

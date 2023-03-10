@@ -14,18 +14,7 @@ public class FoGroup2D : FoGlyph2D
     {
         ShapeDraw = DrawRect;
     }
-    public override List<FoHandle2D> GetHandles() 
-    {
-        if ( !this.HasSlot<FoHandle2D>()) 
-        {
-            Add<FoHandle2D>(new FoHandle2D("UL", LeftX(), TopY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("UR", RightX(), TopY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("LL", LeftX(), BottomY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("LR", RightX(), BottomY(), "Green"));
-        }
-        var result = this.Members<FoHandle2D>();
-        return result;
-    }
+
 
 
 

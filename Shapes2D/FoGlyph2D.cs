@@ -230,12 +230,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public int FractionX(double fraction) => (int)(fraction * Width);
     public int FractionY(double fraction) => (int)(fraction * Height);
-    public int CenterX() => FractionX(0.5);
-    public int LeftX() => 0;
-    public int RightX() => Width;
-    public int CenterY() => FractionY(0.5);
-    public int TopY() => 0;
-    public int BottomY() => Height;
+    public int CenterX() => FractionX(0.0);
+    public int LeftX() =>  FractionX(0.5);
+    public int RightX() =>  FractionX(1.0);
+    public int CenterY() => FractionY(0.0);
+    public int TopY() => FractionY(0.5);
+    public int BottomY() => FractionY(1.0);
 
    public virtual FoGlyph2D ResizeToBox(Rectangle rect) 
    {
@@ -287,6 +287,20 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.SetFillStyleAsync(Color);
     }
 
+    public FoHandle2D AddHandle2D(FoHandle2D point)
+    {
+        point.GetParent = () => this;
+        point.Level = Level + 1;
+        Add<FoHandle2D>(point);
+        return point;
+    }
+    public FoConnectionPoint2D AddConnectionPoint2D(FoConnectionPoint2D point)
+    {
+        point.GetParent = () => this;
+        point.Level = Level + 1;
+        Add<FoConnectionPoint2D>(point);
+        return point;
+    }
     public FoHandle2D? FindHandle(string key)
     {
         //GetHandles();

@@ -67,7 +67,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         ShapeDraw = DrawRect;
         this.height = 10;
     }
+    public FoShape1D(string name, string color) : base(name, color)
+    {
+        ShapeDraw = DrawRect;
 
+        this.height = 10;
+    }
     public FoShape1D(int x1, int y1, int x2, int y2, int height, string color) : base("", color)
     {
         ShapeDraw = DrawRect;
@@ -127,18 +132,23 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
 
 
-    public override List<FoHandle2D> GetHandles()
+    public override List<FoHandle2D> GetHandles() 
     {
-        if (!this.HasSlot<FoHandle2D>())
+        if ( !this.HasSlot<FoHandle2D>()) 
         {
-            Add<FoHandle2D>(new FoHandle2D("Begin", LeftX(), CenterY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("Finish", RightX(), CenterY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("Top", CenterX(), TopY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("Bottom", CenterX(), BottomY(), "Green"));
+            var lx = LeftX();
+            var ty = TopY();
+            var rx = RightX();
+            var by = BottomY();
+            AddHandle2D(new FoHandle2D("UL", lx, ty, "Green"));
+            AddHandle2D(new FoHandle2D("UR", rx, ty, "Green"));
+            AddHandle2D(new FoHandle2D("LL", lx, by, "Green"));
+            AddHandle2D(new FoHandle2D("LR", rx, by, "Green"));
         }
         var result = this.Members<FoHandle2D>();
         return result;
     }
+
 
     public override Matrix2D GetMatrix()
     {
