@@ -30,28 +30,4 @@ public class FoHandle2D : FoGlyph2D
     }
 
 
-    public override Point AttachTo()
-    {
-        var point = base.AttachTo();
-     
-        //you need to compute where that point is on the parent !!
-        //do this for real using a matrix
-
-        if (Level > 0 && GetParent() is FoGlyph2D parent)
-        {
-            //$"------------------------------++++++AttachTo OLD {point.X}  {point.Y}".WriteInfo(2);
-
-            //var matrix = GetMatrix();
-            //point = matrix.TransformPoint(point);
-
-            var matrix = parent.GetMatrix();
-            point = matrix.TransformPoint(point);
-            //$"AttachTo NEW {point.X}  {point.Y}".WriteInfo(2);
-        }
-        //else
-        //    $"No Parent AttachTo {Name}".WriteError();
-
-        return point;
-    }
-
 }

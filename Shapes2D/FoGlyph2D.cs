@@ -142,10 +142,27 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         ShapeDraw = DrawRect;
     }
 
-    public virtual Point AttachTo() 
+    public Point ParentAttachTo(Point source)
     {
-       // $"AttachTo {Name}  {PinX}  {PinY}".WriteInfo();
-        return new Point(PinX, PinY); 
+        if (Level > 0 && GetParent() is FoGlyph2D parent)
+        {
+            var matrix = parent.GetMatrix();
+            source = matrix.TransformPoint(source);
+            return parent.ParentAttachTo(source);
+        }
+
+        return source;
+    }
+
+
+    public virtual Point AttachTo()
+    {
+        var point = new Point(PinX, PinY);
+
+        //you need to compute where that point is on the parent !!
+        //do this for real using a matrix
+
+        return ParentAttachTo(point);
     }
 
     public static async Task<MeasuredText> ComputeMeasuredText(Canvas2DContext ctx, string Fragment,string FontSize, string Font)
@@ -230,11 +247,11 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public int FractionX(double fraction) => (int)(fraction * Width);
     public int FractionY(double fraction) => (int)(fraction * Height);
-    public int CenterX() => FractionX(0.0);
-    public int LeftX() =>  FractionX(0.5);
+    public int CenterX() => FractionX(0.5);
+    public int LeftX() =>  FractionX(0.0);
     public int RightX() =>  FractionX(1.0);
-    public int CenterY() => FractionY(0.0);
-    public int TopY() => FractionY(0.5);
+    public int CenterY() => FractionY(0.5);
+    public int TopY() => FractionY(0.0);
     public int BottomY() => FractionY(1.0);
 
    public virtual FoGlyph2D ResizeToBox(Rectangle rect) 
@@ -301,9 +318,9 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         Add<FoConnectionPoint2D>(point);
         return point;
     }
-    public FoHandle2D? FindHandle(string key)
+    public FoHandle2D? FindHandle(string key, bool force = false)
     {
-        //GetHandles();
+        if ( force) GetHandles();
         return this.Find<FoHandle2D>(key);
     }
 
@@ -314,9 +331,9 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return null;
     }
 
-    public FoConnectionPoint2D? FindConnectionPoint(string key)
+    public FoConnectionPoint2D? FindConnectionPoint(string key, bool force = false)
     {
-        //GetConnectionPoints();
+        if (force) GetConnectionPoints();
         return this.Find<FoConnectionPoint2D>(key);
     }
 
@@ -423,7 +440,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         return true;
     }
 
-    public async Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
+    public async virtual Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {
         await ctx.SaveAsync();
         DrawSelected?.Invoke(ctx, this);
