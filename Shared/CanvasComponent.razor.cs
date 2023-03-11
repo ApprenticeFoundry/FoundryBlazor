@@ -92,7 +92,8 @@ public class CanvasComponentBase : ComponentBase, IDisposable
         var drawing = Workspace?.GetDrawing();
         if (drawing == null) return;
 
-        drawing.SetCurrentlyRendering(true);
+        //if you are already rendering then skip it this cycle
+        if ( drawing.SetCurrentlyRendering(true) ) return;
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 

@@ -16,8 +16,8 @@ namespace FoundryBlazor.Shape;
 
 public interface IDrawing : IRender
 {
-    void SetCurrentlyRendering(bool value);
-    void SetCurrentlyProcessing(bool value);
+    bool SetCurrentlyRendering(bool value);
+    bool SetCurrentlyProcessing(bool value);
     void SetCanvasSize(int width, int height);
     Point InchesToPixelsInset(double width, double height);
     int ToPixels(double width);
@@ -81,14 +81,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
-    public void SetCurrentlyRendering(bool value)
+    public bool SetCurrentlyRendering(bool isRendering)
     {
-        if (value)
+        var oldValue = IsCurrentlyRendering;
+        if (isRendering)
         {
             //stopwatch.Restart();
         }
 
-        if (value == false)
+        if (!isRendering)
         {
             while (MouseArgQueue.Count > 0)
             {
@@ -97,18 +98,20 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 ApplyMouseArgs(args);
             }
         }
-        IsCurrentlyRendering = value;
-        if (!value)
+        if (!isRendering)
         {
             //stopwatch.Stop();
             //var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
             //$"render time {stopwatch.Elapsed}  {fps}".WriteInfo();
         }
+        IsCurrentlyRendering = isRendering;
+        return oldValue;
     }
 
-    public void SetCurrentlyProcessing(bool value)
+    public bool SetCurrentlyProcessing(bool isProcessing)
     {
-        if (value == false)
+        var oldValue = IsCurrentlyProcessing;
+        if (!isProcessing)
         {
             while (MouseArgQueue.Count > 0)
             {
@@ -117,7 +120,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 ApplyMouseArgs(args);
             }
         }
-        IsCurrentlyProcessing = value;
+        IsCurrentlyProcessing = isProcessing;
+        return oldValue;
     }
 
     public FoDrawing2D(
@@ -148,6 +152,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {InteractionStyle.ShapeDragging, new ShapeDragging(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeResizing, new ShapeResizing(this, pubSub, panzoom, select, manager, hittest)},
             {InteractionStyle.ShapeConnecting, new ShapeConnecting(this, pubSub, panzoom, select, manager, hittest)},
+            {InteractionStyle.ModelLinking, new MoShapeLinking(this, pubSub, panzoom, select, manager, hittest)},
            //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
         };
 
@@ -482,7 +487,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 
-    private bool TestRule(InteractionStyle style, CanvasMouseArgs args)
+    protected bool TestRule(InteractionStyle style, CanvasMouseArgs args)
     {
         var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
@@ -496,9 +501,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
-    private void SelectInteractionByRuleFor(CanvasMouseArgs args)
+    protected virtual void SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
         if (TestRule(InteractionStyle.PagePanAndZoom, args)) return;
+        
+        if (TestRule(InteractionStyle.ModelLinking, args)) return;
 
         if (TestRule(InteractionStyle.ShapeConnecting, args)) return;
 

@@ -258,6 +258,19 @@ public class FoPage2D : FoGlyph2D
         return true;
     }
 
+    public async Task DrawPageName(Canvas2DContext ctx)
+    {
+        await ctx.SaveAsync();
+        //Draw the page name at the top
+        await ctx.SetFontAsync("16px Segoe UI");
+        await ctx.SetTextAlignAsync(TextAlign.Left);
+        await ctx.SetTextBaselineAsync(TextBaseline.Top);
+
+        await ctx.SetFillStyleAsync("Black");
+        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.RestoreAsync();
+    }
+
   public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
         if (!IsVisible) return false;
@@ -273,12 +286,7 @@ public class FoPage2D : FoGlyph2D
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
 
-        //Draw the page name at the top
-        await ctx.SetTextAlignAsync(TextAlign.Left);
-        await ctx.SetTextBaselineAsync(TextBaseline.Top);
-
-        await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await DrawPageName(ctx);
 
         await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(0.75F);
@@ -289,8 +297,8 @@ public class FoPage2D : FoGlyph2D
         //await DrawFancyPin(ctx);
 
 
-        Shapes2D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         Shapes1D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+        Shapes2D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
 
 
         await ctx.RestoreAsync();

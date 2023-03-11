@@ -130,6 +130,7 @@ public class FoCompound2D : FoGlyph2D, IShape2D
 
         if (DrawModelText == null )
         {
+            await ctx.SaveAsync();
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
@@ -139,6 +140,7 @@ public class FoCompound2D : FoGlyph2D, IShape2D
 
             await ctx.SetFillStyleAsync("White");
             await ctx.FillTextAsync(Name,LeftX()+1,TopY()+1);
+            await ctx.RestoreAsync();
         }
     }
 
@@ -167,9 +169,9 @@ public class FoCompound2D : FoGlyph2D, IShape2D
         if ( deep ) 
         {
             GetMembers<FoCompoundValue2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));  
-            GetMembers<FoImage2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
-            GetMembers<FoText2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
-            GetMembers<FoButton2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));   
+            // GetMembers<FoImage2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
+            // GetMembers<FoText2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
+            // GetMembers<FoButton2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));   
         }
         await ctx.RestoreAsync();
         return true;

@@ -454,11 +454,14 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         if (!string.IsNullOrEmpty(Tag))
         {
+            await ctx.SaveAsync();
+            await ctx.SetFontAsync("12px Segoe UI");
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
             await ctx.SetFillStyleAsync("Black");
             await ctx.FillTextAsync(Tag, LeftX() + 2, TopY() + 3);
+            await ctx.RestoreAsync();
         }
     }
 
