@@ -283,7 +283,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-
     public void ResetPanZoom()
     {
         PanZoomWindow().SizeToFit();
@@ -345,8 +344,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }, true);
 
 
-
-
         // https://coastalcreative.com/standard-paper-sizes/
         EstablishMenu<FoMenu2D>("Page Size", new Dictionary<string, Action>()
         {
@@ -360,8 +357,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }, true)
         .ToggleLayout().MoveTo(0, 80);
 
-        //EdgeSimulation = new MoSimulation("TVA Edge", PageManager, this, DialogService!);
-        //EstablishMenu<FoMenu2D>("Simulation", EdgeSimulation.MenuItems(js), true);
 
         PageManager.SetPageSizeInches(34, 44);
         //PanZoomService.SetZoom(0.5);
@@ -369,38 +364,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //PageManager.SetPageLandscape();
         //ResetPanZoom();
         //PanZoomWindow().IsVisible = false;
-
-        // var plan = "ProcessPlan";
-        // ProcessPlan = new DTARSolution(DTARRestService, this, null);
-        // EstablishMenu<FoMenu2D>(plan, ProcessPlan.ProcessMenuItems(plan, js), true);
-
-        // var treeName = "Documents";
-        // DocumentTree = new DTARSolution(DTARRestService, this, null);
-        // EstablishMenu<FoMenu2D>(treeName, DocumentTree.DocumentMenuItems(treeName, js), true);
-
-        // var RefreshMenus = (string url) =>
-        // {
-        //     DTARRestService.SetServerUrl(url);
-        //     EstablishMenu<FoMenu2D>(plan, DocumentTree.DocumentMenuItems(treeName, js), true);
-        //     EstablishMenu<FoMenu2D>(treeName, DocumentTree.DocumentMenuItems(treeName, js), true);
-        //     CreateCommands(js, nav);
-        // };
-
-        // EstablishMenu<FoMenu2D>("DTAR Server", new Dictionary<string, Action>()
-        // {
-        //     { "localhost:5001", () => RefreshMenus("https://localhost:5001")},
-        //     { "rondtar", () => RefreshMenus("https://rondtar.azurewebsites.net/")},
-        //     { "dtarwebdev", () => RefreshMenus("https://dtarwebdev.azurewebsites.net/")},
-        // }, true);
-
-
-        // var BoidCount = 10;
-        // BoidSimulation = new BoidField(Command, PageManager);
-        // BoidSimulation.CreateBoids(BoidCount, BoidField.RandomColor());
-        // EstablishMenu<FoMenu2D>("Boid", BoidSimulation.MenuItems(),true)
-        //     .LayoutVertical(100, 40).MoveTo(120, 80);
-
-
     }
 
 
@@ -427,7 +390,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public async Task RenderDrawing(Canvas2DContext ctx, int tick, double fps)
     {
-        //BoidSimulation?.Advance();
+
         //skip this frame is still working 
         if ( IsCurrentlyProcessing ) return;
 
