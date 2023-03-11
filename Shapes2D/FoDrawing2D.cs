@@ -58,12 +58,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
-
-    private FoPanZoomWindow? _panZoomWindow { get; set; }
-
     private IPageManagement PageManager { get; set; }
     private IScaledDrawingHelpers ScaleDrawing { get; set; }
     private IHitTestService HitTestService { get; set; }
+    private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
     private ISelectionService SelectionService { get; set; }
 
@@ -74,8 +72,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-    private readonly Dictionary<InteractionStyle, IBaseInteraction> interactionLookup;
-    private InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
+    protected readonly Dictionary<InteractionStyle, IBaseInteraction> interactionLookup;
+    protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
     private IBaseInteraction? lastInteraction;
 
 
@@ -164,6 +162,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
+    public void AddInteraction(InteractionStyle style, BaseInteraction interaction)
+    {
+        interactionLookup.Add(style, interaction);
+
+        $"SetInteraction {interactionStyle}".WriteLine(ConsoleColor.Green);
+    }
     public void SetInteraction(InteractionStyle style)
     {
         if (interactionStyle == style) return;
@@ -296,16 +300,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public FoPanZoomWindow PanZoomWindow()
     {
-        if (_panZoomWindow == null)
+        if (PanZoomShape == null)
         {
-            _panZoomWindow = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
-            _panZoomWindow.SizeToFit();
+            PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
+            PanZoomShape.SizeToFit();
 
             var page = PageManager.CurrentPage();
             var pt = InchesToPixelsInset(page.PageWidth / 2, 3.0);
-            _panZoomWindow.MoveTo(pt.X, pt.Y);
+            PanZoomShape.MoveTo(pt.X, pt.Y);
         }
-        return _panZoomWindow;
+        return PanZoomShape;
     }
 
     public void TogglePanZoomWindow()
@@ -633,7 +637,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PanZoomService.PanBy(dx, dy);
         UserWindowMovedTo(PanZoomService.Pan());
 
-        _panZoomWindow?.Smash(false);  //Anit scale and move
+        PanZoomShape?.Smash(false);  //Anit scale and move
         return true;
     }
 

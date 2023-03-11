@@ -17,6 +17,8 @@ public enum InteractionStyle
     ShapeResizing,
     ShapeCreating,
     ShapeConnecting,
+    ModelLinking,
+    UserExtension,
 }
 
 public interface IBaseInteraction
