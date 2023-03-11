@@ -22,6 +22,8 @@ public interface IDrawing : IRender
     Point InchesToPixelsInset(double width, double height);
     int ToPixels(double width);
     double ToInches(int value);
+
+    Rectangle TransformRect(Rectangle rect);
     void CreateMenus(IJSRuntime js, NavigationManager nav);
 
 
@@ -196,6 +198,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public double ToInches(int value)
     {
         return ScaleDrawing.ToInches(value);
+    }
+    public Rectangle TransformRect(Rectangle rect)
+    {
+        return PanZoomService.TransformRect(rect);
     }
 
     public void SetCanvasSize(int width, int height)
@@ -402,7 +408,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var page = PageManager.CurrentPage();
 
         page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
-
 
         await ScaleDrawing.ClearCanvas(ctx);
 

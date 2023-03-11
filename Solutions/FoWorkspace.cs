@@ -1,3 +1,4 @@
+using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -31,15 +32,18 @@ public interface IWorkspace: IWorkPiece
 
     FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
 
-    FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
+    T EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
-    List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
-    FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece;
+    //List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
+    T EstablishWorkPiece<T>() where T : FoWorkPiece;
 
-   Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
+    Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
     void PreRender(int tick);
     void PostRender(int tick);
+
+    Task RenderWatermark(Canvas2DContext ctx, int tick);
+
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -91,12 +95,15 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
-
     }
 
     public virtual void PostRender(int tick)
     {
+    }
 
+    public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
+    {
+        await Task.CompletedTask;
     }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
@@ -142,7 +149,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return Members<FoWorkPiece>();
     }
 
-    public FoWorkPiece EstablishWorkPiece<T>() where T : FoWorkPiece
+    public T EstablishWorkPiece<T>() where T : FoWorkPiece
     {
         var piece = Activator.CreateInstance(typeof(T), this, Dialog, JsRuntime) as T;
         AddWorkPiece(piece!);
@@ -164,10 +171,10 @@ public class FoWorkspace : FoComponent, IWorkspace
         return list;
     }
 
-    public FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
+    public T EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
     {
         var result = ActiveDrawing?.EstablishMenu<T>(name, menu, clear);
-        return result!;
+        return (result as T)!;
     }
 
     public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)

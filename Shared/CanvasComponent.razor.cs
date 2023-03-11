@@ -97,6 +97,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
         await Ctx.SaveAsync();
 
         await drawing.RenderDrawing(Ctx, tick, fps);
+        Workspace?.RenderWatermark(Ctx, tick);
         
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();

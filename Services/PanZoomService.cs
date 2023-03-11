@@ -148,8 +148,9 @@ public class PanZoomService : IPanZoomService
 
     public Rectangle TransformRect(Rectangle rect)
     {
-        var pt1 = GetMatrix().TransformPoint(rect.Left, rect.Top);
-        var pt2 = GetMatrix().TransformPoint(rect.Right, rect.Bottom);
+        var matrix = GetMatrix();
+        var pt1 = matrix.TransformPoint(rect.Left, rect.Top);
+        var pt2 = matrix.TransformPoint(rect.Right, rect.Bottom);
 
         var newRect = new Rectangle(pt1.X, pt1.Y, pt2.X-pt1.X, pt2.Y-pt1.Y);
 
