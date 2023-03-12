@@ -130,7 +130,8 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         var page = CurrentPage();
         var items = page.GetMembers<FoMenu2D>();
-        list.AddRange(items);
+        if ( items != null)
+            list.AddRange(items);
         return list;
     }   
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)

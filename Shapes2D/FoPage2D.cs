@@ -71,7 +71,7 @@ public class FoPage2D : FoGlyph2D
         
         if (deep)
         {
-            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<T>(list, deep));
+            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
         }
         return list;
     }
@@ -83,7 +83,7 @@ public class FoPage2D : FoGlyph2D
 
         if (deep)
         {
-            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<T>(list, deep));
+            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
         }
         return list;
     }
@@ -137,7 +137,6 @@ public class FoPage2D : FoGlyph2D
         }
 
         return value;
-
     }
 
 

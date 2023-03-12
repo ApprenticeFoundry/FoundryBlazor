@@ -348,13 +348,24 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
+        var openNew = async () =>
+        {
+            var target = nav!.ToAbsoluteUri("/");
+            try
+            {
+                await js.InvokeAsync<object>("open", target); //, "_blank", "height=600,width=1200");
+            }
+            catch { }
+        };
+
         EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
+            { "New Window", () => openNew()},
             { "Clear", () => PageManager?.ClearAll()},
             { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-            //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-            //{ "Save", () => Command?.Save()},
-            //{ "Restore", () => Command?.Restore()},
+            // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
+            // { "Save", () => Command?.Save()},
+            // { "Restore", () => Command?.Restore()},
             { "Pan Zoom", () => TogglePanZoomWindow()},
         }, true);
 

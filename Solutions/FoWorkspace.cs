@@ -24,6 +24,13 @@ public interface IWorkspace: IWorkPiece
     Task InitializedAsync(string defaultHubURI);
     IDrawing? GetDrawing();
     IArena? GetArena();
+    D2D_UserToast GetUserToast();
+    D2D_UserToast SendToast(D2D_UserToast toast);
+    D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
+    D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D;
+    D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D;
+    D2D_Create SendShapeCreate<T>(T? shape) where T : FoGlyph2D;
+
     string GetPanID();
     ViewStyle GetViewStyle();
     void SetViewStyle(ViewStyle style);
@@ -34,7 +41,6 @@ public interface IWorkspace: IWorkPiece
 
     T EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
-    //List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
     T EstablishWorkPiece<T>() where T : FoWorkPiece;
 
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
@@ -101,6 +107,11 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
     }
 
+    public D2D_UserToast GetUserToast()
+    {
+        return UserToast;
+    }
+
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
         await Task.CompletedTask;
@@ -118,6 +129,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         if (!Command.HasHub())
         {
             EstablishDrawingSyncHub(defaultHubURI);
+            Command.StartHub();
+            $"Starting SignalR Hub:{defaultHubURI}".WriteWarning();
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
@@ -368,14 +381,29 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
-    protected D2D_UserToast SendToast(D2D_UserToast toast)
+    public D2D_UserToast SendToast(D2D_UserToast toast)
     {
         Toast?.RenderToast(toast);
         SendSyncMessage(toast);
         return toast;
     }
 
-    protected void SendShapeDestroy<T>(T shape) where T : FoGlyph2D
+    public D2D_Create SendShapeCreate<T>(T? shape) where T : FoGlyph2D
+    {
+        if ( shape == null) return null;
+        var create = new D2D_Create()
+        {
+            PanID = PanID,
+            TargetId = shape.GlyphId,
+            PayloadType = shape.GetType().Name
+        };
+        // $"Send___ D2D_Create {create.TargetId} {create.PayloadType} {create.PanID} Message".WriteLine(ConsoleColor.Yellow);
+
+        SendSyncMessage(create);
+        return create;
+    }
+
+    public D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D
     {
         var destroy = new D2D_Destroy()
         {
@@ -383,13 +411,14 @@ public class FoWorkspace : FoComponent, IWorkspace
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name
         };
-        // $"Send___ D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message".WriteLine(ConsoleColor.Yellow);
+        // $"Send___ D2D_Destroy {destroy.TargetId} {destroy.PayloadType} {destroy.PanID} Message".WriteLine(ConsoleColor.Yellow);
 
         SendSyncMessage(destroy);
+        return destroy;
     }
 
 
-    protected D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D
+    public D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D
     {
         var move = new D2D_Move()
         {
@@ -406,7 +435,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return move;
     }
 
-    protected D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive)
+    public D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive)
     {
         UserLocation ??= new D2D_UserMove();
         UserLocation.Active = isActive;

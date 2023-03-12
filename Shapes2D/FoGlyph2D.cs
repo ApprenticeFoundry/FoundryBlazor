@@ -573,14 +573,17 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.StrokeAsync();
     }
 
-    //public void AddToParent<T>(T parent) where T : FoGlyph2D
-    //{
-    //    parent.Add(this);
-    //}
+
+
+    public Action<Canvas2DContext, FoGlyph2D> DrawBox = async (ctx, obj) =>
+    {
+        await ctx.BeginPathAsync();
+        await ctx.StrokeRectAsync(0, 0, obj.Width, obj.Height);
+        await ctx.StrokeAsync();
+    };
 
     public Action<Canvas2DContext, FoGlyph2D> DrawRect = async (ctx, obj) =>
     {
-        //await ctx.FillRectAsync(obj.X, obj.Y, obj.Width, obj.Height);
         await ctx.FillRectAsync(0, 0, obj.Width, obj.Height);
     };
 

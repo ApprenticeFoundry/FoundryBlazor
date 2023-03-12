@@ -70,6 +70,7 @@ public class CommandService : ICommand
         {
             IsRunning = true;
             Task.Run(async () => await _DrawingSyncHub!.StartAsync());
+            $"StartHub {IsRunning}..".WriteNote();
         }
         return IsRunning;
     }
@@ -79,6 +80,7 @@ public class CommandService : ICommand
         {
             IsRunning = false;
             Task.Run(async () => await _DrawingSyncHub!.StopAsync());
+            $"StopHub {IsRunning}..".WriteNote();
         }
         return IsRunning;
     }
@@ -88,15 +90,14 @@ public class CommandService : ICommand
     {
         if (_DrawingSyncHub == null) return false;
 
-       // $"Sending {msg.Topic()}..".WriteLine(ConsoleColor.DarkMagenta);
+        $"Sending {IsRunning} {msg.Topic()}..".WriteNote();
 
         if (IsRunning)
             await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
-        //$"Sent {msg.Topic()}..".WriteLine(ConsoleColor.DarkMagenta);
-
         
-        return IsRunning;
+        $"Sent {IsRunning} {msg.Topic()}..".WriteNote();
 
+        return IsRunning;
     }
 
     public async ValueTask DisposeAsync()
