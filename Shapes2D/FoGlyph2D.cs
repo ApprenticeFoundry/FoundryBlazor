@@ -288,7 +288,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         if ( mtx != null)  //this should NEVER be the case unless cleared by another process
             await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
-        await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
+        //await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
 
         await ctx.SetFillStyleAsync(Color);
     }

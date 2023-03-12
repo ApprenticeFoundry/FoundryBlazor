@@ -24,14 +24,8 @@ public interface IWorkspace: IWorkPiece
     Task InitializedAsync(string defaultHubURI);
     IDrawing? GetDrawing();
     IArena? GetArena();
-    D2D_UserToast GetUserToast();
-    D2D_UserToast SendToast(D2D_UserToast toast);
-    D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
-    D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D;
-    D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D;
-    D2D_Create SendShapeCreate<T>(T? shape) where T : FoGlyph2D;
 
-    string GetPanID();
+    string GetUserID();
     ViewStyle GetViewStyle();
     void SetViewStyle(ViewStyle style);
     bool IsViewStyle2D();
@@ -55,12 +49,10 @@ public interface IWorkspace: IWorkPiece
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
-    protected string PanID { get; set; } = "";
+    protected string UserID { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
-    public D2D_UserToast UserToast = new();
-    public D2D_UserMove? UserLocation { get; set; }
 
     protected IDrawing? ActiveDrawing { get; init; }
     protected IArena? ActiveArena { get; init; }
@@ -96,9 +88,6 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
-
-
-
     }
 
     public virtual void PreRender(int tick)
@@ -109,10 +98,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
     }
 
-    public D2D_UserToast GetUserToast()
-    {
-        return UserToast;
-    }
+
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
@@ -133,12 +119,6 @@ public class FoWorkspace : FoComponent, IWorkspace
             EstablishDrawingSyncHub(defaultHubURI);
             Command.StartHub();
             $"Starting SignalR Hub:{defaultHubURI}".WriteWarning();
-
-            PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
-            {
-                if (args.Topic.Matches("ON_MOUSE_MOVE"))
-                    SendUserMove(args, true);
-            });
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
@@ -149,14 +129,14 @@ public class FoWorkspace : FoComponent, IWorkspace
         viewStyle = e;
     }
 
-    public string GetPanID()
+    public string GetUserID()
     {
-        if ( string.IsNullOrEmpty(PanID))
+        if ( string.IsNullOrEmpty(UserID))
         {
             var data = new MockDataMaker();
-            PanID = data.GenerateName();
+            UserID = data.GenerateName();
         }
-        return PanID;
+        return UserID;
     }
 
     public IDrawing? GetDrawing()
@@ -205,11 +185,24 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
+        var OpenNew = async () =>
+        {
+            var target = nav!.ToAbsoluteUri("/");
+            try
+            {
+                await js.InvokeAsync<object>("open", target); //, "_blank", "height=600,width=1200");
+            }
+            catch { }
+        };
+
         EstablishMenu<FoMenu2D>("View", new Dictionary<string, Action>()
         {
+            { "New Window", () => OpenNew()},
             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
             { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
+            // { "Save", () => Command?.Save()},
+            // { "Restore", () => Command?.Restore()},
         }, true);
 
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
@@ -323,7 +316,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, PanID);
+        Command.SetHub(hub, UserID, Toast);
 
         hub.Closed += async (error) =>
        {
@@ -344,121 +337,13 @@ public class FoWorkspace : FoComponent, IWorkspace
             await Task.Delay(rand.Next(0, 5) * 1000);
         };
 
-
-
-        hub.On<D2D_Move>("Move", (move) =>
-        {
-            if (move.PayloadType.Matches("Boid"))
-            {
-                // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-                //BoidSimulation?.DoMovement(move);
-                return;
-            }
-            Command?.Move(move);
-        });
-
-        hub.On<D2D_Destroy>("Destroy", (destroy) =>
-        {
-
-            if (destroy.PayloadType.Matches("Boid"))
-            {
-                // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-                // BoidSimulation?.DoDestroy(destroy);
-                return;
-            }
-
-            Command?.Destroy(destroy);
-
-        });
-
-        hub.On<D2D_UserMove>("UserMove", (usermove) =>
-        {
-            var MyUser = GetDrawing()?.UpdateOtherUsers(usermove,Toast);
-        });
-
-        hub.On<D2D_UserToast>("UserToast", (usertoast) =>
-        {
-            Toast?.RenderToast(usertoast);
-        });
+ 
 
         return hub;
     }
 
 
-    public D2D_UserToast SendToast(D2D_UserToast toast)
-    {
-        Toast?.RenderToast(toast);
-        SendSyncMessage(toast);
-        return toast;
-    }
 
-    public D2D_Create SendShapeCreate<T>(T? shape) where T : FoGlyph2D
-    {
-        if ( shape == null) return null;
-        var create = new D2D_Create()
-        {
-            TargetId = shape.GlyphId,
-            Payload = StorageHelpers.Dehydrate<T>(shape, false),
-            PayloadType = shape.GetType().Name
-        };
-        // $"Send___ D2D_Create {create.TargetId} {create.PayloadType} {create.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(create);
-        return create;
-    }
-
-    public D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D
-    {
-        var destroy = new D2D_Destroy()
-        {
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name
-        };
-        // $"Send___ D2D_Destroy {destroy.TargetId} {destroy.PayloadType} {destroy.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(destroy);
-        return destroy;
-    }
-
-
-    public D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D
-    {
-        var move = new D2D_Move()
-        {
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name,
-            PinX = shape.PinX,
-            PinY = shape.PinY,
-            Angle = shape.Angle
-        };
-        // $"Send___ D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(move);
-        return move;
-    }
-
-    public D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive)
-    {
-        UserLocation ??= new D2D_UserMove();
-        UserLocation.Active = isActive;
-        UserLocation.X = args.OffsetX;
-        UserLocation.Y = args.OffsetY;
-
-        //$"Send___ D2D_UserMove  Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(UserLocation);
-        return UserLocation;
-    }
-
-    protected D2D_Base SendSyncMessage(D2D_Base msg)
-    {
-        Task.Run(async () =>
-        {
-            msg.PanID = GetPanID();
-            await Command.Send(msg);
-        });
-        return msg;
-    }
 
     public List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {

@@ -49,7 +49,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
             await CanvasHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSize(CanvasWidth, CanvasHeight);
-            drawing?.SetPanID(Workspace.GetPanID());
+            drawing?.SetPanID(Workspace.GetUserID());
 
             PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
         }
