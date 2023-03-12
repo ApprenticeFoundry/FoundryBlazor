@@ -55,13 +55,12 @@ public interface IWorkspace: IWorkPiece
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
-    public string PanID { get; set; } = "";
+    protected string PanID { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
     public D2D_UserToast UserToast = new();
     public D2D_UserMove? UserLocation { get; set; }
-    public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
 
     protected IDrawing? ActiveDrawing { get; init; }
     protected IArena? ActiveArena { get; init; }
@@ -97,6 +96,9 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
+
+
+
     }
 
     public virtual void PreRender(int tick)
@@ -131,6 +133,12 @@ public class FoWorkspace : FoComponent, IWorkspace
             EstablishDrawingSyncHub(defaultHubURI);
             Command.StartHub();
             $"Starting SignalR Hub:{defaultHubURI}".WriteWarning();
+
+            PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
+            {
+                if (args.Topic.Matches("ON_MOUSE_MOVE"))
+                    SendUserMove(args, true);
+            });
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
@@ -143,6 +151,11 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public string GetPanID()
     {
+        if ( string.IsNullOrEmpty(PanID))
+        {
+            var data = new MockDataMaker();
+            PanID = data.GenerateName();
+        }
         return PanID;
     }
 
@@ -360,16 +373,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         hub.On<D2D_UserMove>("UserMove", (usermove) =>
         {
-            var key = usermove.PanID;
-            if (!OtherUserLocations.Remove(key))
-                if (usermove.Active)
-                    Toast?.Success($"{key} has joined");
-
-
-            if (usermove.Active)
-                OtherUserLocations.Add(key, usermove);
-            else
-                Toast?.Info($"{key} has left");
+            var MyUser = GetDrawing()?.UpdateOtherUsers(usermove,Toast);
         });
 
         hub.On<D2D_UserToast>("UserToast", (usertoast) =>
@@ -393,8 +397,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         if ( shape == null) return null;
         var create = new D2D_Create()
         {
-            PanID = PanID,
             TargetId = shape.GlyphId,
+            Payload = StorageHelpers.Dehydrate<T>(shape, false),
             PayloadType = shape.GetType().Name
         };
         // $"Send___ D2D_Create {create.TargetId} {create.PayloadType} {create.PanID} Message".WriteLine(ConsoleColor.Yellow);
@@ -407,7 +411,6 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var destroy = new D2D_Destroy()
         {
-            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name
         };
@@ -422,7 +425,6 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         var move = new D2D_Move()
         {
-            PanID = PanID,
             TargetId = shape.GlyphId,
             PayloadType = shape.GetType().Name,
             PinX = shape.PinX,
@@ -452,7 +454,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         Task.Run(async () =>
         {
-            msg.PanID = this.PanID;
+            msg.PanID = GetPanID();
             await Command.Send(msg);
         });
         return msg;

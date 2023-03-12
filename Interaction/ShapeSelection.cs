@@ -116,7 +116,7 @@ public class ShapeSelection : ShapeHovering
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
-        //SendUserMove(args, true);
+
 
         if (isFenceSelecting)
         {

@@ -6,6 +6,7 @@ using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
+using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -47,16 +48,17 @@ public interface IDrawing : IRender
     void ToggleHitTestDisplay();
     bool MovePanBy(int dx, int dy);
 
-
+    D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
+    void SetPanID(string panID);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-
+    private string PanID = "NO PanID";
     private InputStyle InputStyle = InputStyle.None;
-    public D2D_UserMove? UserLocation { get; set; }
-    public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
+    private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
+
 
     private IPageManagement PageManager { get; set; }
     private IScaledDrawingHelpers ScaleDrawing { get; set; }
@@ -189,6 +191,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return lastInteraction;
     }
 
+    public void SetPanID(string panID)
+    {
+        PanID = panID;
+    }
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         return PageManager.ExtractShapes(GlyphId);
@@ -468,7 +474,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
         await ctx.SetTextBaselineAsync(TextBaseline.Middle);
 
-        var PanID = "NO PANID";
         await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
         await ctx.SetFontAsync("26px Segoe UI");
         await ctx.FillTextAsync($"Foundry Canvas {PanID} {InputStyle}", offsetX, offsetY);
@@ -478,7 +483,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.FillTextAsync($"fps: {fps:0.00}", offsetX, offsetY + 25);
         await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
 
-        int loc = 50;
+        int loc = 150;
         OtherUserLocations.Values.ForEach(async user =>
         {
             loc += 15;
@@ -487,6 +492,22 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.FillTextAsync($"{user.PanID} is helping", 20 + offsetX, loc);
         });
 
+    }
+
+    public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
+    {
+        var key = usermove.PanID;
+        if (!OtherUserLocations.Remove(key))
+            if (usermove.Active)
+                toast?.Success($"{key} has joined");
+
+
+        if (usermove.Active)
+            OtherUserLocations.Add(key, usermove);
+        else
+            toast?.Info($"{key} has left");
+            
+        return usermove;
     }
 
     private async Task DrawUserWindow(Canvas2DContext ctx)
@@ -537,6 +558,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             if (args.Topic.Matches("ON_MOUSE_DOWN"))
                 SelectInteractionByRuleFor(args);
+
 
             var interact = GetInteraction();
 
