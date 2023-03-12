@@ -173,7 +173,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         interactionLookup.Add(style, interaction);
 
-        $"SetInteraction {interactionStyle}".WriteSuccess();
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
     public void SetInteraction(InteractionStyle style)
     {
@@ -182,7 +182,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         interactionStyle = style;
         lastInteraction = null;
 
-        $"SetInteraction {interactionStyle}".WriteSuccess();
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
 
     public IBaseInteraction GetInteraction()
@@ -518,11 +518,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
         {
-            $"{style} No Match".WriteError();
+           // $"{style} No Match".WriteError();
             return false;
         }
 
-        $"{style} Match".WriteSuccess();
+        //$"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
     }

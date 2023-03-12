@@ -22,8 +22,8 @@ public enum InputStyle { None, Drawing, FileDrop }
 public interface IWorkspace: IWorkPiece
 {
     Task InitializedAsync(string defaultHubURI);
-    IDrawing? GetDrawing();
-    IArena? GetArena();
+    IDrawing GetDrawing();
+    IArena GetArena();
 
     string GetUserID();
     ViewStyle GetViewStyle();
@@ -54,8 +54,8 @@ public class FoWorkspace : FoComponent, IWorkspace
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
 
-    protected IDrawing? ActiveDrawing { get; init; }
-    protected IArena? ActiveArena { get; init; }
+    protected IDrawing ActiveDrawing { get; init; }
+    protected IArena ActiveArena { get; init; }
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
 
@@ -139,12 +139,12 @@ public class FoWorkspace : FoComponent, IWorkspace
         return UserID;
     }
 
-    public IDrawing? GetDrawing()
+    public IDrawing GetDrawing()
     {
         return ActiveDrawing;
     }
 
-    public IArena? GetArena()
+    public IArena GetArena()
     {
         return ActiveArena;
     }
@@ -157,7 +157,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public T EstablishWorkPiece<T>() where T : FoWorkPiece
     {
-        var piece = Activator.CreateInstance(typeof(T), this, Dialog, JsRuntime) as T;
+        var piece = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime) as T;
         AddWorkPiece(piece!);
         return piece!;
     }

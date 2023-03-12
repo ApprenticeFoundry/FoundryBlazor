@@ -14,6 +14,9 @@ namespace FoundryBlazor.Shape;
 
 public interface ICommand
 {
+    IDrawing GetDrawing();
+    IArena GetArena();
+
     D2D_UserToast SendToast(ToastType type, string message);
     D2D_Base SendSyncMessage(D2D_Base msg);
     D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
@@ -45,20 +48,30 @@ public class CommandService : ICommand
     private string UserID { get; set; } = "NO User";
     private bool IsRunning = false;
     private HubConnection? _DrawingSyncHub;
-    private readonly IDrawing Drawing;
-    private readonly D2D_UserToast UserToast = new();
+    protected IDrawing ActiveDrawing { get; init; }
+    protected IArena ActiveArena { get; init; }
     private D2D_UserMove? UserLocation { get; set; }
     protected ComponentBus PubSub { get; set; }
 
     public CommandService(
         IDrawing drawing,
+        IArena arena,
         ComponentBus pubsub
         )
     {
-        Drawing = drawing;
+        ActiveDrawing = drawing;
+        ActiveArena = arena;
         PubSub = pubsub;
+    }
 
+    public IDrawing GetDrawing()
+    {
+        return ActiveDrawing;
+    }
 
+    public IArena GetArena()
+    {
+        return ActiveArena;
     }
 
     public bool HasHub()
@@ -73,7 +86,7 @@ public class CommandService : ICommand
     {
         if (_DrawingSyncHub != null)
         {
-             $"tried to Reset Hub of Pan {panid}  CommandService".WriteError();
+            $"tried to Reset Hub of Pan {panid}  CommandService".WriteError();
             return false;
         }
 
@@ -87,13 +100,13 @@ public class CommandService : ICommand
             SendSyncMessage(usertoast);
         });
 
-       hub.On<D2D_Create>("Create", (create) =>
-        {
-            "Received Create".WriteNote();
-            var newShape = Create(create);
-            if ( newShape != null)
-                Drawing?.AddShape<FoShape2D>((FoShape2D)newShape);
-        });
+        hub.On<D2D_Create>("Create", (create) =>
+         {
+             "Received Create".WriteNote();
+             var newShape = Create(create);
+             if (newShape != null)
+                 GetDrawing().AddShape<FoShape2D>((FoShape2D)newShape);
+         });
 
         hub.On<D2D_Move>("Move", (move) =>
         {
@@ -122,14 +135,14 @@ public class CommandService : ICommand
 
         hub.On<D2D_UserMove>("UserMove", (usermove) =>
         {
-            var MyUser = Drawing.UpdateOtherUsers(usermove,toast);
+            var MyUser = GetDrawing().UpdateOtherUsers(usermove, toast);
         });
 
         hub.On<D2D_UserToast>("UserToast", (usertoast) =>
         {
             toast.RenderToast(usertoast);
         });
-        
+
         return true;
     }
     public bool StartHub()
@@ -240,7 +253,7 @@ public class CommandService : ICommand
     }
     public async Task<bool> Send(D2D_Base msg)
     {
-        if ( _DrawingSyncHub == null || !IsRunning)
+        if (_DrawingSyncHub == null || !IsRunning)
             $"Command Service {IsRunning} {msg.Topic()}..  is NOT Sending".WriteNote();
 
         if (_DrawingSyncHub == null) return false;
@@ -249,7 +262,7 @@ public class CommandService : ICommand
 
         if (IsRunning)
             await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
-        
+
         //$"Sent {IsRunning} {msg.Topic()}..".WriteNote();
 
         return IsRunning;
@@ -304,11 +317,11 @@ public class CommandService : ICommand
 
     public FoPage2D CurrentPage()
     {
-        return Drawing.CurrentPage();
+        return GetDrawing().CurrentPage();
     }
     public IPageManagement Pages()
     {
-        return Drawing.Pages();
+        return GetDrawing().Pages();
     }
 
 
@@ -317,7 +330,7 @@ public class CommandService : ICommand
         var version = VersionInfo.Generate(null, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
-        model.PersistPage(Drawing.CurrentPage());
+        model.PersistPage(CurrentPage());
 
 
         var json = StorageHelpers.Dehydrate<ModelPersist>(model, false);
@@ -338,6 +351,6 @@ public class CommandService : ICommand
         //var json = SettingsHelpers.ReadData("storage", version.filename);
 
         var model = StorageHelpers.Hydrate<ModelPersist>(json, false);
-        model?.RestorePages(Drawing.Pages());
+        model?.RestorePages(Pages());
     }
 }
