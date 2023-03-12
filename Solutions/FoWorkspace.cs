@@ -316,7 +316,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, UserID, Toast);
+        Command.SetHub(hub, GetUserID(), Toast);
 
         hub.Closed += async (error) =>
        {

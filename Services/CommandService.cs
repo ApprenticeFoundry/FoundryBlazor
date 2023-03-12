@@ -19,7 +19,7 @@ public interface ICommand
 
     D2D_UserToast SendToast(ToastType type, string message);
     D2D_Base SendSyncMessage(D2D_Base msg);
-    D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
+    //D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
     D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D;
     D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D;
     D2D_Create SendShapeCreate<T>(T shape) where T : FoGlyph2D;
@@ -82,15 +82,16 @@ public class CommandService : ICommand
     {
         return _DrawingSyncHub;
     }
-    public bool SetHub(HubConnection hub, string panid, IToast toast)
+    public bool SetHub(HubConnection hub, string userid, IToast toast)
     {
         if (_DrawingSyncHub != null)
         {
-            $"tried to Reset Hub of Pan {panid}  CommandService".WriteError();
+            $"tried to Reset Hub of Pan {userid}  CommandService".WriteError();
             return false;
         }
 
-        UserID = panid;
+        UserID = userid;
+        GetDrawing()?.SetUserID(UserID);
         _DrawingSyncHub = hub;
         $"SetHub of Pan {UserID} CommandService".WriteNote();
 
@@ -98,6 +99,16 @@ public class CommandService : ICommand
         {
             toast.RenderToast(usertoast);
             SendSyncMessage(usertoast);
+        });
+
+        PubSub.SubscribeTo<CanvasMouseArgs>(args =>
+        {
+            SendUserMove(args, true);;
+        });
+
+        PubSub.SubscribeTo<FoGlyph2D>(args =>
+        {
+            SendShapeMoved<FoGlyph2D>(args);
         });
 
         hub.On<D2D_Create>("Create", (create) =>

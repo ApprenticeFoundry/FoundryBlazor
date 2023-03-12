@@ -52,7 +52,7 @@ public class PageManagementService : FoComponent, IPageManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoPage2D _activePage { get; set; }
+    private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
     private readonly IScaledDrawingHelpers _ScaledDrawing;
@@ -66,14 +66,14 @@ public class PageManagementService : FoComponent, IPageManagement
         _selectService = sel;
         _ScaledDrawing = help;
 
-        _activePage = CurrentPage();
+        ActivePage = CurrentPage();
     }
 
 
 
     public int PageCount()
     {
-        return 1;
+        return Members<FoPage2D>().Count;
     }
 
 
@@ -163,7 +163,7 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public T? AddShape<T>(T value) where T : FoGlyph2D
     {
-        var found = _activePage.AddShape(value);
+        var found = ActivePage.AddShape(value);
         if ( found != null)
             _hitTestService.Insert(value);
 
@@ -173,7 +173,7 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public FoPage2D CurrentPage()
     {
-        if (_activePage == null)
+        if (ActivePage == null)
         {
             var found = Members<FoPage2D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
@@ -182,18 +182,18 @@ public class PageManagementService : FoComponent, IPageManagement
                 found.SetScaledDrawing(_ScaledDrawing);
                 AddPage(found);
             }
-            _activePage = found;
-            _activePage.IsActive = true;
+            ActivePage = found;
+            ActivePage.IsActive = true;
         }
 
-        return _activePage;
+        return ActivePage;
     }
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
-        _activePage = page;
+        ActivePage = page;
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
-        _activePage.IsActive = true;
-        return _activePage!;
+        ActivePage.IsActive = true;
+        return ActivePage!;
     }
 
     public FoPage2D AddPage(FoPage2D page)

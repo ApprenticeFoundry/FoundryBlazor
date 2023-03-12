@@ -49,12 +49,12 @@ public interface IDrawing : IRender
     bool MovePanBy(int dx, int dy);
 
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
-    void SetPanID(string panID);
+    void SetUserID(string panID);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-    private string PanID = "NO PanID";
+    private string UserID = "";
     private InputStyle InputStyle = InputStyle.None;
     private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
@@ -140,7 +140,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
-
         PubSub = pubSub;
 
 
@@ -191,9 +190,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return lastInteraction;
     }
 
-    public void SetPanID(string panID)
+    public void SetUserID(string panID)
     {
-        PanID = panID;
+        UserID = panID;
     }
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
@@ -449,7 +448,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
         await ctx.SetFontAsync("26px Segoe UI");
-        await ctx.FillTextAsync($"Foundry Canvas {PanID} {InputStyle}", offsetX, offsetY);
+        await ctx.FillTextAsync($"Foundry Canvas {UserID} {InputStyle}", offsetX, offsetY);
 
         await ctx.SetFontAsync("18px consolas");
         //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
@@ -680,13 +679,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool MoveSelectionsBy(int dx, int dy)
     {
         PageManager.SelectionsMoveBy(dx, dy);
-        //PageManager.Selections().ForEach(shape => SendShapeMoved(shape));
+        PageManager.Selections().ForEach(shape => PubSub.Publish<FoGlyph2D>(shape));
         return true;
     }
     public bool RotateSelectionsBy(int angle)
     {
         PageManager.SelectionsRotateBy(angle);
-        //PageManager.Selections().ForEach(shape => SendShapeMoved(shape));
+        PageManager.Selections().ForEach(shape => PubSub.Publish<FoGlyph2D>(shape));
         return true;
     }
 
