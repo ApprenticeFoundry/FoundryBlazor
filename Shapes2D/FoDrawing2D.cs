@@ -6,6 +6,7 @@ using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
+using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -47,16 +48,17 @@ public interface IDrawing : IRender
     void ToggleHitTestDisplay();
     bool MovePanBy(int dx, int dy);
 
-
+    D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
+    void SetPanID(string panID);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-
+    private string PanID = "NO PanID";
     private InputStyle InputStyle = InputStyle.None;
-    public D2D_UserMove? UserLocation { get; set; }
-    public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
+    private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
+
 
     private IPageManagement PageManager { get; set; }
     private IScaledDrawingHelpers ScaleDrawing { get; set; }
@@ -171,7 +173,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         interactionLookup.Add(style, interaction);
 
-        $"SetInteraction {interactionStyle}".WriteLine(ConsoleColor.Green);
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
     public void SetInteraction(InteractionStyle style)
     {
@@ -180,7 +182,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         interactionStyle = style;
         lastInteraction = null;
 
-        $"SetInteraction {interactionStyle}".WriteLine(ConsoleColor.Green);
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
 
     public IBaseInteraction GetInteraction()
@@ -189,6 +191,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return lastInteraction;
     }
 
+    public void SetPanID(string panID)
+    {
+        PanID = panID;
+    }
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         return PageManager.ExtractShapes(GlyphId);
@@ -348,13 +354,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
+
+
         EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
+
             { "Clear", () => PageManager?.ClearAll()},
             { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-            //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-            //{ "Save", () => Command?.Save()},
-            //{ "Restore", () => Command?.Restore()},
+            // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
+            // { "Save", () => Command?.Save()},
+            // { "Restore", () => Command?.Restore()},
             { "Pan Zoom", () => TogglePanZoomWindow()},
         }, true);
 
@@ -432,32 +441,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await GetInteraction().RenderDrawing(ctx, tick);
 
 
-        //this is the mouse 
-        OtherUserLocations.Values.ForEach(async user =>
-        {
-            await ctx.SetStrokeStyleAsync("#FFFFFF");
-            await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(user.X, user.Y);
-            await ctx.LineToAsync(user.X + 20, user.Y + 15);
-            await ctx.LineToAsync(user.X, user.Y + 20);
-            await ctx.LineToAsync(user.X, user.Y);
-            await ctx.ClosePathAsync();
-            await ctx.FillAsync();
-
-            await ctx.SetStrokeStyleAsync("#000000");
-            await ctx.SetFontAsync("16px Segoe UI");
-            await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
-            await ctx.SetTextBaselineAsync(TextBaseline.Top);
-            await ctx.FillTextAsync(user.PanID, user.X + 5, user.Y + 20);
-        });
-
         var offsetY = 60;
         var offsetX = 1400;
 
         await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
         await ctx.SetTextBaselineAsync(TextBaseline.Middle);
 
-        var PanID = "NO PANID";
         await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
         await ctx.SetFontAsync("26px Segoe UI");
         await ctx.FillTextAsync($"Foundry Canvas {PanID} {InputStyle}", offsetX, offsetY);
@@ -467,15 +456,52 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.FillTextAsync($"fps: {fps:0.00}", offsetX, offsetY + 25);
         await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
 
-        int loc = 50;
+        int loc = 130;
+
+        await ctx.SetTextBaselineAsync(TextBaseline.Top);
         OtherUserLocations.Values.ForEach(async user =>
         {
             loc += 15;
-            await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
-            await ctx.SetTextBaselineAsync(TextBaseline.Top);
             await ctx.FillTextAsync($"{user.PanID} is helping", 20 + offsetX, loc);
+
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(user.X, user.Y);
+            await ctx.LineToAsync(user.X + 20, user.Y + 15);
+            await ctx.LineToAsync(user.X, user.Y + 20);
+            await ctx.LineToAsync(user.X, user.Y);
+            await ctx.ClosePathAsync();
+            await ctx.FillAsync();
+
+            await ctx.FillTextAsync(user.PanID, user.X + 5, user.Y + 20);
         });
 
+
+    }
+
+    public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
+    {
+        var key = usermove.PanID;
+
+        if (IsCurrentlyRendering)
+        {
+            var found = OtherUserLocations[key];
+            found.Active = usermove.Active;
+            found.X = usermove.X;
+            found.Y = usermove.Y;
+            return found;
+        }
+
+        if (!OtherUserLocations.Remove(key))
+            if (usermove.Active)
+                toast?.Success($"{key} has joined");
+
+
+        if (usermove.Active)
+            OtherUserLocations.Add(key, usermove);
+        else
+            toast?.Info($"{key} has left");
+            
+        return usermove;
     }
 
     private async Task DrawUserWindow(Canvas2DContext ctx)
@@ -492,11 +518,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
         {
-            $"{style} No Match".WriteLine(ConsoleColor.Red);
+           // $"{style} No Match".WriteError();
             return false;
         }
 
-        $"{style} Match".WriteLine(ConsoleColor.Green);
+        //$"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
     }
@@ -508,6 +534,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (TestRule(InteractionStyle.ModelLinking, args)) return;
 
         if (TestRule(InteractionStyle.ShapeConnecting, args)) return;
+
+        if (TestRule(InteractionStyle.ShapeResizing, args)) return;
 
         if (TestRule(InteractionStyle.ShapeDragging, args)) return;
 
@@ -524,6 +552,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             if (args.Topic.Matches("ON_MOUSE_DOWN"))
                 SelectInteractionByRuleFor(args);
+
 
             var interact = GetInteraction();
 

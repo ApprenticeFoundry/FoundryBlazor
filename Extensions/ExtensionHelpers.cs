@@ -11,9 +11,6 @@ namespace FoundryBlazor.Extensions;
 public static class ExtensionHelpers
 {
 
-
-
-
     public static async Task<string> ReadAsStringAsync(this IFormFile file)
     {
         var result = new StringBuilder();

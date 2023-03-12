@@ -16,12 +16,14 @@ public interface IWorkPiece
 public class FoWorkPiece: FoComponent, IWorkPiece
 {
     protected IWorkspace Workspace { get; set; }
+    protected ICommand Command { get; set; }
     protected DialogService Dialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
 
-    public FoWorkPiece(IWorkspace space, DialogService dialog, IJSRuntime js)
+    public FoWorkPiece(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js)
     {
         Workspace = space;
+        Command = command;
         Dialog = dialog;
         JsRuntime = js;
     }  

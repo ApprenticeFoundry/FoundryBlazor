@@ -35,6 +35,10 @@ public static class ConsoleHelpers
     {
         return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Cyan);
     }
+    public static string WriteNote(this string message, int pad = 0)
+    {
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.DarkMagenta);
+    }
 
     public static string WriteWarning(this string message, int pad = 0)
     {

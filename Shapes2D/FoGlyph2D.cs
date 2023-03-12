@@ -43,17 +43,6 @@ public interface IRender
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
 }
 
-public interface IShape1D
-{
-
-}
-
-public interface IShape2D
-{
-    
-}
-
-
 
 public class MeasuredText
 {
@@ -299,7 +288,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         if ( mtx != null)  //this should NEVER be the case unless cleared by another process
             await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
 
-        await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
+        //await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
 
         await ctx.SetFillStyleAsync(Color);
     }
@@ -584,14 +573,17 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await ctx.StrokeAsync();
     }
 
-    //public void AddToParent<T>(T parent) where T : FoGlyph2D
-    //{
-    //    parent.Add(this);
-    //}
+
+
+    public Action<Canvas2DContext, FoGlyph2D> DrawBox = async (ctx, obj) =>
+    {
+        await ctx.BeginPathAsync();
+        await ctx.StrokeRectAsync(0, 0, obj.Width, obj.Height);
+        await ctx.StrokeAsync();
+    };
 
     public Action<Canvas2DContext, FoGlyph2D> DrawRect = async (ctx, obj) =>
     {
-        //await ctx.FillRectAsync(obj.X, obj.Y, obj.Width, obj.Height);
         await ctx.FillRectAsync(0, 0, obj.Width, obj.Height);
     };
 

@@ -47,7 +47,9 @@ public class CanvasComponentBase : ComponentBase, IDisposable
         {
             Ctx = await CanvasReference.CreateCanvas2DAsync();
             await CanvasHelperReference!.Initialize();
-            Workspace!.GetDrawing()?.SetCanvasSize(CanvasWidth, CanvasHeight);
+            var drawing = Workspace!.GetDrawing();
+            drawing?.SetCanvasSize(CanvasWidth, CanvasHeight);
+            drawing?.SetPanID(Workspace.GetUserID());
 
             PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
         }

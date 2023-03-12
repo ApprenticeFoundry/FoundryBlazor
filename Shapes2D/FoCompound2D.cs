@@ -169,9 +169,9 @@ public class FoCompound2D : FoGlyph2D, IShape2D
         if ( deep ) 
         {
             GetMembers<FoCompoundValue2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));  
-            // GetMembers<FoImage2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
-            // GetMembers<FoText2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
-            // GetMembers<FoButton2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));   
+            GetMembers<FoImage2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
+            GetMembers<FoText2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));    
+            GetMembers<FoButton2D>()?.ForEach( async item => await item.RenderDetailed(ctx, tick, deep));   
         }
         await ctx.RestoreAsync();
         return true;

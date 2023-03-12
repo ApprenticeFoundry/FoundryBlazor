@@ -57,8 +57,6 @@ public class FoComponent : FoBase, IFoComponent
         return Slots.ContainsKey(key);
     }
 
-
-
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
     {
         return Slots.FindSlot<T>();

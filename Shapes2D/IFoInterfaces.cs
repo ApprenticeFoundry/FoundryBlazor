@@ -16,3 +16,18 @@ public interface IFoCommand
 {
     List<IFoButton> Buttons();
 }
+
+
+public interface IShape1D
+{
+
+}
+
+public interface IShape2D
+{
+    
+}
+public interface IImage2D: IShape2D
+{
+    
+}
