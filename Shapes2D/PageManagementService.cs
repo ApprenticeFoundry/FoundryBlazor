@@ -122,22 +122,20 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
-        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectImages(list, deep));
         return list;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         var page = CurrentPage();
-        page.GetMembers<FoMenu2D>()?.ForEach(item =>
-        {
-            list.Add(item);
-        });
+        var items = page.GetMembers<FoMenu2D>();
+        list.AddRange(items);
         return list;
     }   
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
-        Slot<FoPage2D>().ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
+        Slot<FoPage2D>().ForEach(item => item.CollectVideos(list, deep));
         return list;
     }
 

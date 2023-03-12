@@ -2,7 +2,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoGroup2D : FoGlyph2D
+public class FoGroup2D : FoGlyph2D, IShape2D
 {
 
     public FoGroup2D() : base()

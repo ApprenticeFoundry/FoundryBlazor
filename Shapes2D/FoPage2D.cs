@@ -1,6 +1,7 @@
 ﻿
 using System.Drawing;
-using System.Xml.Linq;
+using System.Linq;
+
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 
@@ -61,6 +62,30 @@ public class FoPage2D : FoGlyph2D
     {
         _ScaledDrawing = scaledDrawing;
         scaledDrawing.SetPageDefaults(this);
+    }
+
+    public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        var members = Shapes2D.ValuesOfType<FoImage2D>();
+        list.AddRange(members);
+        
+        if (deep)
+        {
+            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<T>(list, deep));
+        }
+        return list;
+    }
+
+    public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    {
+        var members = Shapes2D.ValuesOfType<FoVideo2D>();
+        list.AddRange(members);
+
+        if (deep)
+        {
+            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<T>(list, deep));
+        }
+        return list;
     }
 
     public override List<T> CollectMembers<T>(List<T> list, bool deep = true)

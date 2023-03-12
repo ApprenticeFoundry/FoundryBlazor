@@ -13,17 +13,17 @@ public class FoCollection<T> where T : FoBase
     {
         Key = typeof(T).Name;
     }
-
-
     public List<string> Keys()
     {
         return this.members.Keys.ToList();
     }
-
-
     public List<T> Values()
     {
         return this.members.Values.ToList<T>();
+    }
+    public List<U> ValuesOfType<U>()
+    {
+        return this.members.Values.Where(item => item is U).Cast<U>().ToList();
     }
     public T? GetValue(string key)
     {
@@ -31,7 +31,6 @@ public class FoCollection<T> where T : FoBase
             return value;
         return null;
     }
-
     public bool TryGetValue(string key, out T? found)
     {
         found = null;
@@ -43,8 +42,7 @@ public class FoCollection<T> where T : FoBase
     {
         list.ForEach(item => Add(item));
         return list;
-    }
-    
+    } 
     public T Add(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
@@ -52,7 +50,6 @@ public class FoCollection<T> where T : FoBase
         }
         return this.Add(value.Name, value);
     }
-
     public T Add(string key, T value)
     {
         if (!TryGetValue(key, out T? found) || found == null)
@@ -61,7 +58,6 @@ public class FoCollection<T> where T : FoBase
         }
         return value;
     }
-
     public T Remove(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
@@ -78,7 +74,6 @@ public class FoCollection<T> where T : FoBase
         }
         return false;
     }
-
     public T Remove(string key, T value)
     {
         if (TryGetValue(key, out T? found) && found != null)
@@ -87,32 +82,27 @@ public class FoCollection<T> where T : FoBase
         }
         return value;
     }
-
     public List<T> ForEach(Action<T> applyClause)
     {
         var list = Values();
         list.ForEach(applyClause);
         return list;
     }
-
     public List<T> ExtractWhere(Func<T,bool> whereClause)
     {
         var extraction = FindWhere(whereClause);
         extraction.ForEach(item => this.members.Remove(item.Name));
         return extraction;
     }
-
     public List<T> FindWhere(Func<T,bool> whereClause)
     {
         var extraction = Values().Where(item => whereClause(item)).ToList();
         return extraction;
     }
-
     public void Clear()
     {
         members.Clear();
     }
-
     public FoCollection<T> Flush()
     {
         Clear();

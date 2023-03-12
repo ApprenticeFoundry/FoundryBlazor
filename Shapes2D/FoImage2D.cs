@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoImage2D : FoGlyph2D
+public class FoImage2D : FoGlyph2D, IImage2D
 {
     public static bool RefreshImages { get; set; } = true;
 
@@ -32,7 +32,11 @@ public class FoImage2D : FoGlyph2D
     public string ImageUrl 
     { 
         get { return this.imageUrl; } 
-        set { this.imageUrl = value; waitcount = 0; FoImage2D.RefreshImages = true; } 
+        set { 
+            this.imageUrl = value; 
+            waitcount = 0; 
+            FoImage2D.RefreshImages = true; 
+        } 
     }
 
     private ElementReference imageRef;

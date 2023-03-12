@@ -509,6 +509,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         if (TestRule(InteractionStyle.ShapeConnecting, args)) return;
 
+        if (TestRule(InteractionStyle.ShapeResizing, args)) return;
+
         if (TestRule(InteractionStyle.ShapeDragging, args)) return;
 
         TestRule(InteractionStyle.ShapeSelection, args);
