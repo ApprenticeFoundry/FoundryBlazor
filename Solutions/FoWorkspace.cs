@@ -200,10 +200,10 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "New Window", () => OpenNew()},
             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
-            { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
+            { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
+          //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
             { "Save", () => Command.Save()},
             { "Restore", () => Command.Restore()},
-            { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
         }, true);
 
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
