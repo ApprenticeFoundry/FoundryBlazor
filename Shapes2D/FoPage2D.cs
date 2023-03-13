@@ -19,7 +19,7 @@ public class FoPage2D : FoGlyph2D
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
-    protected FoCollection<FoGlyph2D> ShapesHidden = new();
+
 
     public override Rectangle Rect()
     {
@@ -40,9 +40,8 @@ public class FoPage2D : FoGlyph2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-    public List<FoGlyph2D> GetShapes1D() { return Shapes1D.Values(); }
-    public List<FoGlyph2D> GetShapes2D() { return Shapes2D.Values(); }
-    public List<FoGlyph2D> GetHiddenShapes() { return ShapesHidden.Values(); }   
+
+ 
 
     public int DrawingWidth()
     {
@@ -126,8 +125,9 @@ public class FoPage2D : FoGlyph2D
         return base.Smash(force);
     }
 
-    public T? AddShape<T>(T value) where T : FoGlyph2D
+    public T AddShape<T>(T value) where T : FoGlyph2D
     {
+        Slot<T>().Add(value);   
 
         if ( value is IShape2D)
         {
@@ -139,12 +139,7 @@ public class FoPage2D : FoGlyph2D
             Shapes1D.Add(value);
              $"Shapes1D Added {value.Name}".WriteSuccess();
         }
-        else
-        {
-            $"Shape no ShapesHidden {value.Name}".WriteError();
-            ShapesHidden.Add(value);
-            return null;
-        }
+
 
         return value;
     }
@@ -160,7 +155,6 @@ public class FoPage2D : FoGlyph2D
     {
         Shapes1D.Clear();
         Shapes2D.Clear();
-        ShapesHidden.Clear();
         return this;
     }
 

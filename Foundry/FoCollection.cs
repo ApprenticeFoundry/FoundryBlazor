@@ -13,6 +13,10 @@ public class FoCollection<T> where T : FoBase
     {
         Key = typeof(T).Name;
     }
+    public int Count()
+    {
+        return this.members.Keys.Count;
+    }
     public List<string> Keys()
     {
         return this.members.Keys.ToList();

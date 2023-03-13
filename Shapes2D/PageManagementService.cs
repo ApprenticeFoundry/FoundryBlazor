@@ -39,7 +39,7 @@ public interface IPageManagement: IRender
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
     void SelectionsZoomBy(double factor);
-    T? AddShape<T>(T value) where T : FoGlyph2D;
+    T AddShape<T>(T value) where T : FoGlyph2D;
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
@@ -156,7 +156,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public T? AddShape<T>(T value) where T : FoGlyph2D
+    public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var found = ActivePage.AddShape(value);
         if ( found != null)

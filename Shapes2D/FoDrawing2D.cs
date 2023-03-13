@@ -39,7 +39,7 @@ public interface IDrawing : IRender
 
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    V? AddShape<V>(V shape) where V : FoGlyph2D;
+    V AddShape<V>(V shape) where V : FoGlyph2D;
     FoPage2D CurrentPage();
     IPageManagement Pages();
     List<FoGlyph2D> ExtractShapes(string glyphId);
@@ -239,7 +239,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var page = PageManager.CurrentPage();
         return page;
     }
-    public V? AddShape<V>(V shape) where V : FoGlyph2D
+    public V AddShape<V>(V shape) where V : FoGlyph2D
     {
         return PageManager.AddShape<V>(shape);
     }

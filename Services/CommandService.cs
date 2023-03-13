@@ -382,14 +382,45 @@ public class CommandService : ICommand
         return GetDrawing().Pages();
     }
 
+    public static string LastSavedVersionNumber(string folder, string filename)
+    {
+        var root = filename.Split("_").First();
+
+        var files = Directory.GetFiles(folder);
+        var found = files.Where(item => Path.GetFileName(item).StartsWith(root))
+                         .OrderByDescending(item => Path.GetFileName(item))
+                         .FirstOrDefault();
+
+        if (found != null)
+        {
+            root = filename.Split("_")[1];
+            root = root.Split(".").First();
+            return root;
+        }
+        return "0000";
+    }
+
+    public static string? LastSavedFileVersion(string folder, string filename)
+    {
+        var root = filename.Split("_").First();
+        var ext = filename.Split(".").Last();
+        var files = Directory.GetFiles(folder);
+        var found = files.Where(item => Path.GetFileName(item).StartsWith(root) && Path.GetFileName(item).EndsWith(ext))
+                         .OrderByDescending(item => Path.GetFileName(item))
+                         .FirstOrDefault();
+
+        return found;
+    }
 
     public void Save()
     {
-        var version = VersionInfo.Generate(null, "model", "Model Drawing", "steve@gmail.com");
+        var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
+        $"lastVersion {lastVersion}".WriteNote();
+
+        var version = VersionInfo.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());
-
 
         var json = StorageHelpers.Dehydrate<ModelPersist>(model, false);
         StorageHelpers.WriteData("storage", version.Filename, json);
@@ -397,12 +428,14 @@ public class CommandService : ICommand
         var filename = version.Filename.Replace("json", "zip");
         var compress = json.Compress();
         StorageHelpers.WriteData("storage", filename, compress);
+        SendToast(ToastType.Success, $"{version.Filename} is Saved");
     }
 
-    public void Restore()
+    public bool Restore()
     {
-        var version = VersionInfo.Generate(null, "model", "Model Drawing", "steve@gmail.com");
-        var filename = version.Filename.Replace("json", "zip");
+        var version = LastSavedFileVersion("storage", "model_0000.json");
+        if ( version == null) return false;
+        var filename = version.Replace("json", "zip");
         var compress = StorageHelpers.ReadData("storage", filename);
         var json = compress.Decompress();
 
@@ -410,5 +443,8 @@ public class CommandService : ICommand
 
         var model = StorageHelpers.Hydrate<ModelPersist>(json, false);
         model?.RestorePages(Pages());
+         
+        SendToast(ToastType.Success, $"{filename} is Restored");
+        return true;
     }
 }

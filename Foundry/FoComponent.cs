@@ -34,10 +34,12 @@ public class SlotGroups: Dictionary<string, object>
 
 public class FoComponent : FoBase, IFoComponent
 {
+    public string ClassType { get; init; }
     private SlotGroups Slots { get; set; } = new();
 
     public FoComponent(string name = "") : base(name)
     {
+        ClassType = GetType().Name;
     }
 
     public virtual bool OpenEdit() { return false; }

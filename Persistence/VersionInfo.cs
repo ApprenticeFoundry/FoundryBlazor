@@ -96,9 +96,9 @@ public class VersionInfo // : FoBase
         return filename;
     }
 
-    public static VersionInfo Generate(VersionInfo? previous, string name, string title, string author)
+    public static VersionInfo Generate(string previous, string name, string title, string author)
     {
-        var version = IncrementVersion(previous != null ? previous.Version : "0000");
+        var version = IncrementVersion(!string.IsNullOrEmpty(previous) ? previous : "0000");
         var filename = CleanToFilename(name);
         var info = new VersionInfo
         {
