@@ -50,6 +50,7 @@ public interface IDrawing : IRender
 
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
     void SetUserID(string panID);
+    void ClearAll();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -223,6 +224,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         ScaleDrawing.SetCanvasSize(width, height);
     }
 
+    public void ClearAll()
+    {
+        FoGlyph2D.ResetHitTesting = true;
+        CurrentPage().ClearAll();
+    }
     public IPageManagement Pages()
     {
         return PageManager;
@@ -358,12 +364,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
 
-            { "Clear", () => PageManager?.ClearAll()},
+            { "Clear", () => ClearAll()},
             { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
             // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-            // { "Save", () => Command?.Save()},
-            // { "Restore", () => Command?.Restore()},
-            { "Pan Zoom", () => TogglePanZoomWindow()},
+
         }, true);
 
 
@@ -461,7 +465,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         OtherUserLocations.Values.ForEach(async user =>
         {
             loc += 15;
-            await ctx.FillTextAsync($"{user.PanID} is helping", 20 + offsetX, loc);
+            await ctx.FillTextAsync($"{user.UserID} is helping", 20 + offsetX, loc);
 
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(user.X, user.Y);
@@ -471,7 +475,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.ClosePathAsync();
             await ctx.FillAsync();
 
-            await ctx.FillTextAsync(user.PanID, user.X + 5, user.Y + 20);
+            await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
 
 
@@ -479,10 +483,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
     {
-        var key = usermove.PanID;
+        var key = usermove.UserID;
 
         if (IsCurrentlyRendering)
         {
+            if (!OtherUserLocations.ContainsKey(key)) return usermove;
+
             var found = OtherUserLocations[key];
             found.Active = usermove.Active;
             found.X = usermove.X;
@@ -727,7 +733,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {
                 PageManager.ExtractShapes(shape.GlyphId);
                 shape.UnglueAll();
-                //SendShapeDestroy(shape);
+                PubSub.Publish<D2D_Destroy>(new D2D_Destroy(shape));
             });
         });
         return true;

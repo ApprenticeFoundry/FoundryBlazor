@@ -195,14 +195,15 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        EstablishMenu<FoMenu2D>("View", new Dictionary<string, Action>()
+        EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
             { "New Window", () => OpenNew()},
             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
             { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-            // { "Save", () => Command?.Save()},
-            // { "Restore", () => Command?.Restore()},
+            { "Save", () => Command.Save()},
+            { "Restore", () => Command.Restore()},
+            { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
         }, true);
 
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));

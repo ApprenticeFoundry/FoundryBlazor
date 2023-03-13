@@ -131,6 +131,11 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         ShapeDraw = DrawRect;
     }
 
+    public string GetName()
+    {
+        return Name;
+    }
+    
     public Point ParentAttachTo(Point source)
     {
         if (Level > 0 && GetParent() is FoGlyph2D parent)

@@ -25,7 +25,6 @@ public interface IPageManagement: IRender
     void RefreshHitTesting(FoPanZoomWindow window);
     bool ToggleHitTestRender();
 
-    void ClearAll();
 
     int PageCount();
 
@@ -100,11 +99,7 @@ public class PageManagementService : FoComponent, IPageManagement
         _ScaledDrawing.SetPageDefaults(page);
         return page;
     }
-    public void ClearAll()
-    {
-        FoGlyph2D.ResetHitTesting = true;
-        CurrentPage().ClearAll();
-    }
+
 
     public bool ToggleHitTestRender()
     {

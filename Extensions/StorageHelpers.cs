@@ -65,6 +65,7 @@ public static class StorageHelpers
         return result.ToString();
     }
 
+
     public static T Hydrate<T>(this string target, bool includeFields) where T : class
     {
         using var stream = new MemoryStream();
