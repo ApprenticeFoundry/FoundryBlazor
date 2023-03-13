@@ -150,22 +150,20 @@ public static class StorageHelpers
         return stream;
     }
 
-    public static bool FileExist(string path)
-    {
-        var found = File.Exists(path);
+	public static void EstablishDirectory(string folder)
+	{
+		if (!Directory.Exists(folder))
+			Directory.CreateDirectory(folder);
+	}
+    public static bool PathExist(string filePath)
+	{
+		return Directory.Exists(filePath);
+	}
 
-        if (found)
-        {
-            $"exist {path}".WriteTrace();
-        }
-        else
-        {
-
-            $"DOES NOT exist {path}".WriteTrace();
-        }
-
-        return found;
-    }
+	public static bool FileExist(string filePath)
+	{
+		return File.Exists(filePath);
+	}
 
     public static string LocalPath(string directory, string filename)
     {
@@ -177,6 +175,7 @@ public static class StorageHelpers
     {
         string path = Directory.GetCurrentDirectory();
         string filePath = Path.Combine(path, directory, filename);
+   
         return filePath;
     }
 
@@ -185,7 +184,7 @@ public static class StorageHelpers
         try
         {
             $"WriteData local {folder.ToUpper()}: {filename}".WriteTrace();
-
+            EstablishDirectory(folder);
             string filePath = FullPath(folder, filename);
             File.WriteAllText(filePath, data);
             return data;
@@ -201,7 +200,7 @@ public static class StorageHelpers
         try
         {
             $"ReadData local {folder.ToUpper()}: {filename}".WriteTrace();
-
+            EstablishDirectory(folder);
             string filePath = FullPath(folder, filename);
             string data = File.ReadAllText(filePath);
             return data;

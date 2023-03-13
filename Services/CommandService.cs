@@ -37,7 +37,6 @@ public interface ICommand
     ValueTask DisposeAsync();
     bool IsConnected { get; }
 
-
     void Save();
     void Restore();
 }

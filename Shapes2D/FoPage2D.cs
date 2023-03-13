@@ -20,6 +20,7 @@ public class FoPage2D : FoGlyph2D
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
     protected FoCollection<FoGlyph2D> ShapesHidden = new();
+
     public override Rectangle Rect()
     {
         var pt = new Point(PinX, PinY);
@@ -27,7 +28,6 @@ public class FoPage2D : FoGlyph2D
         var result = new Rectangle(pt, sz);
         return result;
     }
-
 
 
     public FoPage2D(string name, string color) : base(name, color)
@@ -39,6 +39,10 @@ public class FoPage2D : FoGlyph2D
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
+
+    public List<FoGlyph2D> GetShapes1D() { return Shapes1D.Values(); }
+    public List<FoGlyph2D> GetShapes2D() { return Shapes2D.Values(); }
+    public List<FoGlyph2D> GetHiddenShapes() { return ShapesHidden.Values(); }   
 
     public int DrawingWidth()
     {
