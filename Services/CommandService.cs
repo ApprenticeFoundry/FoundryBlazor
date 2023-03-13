@@ -38,7 +38,7 @@ public interface ICommand
     bool IsConnected { get; }
 
     void Save();
-    void Restore();
+    bool Restore();
 }
 
 public class CommandService : ICommand
@@ -125,7 +125,6 @@ public class CommandService : ICommand
 
         hub.On<D2D_Create>("Create", (create) =>
          {
-             "Received Create".WriteNote();
             UpdateCreate(create);
          });
 
@@ -314,14 +313,14 @@ public class CommandService : ICommand
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
         var newShape = HydrateObject(create) as FoGlyph2D;
+        if ( newShape == null ) return false;
 
         $"newShape {newShape?.GetType().Name} {newShape?.Name}".WriteNote();
-        if (newShape != null)
-            GetDrawing().AddShape<FoGlyph2D>(newShape);
+        GetDrawing().AddShape<FoGlyph2D>(newShape);
 
        $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
 
-        return newShape != null;
+        return true;
     }
 
     public bool UpdateMove(D2D_Move move)
@@ -384,26 +383,26 @@ public class CommandService : ICommand
 
     public static string LastSavedVersionNumber(string folder, string filename)
     {
-        var root = filename.Split("_").First();
+        StorageHelpers.EstablishDirectory(folder);
 
-        var files = Directory.GetFiles(folder);
-        var found = files.Where(item => Path.GetFileName(item).StartsWith(root))
-                         .OrderByDescending(item => Path.GetFileName(item))
-                         .FirstOrDefault();
+        var found = LastSavedFileVersion(folder, filename);
 
         if (found != null)
         {
-            root = filename.Split("_")[1];
-            root = root.Split(".").First();
-            return root;
+            var version = found.Split("_").Last();
+            version = version.Split(".").First();
+            return version;
         }
         return "0000";
     }
 
     public static string? LastSavedFileVersion(string folder, string filename)
     {
+        StorageHelpers.EstablishDirectory(folder);
+
         var root = filename.Split("_").First();
         var ext = filename.Split(".").Last();
+
         var files = Directory.GetFiles(folder);
         var found = files.Where(item => Path.GetFileName(item).StartsWith(root) && Path.GetFileName(item).EndsWith(ext))
                          .OrderByDescending(item => Path.GetFileName(item))
