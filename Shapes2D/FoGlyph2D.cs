@@ -114,16 +114,18 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     //protected Matrix2D? _invGlobalMatrix;
     public FoGlyph2D() : base("")
     {
+         GlyphId = Guid.NewGuid().ToString();
         Color = "Green";
         ShapeDraw = DrawRect;
     }
     public FoGlyph2D(string name, string color) : base(name)
     {
+        GlyphId = Guid.NewGuid().ToString();
         Color = color;
         ShapeDraw = DrawRect;
     }
 
-    public FoGlyph2D(string name, int width, int height, string color) : base(name)
+    public FoGlyph2D(string name, int width, int height, string color) : this(color, name)
     {
         this.width = width;
         this.height = height;
@@ -135,6 +137,13 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         return Name;
     }
+    public string GetGlyphId()
+    {
+        if ( !string.IsNullOrEmpty(GlyphId))
+            GlyphId = Guid.NewGuid().ToString();
+        return GlyphId;
+    }
+
     
     public Point ParentAttachTo(Point source)
     {
