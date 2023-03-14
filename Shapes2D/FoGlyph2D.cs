@@ -59,13 +59,13 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
     public static bool ResetHitTesting { get; set; } = false;
-    public float Thickness { get; set; } = 1;
+    public float Thickness { get; set; }
     public bool IsSelected { get; set; } = false;
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
-    public string Tag { get; set; } = "";
+    public string? Tag { get; set; }
     public int Level { get; set; } = 0;
-    public string GlyphId { get; set; } = Guid.NewGuid().ToString();
+    public string GlyphId { get; set; }
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -110,11 +110,10 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
-    //protected Matrix2D? _globalMatrix;
-    //protected Matrix2D? _invGlobalMatrix;
+
     public FoGlyph2D() : base("")
     {
-         GlyphId = Guid.NewGuid().ToString();
+        GlyphId = "";
         Color = "Green";
         ShapeDraw = DrawRect;
     }
@@ -125,8 +124,9 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         ShapeDraw = DrawRect;
     }
 
-    public FoGlyph2D(string name, int width, int height, string color) : this(color, name)
+    public FoGlyph2D(string name, int width, int height, string color) : base(name)
     {
+        GlyphId = Guid.NewGuid().ToString();
         this.width = width;
         this.height = height;
         Color = color;

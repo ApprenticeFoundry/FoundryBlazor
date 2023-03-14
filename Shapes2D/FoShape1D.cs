@@ -10,11 +10,9 @@ public interface IGlueOwner
     void RemoveGlue(FoGlue2D glue);
     void RemoveGlue(string name);
     string GetName();
-
+    string GetGlyphId();
     bool Smash(bool force);
-    //void RecomputeGlue();
-    //public bool ComputeFinishFor(FoGlyph2D? target);
-    //public bool ComputeStartFor(FoGlyph2D? target);
+
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D

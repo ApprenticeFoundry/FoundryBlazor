@@ -15,8 +15,8 @@ public class D2D_Unglue : D2D_Base
     public D2D_Unglue(FoGlue2D glue)
     {
         var (source, target) = glue;
-        TargetId = target.GetName();
-        SourceId = source.GetName();
+        TargetId = target.GetGlyphId();
+        SourceId = source.GetGlyphId();
         PayloadType = glue.GetType().Name;
     }
 }

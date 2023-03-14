@@ -16,8 +16,8 @@ public class D2D_Glue : D2D_Base
     {
         var (source, target) = glue;
         Name = glue.Name;
-        TargetId = target.GetName();
-        SourceId = source.GetName();
+        TargetId = target.GetGlyphId();
+        SourceId = source.GetGlyphId();
         PayloadType = glue.GetType().Name;
     }
 }

@@ -312,8 +312,7 @@ public class CommandService : ICommand
     {
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
-        var newShape = HydrateObject(create) as FoGlyph2D;
-        if ( newShape == null ) return false;
+        if (HydrateObject(create) is not FoGlyph2D newShape) return false;
 
         $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
         GetDrawing().AddShape<FoGlyph2D>(newShape);
