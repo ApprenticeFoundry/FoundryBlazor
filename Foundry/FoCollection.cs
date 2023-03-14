@@ -1,13 +1,30 @@
 namespace FoundryBlazor;
 
-
+public interface IFoCollection
+{
+    int Count();
+    List<string> Keys();
+    List<U> ValuesOfType<U>();
+    bool AddObject(string key, object value);
+}
 
 [System.Serializable]
-public class FoCollection<T> where T : FoBase
+public class FoCollection<T>: IFoCollection where T : FoBase
 {
     public string Key { get; set; }
 
     private readonly Dictionary<string, T> members = new();
+
+    public bool AddObject(string key, object value)
+    {
+
+        if (!TryGetValue(key, out T? found) || found == null)
+        {
+            this.members.Add(key, (T)value);
+            return true;
+        }
+        return false;
+    }
 
     public FoCollection()
     {
@@ -112,6 +129,7 @@ public class FoCollection<T> where T : FoBase
         Clear();
         return this;
     }
+
 
 
 }

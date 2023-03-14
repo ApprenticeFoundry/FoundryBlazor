@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using System.Reflection;
+using static System.Reflection.Metadata.BlobBuilder;
+
 namespace FoundryBlazor;
 
 public interface IFoComponent
@@ -10,6 +14,18 @@ public interface IFoComponent
 
 public class SlotGroups: Dictionary<string, object>
 {
+    public IFoCollection EstablishSlotFor(Type TypeSpec)
+    {
+        var key = TypeSpec.Name;
+        if (ContainsKey(key) == false)
+        {
+            var type = typeof(FoCollection<>).MakeGenericType(TypeSpec);
+            var result = Activator.CreateInstance(type);
+            Add(key, result!);
+        }
+        return (this[key] as IFoCollection)!;
+    }
+
     public FoCollection<U> EstablishSlot<U>() where U: FoBase
     {
         var key = typeof(U).Name;
@@ -45,6 +61,12 @@ public class FoComponent : FoBase, IFoComponent
     public virtual bool OpenEdit() { return false; }
     public virtual bool OpenCreate() { return false; }
 
+
+    public virtual IFoCollection DynamicSlot(Type type)
+    {
+        var found = Slots.EstablishSlotFor(type);
+        return found;
+    }
 
 
     public virtual FoCollection<T> Slot<T>() where T : FoBase

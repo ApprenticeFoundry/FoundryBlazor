@@ -127,7 +127,7 @@ public class FoPage2D : FoGlyph2D
 
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
-        Slot<T>().Add(value);   
+        DynamicSlot(value.GetType()).AddObject(value.Name, value);
 
         if ( value is IShape2D)
         {

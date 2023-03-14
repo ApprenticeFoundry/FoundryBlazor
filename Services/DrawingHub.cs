@@ -51,6 +51,18 @@ public class DrawingSyncHub : Hub, IDrawingHub
     {
         await Clients.Others.SendAsync(message.Topic(), message);
     }
+    public async Task ModelCreate(D2D_ModelCreate message)
+    {
+        await Clients.Others.SendAsync(message.Topic(), message);
+    }
+    public async Task ModelUpdate(D2D_ModelUpdate message)
+    {
+        await Clients.Others.SendAsync(message.Topic(), message);
+    }
+    public async Task ModelDestroy(D2D_ModelDestroy message)
+    {
+        await Clients.Others.SendAsync(message.Topic(), message);
+    }
     public async Task UserMove(D2D_UserMove message)
     {
         await Clients.Others.SendAsync(message.Topic(), message);
