@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -65,7 +66,12 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public bool ShouldRender { get; set; } = true;
     public string? Tag { get; set; }
     public int Level { get; set; } = 0;
-    public string GlyphId { get; set; }
+
+    public string id; //use this to trap changes in GlyphId
+    public string GlyphId { 
+        get { return this.id; } 
+        set { this.id = value; } 
+    }
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -139,7 +145,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     }
     public string GetGlyphId()
     {
-        if ( !string.IsNullOrEmpty(GlyphId))
+        if ( string.IsNullOrEmpty(GlyphId))
             GlyphId = Guid.NewGuid().ToString();
         return GlyphId;
     }
