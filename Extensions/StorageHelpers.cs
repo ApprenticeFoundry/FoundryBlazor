@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -138,7 +139,30 @@ public static class StorageHelpers
         return result;
     }
 
+	public static object? HydrateObject(Assembly assembly, string payloadType, string payload) where SourceAssembly: class
+    {
+        
+		Type? type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == payloadType);
+        if ( type == null) return null;
 
+        var node = JsonNode.Parse(payload);
+        if ( node == null) return null;
+
+		using var stream = new MemoryStream();
+		using var writer = new Utf8JsonWriter(stream);
+		node.WriteTo(writer);
+		writer.Flush();
+
+		var options = new JsonSerializerOptions()
+		{
+			IncludeFields = true,
+			IgnoreReadOnlyFields = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+		};
+
+		var result = JsonSerializer.Deserialize(stream.ToArray(), type, options);
+		return result;
+	}
 
     public static Stream GenerateStream(this string s)
     {

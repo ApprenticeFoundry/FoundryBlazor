@@ -277,37 +277,7 @@ public class CommandService : ICommand
         _DrawingSyncHub = null;
     }
 
-	public static object? HydrateObject<SourceAssembly>(D2D_Create Source) where T: class
-    {
-        var Payload = Source.Payload;
-        var PayloadType = Source.PayloadType;
 
-        var assembly = typeof(SourceAssembly).Assembly;
-		//var nameSpace = assembly.GetName().Name;
-        
-		Type? type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == PayloadType);
-        if ( type == null) return null;
-
-        var node = JsonNode.Parse(Source.Payload);
-        if ( node == null) return null;
-
-		using var stream = new MemoryStream();
-		using var writer = new Utf8JsonWriter(stream);
-		node.WriteTo(writer);
-		writer.Flush();
-
-		var options = new JsonSerializerOptions()
-		{
-			IncludeFields = true,
-			IgnoreReadOnlyFields = true,
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-		};
-
-
-		var result = JsonSerializer.Deserialize(stream.ToArray(), type, options);
-
-		return result;
-	}
 
 
 
@@ -315,7 +285,9 @@ public class CommandService : ICommand
     {
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
-        if (HydrateObject(create) is not FoGlyph2D newShape) return false;
+        var assembly = typeof(FoGlyph2D).Assembly;
+        var result = StorageHelpers.HydrateObject(assembly, create.PayloadType, create.Payload);
+        if (result is not FoGlyph2D newShape) return false;
 
         $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
         GetDrawing().AddShape<FoGlyph2D>(newShape);
