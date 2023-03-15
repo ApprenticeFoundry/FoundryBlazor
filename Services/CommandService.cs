@@ -22,6 +22,7 @@ public interface ICommand
     IDrawing GetDrawing();
     IArena GetArena();
 
+    D2D_Base SendSyncMessage(D2D_Base msg);
     D2D_UserToast SendToast(ToastType type, string message);
     void SendShapeCreate(FoGlyph2D? shape);
     void SendGlue(FoGlue2D? glue);
