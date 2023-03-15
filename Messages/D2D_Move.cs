@@ -18,7 +18,7 @@ public class D2D_Move : D2D_Base
 
     public D2D_Move(FoGlyph2D glyph)
     {
-        TargetId = glyph.GlyphId;
+        TargetId = glyph.GetGlyphId();
         PayloadType = glyph.GetType().Name;
         PinX = glyph.PinX;
         PinY = glyph.PinY;

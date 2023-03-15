@@ -13,7 +13,7 @@ public class D2D_Destroy : D2D_Base
 
     public D2D_Destroy(FoGlyph2D glyph)
     {
-        TargetId = glyph.GlyphId;
+        TargetId = glyph.GetGlyphId();
         PayloadType = glyph.GetType().Name;
     }
 }

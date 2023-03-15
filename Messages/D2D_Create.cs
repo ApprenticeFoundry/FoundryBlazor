@@ -14,7 +14,7 @@ public class D2D_Create : D2D_Base
     }
     public D2D_Create(FoGlyph2D glyph)
     {
-        TargetId = glyph.GlyphId;
+        TargetId = glyph.GetGlyphId();
         Payload = StorageHelpers.Dehydrate(glyph, false);
         PayloadType = glyph.GetType().Name;
     }

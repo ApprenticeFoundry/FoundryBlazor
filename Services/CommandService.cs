@@ -84,14 +84,14 @@ public class CommandService : ICommand
     {
         if (_DrawingSyncHub != null)
         {
-            $"tried to Reset Hub of Pan {userid}  CommandService".WriteError();
+            $"tried to Reset Hub of UserID {userid}  CommandService".WriteError();
             return false;
         }
 
         UserID = userid;
         GetDrawing()?.SetUserID(UserID);
         _DrawingSyncHub = hub;
-        $"SetHub of Pan {UserID} CommandService".WriteNote();
+        $"SetHub of UserID {UserID} CommandService".WriteNote();
 
         PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
         {
@@ -122,6 +122,8 @@ public class CommandService : ICommand
         {
             SendSyncMessage(destroy);
         });
+
+
 
         hub.On<D2D_Create>("Create", (create) =>
          {
