@@ -298,9 +298,15 @@ function hideFileInput() {
     }
 }
 
+function canvasPNGBase64() {
+    return getCanvasNode().toDataURL();
+}
+
 window.CanvasFileInput = {
     ShowFileInput: showFileInput,
     HideFileInput: hideFileInput,
 };
+
+window.canvasPNGBase64 = canvasPNGBase64;
 
 window.initRenderJS = initRenderJS;
