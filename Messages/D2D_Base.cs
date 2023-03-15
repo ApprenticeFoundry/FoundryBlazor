@@ -6,7 +6,7 @@ public class D2D_Base
     public string Name { get; set; } = "";
     public string Type { get; set; } = "";
     public string TimeStamp { get; set; } = "";
-    public string PanID { get; set; } = "";
+    public string UserID { get; set; } = "";
 
     private ControlParameters? _metaData;
 

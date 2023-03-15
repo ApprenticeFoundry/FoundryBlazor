@@ -11,6 +11,7 @@ public class PagePersist
     public ShapeSetPersist<FoShape1D>? FoShape1D { get; set; }
     public ShapeSetPersist<FoGroup2D>? FoGroup2D { get; set; }
 
+
     public PagePersist()
     {
     }
@@ -29,6 +30,7 @@ public class PagePersist
         if (source.HasSlot<FoGroup2D>()) {
             FoGroup2D = PersistShapes<FoGroup2D>(source.Members<FoGroup2D>());
         }
+
         return this;
     }
 
@@ -47,10 +49,10 @@ public class PagePersist
 
     public void RestorePage(FoPage2D page)
     {
-        FoShape2D?.ForEach(shape => page.Add<FoShape2D>(shape.RestoreShape()));
-        FoShape1D?.ForEach(shape => page.Add<FoShape1D>(shape.RestoreShape()));
-        FoText2D?.ForEach(shape => page.Add<FoText2D>(shape.RestoreShape()));
-        FoGroup2D?.ForEach(shape => page.Add<FoGroup2D>(shape.RestoreShape()));
+        FoShape2D?.ForEach(shape => page.AddShape<FoShape2D>(shape.RestoreShape()));
+        FoShape1D?.ForEach(shape => page.AddShape<FoShape1D>(shape.RestoreShape()));
+        FoText2D?.ForEach(shape => page.AddShape<FoText2D>(shape.RestoreShape()));
+        FoGroup2D?.ForEach(shape => page.AddShape<FoGroup2D>(shape.RestoreShape()));
     }
 }
 

@@ -184,27 +184,28 @@ namespace Unglide
 
             private void AddAndRemove()
             {
-               
-                foreach (var add in _toAdd)
-                {
-                     List<Tween>? list = null;
-                    if (add.Target != null && !_tweens.TryGetValue(add.Target, out list))
-                        _tweens[add.Target] = list = new List<Tween>();
-
-                    list?.Add(add);
-                }
-
-                foreach (var remove in _toRemove)
-                {
-                    if (remove.Target != null && _tweens.TryGetValue(remove.Target, out List<Tween>? list))
+                if ( _toAdd.Count > 0 )
+                    foreach (var add in _toAdd)
                     {
-                        list.Remove(remove);
-                        if (list.Count == 0)
+                         List<Tween>? list = null;
+                        if (add.Target != null && !_tweens.TryGetValue(add.Target, out list))
+                            _tweens[add.Target] = list = new List<Tween>();
+
+                        list?.Add(add);
+                    }
+
+                if ( _toRemove.Count > 0)
+                    foreach (var remove in _toRemove)
+                    {
+                        if (remove.Target != null && _tweens.TryGetValue(remove.Target, out List<Tween>? list))
                         {
-                            _tweens.Remove(remove.Target);
+                            list.Remove(remove);
+                            if (list.Count == 0)
+                            {
+                                _tweens.Remove(remove.Target);
+                            }
                         }
                     }
-                }
 
                 _toAdd.Clear();
                 _toRemove.Clear();

@@ -1,17 +1,53 @@
+using Newtonsoft.Json.Linq;
+
 namespace FoundryBlazor;
 
-
+public interface IFoCollection
+{
+    int Count();
+    string GetName();
+    string NextItemName();
+    List<string> Keys();
+    List<U> ValuesOfType<U>();
+    bool AddObject(string key, object value);
+}
 
 [System.Serializable]
-public class FoCollection<T> where T : FoBase
+public class FoCollection<T>: IFoCollection where T : FoBase
 {
     public string Key { get; set; }
 
     private readonly Dictionary<string, T> members = new();
 
+    public string GetName()
+    {
+        return Key;
+    }
+
+    public string NextItemName()
+    {
+        return  $"{Key}-{members.Count}";
+    }
+
+
+    public bool AddObject(string key, object value)
+    {
+
+        if (!TryGetValue(key, out T? found) || found == null)
+        {
+            this.members.Add(key, (T)value);
+            return true;
+        }
+        return false;
+    }
+
     public FoCollection()
     {
         Key = typeof(T).Name;
+    }
+    public int Count()
+    {
+        return this.members.Keys.Count;
     }
     public List<string> Keys()
     {
@@ -46,7 +82,7 @@ public class FoCollection<T> where T : FoBase
     public T Add(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = $"{typeof(T).Name}-{this.members.Count}";
+            value.Name = NextItemName();
         }
         return this.Add(value.Name, value);
     }
@@ -61,7 +97,7 @@ public class FoCollection<T> where T : FoBase
     public T Remove(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = $"{typeof(T).Name}-{this.members.Count}";
+            value.Name = NextItemName();
         }
         return this.Remove(value.Name, value);
     }
@@ -108,6 +144,7 @@ public class FoCollection<T> where T : FoBase
         Clear();
         return this;
     }
+
 
 
 }

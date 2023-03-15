@@ -8,11 +8,11 @@ public interface IGlueOwner
 {
     void AddGlue(FoGlue2D glue);
     void RemoveGlue(FoGlue2D glue);
-
+    void RemoveGlue(string name);
+    string GetName();
+    string GetGlyphId();
     bool Smash(bool force);
-    //void RecomputeGlue();
-    //public bool ComputeFinishFor(FoGlyph2D? target);
-    //public bool ComputeStartFor(FoGlyph2D? target);
+
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
@@ -110,7 +110,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         return result;
     }
 
-
+    public void RemoveGlue(string name)
+    {
+        //$"remove glue from {Name} glue {glue.Name}".WriteLine(ConsoleColor.DarkBlue);;
+        this.Remove<FoGlue2D>(name);
+        this.SmashGlue();
+    }
 
     public override bool Smash(bool force)
     {

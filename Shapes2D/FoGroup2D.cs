@@ -20,7 +20,7 @@ public class FoGroup2D : FoGlyph2D, IShape2D
         ShapeDraw = DrawBox;
     }
 
-    public T? AddShape<T>(T value) where T : FoGlyph2D
+    public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var dx = -LeftEdge();
         var dy = -TopEdge();

@@ -8,10 +8,7 @@ public class FoBase
 
     public FoBase(string name)
     {
-        //if ( !string.IsNullOrEmpty(name))
         Name = name;
-        //else
-        //    Name = Guid.NewGuid().ToString();
     }
     public ControlParameters MetaData()
     {

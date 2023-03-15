@@ -19,7 +19,8 @@ public class FoPage2D : FoGlyph2D
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
-    protected FoCollection<FoGlyph2D> ShapesHidden = new();
+
+
     public override Rectangle Rect()
     {
         var pt = new Point(PinX, PinY);
@@ -27,7 +28,6 @@ public class FoPage2D : FoGlyph2D
         var result = new Rectangle(pt, sz);
         return result;
     }
-
 
 
     public FoPage2D(string name, string color) : base(name, color)
@@ -39,6 +39,9 @@ public class FoPage2D : FoGlyph2D
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
+
+
+ 
 
     public int DrawingWidth()
     {
@@ -122,19 +125,27 @@ public class FoPage2D : FoGlyph2D
         return base.Smash(force);
     }
 
-    public T? AddShape<T>(T value) where T : FoGlyph2D
+    public T AddShape<T>(T value) where T : FoGlyph2D
     {
+        var collection = DynamicSlot(value.GetType());
+        if (string.IsNullOrEmpty(value.Name))
+        {
+            value.Name = collection.NextItemName();
+        }
+
+        collection.AddObject(value.Name, value);
 
         if ( value is IShape2D)
-            Shapes2D.Add(value);   
-        else if ( value is IShape1D)
-            Shapes1D.Add(value);
-        else
         {
-            $"Shape no rendered {value.Name}".WriteError();
-            ShapesHidden.Add(value);
-            return null;
+            Shapes2D.Add(value);   
+            $"Shapes2D Added {value.Name}".WriteSuccess();
         }
+        else if ( value is IShape1D)
+        {
+            Shapes1D.Add(value);
+             $"Shapes1D Added {value.Name}".WriteSuccess();
+        }
+
 
         return value;
     }
@@ -150,7 +161,6 @@ public class FoPage2D : FoGlyph2D
     {
         Shapes1D.Clear();
         Shapes2D.Clear();
-        ShapesHidden.Clear();
         return this;
     }
 

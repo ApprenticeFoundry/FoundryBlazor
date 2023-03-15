@@ -1,5 +1,10 @@
 
-
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -18,14 +23,8 @@ public interface ICommand
     IArena GetArena();
 
     D2D_UserToast SendToast(ToastType type, string message);
-    D2D_Base SendSyncMessage(D2D_Base msg);
-    //D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive);
-    D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D;
-    D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D;
-    D2D_Create SendShapeCreate<T>(T shape) where T : FoGlyph2D;
-    object? Create(D2D_Create msg);
-    bool Move(D2D_Move msg);
-    bool Destroy(D2D_Destroy msg);
+    void SendShapeCreate(FoGlyph2D? shape);
+    void SendGlue(FoGlue2D? glue);
 
     HubConnection? GetHub();
     bool SetHub(HubConnection hub, string panid, IToast toast);
@@ -38,9 +37,8 @@ public interface ICommand
     ValueTask DisposeAsync();
     bool IsConnected { get; }
 
-
     void Save();
-    void Restore();
+    bool Restore();
 }
 
 public class CommandService : ICommand
@@ -86,14 +84,14 @@ public class CommandService : ICommand
     {
         if (_DrawingSyncHub != null)
         {
-            $"tried to Reset Hub of Pan {userid}  CommandService".WriteError();
+            $"tried to Reset Hub of UserID {userid}  CommandService".WriteError();
             return false;
         }
 
         UserID = userid;
         GetDrawing()?.SetUserID(UserID);
         _DrawingSyncHub = hub;
-        $"SetHub of Pan {UserID} CommandService".WriteNote();
+        $"SetHub of UserID {UserID} CommandService".WriteNote();
 
         PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
         {
@@ -108,40 +106,47 @@ public class CommandService : ICommand
 
         PubSub.SubscribeTo<FoGlyph2D>(args =>
         {
-            SendShapeMoved<FoGlyph2D>(args);
+            SendShapeMoved(args);
         });
+
+        PubSub.SubscribeTo<D2D_Create>(create =>
+        {
+            SendSyncMessage(create);
+        });
+        PubSub.SubscribeTo<D2D_Move>(move =>
+        {
+            SendSyncMessage(move);
+        });
+
+        PubSub.SubscribeTo<D2D_Destroy>(destroy =>
+        {
+            SendSyncMessage(destroy);
+        });
+
+
 
         hub.On<D2D_Create>("Create", (create) =>
          {
-             "Received Create".WriteNote();
-             var newShape = Create(create);
-             if (newShape != null)
-                 GetDrawing().AddShape<FoShape2D>((FoShape2D)newShape);
+            UpdateCreate(create);
          });
 
+        hub.On<D2D_Glue>("Glue", (glue) =>
+        {
+            UpdateGlue(glue);
+        });
+
+        hub.On<D2D_Unglue>("Unglue", (glue) =>
+        {
+            UpdateUnglue(glue);
+        });
         hub.On<D2D_Move>("Move", (move) =>
         {
-            // if (move.PayloadType.Matches("Boid"))
-            // {
-            //     // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-            //     //BoidSimulation?.DoMovement(move);
-            //     return;
-            // }
-            Move(move);
+            UpdateMove(move);
         });
 
         hub.On<D2D_Destroy>("Destroy", (destroy) =>
         {
-
-            // if (destroy.PayloadType.Matches("Boid"))
-            // {
-            //     // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-            //     // BoidSimulation?.DoDestroy(destroy);
-            //     return;
-            // }
-
-            Destroy(destroy);
-
+            UpdateDestroy(destroy);
         });
 
         hub.On<D2D_UserMove>("UserMove", (usermove) =>
@@ -203,61 +208,42 @@ public class CommandService : ICommand
         UserLocation.X = args.OffsetX;
         UserLocation.Y = args.OffsetY;
 
-        //$"Send___ D2D_UserMove  Message".WriteLine(ConsoleColor.Yellow);
-
         SendSyncMessage(UserLocation);
         return UserLocation;
     }
 
-    public D2D_Create SendShapeCreate<T>(T shape) where T : FoGlyph2D
+    public void SendShapeCreate(FoGlyph2D? shape)
     {
-        var create = new D2D_Create()
-        {
-            TargetId = shape.GlyphId,
-            Payload = StorageHelpers.Dehydrate<T>(shape, false),
-            PayloadType = shape.GetType().Name
-        };
-        // $"Send___ D2D_Create {create.TargetId} {create.PayloadType} {create.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
+        if ( shape == null) return;
+        var create = new D2D_Create(shape);
         SendSyncMessage(create);
-        return create;
     }
 
-    public D2D_Destroy SendShapeDestroy<T>(T shape) where T : FoGlyph2D
+    public void SendGlue(FoGlue2D? glue)
     {
-        var destroy = new D2D_Destroy()
-        {
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name
-        };
-        // $"Send___ D2D_Destroy {destroy.TargetId} {destroy.PayloadType} {destroy.PanID} Message".WriteLine(ConsoleColor.Yellow);
+        if ( glue == null) return;
+        var obj = new D2D_Glue(glue);
+        SendSyncMessage(obj);
+    }
 
+    public void SendShapeDestroy(FoGlyph2D shape)
+    {
+        var destroy = new D2D_Destroy(shape);
         SendSyncMessage(destroy);
-        return destroy;
     }
 
 
-    public D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D
+    public void SendShapeMoved(FoGlyph2D shape)
     {
-        var move = new D2D_Move()
-        {
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name,
-            PinX = shape.PinX,
-            PinY = shape.PinY,
-            Angle = shape.Angle
-        };
-        // $"Send___ D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
+        var move = new D2D_Move(shape);
         SendSyncMessage(move);
-        return move;
     }
 
     public D2D_Base SendSyncMessage(D2D_Base msg)
     {
         Task.Run(async () =>
         {
-            msg.PanID = UserID;
+            msg.UserID = UserID;
             await Send(msg);
         });
         return msg;
@@ -274,7 +260,9 @@ public class CommandService : ICommand
         if (IsRunning)
             await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
 
-        //$"Sent {IsRunning} {msg.Topic()}..".WriteNote();
+        if ( msg is D2D_UserMove) return IsRunning;
+
+        $"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
 
         return IsRunning;
     }
@@ -288,40 +276,99 @@ public class CommandService : ICommand
         _DrawingSyncHub = null;
     }
 
+	public static object? HydrateObject(D2D_Create Source)
+    {
+        var Payload = Source.Payload;
+        var PayloadType = Source.PayloadType;
+
+        var assembly = typeof(D2D_Create).Assembly;
+		//var nameSpace = assembly.GetName().Name;
+        
+		Type type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == PayloadType);
+        if ( type == null) return null;
+
+        var node = JsonNode.Parse(Source.Payload);
+        if ( node == null) return null;
+
+		using var stream = new MemoryStream();
+		using var writer = new Utf8JsonWriter(stream);
+		node.WriteTo(writer);
+		writer.Flush();
+
+		var options = new JsonSerializerOptions()
+		{
+			IncludeFields = true,
+			IgnoreReadOnlyFields = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+		};
 
 
-    public object? Create(D2D_Create create)
+		var result = JsonSerializer.Deserialize(stream.ToArray(), type, options);
+
+		return result;
+	}
+
+
+
+    public bool UpdateCreate(D2D_Create create)
     {
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
-        if (create.PayloadType.Matches("FoShape2D"))
-            return StorageHelpers.Hydrate<FoShape2D>(create.Payload, false);
+        if (HydrateObject(create) is not FoGlyph2D newShape) return false;
 
-        else if (create.PayloadType.Matches("FoShape1D"))
-            return StorageHelpers.Hydrate<FoShape1D>(create.Payload, false);
+        $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
+        GetDrawing().AddShape<FoGlyph2D>(newShape);
 
-        else if (create.PayloadType.Matches("FoText2D"))
-            return StorageHelpers.Hydrate<FoText2D>(create.Payload, false);
+       $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
 
-        // else if (create.PayloadType.Matches("Boid"))
-        //     return StorageHelpers.Hydrate<Boid>(create.Payload, false);
-
-        return null;
+        return true;
     }
 
-    public bool Move(D2D_Move move)
+    public bool UpdateMove(D2D_Move move)
     {
         var shapes = Pages().FindShapes(move.TargetId);
-        //$"Move {move.Target} {move.Angle} Shape {shape}".WriteLine(ConsoleColor.Magenta);
+
         shapes?.ForEach(item => item.MoveTo(move.PinX, move.PinY));
         shapes?.ForEach(item => item.RotateTo(move.Angle));
+        $"UpdateMove {move.TargetId} {move.PayloadType} {move.UserID}".WriteSuccess();
+  
         return shapes != null;
     }
 
-    public bool Destroy(D2D_Destroy destroy)
+    public bool UpdateGlue(D2D_Glue glue)
+    { 
+        var target = Pages().FindShapes(glue.TargetId).FirstOrDefault();
+        var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
+        
+        if ( target != null && source is IGlueOwner owner) 
+        {
+            $"UpdateGlue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
+            var glueObj = new FoGlue2D(glue.Name);
+            glueObj.GlueTo(owner, target);
+
+            return true;
+        }
+
+        return false;
+    }
+    public bool UpdateUnglue(D2D_Unglue glue)
+    {
+        $"UpdateUnglue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
+
+        var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
+        if ( source is IGlueOwner owner) 
+        {
+            owner.RemoveGlue(glue.Name);
+            return true;
+        }
+
+
+        return false;
+    }
+    public bool UpdateDestroy(D2D_Destroy destroy)
     {
         var shapes = Pages().ExtractShapes(destroy.TargetId);
-        //$"Move {move.Target} {move.Angle} Shape {shape}".WriteLine(ConsoleColor.Magenta);
+        $"UpdateDestroy {destroy.TargetId} {destroy.PayloadType} {destroy.UserID}".WriteSuccess();
         return shapes != null;
     }
 
@@ -335,14 +382,45 @@ public class CommandService : ICommand
         return GetDrawing().Pages();
     }
 
+    public static string LastSavedVersionNumber(string folder, string filename)
+    {
+        StorageHelpers.EstablishDirectory(folder);
+
+        var found = LastSavedFileVersion(folder, filename);
+
+        if (found != null)
+        {
+            var version = found.Split("_").Last();
+            version = version.Split(".").First();
+            return version;
+        }
+        return "0000";
+    }
+
+    public static string? LastSavedFileVersion(string folder, string filename)
+    {
+        StorageHelpers.EstablishDirectory(folder);
+
+        var root = filename.Split("_").First();
+        var ext = filename.Split(".").Last();
+
+        var files = Directory.GetFiles(folder);
+        var found = files.Where(item => Path.GetFileName(item).StartsWith(root) && Path.GetFileName(item).EndsWith(ext))
+                         .OrderByDescending(item => Path.GetFileName(item))
+                         .FirstOrDefault();
+
+        return found;
+    }
 
     public void Save()
     {
-        var version = VersionInfo.Generate(null, "model", "Model Drawing", "steve@gmail.com");
+        var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
+        $"lastVersion {lastVersion}".WriteNote();
+
+        var version = VersionInfo.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());
-
 
         var json = StorageHelpers.Dehydrate<ModelPersist>(model, false);
         StorageHelpers.WriteData("storage", version.Filename, json);
@@ -350,12 +428,14 @@ public class CommandService : ICommand
         var filename = version.Filename.Replace("json", "zip");
         var compress = json.Compress();
         StorageHelpers.WriteData("storage", filename, compress);
+        SendToast(ToastType.Success, $"{version.Filename} is Saved");
     }
 
-    public void Restore()
+    public bool Restore()
     {
-        var version = VersionInfo.Generate(null, "model", "Model Drawing", "steve@gmail.com");
-        var filename = version.Filename.Replace("json", "zip");
+        var version = LastSavedFileVersion("storage", "model_0000.json");
+        if ( version == null) return false;
+        var filename = version.Replace("json", "zip");
         var compress = StorageHelpers.ReadData("storage", filename);
         var json = compress.Decompress();
 
@@ -363,5 +443,8 @@ public class CommandService : ICommand
 
         var model = StorageHelpers.Hydrate<ModelPersist>(json, false);
         model?.RestorePages(Pages());
+         
+        SendToast(ToastType.Success, $"{filename} is Restored");
+        return true;
     }
 }

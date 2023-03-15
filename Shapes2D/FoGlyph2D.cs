@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -59,13 +60,18 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
     public static bool ResetHitTesting { get; set; } = false;
-    public float Thickness { get; set; } = 1;
+    public float Thickness { get; set; }
     public bool IsSelected { get; set; } = false;
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
-    public string Tag { get; set; } = "";
+    public string? Tag { get; set; }
     public int Level { get; set; } = 0;
-    public string GlyphId { get; set; } = Guid.NewGuid().ToString();
+
+    public string id; //use this to trap changes in GlyphId
+    public string GlyphId { 
+        get { return this.id; } 
+        set { this.id = value; } 
+    }
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -110,27 +116,41 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
-    //protected Matrix2D? _globalMatrix;
-    //protected Matrix2D? _invGlobalMatrix;
+
     public FoGlyph2D() : base("")
     {
+        GlyphId = "";
         Color = "Green";
         ShapeDraw = DrawRect;
     }
     public FoGlyph2D(string name, string color) : base(name)
     {
+        GlyphId = Guid.NewGuid().ToString();
         Color = color;
         ShapeDraw = DrawRect;
     }
 
     public FoGlyph2D(string name, int width, int height, string color) : base(name)
     {
+        GlyphId = Guid.NewGuid().ToString();
         this.width = width;
         this.height = height;
         Color = color;
         ShapeDraw = DrawRect;
     }
 
+    public string GetName()
+    {
+        return Name;
+    }
+    public string GetGlyphId()
+    {
+        if ( string.IsNullOrEmpty(GlyphId))
+            GlyphId = Guid.NewGuid().ToString();
+        return GlyphId;
+    }
+
+    
     public Point ParentAttachTo(Point source)
     {
         if (Level > 0 && GetParent() is FoGlyph2D parent)
