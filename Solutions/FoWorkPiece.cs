@@ -1,5 +1,6 @@
 using FoundryBlazor.Shape;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
 
@@ -11,6 +12,7 @@ public interface IWorkPiece
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
     void CreateMenus(IJSRuntime js, NavigationManager nav);
     List<IFoMenu> CollectMenus(List<IFoMenu> list);  
+    bool SetSignalRHub(HubConnection hub, string panid);
 }
 
 public class FoWorkPiece: FoComponent, IWorkPiece
@@ -43,5 +45,10 @@ public class FoWorkPiece: FoComponent, IWorkPiece
 
     public virtual void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
     {
+    }
+
+    public virtual bool SetSignalRHub(HubConnection hub, string panid)
+    {
+        return false;
     }
 }

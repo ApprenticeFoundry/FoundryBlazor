@@ -202,8 +202,8 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
             { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
           //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-            { "Save", () => Command.Save()},
-            { "Restore", () => Command.Restore()},
+            { "Save Drawing", () => Command.Save()},
+            { "Restore Drawing", () => Command.Restore()},
         }, true);
 
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
@@ -307,7 +307,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public HubConnection EstablishDrawingSyncHub(string defaultHubURI)
     {
-        if (Command.HasHub()) return Command.GetHub()!;
+        if (Command.HasHub()) return Command.GetSignalRHub()!;
 
         var secureHub = defaultHubURI.Replace("http://", "https://");
         var secureHubURI = new Uri(secureHub);
@@ -317,7 +317,16 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, GetUserID(), Toast);
+        Command.SetSignalRHub(hub, GetUserID(), Toast);
+        SetSignalRHub(hub, GetUserID());
+
+
+        return hub;
+    }
+
+    public bool SetSignalRHub(HubConnection hub, string panid)
+    {
+        Members<FoWorkPiece>().ForEach(item => item.SetSignalRHub(hub, panid));
 
         hub.Closed += async (error) =>
        {
@@ -337,13 +346,8 @@ public class FoWorkspace : FoComponent, IWorkspace
             var rand = new Random();
             await Task.Delay(rand.Next(0, 5) * 1000);
         };
-
- 
-
-        return hub;
+        return true;
     }
-
-
 
 
     public List<IFoCommand> CollectCommands(List<IFoCommand> list)

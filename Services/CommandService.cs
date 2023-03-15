@@ -27,8 +27,8 @@ public interface ICommand
     void SendShapeCreate(FoGlyph2D? shape);
     void SendGlue(FoGlue2D? glue);
 
-    HubConnection? GetHub();
-    bool SetHub(HubConnection hub, string panid, IToast toast);
+    HubConnection? GetSignalRHub();
+    bool SetSignalRHub(HubConnection hub, string panid, IToast toast);
     bool HasHub();
 
     bool StartHub();
@@ -77,11 +77,11 @@ public class CommandService : ICommand
     {
         return _DrawingSyncHub != null;
     }
-    public HubConnection? GetHub()
+    public HubConnection? GetSignalRHub()
     {
         return _DrawingSyncHub;
     }
-    public bool SetHub(HubConnection hub, string userid, IToast toast)
+    public bool SetSignalRHub(HubConnection hub, string userid, IToast toast)
     {
         if (_DrawingSyncHub != null)
         {
@@ -92,7 +92,7 @@ public class CommandService : ICommand
         UserID = userid;
         GetDrawing()?.SetUserID(UserID);
         _DrawingSyncHub = hub;
-        $"SetHub of UserID {UserID} CommandService".WriteNote();
+        $"SetSignalRHub of UserID {UserID} CommandService".WriteNote();
 
         PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
         {
@@ -263,7 +263,7 @@ public class CommandService : ICommand
 
         if ( msg is D2D_UserMove) return IsRunning;
 
-        $"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
+        //$"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
 
         return IsRunning;
     }
@@ -277,15 +277,15 @@ public class CommandService : ICommand
         _DrawingSyncHub = null;
     }
 
-	public static object? HydrateObject(D2D_Create Source)
+	public static object? HydrateObject<SourceAssembly>(D2D_Create Source) where T: class
     {
         var Payload = Source.Payload;
         var PayloadType = Source.PayloadType;
 
-        var assembly = typeof(D2D_Create).Assembly;
+        var assembly = typeof(SourceAssembly).Assembly;
 		//var nameSpace = assembly.GetName().Name;
         
-		Type type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == PayloadType);
+		Type? type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == PayloadType);
         if ( type == null) return null;
 
         var node = JsonNode.Parse(Source.Payload);

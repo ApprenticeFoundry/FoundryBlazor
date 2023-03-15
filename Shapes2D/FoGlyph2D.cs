@@ -67,7 +67,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public string? Tag { get; set; }
     public int Level { get; set; } = 0;
 
-    public string id; //use this to trap changes in GlyphId
+    public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId { 
         get { return this.id; } 
         set { this.id = value; } 
@@ -119,20 +119,17 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
 
     public FoGlyph2D() : base("")
     {
-        GlyphId = "";
         Color = "Green";
         ShapeDraw = DrawRect;
     }
     public FoGlyph2D(string name, string color) : base(name)
     {
-        GlyphId = Guid.NewGuid().ToString();
         Color = color;
         ShapeDraw = DrawRect;
     }
 
     public FoGlyph2D(string name, int width, int height, string color) : base(name)
     {
-        GlyphId = Guid.NewGuid().ToString();
         this.width = width;
         this.height = height;
         Color = color;
@@ -147,6 +144,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     {
         if ( string.IsNullOrEmpty(GlyphId))
             GlyphId = Guid.NewGuid().ToString();
+
         return GlyphId;
     }
 

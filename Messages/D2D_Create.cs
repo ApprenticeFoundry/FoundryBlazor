@@ -3,6 +3,7 @@ using FoundryBlazor.Shape;
 
 namespace FoundryBlazor.Message;
 
+//D2D means drawing to drawing
 public class D2D_Create : D2D_Base
 {
     public string TargetId { get; set; }
