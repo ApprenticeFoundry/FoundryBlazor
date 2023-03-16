@@ -30,6 +30,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
 
     public void Dispose()
     {
+        Ctx = null;
         //Dispose(true);
         PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
 
@@ -95,13 +96,13 @@ public class CanvasComponentBase : ComponentBase, IDisposable
         if (drawing == null) return;
 
         //if you are already rendering then skip it this cycle
-        if ( drawing.SetCurrentlyRendering(true) ) return;
+        if (drawing.SetCurrentlyRendering(true)) return;
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
         await drawing.RenderDrawing(Ctx, tick, fps);
         Workspace?.RenderWatermark(Ctx, tick);
-        
+
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
         drawing.SetCurrentlyRendering(false);
