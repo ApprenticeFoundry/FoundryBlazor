@@ -13,6 +13,7 @@ namespace FoundryBlazor.Extensions;
 
 public static class StorageHelpers
 {
+    private static readonly Dictionary<string, Type> typeLookup = new();
     private static FileExtensionContentTypeProvider? _provider;
     public static FileExtensionContentTypeProvider MIMETypeProvider()
     {
@@ -139,7 +140,40 @@ public static class StorageHelpers
         return result;
     }
 
-	public static object? HydrateObject(Assembly assembly, string payloadType, string payload) 
+    public static Type? LookupType(string payloadType, Assembly? assembly=null)
+    {
+        
+        if ( typeLookup.TryGetValue(payloadType, out Type? type) == false ) {
+            var source = assembly ?? typeof(StorageHelpers).Assembly;
+            type = source.DefinedTypes.FirstOrDefault(item => item.Name == payloadType);
+            if ( type != null)
+                typeLookup.Add(payloadType, type);
+        }
+        return type;
+    }
+
+    public static object? HydrateObject(Type type, string payload) 
+    {
+        var node = JsonNode.Parse(payload);
+        if ( node == null) return null;
+
+		using var stream = new MemoryStream();
+		using var writer = new Utf8JsonWriter(stream);
+		node.WriteTo(writer);
+		writer.Flush();
+
+		var options = new JsonSerializerOptions()
+		{
+			IncludeFields = true,
+			IgnoreReadOnlyFields = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+		};
+
+		var result = JsonSerializer.Deserialize(stream.ToArray(), type, options);
+		return result;
+	}
+
+    public static object? HydrateObject(string payloadType, string payload, Assembly assembly) 
     {
         
 		Type? type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == payloadType);

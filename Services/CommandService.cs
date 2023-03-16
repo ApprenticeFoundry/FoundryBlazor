@@ -285,8 +285,8 @@ public class CommandService : ICommand
     {
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
-        var assembly = typeof(FoGlyph2D).Assembly;
-        var result = StorageHelpers.HydrateObject(assembly, create.PayloadType, create.Payload);
+        var type = StorageHelpers.LookupType(create.PayloadType);
+        var result = StorageHelpers.HydrateObject(type, create.Payload);
         if (result is not FoGlyph2D newShape) return false;
 
         $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
