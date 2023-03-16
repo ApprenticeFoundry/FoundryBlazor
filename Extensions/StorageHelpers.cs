@@ -139,7 +139,7 @@ public static class StorageHelpers
         return result;
     }
 
-	public static object? HydrateObject(Assembly assembly, string payloadType, string payload) where SourceAssembly: class
+	public static object? HydrateObject(Assembly assembly, string payloadType, string payload) 
     {
         
 		Type? type = assembly.DefinedTypes.FirstOrDefault(item => item.Name == payloadType);

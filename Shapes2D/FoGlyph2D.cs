@@ -64,7 +64,7 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
     public bool IsSelected { get; set; } = false;
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
-    public string? Tag { get; set; }
+    public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
 
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
