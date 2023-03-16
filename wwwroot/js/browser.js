@@ -5,7 +5,6 @@ class Browser {
             innerHeight: window.innerHeight,
         };
     }
-
     canvasPNGBase64(id = 'canvasHolder') {
         const containerNode = document.getElementById(id);
         let canvasNode = null;
