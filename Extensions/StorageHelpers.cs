@@ -140,6 +140,15 @@ public static class StorageHelpers
         return result;
     }
 
+    public static void RegisterLookupType<T>() where T: class
+    {
+        var type = typeof(T);
+        var name = type.Name;
+        if ( typeLookup.ContainsKey(name) == false ) {
+            typeLookup.Add(name, type);
+        }
+    }
+
     public static Type? LookupType(string payloadType, Assembly? assembly=null)
     {
         
