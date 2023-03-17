@@ -136,8 +136,9 @@ public class FoImage2D : FoGlyph2D, IImage2D
     }
     public FoImage2D(int width, int height, string color) : base("", width, height, color)
     {
-        // ResetLocalPin((obj) => 0, (obj) => 0);
-
+    }
+    public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
+    {
     }
 
 }
