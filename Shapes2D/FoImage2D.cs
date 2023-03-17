@@ -72,7 +72,11 @@ public class FoImage2D : FoGlyph2D, IImage2D
         return this;
     }
 
-
+    public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        list.Add(this);
+        return list;
+    }
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -136,8 +140,9 @@ public class FoImage2D : FoGlyph2D, IImage2D
     }
     public FoImage2D(int width, int height, string color) : base("", width, height, color)
     {
-        // ResetLocalPin((obj) => 0, (obj) => 0);
-
+    }
+    public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
+    {
     }
 
 }

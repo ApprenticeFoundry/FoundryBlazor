@@ -279,7 +279,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllImages.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                var data = item.ImageUrl;
+                $"{data}".WriteLine();
             });
             FoImage2D.RefreshImages = false;
         }
@@ -300,7 +301,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllVideos.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                var data = item.ImageUrl;
+                $"{data}".WriteLine();
             });
             FoVideo2D.RefreshVideos = false;
         }
@@ -523,11 +525,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
         {
-           // $"{style} No Match".WriteError();
+            $"{style} No Match".WriteError();
             return false;
         }
 
-        //$"{style} Match".WriteSuccess();
+        $"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
     }

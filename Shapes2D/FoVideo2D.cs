@@ -72,7 +72,11 @@ public class FoVideo2D : FoGlyph2D, IImage2D
         return this;
     }
 
-
+    public override List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    {
+        list.Add(this);
+        return list;
+    }
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {

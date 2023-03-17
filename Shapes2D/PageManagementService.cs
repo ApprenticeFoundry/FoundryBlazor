@@ -115,11 +115,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
-    {
-        Slot<FoPage2D>().ForEach(item => item.CollectImages(list, deep));
-        return list;
-    }
+
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
@@ -129,6 +125,11 @@ public class PageManagementService : FoComponent, IPageManagement
             list.AddRange(items);
         return list;
     }   
+    public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        Slot<FoPage2D>().ForEach(item => item.CollectImages(list, deep));
+        return list;
+    }
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
         Slot<FoPage2D>().ForEach(item => item.CollectVideos(list, deep));
@@ -162,7 +163,7 @@ public class PageManagementService : FoComponent, IPageManagement
         if ( found != null)
             _hitTestService.Insert(value);
 
-        return found;
+        return found!;
 
     }
 
