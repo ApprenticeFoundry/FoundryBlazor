@@ -622,6 +622,15 @@ public class FoGlyph2D : FoComponent, IHasRectangle, IRender
         await obj.DrawPin(ctx);
     };
 
+    public virtual List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        return list;
+    }
+    public virtual List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    {
+        return list;
+    }
+
     public List<T>? ExtractSelected<T>() where T : FoGlyph2D
     {
         var list = ExtractWhere<T>(child => child.IsSelected);

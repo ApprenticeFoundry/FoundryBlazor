@@ -69,25 +69,13 @@ public class FoPage2D : FoGlyph2D
 
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
-        var members = Shapes2D.ValuesOfType<FoImage2D>();
-        list.AddRange(members);
-        
-        if (deep)
-        {
-            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<FoImage2D>(list, deep));
-        }
+        Shapes2D.ForEach(item => item.CollectImages(list, deep));
         return list;
     }
 
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
-        var members = Shapes2D.ValuesOfType<FoVideo2D>();
-        list.AddRange(members);
-
-        if (deep)
-        {
-            GetMembers<FoCompound2D>()?.ForEach(item => item.CollectMembers<FoVideo2D>(list, deep));
-        }
+        Shapes2D.ForEach(item => item.CollectVideos(list, deep));
         return list;
     }
 
