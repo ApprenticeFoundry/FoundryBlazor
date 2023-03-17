@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <Version>1.0.4</Version>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
