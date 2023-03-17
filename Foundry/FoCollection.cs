@@ -59,7 +59,7 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     }
     public List<U> ValuesOfType<U>()
     {
-        return this.members.Values.Where(item => item is U).Cast<U>().ToList();
+        return this.members.Values.Where(item => item is U || item.GetType().IsSubclassOf(typeof(U)) ).Cast<U>().ToList();
     }
     public T? GetValue(string key)
     {

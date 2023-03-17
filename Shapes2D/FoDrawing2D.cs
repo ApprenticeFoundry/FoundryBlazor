@@ -279,7 +279,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllImages.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                $"{item.ImageUrl.Substring(0, 30)}".WriteLine();
             });
             FoImage2D.RefreshImages = false;
         }
@@ -300,7 +300,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllVideos.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                $"{item.ImageUrl.Substring(0, 30)}".WriteLine();
             });
             FoVideo2D.RefreshVideos = false;
         }
