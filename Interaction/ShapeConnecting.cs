@@ -76,15 +76,14 @@ public class ShapeConnecting :  ShapeHovering
     {
         var findings = pageManager?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
-        var targets = heros.Where(item => item.Tag.Matches(TargetType.Name));
-        return targets.ToList(); 
+        return heros.ToList(); 
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
-        var heros = findings!.Where(item => item.GetType() == SourceType);
-        var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
+        var targets = findings!.Where(item => item.GetType() == TargetType);
+        //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 
     }
 
@@ -100,12 +99,14 @@ public class ShapeConnecting :  ShapeHovering
             if ( found != null)
             {
                 //link this in the model and force a new layout
-                var msg = new AttachAssetFileEvent<FoGlyph2D>()
+                var msg = new AttachAssetFileEvent()
                 {
-                    AssetFile = (FoGlyph2D)selectedShape,
-                    Target = (FoGlyph2D)found
+                    AssetGuid = selectedShape.GetGlyphId(),
+                    TargetGuid = found.GetGlyphId(),
+                    AssetShape = selectedShape,
+                    TargetShape = found
                 };
-                pubsub?.Publish<AttachAssetFileEvent<FoGlyph2D>>(msg);
+                pubsub?.Publish<AttachAssetFileEvent>(msg);
                 return true;
             }
         }

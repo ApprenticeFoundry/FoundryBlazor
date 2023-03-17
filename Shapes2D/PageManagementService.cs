@@ -162,7 +162,7 @@ public class PageManagementService : FoComponent, IPageManagement
         if ( found != null)
             _hitTestService.Insert(value);
 
-        return found;
+        return found!;
 
     }
 

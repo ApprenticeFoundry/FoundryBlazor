@@ -68,6 +68,9 @@ public class FoWorkspace : FoComponent, IWorkspace
     public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
 
 
+    protected Action SetDrawingStyle { get; set; }
+    protected Action SetFileDropStyle { get; set; }  
+
     public FoWorkspace (
         IToast toast,
         ICommand command,
@@ -88,6 +91,30 @@ public class FoWorkspace : FoComponent, IWorkspace
         PanZoom = panzoom;
         Dialog = dialog;
         JsRuntime = js;
+
+        SetDrawingStyle = async () =>
+        {
+            try
+            {
+                await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
+                InputStyle = InputStyle.Drawing;
+                await PubSub!.Publish<InputStyle>(InputStyle);
+                "SetDrawingStyle".WriteWarning();
+            }
+            catch { }
+        };
+
+        SetFileDropStyle = async () =>
+        {
+            try
+            {
+                await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
+                InputStyle = InputStyle.FileDrop;
+                await PubSub!.Publish<InputStyle>(InputStyle);
+                "SetFileDropStyle".WriteWarning();
+            }
+            catch { }
+        };
     }
 
     public virtual void PreRender(int tick)
@@ -108,7 +135,6 @@ public class FoWorkspace : FoComponent, IWorkspace
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
     {
         await OnFileDrop.Invoke(file, args);
-        await Task.CompletedTask;
     }
 
     public async Task InitializedAsync(string defaultHubURI)
@@ -243,29 +269,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        var SetDrawingStyle = async () =>
-        {
-            try
-            {
-                await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
-                InputStyle = InputStyle.Drawing;
-                await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetDrawingStyle".WriteWarning();
-            }
-            catch { }
-        };
 
-        var SetFileDropStyle = async () =>
-        {
-            try
-            {
-                await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
-                InputStyle = InputStyle.FileDrop;
-                await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetFileDropStyle".WriteWarning();
-            }
-            catch { }
-        };
         EstablishCommand<FoButton2D>("CMD", new Dictionary<string, Action>()
         {
             { serverUrl, () => OpenDTAR() },

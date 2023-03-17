@@ -58,7 +58,12 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     public void OnFileInputChange(InputFileChangeEventArgs e)
     {
         InputFile = e.File;
-        $"{InputFile.Name} {InputFile.Size}".WriteLine(ConsoleColor.Green);
+        $"OnFileInputChange {InputFile.Name} {InputFile.Size} {DateTime.Now.ToLongTimeString()}".WriteInfo();
+        
+        CaptureFileAndSend(new CanvasMouseArgs() {
+            OffsetX = 300,
+            OffsetY = 300
+        });
         //Task.Run(async () =>
         //{
         //    await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
@@ -66,12 +71,12 @@ public class CanvasComponentBase : ComponentBase, IDisposable
 
     }
 
-    private void OnCanvasMouseEvent(CanvasMouseArgs MouseArgs)
+    private void CaptureFileAndSend(CanvasMouseArgs MouseArgs)
     {
         if (InputFile != null && IsUploading == false)
         {
             IsUploading = true;
-            $"OnCanvasMouseEvent {MouseArgs.OffsetX} {MouseArgs.OffsetY}".WriteLine(ConsoleColor.Green);
+            $"DropFileCreateShape OnCanvasMouseEvent {MouseArgs.OffsetX} {MouseArgs.OffsetY} {DateTime.Now.ToLongTimeString()}".WriteInfo();
             Task.Run(async () =>
             {
                 //await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
@@ -80,6 +85,11 @@ public class CanvasComponentBase : ComponentBase, IDisposable
                 IsUploading = false;
             });
         }
+    }
+
+    private void OnCanvasMouseEvent(CanvasMouseArgs MouseArgs)
+    {
+        CaptureFileAndSend(MouseArgs);
     }
 
 

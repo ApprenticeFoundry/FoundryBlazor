@@ -58,6 +58,7 @@ public class DrawingSyncHub : Hub, IDrawingHub
     public async Task ModelUpdate(D2D_ModelUpdate message)
     {
         await Clients.Others.SendAsync(message.Topic(), message);
+        await Clients.Caller.SendAsync("ModelReflect", message);
     }
     public async Task ModelDestroy(D2D_ModelDestroy message)
     {

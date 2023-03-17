@@ -138,12 +138,12 @@ public class FoPage2D : FoGlyph2D
         if ( value is IShape2D)
         {
             Shapes2D.Add(value);   
-            $"Shapes2D Added {value.Name}".WriteSuccess();
+            //$"Shapes2D Added {value.Name}".WriteSuccess();
         }
         else if ( value is IShape1D)
         {
             Shapes1D.Add(value);
-             $"Shapes1D Added {value.Name}".WriteSuccess();
+            // $"Shapes1D Added {value.Name}".WriteSuccess();
         }
 
 
