@@ -178,7 +178,11 @@ public class FoArena3D : FoGlyph3D, IArena
             .Position = new FoVector3D();
 
 
-        RenderPlatformToScene(platform);
+        Task.Run(async () =>
+        {
+            await RenderPlatformToScene(platform);
+        });
+
         return platform;
     }
 
@@ -216,12 +220,23 @@ public class FoArena3D : FoGlyph3D, IArena
         $"cleared scene".WriteInfo();
 
         $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
-
-        world.Platforms()?.ForEach(RenderPlatformToScene);
+        var platforms = world.Platforms();
+        if (platforms != null)
+        {
+            foreach (var platform in platforms)
+            {
+                await RenderPlatformToScene(platform);
+            }
+        }
     }
 
-    public void RenderPlatformToScene(FoGroup3D? platform)
+    public async Task RenderPlatformToScene(FoGroup3D? platform)
     {
+        await ClearViewer3D();
+        await Task.CompletedTask;
+
+        $"RenderPlatformToScene PlatformName={platform?.PlatformName}".WriteInfo();
+
         $"platform={platform}".WriteInfo();
         if (platform == null)
         {
@@ -251,6 +266,7 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(scene, 0, 0);
         });
 
+        await Viewer3D!.UpdateScene();
     }
 
     public void PreRenderWorld(FoWorld3D? world)
