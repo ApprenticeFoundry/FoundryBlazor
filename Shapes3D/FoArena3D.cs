@@ -112,7 +112,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return result;
     }
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
         EstablishMenu<FoMenu3D>("Main", new Dictionary<string, Action>()
         {
