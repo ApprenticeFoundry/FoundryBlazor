@@ -67,13 +67,13 @@ public class FoPage2D : FoGlyph2D
         scaledDrawing.SetPageDefaults(this);
     }
 
-    public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Shapes2D.ForEach(item => item.CollectImages(list, deep));
         return list;
     }
 
-    public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    public override List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
         Shapes2D.ForEach(item => item.CollectVideos(list, deep));
         return list;
