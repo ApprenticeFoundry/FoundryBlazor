@@ -45,7 +45,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
     private Viewer? Viewer3D { get; set; }
-    private ComponentBus PubSub { get; set; }
+    public ComponentBus PubSub { get; set; }
 
 
     public ViewerSettings settings = new()
@@ -155,6 +155,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoGroup3D MakeAndRenderTestPlatform()
     {
+        FillScene();
         var platform = new FoGroup3D()
         {
             UniqueGuid = Guid.NewGuid().ToString(),
@@ -301,7 +302,7 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    public void FillScene()
+    public virtual void FillScene()
     {
         var scene = GetScene();
         scene.Add(new AmbientLight());
