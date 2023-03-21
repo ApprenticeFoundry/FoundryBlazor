@@ -19,7 +19,7 @@ public enum InputStyle { None, Drawing, FileDrop }
 
 
 
-public interface IWorkspace: IWorkPiece
+public interface IWorkspace : IWorkPiece
 {
     Task InitializedAsync(string defaultHubURI);
     IDrawing GetDrawing();
@@ -69,9 +69,9 @@ public class FoWorkspace : FoComponent, IWorkspace
 
 
     protected Action SetDrawingStyle { get; set; }
-    protected Action SetFileDropStyle { get; set; }  
+    protected Action SetFileDropStyle { get; set; }
 
-    public FoWorkspace (
+    public FoWorkspace(
         IToast toast,
         ICommand command,
         IPanZoomService panzoom,
@@ -157,7 +157,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public string GetUserID()
     {
-        if ( string.IsNullOrEmpty(UserID))
+        if (string.IsNullOrEmpty(UserID))
         {
             var data = new MockDataMaker();
             UserID = data.GenerateName();
@@ -192,13 +192,13 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
 
-        if ( !IsViewStyle3D())
+        if (!IsViewStyle3D())
             GetDrawing()?.CollectMenus(list);
 
-        if ( !IsViewStyle2D())
+        if (!IsViewStyle2D())
             GetArena()?.CollectMenus(list);
 
-        Members<FoWorkPiece>().ForEach( item => item.CollectMenus(list));
+        Members<FoWorkPiece>().ForEach(item => item.CollectMenus(list));
 
         return list;
     }
@@ -232,7 +232,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Restore Drawing", () => Command.Restore()},
         }, true);
 
-        Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js,nav));
+        Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js, nav));
     }
 
 
@@ -275,13 +275,13 @@ public class FoWorkspace : FoComponent, IWorkspace
             { serverUrl, () => OpenDTAR() },
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
-            { "1:1", () => PanZoom.Reset()},
-            { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
-            { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
-            { "Down", () => ActiveDrawing?.MovePanBy(0,50)},
-            { "Right", () => ActiveDrawing?.MovePanBy(50,0)},
-            { "Up", () => ActiveDrawing?.MovePanBy(0,-50)},
-            { "Left", () => ActiveDrawing?.MovePanBy(-50,0)},
+            // { "1:1", () => PanZoom.Reset()},
+            // { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
+            // { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
+            // { "Down", () => ActiveDrawing?.MovePanBy(0,50)},
+            // { "Right", () => ActiveDrawing?.MovePanBy(50,0)},
+            // { "Up", () => ActiveDrawing?.MovePanBy(0,-50)},
+            // { "Left", () => ActiveDrawing?.MovePanBy(-50,0)},
             { "Window", () => ActiveDrawing?.TogglePanZoomWindow()},
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
