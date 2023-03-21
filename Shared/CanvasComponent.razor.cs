@@ -18,6 +18,9 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
+
+    [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
+    [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
     private int tick = 0;
     public int CanvasWidth = 2500;
     public int CanvasHeight = 4000;
@@ -60,8 +63,9 @@ public class CanvasComponentBase : ComponentBase, IDisposable
     {
         InputFile = e.File;
         $"OnFileInputChange {InputFile.Name} {InputFile.Size} {DateTime.Now.ToLongTimeString()}".WriteInfo();
-        
-        CaptureFileAndSend(new CanvasMouseArgs() {
+
+        CaptureFileAndSend(new CanvasMouseArgs()
+        {
             OffsetX = 300,
             OffsetY = 300
         });
