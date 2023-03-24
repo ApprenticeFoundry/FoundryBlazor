@@ -280,7 +280,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             AllImages.ForEach(item =>
             {
                 var data = item.ImageUrl;
-                $"{data}".WriteLine();
+                // $"{data}".WriteLine();
             });
             FoImage2D.RefreshImages = false;
         }
@@ -421,7 +421,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
 
         //skip this frame is still working 
-        if ( IsCurrentlyProcessing ) return;
+        if (IsCurrentlyProcessing) return;
 
         FoGlyph2D.Animations.Update((float)0.033);
 
@@ -507,7 +507,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             OtherUserLocations.Add(key, usermove);
         else
             toast?.Info($"{key} has left");
-            
+
         return usermove;
     }
 
@@ -537,7 +537,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     protected virtual void SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
         if (TestRule(InteractionStyle.PagePanAndZoom, args)) return;
-        
+
         if (TestRule(InteractionStyle.ModelLinking, args)) return;
 
         if (TestRule(InteractionStyle.ShapeConnecting, args)) return;
