@@ -44,6 +44,8 @@ public interface IWorkspace : IWorkPiece
 
     Task RenderWatermark(Canvas2DContext ctx, int tick);
 
+    ComponentBus GetPubSub();
+
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -359,5 +361,10 @@ public class FoWorkspace : FoComponent, IWorkspace
         GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));
         Members<FoWorkPiece>().ForEach(item => item.CollectCommands(list));
         return list;
+    }
+
+    public ComponentBus GetPubSub()
+    {
+        return PubSub;
     }
 }
