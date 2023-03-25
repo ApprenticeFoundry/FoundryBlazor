@@ -1,4 +1,3 @@
-using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
@@ -26,9 +25,9 @@ public class FoShape2D : FoGlyph2D, IShape2D
 
 
 
-    public override List<FoHandle2D> GetHandles() 
+    public override List<FoHandle2D> GetHandles()
     {
-        if ( !this.HasSlot<FoHandle2D>()) 
+        if (!this.HasSlot<FoHandle2D>())
         {
             var lx = LeftX();
             var ty = TopY();
@@ -45,9 +44,9 @@ public class FoShape2D : FoGlyph2D, IShape2D
 
 
 
-    public override List<FoConnectionPoint2D> GetConnectionPoints() 
+    public override List<FoConnectionPoint2D> GetConnectionPoints()
     {
-        if ( !this.HasSlot<FoConnectionPoint2D>()) 
+        if (!this.HasSlot<FoConnectionPoint2D>())
         {
             var lx = LeftX();
             var ty = TopY();
