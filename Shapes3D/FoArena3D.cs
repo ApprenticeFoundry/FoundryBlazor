@@ -17,9 +17,8 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    //Scene GetScene();
+    Scene ThreeJSScene();
     FoScene3D CurrentScene();
-    //Scene InitScene();
     Task ClearViewer3D();
     ViewerSettings GetSettings();
 
@@ -62,6 +61,7 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         SceneManager = sceneManagement;
         PubSub = pubSub;
+        InitScene();
     }
 
     public FoScene3D CurrentScene()
@@ -69,13 +69,14 @@ public class FoArena3D : FoGlyph3D, IArena
         return SceneManager.CurrentScene();
     }
 
-    public Scene GetScene()
+    public Scene ThreeJSScene()
     {
         return CurrentScene().GetScene();
     }
+
     public Scene InitScene()
     {
-        var scene = this.GetScene();
+        var scene = CurrentScene().GetScene();
         if (scene != null)
         {
             scene.Add(new AmbientLight());
@@ -85,7 +86,7 @@ public class FoArena3D : FoGlyph3D, IArena
             });
         }
 
-        return SceneManager.CurrentScene().GetScene();
+        return CurrentScene().GetScene();
     }
 
     public async Task ClearViewer3D()
@@ -217,7 +218,7 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = GetScene();
+        var scene = CurrentScene().GetScene();
         $"scene={scene}".WriteInfo();
 
         await ClearViewer3D();
@@ -248,7 +249,7 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = GetScene();
+        var scene = CurrentScene().GetScene();
         $"scene={scene}".WriteInfo();
 
 
@@ -294,7 +295,7 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = GetScene();
+        var scene = CurrentScene().GetScene();
         $"scene={scene}".WriteInfo();
 
 
@@ -307,7 +308,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     private void FillScene()
     {
-        var scene = GetScene();
+        var scene = CurrentScene().GetScene();
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
         {
