@@ -63,12 +63,12 @@ public class FoScene3D : FoGlyph3D, IScene
         if ( value is IShape3D)
         {
             Shapes3D.Add(value);   
-            $"Shapes2D Added {value.Name}".WriteSuccess();
+            //$"IShape3D Added {value.Name}".WriteSuccess();
         }
         else if ( value is IPipe3D)
         {
             Pipes3D.Add(value);
-            $"Pipes3D Added {value.Name}".WriteSuccess();
+            //$"IPipe3D Added {value.Name}".WriteSuccess();
         }
 
         value.Render(GetScene(), 1, 1);
