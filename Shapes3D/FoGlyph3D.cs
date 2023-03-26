@@ -39,6 +39,11 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
+    public virtual bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
+    {
+        return false;
+    }
+
     public FoGlyph3D MoveTo(int x, int y, int z) 
     {
         var pos = GetPosition();

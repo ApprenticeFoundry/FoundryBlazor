@@ -28,6 +28,7 @@ public interface IArena
 
     void RenderWorld(FoWorld3D? world);
     void PostRender(Guid guid);
+    Task UpdateScene();
 
     FoGroup3D MakeAndRenderTestPlatform();
 
@@ -202,11 +203,15 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             PreRenderWorld(world);
             await RenderWorldToScene(world);
-            await Viewer3D!.UpdateScene();
+            await UpdateScene();
         });
 
     }
 
+    public async Task UpdateScene()
+    {
+        await Viewer3D!.UpdateScene();
+    }
 
 
     public async Task RenderWorldToScene(FoWorld3D? world)
@@ -305,6 +310,24 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
+    public void PostRender(Guid guid)
+    {
+        var shape = Find<FoShape3D>(guid.ToString());
+        if (shape != null)
+        {
+            Task.Run(async () =>
+            {
+                var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
+                await Viewer3D!.RemoveByUuidAsync(removeGuid);
+                shape.PromiseGUID = null;
+                shape.LoadingGUID = null;
+            });
+        }
+        else
+        {
+            $"Did not find Shape guid={guid}".WriteError();
+        }
+    }
     private void FillScene()
     {
         var scene = CurrentScene().GetScene();
@@ -457,22 +480,5 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    public void PostRender(Guid guid)
-    {
-        var shape = Find<FoShape3D>(guid.ToString());
-        if (shape != null)
-        {
-            Task.Run(async () =>
-            {
-                var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
-                await Viewer3D!.RemoveByUuidAsync(removeGuid);
-                shape.PromiseGUID = null;
-                shape.LoadingGUID = null;
-            });
-        }
-        else
-        {
-            $"Did not find Shape guid={guid}".WriteError();
-        }
-    }
+
 }

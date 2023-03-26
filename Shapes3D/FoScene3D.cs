@@ -1,9 +1,3 @@
-
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Lights;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using FoundryBlazor.Extensions;
@@ -81,4 +75,13 @@ public class FoScene3D : FoGlyph3D, IScene
 
         return value;
     }
+
+    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+        //$"Render {tick} {Shapes3D.Count()}".WriteInfo();
+        Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
+        return true;
+    }
+
+
 }

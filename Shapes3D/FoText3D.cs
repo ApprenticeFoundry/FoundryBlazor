@@ -3,7 +3,7 @@ using BlazorThreeJS.Scenes;
 
 namespace FoundryBlazor.Shape;
 
-public class FoText3D : FoGlyph3D
+public class FoText3D : FoGlyph3D, IShape3D
 {
 
     private string text = "";
