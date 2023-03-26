@@ -55,7 +55,7 @@ public class FoGroup3D : FoGlyph3D
 
     public T CreateUsingDTBASE<T>(FoGlyph3D obj) where T : FoGlyph3D
     {
-        return CreateUsing<T>(obj.Name, obj.UniqueGuid);
+        return CreateUsing<T>(obj.Name, obj.GlyphId);
     }
 
     public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
@@ -111,16 +111,16 @@ public class FoGroup3D : FoGlyph3D
 
     public U? RelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
     {
-        var tag = $"{source.UniqueGuid}:{name}";
+        var tag = $"{source.GlyphId}:{name}";
         var relationship = Find<U>(tag);
         if (relationship == null)
         {
             relationship = FindOrCreate<U>(tag, true);
-            relationship?.Build(source.UniqueGuid, name, target.UniqueGuid);
+            relationship?.Build(source.GlyphId, name, target.GlyphId);
         }
         else
         {
-            relationship.Relate(target.UniqueGuid);
+            relationship.Relate(target.GlyphId);
         }
 
         return relationship;
@@ -128,9 +128,9 @@ public class FoGroup3D : FoGlyph3D
 
     public U? UnrelateMembers<U>(FoGlyph3D source, string name, FoGlyph3D target) where U : FoRelationship3D
     {
-        var tag = $"{source.UniqueGuid}:{name}";
+        var tag = $"{source.GlyphId}:{name}";
         var relationship = Find<U>(tag);
-        relationship?.Unrelate(target.UniqueGuid);
+        relationship?.Unrelate(target.GlyphId);
 
         return relationship;
     }
@@ -143,7 +143,7 @@ public class FoGroup3D : FoGlyph3D
         var found = Activator.CreateInstance<T>() as T;
         found.Name = name;
         found.PlatformName = PlatformName;
-        found.UniqueGuid = Guid.NewGuid().ToString();
+        found.GlyphId = Guid.NewGuid().ToString();
         return found;
     }
 
@@ -153,7 +153,7 @@ public class FoGroup3D : FoGlyph3D
     {
         var found = FindOrCreate<T>(name, true);
         if (!string.IsNullOrEmpty(guid) )
-            found!.UniqueGuid = guid;
+            found!.GlyphId = guid;
 
         return found!;
     }

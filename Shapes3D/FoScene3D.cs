@@ -6,7 +6,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
-
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -15,6 +15,9 @@ public interface IScene
     void Clearall();
     Scene GetScene();
     ViewerSettings GetSettings();
+    V AddShape<V>(V shape) where V : FoGlyph3D;
+
+
 }
 
 public class FoScene3D : FoGlyph3D, IScene
@@ -33,6 +36,9 @@ public class FoScene3D : FoGlyph3D, IScene
         }
     };
 
+    protected FoCollection<FoGlyph3D> Pipes3D = new();
+    protected FoCollection<FoGlyph3D> Shapes3D = new();
+
     public FoScene3D()
     {
     }
@@ -50,5 +56,29 @@ public class FoScene3D : FoGlyph3D, IScene
     {
         return settings;
     }
+    public T AddShape<T>(T value) where T : FoGlyph3D
+    {
+        var collection = DynamicSlot(value.GetType());
+        if (string.IsNullOrEmpty(value.Name))
+        {
+            value.Name = collection.NextItemName();
+        }
 
+        collection.AddObject(value.Name, value);
+
+        if ( value is IShape3D)
+        {
+            Shapes3D.Add(value);   
+            $"Shapes2D Added {value.Name}".WriteSuccess();
+        }
+        else if ( value is IPipe3D)
+        {
+            Pipes3D.Add(value);
+            $"Pipes3D Added {value.Name}".WriteSuccess();
+        }
+
+        value.Render(GetScene(), 1, 1);
+
+        return value;
+    }
 }

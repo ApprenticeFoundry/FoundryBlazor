@@ -7,7 +7,7 @@ namespace FoundryBlazor.Shape;
 
 public class FoGlyph3D : FoComponent
 {
-    public string UniqueGuid { get; set; } = "";
+    public string GlyphId { get; set; } = "";
     public string PlatformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
@@ -23,6 +23,8 @@ public class FoGlyph3D : FoComponent
         Color = color;
     }
 
+    public Action<FoGlyph3D, int>? ContextLink;
+
     public bool IsSamePlatform(FoGlyph3D obj)
     {
         return PlatformName.Matches(obj.PlatformName);
@@ -37,7 +39,12 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-
+    public FoGlyph3D MoveTo(int x, int y, int z) 
+    {
+        var pos = GetPosition();
+        pos.Loc(x, y, z);
+        return this; 
+    }
     public virtual FoVector3D GetPosition()
     {
         var result = new FoVector3D(0, 0, 0);

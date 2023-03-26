@@ -162,7 +162,7 @@ public class FoArena3D : FoGlyph3D, IArena
         FillScene();
         var platform = new FoGroup3D()
         {
-            UniqueGuid = Guid.NewGuid().ToString(),
+            GlyphId = Guid.NewGuid().ToString(),
             PlatformName = "RonTest",
             Name = "RonTest"
         };
@@ -238,7 +238,6 @@ public class FoArena3D : FoGlyph3D, IArena
     public async Task RenderPlatformToScene(FoGroup3D? platform)
     {
         await ClearViewer3D();
-        await Task.CompletedTask;
 
         $"RenderPlatformToScene PlatformName={platform?.PlatformName}".WriteInfo();
 
