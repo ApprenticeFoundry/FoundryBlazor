@@ -31,16 +31,16 @@ public class SceneManagementService : ISceneManagement
     private readonly FoCollection<FoScene3D> _scenes = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawingHelpers _helper;
+    private readonly IScaledDrawing _ScaledDrawing;
 
     public SceneManagementService(
         IHitTestService hit,
-        IScaledDrawingHelpers help,
+        IScaledDrawing help,
         ISelectionService sel)
     {
         _hitTestService = hit;
         _selectService = sel;
-        _helper = help;
+        _ScaledDrawing = help;
 
         _activeScene = new FoScene3D()
         {

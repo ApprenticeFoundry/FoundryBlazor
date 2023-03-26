@@ -3,7 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public interface IScaledDrawingHelpers
+public interface IScaledDrawing
 {
     Rectangle Rect();
     Rectangle UserWindow();
@@ -30,7 +30,7 @@ public interface IScaledDrawingHelpers
     Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major);
 }
 
-public class ScaledDrawingHelpers : IScaledDrawingHelpers
+public class ScaledDrawing : IScaledDrawing
 {
     public int TrueCanvasWidth = 0;
     public int TrueCanvasHeight = 0;
@@ -42,7 +42,7 @@ public class ScaledDrawingHelpers : IScaledDrawingHelpers
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 6.0;  //inches
 
-    public ScaledDrawingHelpers()
+    public ScaledDrawing()
     {
     }
 

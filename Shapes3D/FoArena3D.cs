@@ -39,11 +39,11 @@ public interface IArena
 public class FoArena3D : FoGlyph3D, IArena
 {
     private ISceneManagement SceneManager { get; set; }
-
-    public Action<CanvasMouseArgs>? DoCreate { get; set; }
-
+    private IScaledArena ScaledArena { get; set; }
     private Viewer? Viewer3D { get; set; }
     public ComponentBus PubSub { get; set; }
+
+    public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
 
     public ViewerSettings settings = new()
@@ -57,11 +57,13 @@ public class FoArena3D : FoGlyph3D, IArena
     };
 
     public FoArena3D(
+        IScaledArena scaled,
         ISceneManagement sceneManagement,
         ComponentBus pubSub)
     {
         SceneManager = sceneManagement;
         PubSub = pubSub;
+        ScaledArena = scaled;
         InitScene();
     }
 
@@ -210,7 +212,8 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public async Task UpdateScene()
     {
-        await Viewer3D!.UpdateScene();
+        if ( Viewer3D != null)
+            await Viewer3D.UpdateScene();
     }
 
 
@@ -275,7 +278,7 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(scene, 0, 0);
         });
 
-        await Viewer3D!.UpdateScene();
+        await UpdateScene();
     }
 
     public void PreRenderWorld(FoWorld3D? world)

@@ -1,12 +1,19 @@
+using BlazorThreeJS.Enums;
+using BlazorThreeJS.Geometires;
+using BlazorThreeJS.Labels;
+using BlazorThreeJS.Materials;
+using BlazorThreeJS.Maths;
+using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
+using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
 public interface IScene
 {
-    void Clearall();
+    FoScene3D ClearAll();
     Scene GetScene();
     ViewerSettings GetSettings();
     V AddShape<V>(V shape) where V : FoGlyph3D;
@@ -18,7 +25,14 @@ public class FoScene3D : FoGlyph3D, IScene
 {
     public bool IsActive { get; set; } = false;
 
-    public Scene scene = new();
+    public double PageMargin { get; set; } = .50;  //inches
+    public double PageWidth { get; set; } = 10.0;  //inches
+    public double PageHeight { get; set; } = 4.0;  //inches
+    public double PageDepth { get; set; } = 4.0;  //inches
+    protected IScaledDrawing? _ScaledDrawing;
+
+    private Scene? Scene { get; set; }
+    private Mesh? ShapeMesh { get; set; }
 
     public ViewerSettings settings = new()
     {
@@ -39,12 +53,59 @@ public class FoScene3D : FoGlyph3D, IScene
 
     public Scene GetScene()
     {
-        return scene;
+        if ( Scene == null){
+            Scene = new();
+            ShapeMesh = null;
+            ClearAll();
+        }
+        return Scene;
     }
 
-    public void Clearall()
+    public FoScene3D ClearAll()
     {
-        //scene.cl;
+        Shapes3D.Clear();
+        Pipes3D.Clear();
+        EstablishBoundry();
+        return this;
+    }
+
+    public int DrawingWidth()
+    {
+        return _ScaledDrawing?.ToPixels(PageWidth) ?? 0;
+    }
+    public int DrawingHeight()
+    {
+        return _ScaledDrawing?.ToPixels(PageHeight) ?? 0;
+    }
+    public int DrawingDepth()
+    {
+        return _ScaledDrawing?.ToPixels(PageDepth) ?? 0;
+    }
+    public int DrawingMargin()
+    {
+        return _ScaledDrawing?.ToPixels(PageMargin) ?? 0;  //margin all around
+    }
+
+    public bool EstablishBoundry()
+    {
+        if ( ShapeMesh != null) return false;
+        Width = DrawingWidth();
+        Height = DrawingHeight();
+        Depth = DrawingDepth();
+        ShapeMesh = new Mesh
+        {
+            Geometry = new BoxGeometry(Width, Height, Depth),
+            Position = new Vector3(0, 0, 0),
+            Material = new MeshStandardMaterial()
+            {
+                Color = "red",
+                //Wireframe = true
+            }
+        };
+        Scene?.Add(ShapeMesh);
+        
+        $"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
+        return true;
     }
     public ViewerSettings GetSettings()
     {
@@ -52,6 +113,7 @@ public class FoScene3D : FoGlyph3D, IScene
     }
     public T AddShape<T>(T value) where T : FoGlyph3D
     {
+
         var collection = DynamicSlot(value.GetType());
         if (string.IsNullOrEmpty(value.Name))
         {
@@ -71,10 +133,12 @@ public class FoScene3D : FoGlyph3D, IScene
             //$"IPipe3D Added {value.Name}".WriteSuccess();
         }
 
-        value.Render(GetScene(), 1, 1);
+        var scene = GetScene();
+        value.Render(scene, 0, 0);
 
         return value;
     }
+
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {

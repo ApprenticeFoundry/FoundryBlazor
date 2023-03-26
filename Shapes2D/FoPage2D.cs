@@ -15,7 +15,7 @@ public class FoPage2D : FoGlyph2D
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
 
-    protected IScaledDrawingHelpers? _ScaledDrawing;
+    protected IScaledDrawing? _ScaledDrawing;
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
@@ -61,7 +61,7 @@ public class FoPage2D : FoGlyph2D
         return $"Drawing Size [{PageWidth}x{PageHeight} ({PageMargin})]in";
     }   
 
-    public virtual void SetScaledDrawing(IScaledDrawingHelpers scaledDrawing)
+    public virtual void SetScaledDrawing(IScaledDrawing scaledDrawing)
     {
         _ScaledDrawing = scaledDrawing;
         scaledDrawing.SetPageDefaults(this);
