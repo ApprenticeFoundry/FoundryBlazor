@@ -1,3 +1,4 @@
+using BlazorComponentBus;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
@@ -6,22 +7,19 @@ using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
-
-using BlazorComponentBus;
-
-using FoundryBlazor.PubSub;
-
+using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.PubSub;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    Scene GetScene();
-    Scene InitScene();
+    //Scene GetScene();
+    FoScene3D CurrentScene();
+    //Scene InitScene();
     Task ClearViewer3D();
     ViewerSettings GetSettings();
 
@@ -66,9 +64,14 @@ public class FoArena3D : FoGlyph3D, IArena
         PubSub = pubSub;
     }
 
+    public FoScene3D CurrentScene()
+    {
+        return SceneManager.CurrentScene();
+    }
+
     public Scene GetScene()
     {
-        return SceneManager.CurrentScene().GetScene();
+        return CurrentScene().GetScene();
     }
     public Scene InitScene()
     {
@@ -210,7 +213,7 @@ public class FoArena3D : FoGlyph3D, IArena
         $"world={world}".WriteInfo();
         if (world == null)
         {
-            $"world is empty or viewer is not preent".WriteError();
+            $"world is empty or viewer is not present".WriteError();
             return;
         }
 
@@ -302,7 +305,7 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    public virtual void FillScene()
+    private void FillScene()
     {
         var scene = GetScene();
         scene.Add(new AmbientLight());
