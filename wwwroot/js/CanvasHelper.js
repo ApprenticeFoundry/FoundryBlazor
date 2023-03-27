@@ -302,11 +302,24 @@ function canvasPNGBase64() {
     return getCanvasNode().toDataURL();
 }
 
+function removeKeyEventListeners() {
+    window.removeEventListener('keydown', keyDown);
+    window.removeEventListener('keyup', keyUp);
+    window.removeEventListener('keypress', keyPress);
+}
+
+function addKeyEventListeners() {
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
+    window.addEventListener('keypress', keyPress);
+}
+
 window.CanvasFileInput = {
     ShowFileInput: showFileInput,
     HideFileInput: hideFileInput,
 };
 
+window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventListeners };
 window.canvasPNGBase64 = canvasPNGBase64;
 
 window.initRenderJS = initRenderJS;
