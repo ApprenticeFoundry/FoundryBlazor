@@ -86,21 +86,21 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
             var arena = Workspace?.GetArena();
             arena?.SetViewer(ThreeJSView3D, ActiveScene!);
 
-            var ShapeMesh = new Mesh
-            {
-                Geometry = new BoxGeometry(1, 2, 3),
-                Position = new Vector3(8, 4, 0),
-                Material = new MeshStandardMaterial()
-                {
-                    Color = "green",
-                    //Wireframe = true
-                }
-            };
+            // var ShapeMesh = new Mesh
+            // {
+            //     Geometry = new BoxGeometry(1, 2, 3),
+            //     Position = new Vector3(8, 4, 0),
+            //     Material = new MeshStandardMaterial()
+            //     {
+            //         Color = "green",
+            //         //Wireframe = true
+            //     }
+            // };
+            // ActiveScene?.Add(ShapeMesh);
 
-            $"OnAfterRenderAsync ActiveScene={ActiveScene}, Mesh={ShapeMesh}".WriteInfo();
+            // $"OnAfterRenderAsync ActiveScene={ActiveScene}, Mesh={ShapeMesh}".WriteInfo();
 
 
-            ActiveScene?.Add(ShapeMesh);
 
             // await ThreeJSView3D.UpdateScene();
 
@@ -113,14 +113,14 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         InvokeAsync(StateHasChanged);
-        $"ThreeJSView3D.UpdateScene()".WriteInfo();
+        $"OnRefreshUIEvent ThreeJSView3D.UpdateScene()".WriteInfo();
         Task.Run(async () => await ThreeJSView3D.UpdateScene());
     }
     public async Task OnObjectLoaded(Object3DArgs e)
     {
         "OnObjectLoaded Start".WriteInfo();
-        // var arena = Workspace?.GetArena();
-        // arena?.PostRender(e.UUID);
+        var arena = Workspace?.GetArena();
+        arena?.PostRender(e.UUID);
         "OnObjectLoaded Before UpdateScene".WriteInfo();
         await ThreeJSView3D.UpdateScene();
     }
