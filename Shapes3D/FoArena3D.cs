@@ -21,6 +21,7 @@ public interface IArena
 
     void RefreshUI();
     void SetViewer(Viewer viewer);
+    Task RenderScene(Scene scene, int tick, double fps);
 
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
@@ -66,6 +67,11 @@ public class FoArena3D : FoGlyph3D, IArena
         return CurrentScene().GetScene();
     }
 
+    public async Task RenderScene(Scene scene, int tick, double fps)
+    {
+        await Task.CompletedTask;
+        //$"Arean Render Scene {tick}".WriteInfo();
+    }
     public Scene InitScene()
     {
         var scene = ThreeJSScene();

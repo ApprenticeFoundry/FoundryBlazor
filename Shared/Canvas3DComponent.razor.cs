@@ -35,6 +35,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
 
+    public AnimationHelper? AnimationHelperReference;
+
 
     public ViewerSettings GetSettings()
     {
@@ -78,10 +80,11 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
 
-            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            await AnimationHelperReference!.Initialize();
             var arena = Workspace?.GetArena();
             arena?.SetViewer(ThreeJSView3D);
-            
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+
            // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
             ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
         }
@@ -96,36 +99,36 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     }
     public async Task OnObjectLoaded(Object3DArgs e)
     {
-        var arena = Workspace!.GetArena();
+        var arena = Workspace?.GetArena();
         arena?.PostRender(e.UUID);
         await Task.CompletedTask;
     }
 
 
-    // public async Task RenderFrame(double fps)
-    // {
-    //     if (Ctx == null) return;
-    //     tick++;
+    public async Task RenderFrame(double fps)
+    {
+        if (ActiveScene == null) return;
+        tick++;
 
-    //     Workspace?.PreRender(tick);
+        //Workspace?.PreRender(tick);
 
-    //     var drawing = Workspace?.GetDrawing();
-    //     if (drawing == null) return;
+        var arena = Workspace?.GetArena();
+        if (arena == null) return;
 
-    //     //if you are already rendering then skip it this cycle
-    //     if (drawing.SetCurrentlyRendering(true)) return;
-    //     await Ctx.BeginBatchAsync();
-    //     await Ctx.SaveAsync();
+        //$"RenderFrame {tick}".WriteError();
 
-    //     await drawing.RenderDrawing(Ctx, tick, fps);
-    //     Workspace?.RenderWatermark(Ctx, tick);
+        //if you are already rendering then skip it this cycle
+        //if (drawing.SetCurrentlyRendering(true)) return;
 
-    //     await Ctx.RestoreAsync();
-    //     await Ctx.EndBatchAsync();
-    //     drawing.SetCurrentlyRendering(false);
 
-    //     Workspace?.PostRender(tick);
-    // }
+        await arena.RenderScene(ActiveScene, tick, fps);
+        //Workspace?.RenderWatermark(Ctx, tick);
+
+
+        //drawing.SetCurrentlyRendering(false);
+
+        //Workspace?.PostRender(tick);
+    }
 
 
 

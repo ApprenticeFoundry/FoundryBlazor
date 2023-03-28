@@ -18,7 +18,9 @@
 </div>
 
 <div style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight >
-    <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene()  />
+   <AnimationHelper @ref="AnimationHelperReference" RenderFrame="RenderFrame"  >
+        <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene()  />
+    </AnimationHelper>
 </div>
 
 
