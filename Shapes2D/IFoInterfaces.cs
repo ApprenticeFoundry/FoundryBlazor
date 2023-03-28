@@ -31,3 +31,13 @@ public interface IImage2D: IShape2D
 {
     
 }
+
+public interface IShape3D
+{
+
+}
+
+public interface IPipe3D
+{
+    
+}

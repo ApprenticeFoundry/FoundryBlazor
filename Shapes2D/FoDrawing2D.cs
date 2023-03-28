@@ -62,7 +62,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
     private IPageManagement PageManager { get; set; }
-    private IScaledDrawingHelpers ScaleDrawing { get; set; }
+    private IScaledDrawing ScaleDrawing { get; set; }
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -131,7 +131,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
-        IScaledDrawingHelpers scaled,
+        IScaledDrawing scaled,
         IHitTestService hittest,
         ComponentBus pubSub
         )
@@ -553,6 +553,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         try
         {
+            if (args == null) return;
             SetCurrentlyProcessing(true);
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?

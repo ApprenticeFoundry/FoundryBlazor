@@ -1,19 +1,20 @@
+using BlazorThreeJS.Scenes;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
-public interface ISceneManagement
+public interface IStageManagement
 {
 
-    FoScene3D CurrentScene();
-    FoScene3D SetCurrentScene(FoScene3D page);
-    FoScene3D AddScene(FoScene3D page);
+    FoStage3D CurrentStage();
+    FoStage3D SetCurrentStage(FoStage3D page);
+    FoStage3D AddStage(FoStage3D page);
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
 
     void ClearAll();
-    int SceneCount();
+    int StageCount();
 
-
+    Task RenderDetailed(Scene scene, int tick, double fps);
 
     T Add<T>(T value) where T : FoGlyph3D;
     //T Duplicate<T>(T value) where T : FoGlyph3D;
@@ -23,38 +24,39 @@ public interface ISceneManagement
 }
 
 
-public class SceneManagementService : ISceneManagement
+public class StageManagementService : IStageManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoScene3D _activeScene { get; set; }
-    private readonly FoCollection<FoScene3D> _scenes = new();
+    private FoStage3D ActiveStage { get; set; }
+    private readonly FoCollection<FoStage3D> Stages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawingHelpers _helper;
+    private readonly IScaledArena _ScaledArena;
 
-    public SceneManagementService(
+    public StageManagementService
+    (
         IHitTestService hit,
-        IScaledDrawingHelpers help,
+        IScaledArena scaled,
         ISelectionService sel)
     {
         _hitTestService = hit;
         _selectService = sel;
-        _helper = help;
+        _ScaledArena = scaled;
 
-        _activeScene = new FoScene3D()
-        {
-            IsActive = true
-        };
-
-        AddScene(_activeScene);
+        ActiveStage = CurrentStage();
     }
 
 
 
-    public int SceneCount()
+    public int StageCount()
     {
         return 1;
+    }
+
+    public async Task RenderDetailed(Scene scene, int tick, double fps)
+    {
+        await CurrentStage().RenderDetailed(scene, tick, fps);
     }
 
 
@@ -62,7 +64,7 @@ public class SceneManagementService : ISceneManagement
     public void ClearAll()
     {
         FoGlyph2D.ResetHitTesting = true;
-        //SRS fix CurrentScene().ClearAll();
+       // CurrentStage().ClearAll();
     }
 
     public bool ToggleHitTestRender()
@@ -75,7 +77,7 @@ public class SceneManagementService : ISceneManagement
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        CurrentScene().GetMembers<FoMenu3D>()?.ForEach(item =>
+        CurrentStage().GetMembers<FoMenu3D>()?.ForEach(item =>
         {
             list.Add(item);
         });
@@ -86,41 +88,42 @@ public class SceneManagementService : ISceneManagement
 
     public T Add<T>(T value) where T : FoGlyph3D
     {
-        var found = _activeScene.Add(value);
+        var found = CurrentStage().Add(value);
         //_hitTestService.Insert(value);
         return found;
 
     }
 
-    public FoScene3D CurrentScene()
+    public FoStage3D CurrentStage()
     {
-        if (_activeScene == null)
+        if (ActiveStage == null)
         {
-            var found = _scenes.Values().Where(page => page.IsActive).FirstOrDefault();
+            var found = Stages.Values().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoScene3D();
-                AddScene(found);
+                found = new FoStage3D("Stage-1",10,10,10,"Red");
+                found.SetScaledArena(_ScaledArena);
+                AddStage(found);
             }
-            _activeScene = found;
-            _activeScene.IsActive = true;
+            ActiveStage = found;
+            ActiveStage.IsActive = true;
         }
 
-        return _activeScene;
+        return ActiveStage;
     }
-    public FoScene3D SetCurrentScene(FoScene3D page)
+    public FoStage3D SetCurrentStage(FoStage3D page)
     {
-        _activeScene = page;
-        _scenes.Values().ForEach(item => item.IsActive = false);
-        _activeScene.IsActive = true;
-        return _activeScene!;
+        ActiveStage = page;
+        Stages.Values().ForEach(item => item.IsActive = false);
+        ActiveStage.IsActive = true;
+        return ActiveStage!;
     }
 
-    public FoScene3D AddScene(FoScene3D scene)
+    public FoStage3D AddStage(FoStage3D scene)
     {
-        var found = _scenes.Values().Where(item => item == scene).FirstOrDefault();
+        var found = Stages.Values().Where(item => item == scene).FirstOrDefault();
         if (found == null)
-            _scenes.Add(scene);
+            Stages.Add(scene);
         return scene;
     }
 
@@ -141,13 +144,13 @@ public class SceneManagementService : ISceneManagement
 
     public void ClearMenu3D<U>(string name) where U : FoMenu3D
     {
-        var menu = CurrentScene().Find<U>(name);
+        var menu = CurrentStage().Find<U>(name);
         menu?.Clear();
     }
 
     public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
     {
-        var menu = CurrentScene().Find<U>(name);
+        var menu = CurrentStage().Find<U>(name);
         if (menu == null)
         {
             menu = Activator.CreateInstance(typeof(U), name) as U;

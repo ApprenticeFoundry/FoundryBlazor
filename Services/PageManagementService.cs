@@ -54,11 +54,11 @@ public class PageManagementService : FoComponent, IPageManagement
     private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawingHelpers _ScaledDrawing;
+    private readonly IScaledDrawing _ScaledDrawing;
 
     public PageManagementService(
         IHitTestService hit,
-        IScaledDrawingHelpers help,
+        IScaledDrawing help,
         ISelectionService sel)
     {
         _hitTestService = hit;

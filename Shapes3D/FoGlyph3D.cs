@@ -7,10 +7,17 @@ namespace FoundryBlazor.Shape;
 
 public class FoGlyph3D : FoComponent
 {
-    public string UniqueGuid { get; set; } = "";
+    public string GlyphId { get; set; } = "";
     public string PlatformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
+
+    protected int width = 0;
+    public int Width { get { return this.width; } set { this.width = AssignInt(value, width); } }
+    protected int height = 0;
+    public int Height { get { return this.height; } set { this.height = AssignInt(value, height); } }
+    protected int depth = 0;
+    public int Depth { get { return this.depth; } set { this.depth = AssignInt(value, depth); } }
 
     public FoGlyph3D() : base("")
     {
@@ -22,6 +29,35 @@ public class FoGlyph3D : FoComponent
     {
         Color = color;
     }
+
+    public FoGlyph3D SetBoundry(int width, int height, int depth)
+    {
+        (Width, Height, Depth) = (width, height, depth);
+        return this;
+    }
+
+    protected int AssignInt(int newValue, int oldValue)
+    {
+        if ( Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
+
+        return newValue;
+    }
+
+
+    public virtual bool Smash(bool force)
+    {
+        //if ( _matrix == null && !force) return false;
+        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
+
+        // ResetHitTesting = true;
+        // this._matrix = null;
+        // this._invMatrix = null;
+
+        return true;
+    }
+
+    public Action<FoGlyph3D, int>? ContextLink;
 
     public bool IsSamePlatform(FoGlyph3D obj)
     {
@@ -37,7 +73,17 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
+    public virtual bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
+    {
+        return false;
+    }
 
+    public FoGlyph3D MoveTo(int x, int y, int z) 
+    {
+        var pos = GetPosition();
+        pos.Loc(x, y, z);
+        return this; 
+    }
     public virtual FoVector3D GetPosition()
     {
         var result = new FoVector3D(0, 0, 0);

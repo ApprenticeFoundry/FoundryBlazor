@@ -156,7 +156,7 @@
         /// <returns>Eased timescale.</returns>
         public static float QuintOut(float t)
         {
-            return (t = t - 1) * t * t * t * t + 1;
+            return (--t) * t * t * t * t + 1;
         }
 
         /// <summary>
