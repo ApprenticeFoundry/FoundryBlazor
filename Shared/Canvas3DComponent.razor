@@ -1,5 +1,6 @@
 ﻿@using FoundryBlazor.Shared
-@inherits CanvasComponentBase
+@using BlazorThreeJS.Viewers
+@inherits Canvas3DComponentBase
 
 <div style="position: absolute; top: 1px; right: 1px">
     @foreach (var image in Workspace!.GetDrawing()?.GetAllImages())
@@ -16,12 +17,10 @@
     }
 </div>
 
-<div  id="canvasHolder" style=@StyleCanvas>
-    <CanvasHelper @ref="CanvasHelperReference" RenderFrame="RenderFrame"  >
-        <BECanvas Width=@CanvasWidth Height=@CanvasHeight @ref="CanvasReference"></BECanvas>
-    </CanvasHelper>
-</div> 
+<div style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight >
+    <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene()  />
+</div>
 
-<div  id="fileInputHolder" style=@StyleDrop>
-    <InputFile OnChange="@OnFileInputChange" style="@FileInputStyle()"/>
-</div> 
+
+
+

@@ -29,7 +29,7 @@ public class FoScene3D : FoGlyph3D, IScene
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
     public double PageDepth { get; set; } = 4.0;  //inches
-    protected IScaledDrawing? _ScaledDrawing;
+    protected IScaledArena? _ScaledDArena;
 
     private Scene? Scene { get; set; }
     private Mesh? ShapeMesh { get; set; }
@@ -47,13 +47,53 @@ public class FoScene3D : FoGlyph3D, IScene
     protected FoCollection<FoGlyph3D> Pipes3D = new();
     protected FoCollection<FoGlyph3D> Shapes3D = new();
 
-    public FoScene3D()
+    public FoScene3D(): base()
     {
+    }
+
+    public FoScene3D(string name) : base(name)
+    {
+    }
+    public FoScene3D(string name, string color) : base(name, color)
+    {
+    }
+
+
+    public FoScene3D(string name, int width, int height, int depth, string color) : base(name, color)
+    {
+        //ResetLocalPin((obj) => 0, (obj) => 0);
+        SetBoundry(width, height, depth);
+    }
+
+
+
+    public int DrawingWidth()
+    {
+        return _ScaledDArena?.ToPixels(PageWidth) ?? 0;
+    }
+    public int DrawingHeight()
+    {
+        return _ScaledDArena?.ToPixels(PageHeight) ?? 0;
+    }
+    public int DrawingDepth()
+    {
+        return _ScaledDArena?.ToPixels(PageDepth) ?? 0;
+    }
+    public int DrawingMargin()
+    {
+        return _ScaledDArena?.ToPixels(PageMargin) ?? 0;  //margin all around
+    }
+
+    public virtual void SetScaledArena(IScaledArena scaledArena)
+    {
+        _ScaledDArena = scaledArena;
+        scaledArena.SetPageDefaults(this);
     }
 
     public Scene GetScene()
     {
-        if ( Scene == null){
+        if ( Scene == null)
+        {
             Scene = new();
             ShapeMesh = null;
             ClearAll();
@@ -65,30 +105,14 @@ public class FoScene3D : FoGlyph3D, IScene
     {
         Shapes3D.Clear();
         Pipes3D.Clear();
-        EstablishBoundry();
         return this;
-    }
-
-    public int DrawingWidth()
-    {
-        return _ScaledDrawing?.ToPixels(PageWidth) ?? 0;
-    }
-    public int DrawingHeight()
-    {
-        return _ScaledDrawing?.ToPixels(PageHeight) ?? 0;
-    }
-    public int DrawingDepth()
-    {
-        return _ScaledDrawing?.ToPixels(PageDepth) ?? 0;
-    }
-    public int DrawingMargin()
-    {
-        return _ScaledDrawing?.ToPixels(PageMargin) ?? 0;  //margin all around
     }
 
     public bool EstablishBoundry()
     {
+        $"try EstablishBoundry".WriteSuccess();
         if ( ShapeMesh != null) return false;
+        
         Width = DrawingWidth();
         Height = DrawingHeight();
         Depth = DrawingDepth();
@@ -102,7 +126,9 @@ public class FoScene3D : FoGlyph3D, IScene
                 //Wireframe = true
             }
         };
-        Scene?.Add(ShapeMesh);
+
+        Scene ??= new();
+        Scene.Add(ShapeMesh);
         
         $"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
         return true;

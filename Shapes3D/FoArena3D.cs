@@ -17,18 +17,16 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    Scene ThreeJSScene();
     FoScene3D CurrentScene();
-    Task ClearViewer3D();
-    ViewerSettings GetSettings();
 
     void RefreshUI();
     void SetViewer(Viewer viewer);
+
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
     void PostRender(Guid guid);
-    Task UpdateScene();
+
 
     FoGroup3D MakeAndRenderTestPlatform();
 
@@ -38,23 +36,15 @@ public interface IArena
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
+    public Viewer? Viewer3D { get; set; }
     private ISceneManagement SceneManager { get; set; }
     private IScaledArena ScaledArena { get; set; }
-    private Viewer? Viewer3D { get; set; }
+
     public ComponentBus PubSub { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
 
-    public ViewerSettings settings = new()
-    {
-        CanSelect = true,// default is false
-        SelectedColor = "black",
-        WebGLRendererSettings = new WebGLRendererSettings
-        {
-            Antialias = false // if you need poor quality for some reasons
-        }
-    };
 
     public FoArena3D(
         IScaledArena scaled,
@@ -64,7 +54,6 @@ public class FoArena3D : FoGlyph3D, IArena
         SceneManager = sceneManagement;
         PubSub = pubSub;
         ScaledArena = scaled;
-        InitScene();
     }
 
     public FoScene3D CurrentScene()
@@ -79,7 +68,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public Scene InitScene()
     {
-        var scene = CurrentScene().GetScene();
+        var scene = ThreeJSScene();
         if (scene != null)
         {
             scene.Add(new AmbientLight());
@@ -87,27 +76,25 @@ public class FoArena3D : FoGlyph3D, IArena
             {
                 Position = new Vector3(1, 3, 0)
             });
+            CurrentScene().EstablishBoundry();
+            RefreshUI();
+            "InitScene".WriteInfo();
         }
 
-        return CurrentScene().GetScene();
+        return ThreeJSScene();
     }
 
-    public async Task ClearViewer3D()
-    {
-        if (Viewer3D != null)
-            await Viewer3D.ClearSceneAsync();
-    }
-
-    public ViewerSettings GetSettings()
-    {
-        return settings;
-    }
+    // public async Task ClearViewer3D()
+    // {
+    //     "ClearViewer3D".WriteInfo();
+    //     if (Viewer3D != null)
+    //         await Viewer3D.ClearSceneAsync();
+    // }
 
     public void SetViewer(Viewer viewer)
     {
         Viewer3D = viewer;
     }
-
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         return SceneManager.CollectMenus(list);
@@ -186,10 +173,7 @@ public class FoArena3D : FoGlyph3D, IArena
             .Position = new FoVector3D();
 
 
-        Task.Run(async () =>
-        {
-            await RenderPlatformToScene(platform);
-        });
+        RenderPlatformToScene(platform);
 
         return platform;
     }
@@ -201,23 +185,15 @@ public class FoArena3D : FoGlyph3D, IArena
 
         $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
 
-        Task.Run(async () =>
-        {
-            PreRenderWorld(world);
-            await RenderWorldToScene(world);
-            await UpdateScene();
-        });
 
-    }
-
-    public async Task UpdateScene()
-    {
-        if ( Viewer3D != null)
-            await Viewer3D.UpdateScene();
+        PreRenderWorld(world);
+        RenderWorldToScene(world);
+        RefreshUI();
     }
 
 
-    public async Task RenderWorldToScene(FoWorld3D? world)
+
+    public void RenderWorldToScene(FoWorld3D? world)
     {
         $"world={world}".WriteInfo();
         if (world == null)
@@ -229,8 +205,8 @@ public class FoArena3D : FoGlyph3D, IArena
         var scene = CurrentScene().GetScene();
         $"scene={scene}".WriteInfo();
 
-        await ClearViewer3D();
-        $"cleared scene".WriteInfo();
+        //await ClearViewer3D();
+        //$"cleared scene".WriteInfo();
 
         $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
         var platforms = world.Platforms();
@@ -238,14 +214,14 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             foreach (var platform in platforms)
             {
-                await RenderPlatformToScene(platform);
+                RenderPlatformToScene(platform);
             }
         }
     }
 
-    public async Task RenderPlatformToScene(FoGroup3D? platform)
+    public void RenderPlatformToScene(FoGroup3D? platform)
     {
-        await ClearViewer3D();
+        //await ClearViewer3D();
 
         $"RenderPlatformToScene PlatformName={platform?.PlatformName}".WriteInfo();
 
@@ -278,13 +254,13 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(scene, 0, 0);
         });
 
-        await UpdateScene();
+        RefreshUI();
     }
 
     public void PreRenderWorld(FoWorld3D? world)
     {
-        $"world={world}".WriteInfo();
-        if (world == null || Viewer3D == null)
+        $"PreRenderWorld world={world}".WriteInfo();
+        if (world == null )
         {
             $"world is empty or viewer is not preent".WriteError();
             return;
@@ -295,8 +271,8 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void PreRenderPlatform(FoGroup3D? platform)
     {
-        $"platform={platform}".WriteInfo();
-        if (platform == null || Viewer3D == null)
+        $"PreRenderPlatform platform={platform}".WriteInfo();
+        if (platform == null)
         {
             $"platform is empty or viewer is not present".WriteError();
             return;
@@ -318,13 +294,12 @@ public class FoArena3D : FoGlyph3D, IArena
         var shape = Find<FoShape3D>(guid.ToString());
         if (shape != null)
         {
-            Task.Run(async () =>
-            {
-                var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
-                await Viewer3D!.RemoveByUuidAsync(removeGuid);
-                shape.PromiseGUID = null;
-                shape.LoadingGUID = null;
-            });
+
+            //var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
+            //await Viewer3D!.RemoveByUuidAsync(removeGuid);
+            shape.PromiseGUID = null;
+            shape.LoadingGUID = null;
+
         }
         else
         {

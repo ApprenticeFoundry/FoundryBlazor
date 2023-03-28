@@ -27,27 +27,23 @@ public class SceneManagementService : ISceneManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoScene3D _activeScene { get; set; }
+    private FoScene3D ActiveScene { get; set; }
     private readonly FoCollection<FoScene3D> _scenes = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawing _ScaledDrawing;
+    private readonly IScaledArena _ScaledArena;
 
-    public SceneManagementService(
+    public SceneManagementService
+    (
         IHitTestService hit,
-        IScaledDrawing help,
+        IScaledArena scaled,
         ISelectionService sel)
     {
         _hitTestService = hit;
         _selectService = sel;
-        _ScaledDrawing = help;
+        _ScaledArena = scaled;
 
-        _activeScene = new FoScene3D()
-        {
-            IsActive = true
-        };
-
-        AddScene(_activeScene);
+        ActiveScene = CurrentScene();
     }
 
 
@@ -62,7 +58,7 @@ public class SceneManagementService : ISceneManagement
     public void ClearAll()
     {
         FoGlyph2D.ResetHitTesting = true;
-        //SRS fix CurrentScene().ClearAll();
+        CurrentScene().ClearAll();
     }
 
     public bool ToggleHitTestRender()
@@ -86,7 +82,7 @@ public class SceneManagementService : ISceneManagement
 
     public T Add<T>(T value) where T : FoGlyph3D
     {
-        var found = _activeScene.Add(value);
+        var found = CurrentScene().Add(value);
         //_hitTestService.Insert(value);
         return found;
 
@@ -94,26 +90,27 @@ public class SceneManagementService : ISceneManagement
 
     public FoScene3D CurrentScene()
     {
-        if (_activeScene == null)
+        if (ActiveScene == null)
         {
             var found = _scenes.Values().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoScene3D();
+                found = new FoScene3D("Scene-1",10,10,10,"Red");
+                found.SetScaledArena(_ScaledArena);
                 AddScene(found);
             }
-            _activeScene = found;
-            _activeScene.IsActive = true;
+            ActiveScene = found;
+            ActiveScene.IsActive = true;
         }
 
-        return _activeScene;
+        return ActiveScene;
     }
     public FoScene3D SetCurrentScene(FoScene3D page)
     {
-        _activeScene = page;
+        ActiveScene = page;
         _scenes.Values().ForEach(item => item.IsActive = false);
-        _activeScene.IsActive = true;
-        return _activeScene!;
+        ActiveScene.IsActive = true;
+        return ActiveScene!;
     }
 
     public FoScene3D AddScene(FoScene3D scene)

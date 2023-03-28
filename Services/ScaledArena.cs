@@ -7,7 +7,7 @@ public interface IScaledArena
 {
     Rectangle Rect();
 
-    void SetPageDefaults(FoPage2D page);
+    void SetPageDefaults(FoScene3D page);
     double ConvertToPixels(double inches);
     int ToPixels(double inches);
     double ToInches(int value);
@@ -72,7 +72,7 @@ public class ScaledArena : IScaledArena
 
 
 
-    public void SetPageDefaults(FoPage2D page)
+    public void SetPageDefaults(FoScene3D page)
     {
         page.PageMargin = this.PageMargin;
         page.PageWidth = this.PageWidth;
