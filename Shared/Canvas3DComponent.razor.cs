@@ -1,5 +1,9 @@
 using BlazorComponentBus;
 using BlazorThreeJS.Events;
+using BlazorThreeJS.Geometires;
+using BlazorThreeJS.Materials;
+using BlazorThreeJS.Maths;
+using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
@@ -15,7 +19,7 @@ namespace FoundryBlazor.Shared;
 
 public class Canvas3DComponentBase : ComponentBase, IDisposable
 {
-    
+
     public Viewer ThreeJSView3D = null!;
     private ViewerSettings? Settings { get; set; }
     private Scene? ActiveScene { get; set; }
@@ -80,10 +84,27 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
             ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
 
             var arena = Workspace?.GetArena();
-            arena?.SetViewer(ThreeJSView3D,ActiveScene!);
-            //await ThreeJSView3D.UpdateScene();
+            arena?.SetViewer(ThreeJSView3D, ActiveScene!);
 
-           // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
+            var ShapeMesh = new Mesh
+            {
+                Geometry = new BoxGeometry(1, 2, 3),
+                Position = new Vector3(8, 4, 0),
+                Material = new MeshStandardMaterial()
+                {
+                    Color = "green",
+                    //Wireframe = true
+                }
+            };
+
+            $"OnAfterRenderAsync ActiveScene={ActiveScene}, Mesh={ShapeMesh}".WriteInfo();
+
+
+            ActiveScene?.Add(ShapeMesh);
+
+            // await ThreeJSView3D.UpdateScene();
+
+            // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -97,9 +118,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     }
     public async Task OnObjectLoaded(Object3DArgs e)
     {
-        var arena = Workspace?.GetArena();
-        arena?.PostRender(e.UUID);
-        //await Task.CompletedTask;
+        "OnObjectLoaded Start".WriteInfo();
+        // var arena = Workspace?.GetArena();
+        // arena?.PostRender(e.UUID);
+        "OnObjectLoaded Before UpdateScene".WriteInfo();
         await ThreeJSView3D.UpdateScene();
     }
 
@@ -114,8 +136,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         var arena = Workspace?.GetArena();
         if (arena == null) return;
 
-        var stage = arena.CurrentStage(); 
-        if (stage == null || !stage.IsDirty ) return;
+        var stage = arena.CurrentStage();
+        if (stage == null || !stage.IsDirty) return;
 
         $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
 
@@ -131,7 +153,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
         //Workspace?.PostRender(tick);
 
-        await ThreeJSView3D.UpdateScene();
+        // await ThreeJSView3D.UpdateScene();
     }
 
 
