@@ -28,7 +28,7 @@ public class ScaledArena : IScaledArena
     public int TrueCanvasWidth = 0;
     public int TrueCanvasHeight = 0;
 
-    public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
+    public double PixelsPerInch { get; set; } = 1; // 70; pixels per in or SRS machine
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 6.0;  //inches
@@ -60,7 +60,7 @@ public class ScaledArena : IScaledArena
     }
     public Size CanvasSize()
     {
-        return new Size(TrueCanvasWidth,TrueCanvasHeight);
+        return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
 
     public void SetPageSizeInches(double width, double height, double depth)
@@ -82,7 +82,7 @@ public class ScaledArena : IScaledArena
     public string CanvasWH()
     {
         return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{PixelsPerInch}";
-    }   
+    }
     public double GetPixelsPerInch()
     {
         return PixelsPerInch;
