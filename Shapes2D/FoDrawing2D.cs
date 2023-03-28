@@ -735,6 +735,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             {
                 PageManager.ExtractShapes(shape.GlyphId);
                 shape.UnglueAll();
+                shape.FinalizeDelete(PageManager);
                 PubSub.Publish<D2D_Destroy>(new D2D_Destroy(shape));
             });
         });
