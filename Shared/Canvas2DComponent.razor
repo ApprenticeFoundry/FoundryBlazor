@@ -2,14 +2,14 @@
 @inherits Canvas2DComponentBase
 
 <div style="position: absolute; top: 1px; right: 1px">
-    @foreach (var image in Workspace!.GetDrawing()?.GetAllImages())
+    @foreach (var image in Workspace!.GetDrawing()!.GetAllImages())
     {
         <img @ref="image.ImageRef" src="@image.ImageUrl" style="width: 200px; height: 100px" />
     }
 </div>
 
 <div style="position: absolute; top: 1px; left: 1px">
-    @foreach (var video in Workspace!.GetDrawing()?.GetAllVideos())
+    @foreach (var video in Workspace!.GetDrawing()!.GetAllVideos())
     {
         <video @ref="video.ImageRef" id="@video.Id" src="@video.ImageUrl" controls="true"
         style="width:400px;height:300px"></video>

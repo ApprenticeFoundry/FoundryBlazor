@@ -1,3 +1,4 @@
+using BlazorThreeJS.Scenes;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
@@ -13,7 +14,7 @@ public interface IStageManagement
     void ClearAll();
     int StageCount();
 
-
+    Task RenderDetailed(Scene scene, int tick, double fps);
 
     T Add<T>(T value) where T : FoGlyph3D;
     //T Duplicate<T>(T value) where T : FoGlyph3D;
@@ -51,6 +52,11 @@ public class StageManagementService : IStageManagement
     public int StageCount()
     {
         return 1;
+    }
+
+    public async Task RenderDetailed(Scene scene, int tick, double fps)
+    {
+        await CurrentStage().RenderDetailed(scene, tick, fps);
     }
 
 
@@ -95,7 +101,7 @@ public class StageManagementService : IStageManagement
             var found = Stages.Values().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoStage3D("Scene-1",10,10,10,"Red");
+                found = new FoStage3D("Stage-1",10,10,10,"Red");
                 found.SetScaledArena(_ScaledArena);
                 AddStage(found);
             }

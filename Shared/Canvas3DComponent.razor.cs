@@ -1,5 +1,3 @@
-using Blazor.Extensions;
-using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using BlazorThreeJS.Events;
 using BlazorThreeJS.Scenes;
@@ -9,12 +7,9 @@ using BlazorThreeJS.Viewers;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
-using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shared;
 
@@ -81,9 +76,11 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         {
 
             await AnimationHelperReference!.Initialize();
-            var arena = Workspace?.GetArena();
-            arena?.SetViewer(ThreeJSView3D);
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+
+            var arena = Workspace?.GetArena();
+            arena?.SetViewer(ThreeJSView3D,ActiveScene!);
+            //await ThreeJSView3D.UpdateScene();
 
            // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
             ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
@@ -95,6 +92,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         InvokeAsync(StateHasChanged);
+        $"ThreeJSView3D.UpdateScene()".WriteInfo();
         Task.Run(async () => await ThreeJSView3D.UpdateScene());
     }
     public async Task OnObjectLoaded(Object3DArgs e)
@@ -121,7 +119,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         //if (drawing.SetCurrentlyRendering(true)) return;
 
 
-        await arena.RenderScene(ActiveScene, tick, fps);
+        await arena.RenderArena(ActiveScene, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
 
 

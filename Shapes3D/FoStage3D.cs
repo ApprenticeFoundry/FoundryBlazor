@@ -24,7 +24,7 @@ public interface IScene
 public class FoStage3D : FoGlyph3D, IScene
 {
     public bool IsActive { get; set; } = false;
-
+    public bool IsDirty { get; set; } = true;
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
@@ -128,7 +128,7 @@ public class FoStage3D : FoGlyph3D, IScene
             }
         };
 
-        CurrentScene.Add(ShapeMesh);
+        CurrentScene?.Add(ShapeMesh);
         
         $"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
         return true;
@@ -156,13 +156,17 @@ public class FoStage3D : FoGlyph3D, IScene
             //$"IPipe3D Added {value.Name}".WriteSuccess();
         }
 
-
-        value.Render(CurrentScene, 0, 0);
+        if (CurrentScene != null)
+            value.Render(CurrentScene, 0, 0);
 
         return value;
     }
 
-
+    public async Task RenderDetailed(Scene scene, int tick, double fps)
+    {
+        Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
+        await Task.CompletedTask;
+    }
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         //$"Render {tick} {Shapes3D.Count()}".WriteInfo();

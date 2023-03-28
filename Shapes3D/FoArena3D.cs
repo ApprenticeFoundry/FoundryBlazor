@@ -1,11 +1,5 @@
 using BlazorComponentBus;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Lights;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
@@ -17,18 +11,17 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    FoStage3D CurrentStage();
 
     void RefreshUI();
-    void SetViewer(Viewer viewer);
-    Task RenderScene(Scene scene, int tick, double fps);
+    void SetViewer(Viewer viewer, Scene scene);
+    Task RenderArena(Scene scene, int tick, double fps);
 
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
     void PostRender(Guid guid);
 
-
+    FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
@@ -59,14 +52,20 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoStage3D CurrentStage()
     {
-        return StageManager.CurrentStage();
+         var stage = StageManager.CurrentStage();
+        return stage;
     }
 
-
-
-    public async Task RenderScene(Scene scene, int tick, double fps)
+    public async Task RenderArena(Scene scene, int tick, double fps)
     {
-        await Task.CompletedTask;
+        var stage = StageManager.CurrentStage();
+        if ( stage.IsDirty)
+        {
+            stage.IsDirty = false;
+            await StageManager.RenderDetailed(scene, tick, fps);
+            RefreshUI();
+        }
+        //if the stage is dirty call to update
         //$"Arean Render Scene {tick}".WriteInfo();
     }
 
@@ -77,7 +76,7 @@ public class FoArena3D : FoGlyph3D, IArena
     //         await Viewer3D.ClearSceneAsync();
     // }
 
-    public void SetViewer(Viewer viewer)
+    public void SetViewer(Viewer viewer, Scene scene)
     {
         Viewer3D = viewer;
     }
