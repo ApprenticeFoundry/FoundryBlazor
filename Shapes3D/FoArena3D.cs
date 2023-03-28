@@ -1,37 +1,27 @@
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Lights;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
-using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Settings;
-using BlazorThreeJS.Viewers;
-
 using BlazorComponentBus;
-
-using FoundryBlazor.PubSub;
-
+using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Viewers;
+using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.PubSub;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    Scene GetScene();
-    Scene InitScene();
-    Task ClearViewer3D();
-    ViewerSettings GetSettings();
 
     void RefreshUI();
-    void SetViewer(Viewer viewer);
+    void SetViewer(Viewer viewer, Scene scene);
+    Task RenderArena(Scene scene, int tick, double fps);
+
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
     void PostRender(Guid guid);
 
+    FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
@@ -40,75 +30,65 @@ public interface IArena
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
-    private ISceneManagement SceneManager { get; set; }
+    public Viewer? Viewer3D { get; set; }
+    private IStageManagement StageManager { get; set; }
+    private IScaledArena ScaledArena { get; set; }
+
+    public ComponentBus PubSub { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
-    private Viewer? Viewer3D { get; set; }
-    public ComponentBus PubSub { get; set; }
 
-
-    public ViewerSettings settings = new()
-    {
-        CanSelect = true,// default is false
-        SelectedColor = "black",
-        WebGLRendererSettings = new WebGLRendererSettings
-        {
-            Antialias = false // if you need poor quality for some reasons
-        }
-    };
 
     public FoArena3D(
-        ISceneManagement sceneManagement,
+        IScaledArena scaled,
+        IStageManagement manager,
         ComponentBus pubSub)
     {
-        SceneManager = sceneManagement;
+        StageManager = manager;
         PubSub = pubSub;
+        ScaledArena = scaled;
     }
 
-    public Scene GetScene()
+    public FoStage3D CurrentStage()
     {
-        return SceneManager.CurrentScene().GetScene();
+         var stage = StageManager.CurrentStage();
+        return stage;
     }
-    public Scene InitScene()
+
+    public async Task RenderArena(Scene scene, int tick, double fps)
     {
-        var scene = this.GetScene();
-        if (scene != null)
+        var stage = StageManager.CurrentStage();
+        if ( stage.IsDirty)
         {
-            scene.Add(new AmbientLight());
-            scene.Add(new PointLight()
-            {
-                Position = new Vector3(1, 3, 0)
-            });
+            stage.IsDirty = false;
+            await StageManager.RenderDetailed(scene, tick, fps);
+            RefreshUI();
         }
-
-        return SceneManager.CurrentScene().GetScene();
+        //if the stage is dirty call to update
+        //$"Arean Render Scene {tick}".WriteInfo();
     }
 
-    public async Task ClearViewer3D()
-    {
-        if (Viewer3D != null)
-            await Viewer3D.ClearSceneAsync();
-    }
+    // public async Task ClearViewer3D()
+    // {
+    //     "ClearViewer3D".WriteInfo();
+    //     if (Viewer3D != null)
+    //         await Viewer3D.ClearSceneAsync();
+    // }
 
-    public ViewerSettings GetSettings()
-    {
-        return settings;
-    }
-
-    public void SetViewer(Viewer viewer)
+    public void SetViewer(Viewer viewer, Scene scene)
     {
         Viewer3D = viewer;
+        CurrentStage().InitScene(scene);
     }
-
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        return SceneManager.CollectMenus(list);
+        return StageManager.CollectMenus(list);
     }
 
     public FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D
     {
-        var result = SceneManager.EstablishMenu3D<T, FoButton3D>(name, menu, clear);
+        var result = StageManager.EstablishMenu3D<T, FoButton3D>(name, menu, clear);
         return result;
     }
 
@@ -155,10 +135,10 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoGroup3D MakeAndRenderTestPlatform()
     {
-        FillScene();
+
         var platform = new FoGroup3D()
         {
-            UniqueGuid = Guid.NewGuid().ToString(),
+            GlyphId = Guid.NewGuid().ToString(),
             PlatformName = "RonTest",
             Name = "RonTest"
         };
@@ -179,10 +159,7 @@ public class FoArena3D : FoGlyph3D, IArena
             .Position = new FoVector3D();
 
 
-        Task.Run(async () =>
-        {
-            await RenderPlatformToScene(platform);
-        });
+        RenderPlatformToScene(platform);
 
         return platform;
     }
@@ -194,31 +171,26 @@ public class FoArena3D : FoGlyph3D, IArena
 
         $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
 
-        Task.Run(async () =>
-        {
-            PreRenderWorld(world);
-            await RenderWorldToScene(world);
-            await Viewer3D!.UpdateScene();
-        });
 
+        PreRenderWorld(world);
+        RenderWorldToScene(world);
+        RefreshUI();
     }
 
 
 
-    public async Task RenderWorldToScene(FoWorld3D? world)
+    public void RenderWorldToScene(FoWorld3D? world)
     {
         $"world={world}".WriteInfo();
         if (world == null)
         {
-            $"world is empty or viewer is not preent".WriteError();
+            $"world is empty or viewer is not present".WriteError();
             return;
         }
 
-        var scene = GetScene();
-        $"scene={scene}".WriteInfo();
 
-        await ClearViewer3D();
-        $"cleared scene".WriteInfo();
+        //await ClearViewer3D();
+        //$"cleared scene".WriteInfo();
 
         $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
         var platforms = world.Platforms();
@@ -226,15 +198,14 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             foreach (var platform in platforms)
             {
-                await RenderPlatformToScene(platform);
+                RenderPlatformToScene(platform);
             }
         }
     }
 
-    public async Task RenderPlatformToScene(FoGroup3D? platform)
+    public void RenderPlatformToScene(FoGroup3D? platform)
     {
-        await ClearViewer3D();
-        await Task.CompletedTask;
+        //await ClearViewer3D();
 
         $"RenderPlatformToScene PlatformName={platform?.PlatformName}".WriteInfo();
 
@@ -245,35 +216,34 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = GetScene();
-        $"scene={scene}".WriteInfo();
+
 
 
         platform.Bodies()?.ForEach(body =>
         {
             //$"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
-            body.Render(scene, 0, 0);
+            //body.Render(scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
             //$"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
-            label.Render(scene, 0, 0);
+            //label.Render(scene, 0, 0);
         });
 
         platform.Datums()?.ForEach(datum =>
         {
             //$"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
-            datum.Render(scene, 0, 0);
+            //datum.Render(scene, 0, 0);
         });
 
-        await Viewer3D!.UpdateScene();
+        RefreshUI();
     }
 
     public void PreRenderWorld(FoWorld3D? world)
     {
-        $"world={world}".WriteInfo();
-        if (world == null || Viewer3D == null)
+        $"PreRenderWorld world={world}".WriteInfo();
+        if (world == null )
         {
             $"world is empty or viewer is not preent".WriteError();
             return;
@@ -284,15 +254,15 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void PreRenderPlatform(FoGroup3D? platform)
     {
-        $"platform={platform}".WriteInfo();
-        if (platform == null || Viewer3D == null)
+        $"PreRenderPlatform platform={platform}".WriteInfo();
+        if (platform == null)
         {
             $"platform is empty or viewer is not present".WriteError();
             return;
         }
 
-        var scene = GetScene();
-        $"scene={scene}".WriteInfo();
+        //var scene = CurrentStage().GetScene();
+        //$"scene={scene}".WriteInfo();
 
 
         platform.Bodies()?.ForEach(body =>
@@ -302,174 +272,22 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    public virtual void FillScene()
-    {
-        var scene = GetScene();
-        scene.Add(new AmbientLight());
-        scene.Add(new PointLight()
-        {
-            Position = new Vector3(1, 3, 0)
-        });
-        scene.Add(new Mesh());
-        scene.Add(new Mesh
-        {
-            Geometry = new BoxGeometry(width: 1.2f, height: 0.5f),
-            Position = new Vector3(-2, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "magenta"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CircleGeometry(radius: 0.75f, segments: 12),
-            Position = new Vector3(2, 0, 0),
-            Scale = new Vector3(1, 0.75f, 1),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "#98AFC7"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CapsuleGeometry(radius: 0.5f, length: 2),
-            Position = new Vector3(-4, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkgreen"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new ConeGeometry(radius: 0.5f, height: 2, radialSegments: 16),
-            Position = new Vector3(4, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "green",
-                FlatShading = true,
-                Metalness = 0.5f,
-                Roughness = 0.5f
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CylinderGeometry(radiusTop: 0.5f, height: 1.2f, radialSegments: 16),
-            Position = new Vector3(0, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "red",
-                Wireframe = true
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new DodecahedronGeometry(radius: 0.8f),
-            Position = new Vector3(-2, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkviolet",
-                Metalness = 0.5f,
-                Roughness = 0.5f
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new IcosahedronGeometry(radius: 0.8f),
-            Position = new Vector3(-4, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "violet"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-
-            Geometry = new OctahedronGeometry(radius: 0.75f),
-            Position = new Vector3(2, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "aqua"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new PlaneGeometry(width: 0.5f, height: 2),
-            Position = new Vector3(4, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "purple"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new RingGeometry(innerRadius: 0.6f, outerRadius: 0.7f),
-            Position = new Vector3(0, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "DodgerBlue"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new SphereGeometry(radius: 0.6f),
-            Position = new Vector3(-2, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkgreen"
-            },
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TetrahedronGeometry(radius: 0.75f),
-            Position = new Vector3(2, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "lightblue"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TorusGeometry(radius: 0.6f, tube: 0.4f, radialSegments: 12, tubularSegments: 12),
-            Position = new Vector3(4, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "lightgreen"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TorusKnotGeometry(radius: 0.6f, tube: 0.1f),
-            Position = new Vector3(-4, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "RosyBrown"
-            }
-        });
-    }
-
     public void PostRender(Guid guid)
     {
         var shape = Find<FoShape3D>(guid.ToString());
         if (shape != null)
         {
-            Task.Run(async () =>
-            {
-                var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
-                await Viewer3D!.RemoveByUuidAsync(removeGuid);
-                shape.PromiseGUID = null;
-                shape.LoadingGUID = null;
-            });
+
+            //var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
+            //await Viewer3D!.RemoveByUuidAsync(removeGuid);
+            shape.PromiseGUID = null;
+            shape.LoadingGUID = null;
+
         }
         else
         {
             $"Did not find Shape guid={guid}".WriteError();
         }
     }
+
 }

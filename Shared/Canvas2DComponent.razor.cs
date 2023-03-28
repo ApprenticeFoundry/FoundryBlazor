@@ -13,7 +13,7 @@ using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shared;
 
-public class CanvasComponentBase : ComponentBase, IDisposable
+public class Canvas2DComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
@@ -57,6 +57,7 @@ public class CanvasComponentBase : ComponentBase, IDisposable
 
             PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     public void OnFileInputChange(InputFileChangeEventArgs e)

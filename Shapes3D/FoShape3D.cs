@@ -11,7 +11,7 @@ using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
-public class FoShape3D : FoGlyph3D
+public class FoShape3D : FoGlyph3D, IShape3D
 {
 
     public string Symbol { get; set; } = "";
@@ -23,6 +23,8 @@ public class FoShape3D : FoGlyph3D
 
     public Guid? PromiseGUID { get; set; }
     public Guid? LoadingGUID { get; set; }
+
+    private Mesh? ShapeMesh { get; set; }
 
     public FoShape3D() : base()
     {
@@ -36,7 +38,12 @@ public class FoShape3D : FoGlyph3D
 
     //https://BlazorThreeJS.com/reference/Index.html
 
-
+    public override bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
+    {
+        if ( ShapeMesh == null) return false;
+        ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
+        return true;
+    }
 
     public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
     {
@@ -111,39 +118,39 @@ public class FoShape3D : FoGlyph3D
     public bool Box(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
     public bool Boundary(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition().AsVector3(),
             Material = GetWireframe()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
     private bool Cylinder(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
@@ -151,13 +158,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new SphereGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
@@ -166,13 +173,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new CircleGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
@@ -180,13 +187,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new CapsuleGeometry(radius: box.X / 2, box.Y),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
@@ -194,13 +201,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new ConeGeometry(radius: box.X / 2, height: box.Y),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
 
@@ -208,13 +215,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new DodecahedronGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }
  
@@ -222,13 +229,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new IcosahedronGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }  
 
@@ -236,39 +243,39 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new OctahedronGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }  
       private bool Tetrahedron(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new TetrahedronGeometry(radius: box.X / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     }  
     private bool Plane(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new PlaneGeometry(width: box.X, height: box.Y),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     } 
 
@@ -276,13 +283,13 @@ public class FoShape3D : FoGlyph3D
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
-        var mesh = new Mesh
+        ShapeMesh = new Mesh
         {
             Geometry = new RingGeometry(innerRadius: box.X/2, outerRadius: box.Y/2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
-        ctx.Add(mesh);
+        ctx.Add(ShapeMesh);
         return true;
     } 
 
