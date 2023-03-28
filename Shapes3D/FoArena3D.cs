@@ -17,7 +17,7 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    FoScene3D CurrentScene();
+    FoStage3D CurrentStage();
 
     void RefreshUI();
     void SetViewer(Viewer viewer);
@@ -38,7 +38,7 @@ public interface IArena
 public class FoArena3D : FoGlyph3D, IArena
 {
     public Viewer? Viewer3D { get; set; }
-    private ISceneManagement SceneManager { get; set; }
+    private IStageManagement StageManager { get; set; }
     private IScaledArena ScaledArena { get; set; }
 
     public ComponentBus PubSub { get; set; }
@@ -49,45 +49,25 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoArena3D(
         IScaledArena scaled,
-        ISceneManagement sceneManagement,
+        IStageManagement manager,
         ComponentBus pubSub)
     {
-        SceneManager = sceneManagement;
+        StageManager = manager;
         PubSub = pubSub;
         ScaledArena = scaled;
     }
 
-    public FoScene3D CurrentScene()
+    public FoStage3D CurrentStage()
     {
-        return SceneManager.CurrentScene();
+        return StageManager.CurrentStage();
     }
 
-    public Scene ThreeJSScene()
-    {
-        return CurrentScene().GetScene();
-    }
+
 
     public async Task RenderScene(Scene scene, int tick, double fps)
     {
         await Task.CompletedTask;
         //$"Arean Render Scene {tick}".WriteInfo();
-    }
-    public Scene InitScene()
-    {
-        var scene = ThreeJSScene();
-        if (scene != null)
-        {
-            scene.Add(new AmbientLight());
-            scene.Add(new PointLight()
-            {
-                Position = new Vector3(1, 3, 0)
-            });
-            CurrentScene().EstablishBoundry();
-            RefreshUI();
-            "InitScene".WriteInfo();
-        }
-
-        return ThreeJSScene();
     }
 
     // public async Task ClearViewer3D()
@@ -103,12 +83,12 @@ public class FoArena3D : FoGlyph3D, IArena
     }
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        return SceneManager.CollectMenus(list);
+        return StageManager.CollectMenus(list);
     }
 
     public FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D
     {
-        var result = SceneManager.EstablishMenu3D<T, FoButton3D>(name, menu, clear);
+        var result = StageManager.EstablishMenu3D<T, FoButton3D>(name, menu, clear);
         return result;
     }
 
@@ -155,7 +135,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoGroup3D MakeAndRenderTestPlatform()
     {
-        FillScene();
+
         var platform = new FoGroup3D()
         {
             GlyphId = Guid.NewGuid().ToString(),
@@ -208,8 +188,6 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = CurrentScene().GetScene();
-        $"scene={scene}".WriteInfo();
 
         //await ClearViewer3D();
         //$"cleared scene".WriteInfo();
@@ -238,26 +216,25 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = CurrentScene().GetScene();
-        $"scene={scene}".WriteInfo();
+
 
 
         platform.Bodies()?.ForEach(body =>
         {
             //$"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
-            body.Render(scene, 0, 0);
+            //body.Render(scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
             //$"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
-            label.Render(scene, 0, 0);
+            //label.Render(scene, 0, 0);
         });
 
         platform.Datums()?.ForEach(datum =>
         {
             //$"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
-            datum.Render(scene, 0, 0);
+            //datum.Render(scene, 0, 0);
         });
 
         RefreshUI();
@@ -284,8 +261,8 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var scene = CurrentScene().GetScene();
-        $"scene={scene}".WriteInfo();
+        //var scene = CurrentStage().GetScene();
+        //$"scene={scene}".WriteInfo();
 
 
         platform.Bodies()?.ForEach(body =>
@@ -312,157 +289,5 @@ public class FoArena3D : FoGlyph3D, IArena
             $"Did not find Shape guid={guid}".WriteError();
         }
     }
-    private void FillScene()
-    {
-        var scene = CurrentScene().GetScene();
-        scene.Add(new AmbientLight());
-        scene.Add(new PointLight()
-        {
-            Position = new Vector3(1, 3, 0)
-        });
-        scene.Add(new Mesh());
-        scene.Add(new Mesh
-        {
-            Geometry = new BoxGeometry(width: 1.2f, height: 0.5f),
-            Position = new Vector3(-2, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "magenta"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CircleGeometry(radius: 0.75f, segments: 12),
-            Position = new Vector3(2, 0, 0),
-            Scale = new Vector3(1, 0.75f, 1),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "#98AFC7"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CapsuleGeometry(radius: 0.5f, length: 2),
-            Position = new Vector3(-4, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkgreen"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new ConeGeometry(radius: 0.5f, height: 2, radialSegments: 16),
-            Position = new Vector3(4, 0, 0),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "green",
-                FlatShading = true,
-                Metalness = 0.5f,
-                Roughness = 0.5f
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new CylinderGeometry(radiusTop: 0.5f, height: 1.2f, radialSegments: 16),
-            Position = new Vector3(0, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "red",
-                Wireframe = true
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new DodecahedronGeometry(radius: 0.8f),
-            Position = new Vector3(-2, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkviolet",
-                Metalness = 0.5f,
-                Roughness = 0.5f
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new IcosahedronGeometry(radius: 0.8f),
-            Position = new Vector3(-4, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "violet"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-
-            Geometry = new OctahedronGeometry(radius: 0.75f),
-            Position = new Vector3(2, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "aqua"
-            }
-        });
-
-        scene.Add(new Mesh
-        {
-            Geometry = new PlaneGeometry(width: 0.5f, height: 2),
-            Position = new Vector3(4, 0, -2),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "purple"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new RingGeometry(innerRadius: 0.6f, outerRadius: 0.7f),
-            Position = new Vector3(0, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "DodgerBlue"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new SphereGeometry(radius: 0.6f),
-            Position = new Vector3(-2, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "darkgreen"
-            },
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TetrahedronGeometry(radius: 0.75f),
-            Position = new Vector3(2, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "lightblue"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TorusGeometry(radius: 0.6f, tube: 0.4f, radialSegments: 12, tubularSegments: 12),
-            Position = new Vector3(4, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "lightgreen"
-            }
-        });
-        scene.Add(new Mesh
-        {
-            Geometry = new TorusKnotGeometry(radius: 0.6f, tube: 0.1f),
-            Position = new Vector3(-4, 0, -4),
-            Material = new MeshStandardMaterial()
-            {
-                Color = "RosyBrown"
-            }
-        });
-    }
-
 
 }
