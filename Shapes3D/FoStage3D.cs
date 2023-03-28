@@ -24,7 +24,7 @@ public interface IScene
 public class FoStage3D : FoGlyph3D, IScene
 {
     public bool IsActive { get; set; } = false;
-    public bool IsDirty { get; set; } = true;
+    public bool IsDirty { get; set; } = false;
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
@@ -90,14 +90,14 @@ public class FoStage3D : FoGlyph3D, IScene
 
     public Scene InitScene(Scene scene)
     {
-
+        IsDirty = true;
+        SetScene(scene);
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
         {
             Position = new Vector3(1, 3, 0)
         });
         EstablishBoundry();
-        //RefreshUI();
         "InitScene".WriteInfo();
         
         return scene;

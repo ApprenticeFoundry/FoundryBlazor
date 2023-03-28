@@ -77,13 +77,13 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
             await AnimationHelperReference!.Initialize();
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
 
             var arena = Workspace?.GetArena();
             arena?.SetViewer(ThreeJSView3D,ActiveScene!);
             //await ThreeJSView3D.UpdateScene();
 
            // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
-            ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -99,7 +99,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     {
         var arena = Workspace?.GetArena();
         arena?.PostRender(e.UUID);
-        await Task.CompletedTask;
+        //await Task.CompletedTask;
+        await ThreeJSView3D.UpdateScene();
     }
 
 
@@ -113,7 +114,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         var arena = Workspace?.GetArena();
         if (arena == null) return;
 
-        //$"RenderFrame {tick}".WriteError();
+        var stage = arena.CurrentStage(); 
+        if (stage == null || !stage.IsDirty ) return;
+
+        $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
 
         //if you are already rendering then skip it this cycle
         //if (drawing.SetCurrentlyRendering(true)) return;
@@ -126,6 +130,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         //drawing.SetCurrentlyRendering(false);
 
         //Workspace?.PostRender(tick);
+
+        await ThreeJSView3D.UpdateScene();
     }
 
 

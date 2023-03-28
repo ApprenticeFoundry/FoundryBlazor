@@ -79,6 +79,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public void SetViewer(Viewer viewer, Scene scene)
     {
         Viewer3D = viewer;
+        CurrentStage().InitScene(scene);
     }
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
