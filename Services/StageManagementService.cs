@@ -16,7 +16,7 @@ public interface IStageManagement
 
     Task RenderDetailed(Scene scene, int tick, double fps);
 
-    T Add<T>(T value) where T : FoGlyph3D;
+    //T Add<T>(T value) where T : FoGlyph3D;
     //T Duplicate<T>(T value) where T : FoGlyph3D;
     //U MorphTo<T, U>(T value) where T : FoGlyph3D where U : FoGlyph3D;
     //T? GroupSelected<T>() where T : FoGlyph3D;
@@ -24,12 +24,12 @@ public interface IStageManagement
 }
 
 
-public class StageManagementService : IStageManagement
+public class StageManagementService : FoComponent, IStageManagement
 {
 
     private bool RenderHitTestTree = false;
     private FoStage3D ActiveStage { get; set; }
-    private readonly FoCollection<FoStage3D> Stages = new();
+    //private readonly FoCollection<FoStage3D> Stages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
     private readonly IScaledArena _ScaledArena;
@@ -51,7 +51,7 @@ public class StageManagementService : IStageManagement
 
     public int StageCount()
     {
-        return 1;
+        return Members<FoStage3D>().Count;
     }
 
     public async Task RenderDetailed(Scene scene, int tick, double fps)
@@ -86,11 +86,13 @@ public class StageManagementService : IStageManagement
 
 
 
-    public T Add<T>(T value) where T : FoGlyph3D
+     public T AddShape<T>(T value) where T : FoGlyph3D
     {
-        var found = CurrentStage().Add(value);
-        //_hitTestService.Insert(value);
-        return found;
+        var found = CurrentStage().AddShape(value);
+        //if ( found != null)
+        //    _hitTestService.Insert(value);
+
+        return found!;
 
     }
 
@@ -98,7 +100,7 @@ public class StageManagementService : IStageManagement
     {
         if (ActiveStage == null)
         {
-            var found = Stages.Values().Where(page => page.IsActive).FirstOrDefault();
+            var found = Members<FoStage3D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
                 found = new FoStage3D("Stage-1",10,10,10,"Red");
@@ -114,16 +116,16 @@ public class StageManagementService : IStageManagement
     public FoStage3D SetCurrentStage(FoStage3D page)
     {
         ActiveStage = page;
-        Stages.Values().ForEach(item => item.IsActive = false);
+        Members<FoStage3D>().ForEach(item => item.IsActive = false);
         ActiveStage.IsActive = true;
         return ActiveStage!;
     }
 
     public FoStage3D AddStage(FoStage3D scene)
     {
-        var found = Stages.Values().Where(item => item == scene).FirstOrDefault();
+        var found = Members<FoStage3D>().Where(item => item == scene).FirstOrDefault();
         if (found == null)
-            Stages.Add(scene);
+            Add(scene);
         return scene;
     }
 

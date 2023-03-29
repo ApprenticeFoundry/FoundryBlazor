@@ -7,19 +7,19 @@ public interface IScaledArena
 {
     Rectangle Rect();
 
-    void SetPageDefaults(FoStage3D page);
-    double ConvertToPixels(double inches);
-    int ToPixels(double inches);
-    double ToInches(int value);
-    double ConvertToInches(double pixels);
-    double GetPixelsPerInch();
+    void SetStageDefaults(FoStage3D page);
+    double ConvertToUnits(double meters);
+    double ToUnits(double meters);
+    double ToMeters(int value);
+    double ConvertToMeters(double pixels);
+    double GetUnitsPerMeter();
 
     string CanvasWH();
     void SetCanvasSize(int width, int height);
     Size CanvasSize();
 
 
-    Point InchesToPixelInset(double width, double height);
+    Point MetersToPixelInset(double width, double height);
 
 }
 
@@ -28,11 +28,11 @@ public class ScaledArena : IScaledArena
     public int TrueCanvasWidth = 0;
     public int TrueCanvasHeight = 0;
 
-    public double PixelsPerInch { get; set; } = 1; // 70; pixels per in or SRS machine
-    public double PageMargin { get; set; } = .50;  //inches
-    public double PageWidth { get; set; } = 10.0;  //inches
-    public double PageHeight { get; set; } = 6.0;  //inches
-    public double PageDepth { get; set; } = 6.0;  //inches
+    public double UnitsPerMeter { get; set; } = 1; // 70; pixels per in or SRS machine
+    public double StageMargin { get; set; } = .50;  //Meters
+    public double StageWidth { get; set; } = 30.0;  //Meters
+    public double StageHeight { get; set; } = 30.0;  //Meters
+    public double PageDepth { get; set; } = 30.0;  //Meters
     public ScaledArena()
     {
     }
@@ -46,10 +46,10 @@ public class ScaledArena : IScaledArena
 
 
 
-    public Point InchesToPixelInset(double width, double height)
+    public Point MetersToPixelInset(double width, double height)
     {
-        var w = (int)ConvertToPixels(width + PageMargin);
-        var h = (int)ConvertToPixels(height + PageMargin);
+        var w = (int)ConvertToUnits(width + StageMargin);
+        var h = (int)ConvertToUnits(height + StageMargin);
         return new Point(w, h);
     }
 
@@ -63,46 +63,46 @@ public class ScaledArena : IScaledArena
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
 
-    public void SetPageSizeInches(double width, double height, double depth)
+    public void SetPageSizeMeters(double width, double height, double depth)
     {
-        PageWidth = width;
-        PageHeight = height;
+        StageWidth = width;
+        StageHeight = height;
         PageDepth = depth;
     }
 
 
 
-    public void SetPageDefaults(FoStage3D page)
+    public void SetStageDefaults(FoStage3D stage)
     {
-        page.PageMargin = this.PageMargin;
-        page.PageWidth = this.PageWidth;
-        page.PageHeight = this.PageHeight;
-        page.Smash(false);
+        stage.StageMargin = this.StageMargin;
+        stage.StageWidth = this.StageWidth;
+        stage.StageHeight = this.StageHeight;
+        stage.Smash(false);
     }
     public string CanvasWH()
     {
-        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{PixelsPerInch}";
+        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{UnitsPerMeter}";
     }
-    public double GetPixelsPerInch()
+    public double GetUnitsPerMeter()
     {
-        return PixelsPerInch;
+        return UnitsPerMeter;
     }
-    public int ToPixels(double inches)
+    public double ToUnits(double meters)
     {
-        return (int)(PixelsPerInch * inches);
+        return UnitsPerMeter * meters;
     }
-    public double ToInches(int value)
+    public double ToMeters(int value)
     {
-        return (double)(value / PixelsPerInch);
+        return value / UnitsPerMeter;
     }
-    public double ConvertToPixels(double inches)
+    public double ConvertToUnits(double Meters)
     {
-        return PixelsPerInch * inches;
+        return UnitsPerMeter * Meters;
     }
 
-    public double ConvertToInches(double pixels)
+    public double ConvertToMeters(double units)
     {
-        return pixels / PixelsPerInch;
+        return units / UnitsPerMeter;
     }
 
 }

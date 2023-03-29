@@ -1,34 +1,29 @@
-using BlazorThreeJS.Enums;
 using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Labels;
 using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Settings;
-using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
-public interface IScene
+public interface IStage
 {
     FoStage3D ClearAll();
     Scene SetScene(Scene scene);
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
-
 }
 
-public class FoStage3D : FoGlyph3D, IScene
+public class FoStage3D : FoGlyph3D, IStage
 {
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
-    public double PageMargin { get; set; } = .50;  //inches
-    public double PageWidth { get; set; } = 10.0;  //inches
-    public double PageHeight { get; set; } = 4.0;  //inches
-    public double PageDepth { get; set; } = 4.0;  //inches
+    public double StageMargin { get; set; } = .50;  //meters
+    public double StageWidth { get; set; } = 30.0;  //meters
+    public double StageHeight { get; set; } = 30.0;  //meters
+    public double StageDepth { get; set; } = 30.0;  //meters
     protected IScaledArena? _ScaledArena;
 
     private Scene? CurrentScene { get; set; }
@@ -59,27 +54,27 @@ public class FoStage3D : FoGlyph3D, IScene
 
 
 
-    public int DrawingWidth()
+    public double ArenaWidth()
     {
-        return _ScaledArena?.ToPixels(PageWidth) ?? 0;
+        return _ScaledArena?.ToUnits(StageWidth) ?? 0;
     }
-    public int DrawingHeight()
+    public double ArenaHeight()
     {
-        return _ScaledArena?.ToPixels(PageHeight) ?? 0;
+        return _ScaledArena?.ToUnits(StageHeight) ?? 0;
     }
-    public int DrawingDepth()
+    public double ArenaDepth()
     {
-        return _ScaledArena?.ToPixels(PageDepth) ?? 0;
+        return _ScaledArena?.ToUnits(StageDepth) ?? 0;
     }
-    public int DrawingMargin()
+    public double ArenaMargin()
     {
-        return _ScaledArena?.ToPixels(PageMargin) ?? 0;  //margin all around
+        return _ScaledArena?.ToUnits(StageMargin) ?? 0;  //margin all around
     }
 
     public virtual void SetScaledArena(IScaledArena scaledArena)
     {
         _ScaledArena = scaledArena;
-        scaledArena.SetPageDefaults(this);
+        scaledArena.SetStageDefaults(this);
     }
 
     public Scene SetScene(Scene scene)
@@ -97,8 +92,8 @@ public class FoStage3D : FoGlyph3D, IScene
         {
             Position = new Vector3(1, 3, 0)
         });
-        EstablishBoundry();
         "InitScene".WriteInfo();
+        EstablishBoundry();
         
         return scene;
     }
@@ -114,9 +109,9 @@ public class FoStage3D : FoGlyph3D, IScene
         $"try EstablishBoundry".WriteSuccess();
         if ( ShapeMesh != null) return false;
         
-        Width = DrawingWidth();
-        Height = DrawingHeight();
-        Depth = DrawingDepth();
+        Width = ArenaWidth();
+        Height = ArenaHeight();
+        Depth = ArenaDepth();
         ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(Width, Height, Depth),
@@ -124,7 +119,7 @@ public class FoStage3D : FoGlyph3D, IScene
             Material = new MeshStandardMaterial()
             {
                 Color = "red",
-                //Wireframe = true
+                Wireframe = true
             }
         };
 

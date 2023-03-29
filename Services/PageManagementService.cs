@@ -15,6 +15,7 @@ public interface IPageManagement: IRender
     List<FoGlyph2D> ExtractShapes(string GlyphId);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllObjects();
+    
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
     FoPage2D AddPage(FoPage2D page);

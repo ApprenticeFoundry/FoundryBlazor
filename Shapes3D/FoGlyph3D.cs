@@ -12,12 +12,12 @@ public class FoGlyph3D : FoComponent
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
 
-    protected int width = 0;
-    public int Width { get { return this.width; } set { this.width = AssignInt(value, width); } }
-    protected int height = 0;
-    public int Height { get { return this.height; } set { this.height = AssignInt(value, height); } }
-    protected int depth = 0;
-    public int Depth { get { return this.depth; } set { this.depth = AssignInt(value, depth); } }
+    protected double width = 0;
+    public double Width { get { return this.width; } set { this.width = AssignDouble(value, width); } }
+    protected double height = 0;
+    public double Height { get { return this.height; } set { this.height = AssignDouble(value, height); } }
+    protected double depth = 0;
+    public double Depth { get { return this.depth; } set { this.depth = AssignDouble(value, depth); } }
 
     public FoGlyph3D() : base("")
     {
@@ -36,13 +36,14 @@ public class FoGlyph3D : FoComponent
         return this;
     }
 
-    protected int AssignInt(int newValue, int oldValue)
+    protected double AssignDouble(double newValue, double oldValue)
     {
-        if ( Math.Abs(newValue - oldValue) > 0)
+        if (Math.Abs(newValue - oldValue) > 0)
             Smash(true);
 
         return newValue;
     }
+
 
 
     public virtual bool Smash(bool force)
