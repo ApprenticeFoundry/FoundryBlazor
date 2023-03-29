@@ -31,6 +31,7 @@ public interface IArena
 public class FoArena3D : FoGlyph3D, IArena
 {
     public Viewer? Viewer3D { get; set; }
+    public Scene? Scene { get; set; }
     private IStageManagement StageManager { get; set; }
     private IScaledArena ScaledArena { get; set; }
 
@@ -76,6 +77,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public void SetViewer(Viewer viewer, Scene scene)
     {
         Viewer3D = viewer;
+        Scene = scene;
         CurrentStage().InitScene(scene);
     }
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
@@ -218,20 +220,20 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.Bodies()?.ForEach(body =>
         {
-            //$"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
-            //body.Render(scene, 0, 0);
+            $"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
+            body.Render(Scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
-            //$"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
-            //label.Render(scene, 0, 0);
+            $"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
+            label.Render(Scene, 0, 0);
         });
 
         platform.Datums()?.ForEach(datum =>
         {
-            //$"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
-            //datum.Render(scene, 0, 0);
+            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+            datum.Render(Scene, 0, 0);
         });
 
         RefreshUI();
@@ -240,7 +242,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public void PreRenderWorld(FoWorld3D? world)
     {
         $"PreRenderWorld world={world}".WriteInfo();
-        if (world == null )
+        if (world == null)
         {
             $"world is empty or viewer is not preent".WriteError();
             return;

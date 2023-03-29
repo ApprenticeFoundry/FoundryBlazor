@@ -135,10 +135,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         var arena = Workspace?.GetArena();
         if (arena == null) return;
 
-        var stage = arena.CurrentStage();
-        if (stage == null || !stage.IsDirty) return;
+        // var stage = arena.CurrentStage();
+        // if (stage == null || !stage.IsDirty) return;
 
-       // $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
+        // $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
 
         //if you are already rendering then skip it this cycle
         //if (drawing.SetCurrentlyRendering(true)) return;

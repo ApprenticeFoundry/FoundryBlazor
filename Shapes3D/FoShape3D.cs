@@ -40,7 +40,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
     {
-        if ( ShapeMesh == null) return false;
+        if (ShapeMesh == null) return false;
         ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
         return true;
     }
@@ -224,8 +224,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
         ctx.Add(ShapeMesh);
         return true;
     }
- 
-     private bool Icosahedron(Scene ctx)
+
+    private bool Icosahedron(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
@@ -237,9 +237,9 @@ public class FoShape3D : FoGlyph3D, IShape3D
         };
         ctx.Add(ShapeMesh);
         return true;
-    }  
+    }
 
-      private bool Octahedron(Scene ctx)
+    private bool Octahedron(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
@@ -251,8 +251,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
         };
         ctx.Add(ShapeMesh);
         return true;
-    }  
-      private bool Tetrahedron(Scene ctx)
+    }
+    private bool Tetrahedron(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
 
@@ -264,7 +264,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         };
         ctx.Add(ShapeMesh);
         return true;
-    }  
+    }
     private bool Plane(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);
@@ -277,7 +277,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         };
         ctx.Add(ShapeMesh);
         return true;
-    } 
+    }
 
     private bool Ring(Scene ctx)
     {
@@ -285,13 +285,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         ShapeMesh = new Mesh
         {
-            Geometry = new RingGeometry(innerRadius: box.X/2, outerRadius: box.Y/2),
+            Geometry = new RingGeometry(innerRadius: box.X / 2, outerRadius: box.Y / 2),
             Position = GetPosition().AsVector3(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
         return true;
-    } 
+    }
 
     public static void FillScene(Scene scene)
     {
@@ -319,7 +319,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
-        if (!string.IsNullOrEmpty(Symbol)) return false;
+        if (string.IsNullOrEmpty(Symbol)) return false;
 
         var url = Symbol.Replace("http", "https");
 
