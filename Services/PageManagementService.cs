@@ -311,7 +311,7 @@ public class PageManagementService : FoComponent, IPageManagement
                 menu.Add<T>(shape);
         }
 
-        menu.LayoutHorizontal();
+        //menu.LayoutHorizontal();
 
         return menu;
     }

@@ -359,10 +359,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
-
-
         EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
 

@@ -91,15 +91,15 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
-        EstablishMenu<FoMenu3D>("Main", new Dictionary<string, Action>()
-        {
-            //{ "Clear", () => PageManager?.ClearAll()},
-            //{ "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-            //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-            //{ "Save", () => Command?.Save()},
-            //{ "Restore", () => Command?.Restore()},
-            //{ "Pan Zoom", () => TogglePanZoomWindow()},
-        }, true);
+        //EstablishMenu<FoMenu3D>("Main", new Dictionary<string, Action>()
+        //{
+        //    //{ "Clear", () => PageManager?.ClearAll()},
+        //    //{ "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
+        //    //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
+        //    //{ "Save", () => Command?.Save()},
+        //    //{ "Restore", () => Command?.Restore()},
+        //    //{ "Pan Zoom", () => TogglePanZoomWindow()},
+        //}, true);
 
     }
 

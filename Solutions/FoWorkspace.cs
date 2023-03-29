@@ -33,7 +33,6 @@ public interface IWorkspace : IWorkPiece
 
     FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
 
-    T EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
 
     T EstablishWorkPiece<T>() where T : FoWorkPiece;
 
@@ -193,11 +192,12 @@ public class FoWorkspace : FoComponent, IWorkspace
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
+        GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
 
-        if (!IsViewStyle3D())
+        //if (!IsViewStyle3D())
             GetDrawing()?.CollectMenus(list);
 
-        if (!IsViewStyle2D())
+        //if (!IsViewStyle2D())
             GetArena()?.CollectMenus(list);
 
         Members<FoWorkPiece>().ForEach(item => item.CollectMenus(list));
@@ -205,11 +205,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return list;
     }
 
-    public T EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
-    {
-        var result = ActiveDrawing?.EstablishMenu<T>(name, menu, clear);
-        return (result as T)!;
-    }
+
 
     public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
@@ -223,7 +219,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
+        GetDrawing()?.EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
         {
             { "New Window", () => OpenNew()},
             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
@@ -235,6 +231,10 @@ public class FoWorkspace : FoComponent, IWorkspace
         }, true);
 
         Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js, nav));
+
+        GetDrawing()?.CreateMenus(js, nav);
+        GetArena()?.CreateMenus(js, nav);
+
     }
 
 

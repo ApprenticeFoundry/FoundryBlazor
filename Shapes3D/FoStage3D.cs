@@ -18,6 +18,7 @@ public interface IStage
 
 public class FoStage3D : FoGlyph3D, IStage
 {
+    public static bool RefreshMenus { get; set; } = true;
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
     public double StageMargin { get; set; } = .50;  //meters
@@ -83,6 +84,20 @@ public class FoStage3D : FoGlyph3D, IStage
         return CurrentScene;
     }
 
+    public U EstablishMenu3D<U>(string name, bool clear) where U : FoMenu3D
+    {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
     public Scene InitScene(Scene scene)
     {
         SetScene(scene);
