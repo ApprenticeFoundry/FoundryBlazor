@@ -106,6 +106,16 @@ public class FoGlyph3D : FoComponent
         return false;
     }
 
+    public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.ExtractWhere(whereClause);
+    }
 
+    public virtual List<T>? FindWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.FindWhere(whereClause);
+    }
 
 }

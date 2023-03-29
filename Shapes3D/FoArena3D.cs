@@ -52,19 +52,16 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public FoStage3D CurrentStage()
     {
-         var stage = StageManager.CurrentStage();
+        var stage = StageManager.CurrentStage();
         return stage;
     }
 
     public async Task RenderArena(Scene scene, int tick, double fps)
     {
         var stage = StageManager.CurrentStage();
-        if ( stage.IsDirty)
-        {
-            stage.IsDirty = false;
-            await StageManager.RenderDetailed(scene, tick, fps);
-            RefreshUI();
-        }
+        stage.IsDirty = true;
+        await StageManager.RenderDetailed(scene, tick, fps);
+
         //if the stage is dirty call to update
         //$"Arean Render Scene {tick}".WriteInfo();
     }

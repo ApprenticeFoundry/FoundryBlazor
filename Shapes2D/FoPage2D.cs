@@ -11,6 +11,7 @@ public class FoPage2D : FoGlyph2D
     
     public static bool RefreshMenus { get; set; } = true;
     public bool IsActive { get; set; } = false;
+    public bool IsDirty { get; set; } = false;
     public double PageMargin { get; set; } = .50;  //inches
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches

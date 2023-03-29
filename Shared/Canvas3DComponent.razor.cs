@@ -139,7 +139,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         var stage = arena.CurrentStage();
         if (stage == null || !stage.IsDirty) return;
 
-        $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
+       // $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
 
         //if you are already rendering then skip it this cycle
         //if (drawing.SetCurrentlyRendering(true)) return;
@@ -153,7 +153,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
         //Workspace?.PostRender(tick);
 
-        // await ThreeJSView3D.UpdateScene();
+        await ThreeJSView3D.UpdateScene();
     }
 
 

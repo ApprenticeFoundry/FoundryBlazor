@@ -85,15 +85,14 @@ public class FoStage3D : FoGlyph3D, IStage
 
     public Scene InitScene(Scene scene)
     {
-        IsDirty = true;
         SetScene(scene);
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
         {
             Position = new Vector3(1, 3, 0)
         });
-        "InitScene".WriteInfo();
         EstablishBoundry();
+        IsDirty = true;
         
         return scene;
     }
@@ -106,7 +105,6 @@ public class FoStage3D : FoGlyph3D, IStage
 
     public bool EstablishBoundry()
     {
-        $"try EstablishBoundry".WriteSuccess();
         if ( ShapeMesh != null) return false;
         
         Width = ArenaWidth();
@@ -124,8 +122,9 @@ public class FoStage3D : FoGlyph3D, IStage
         };
 
         CurrentScene?.Add(ShapeMesh);
+
         
-        $"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
+        //$"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
         return true;
     }
 
@@ -152,28 +151,37 @@ public class FoStage3D : FoGlyph3D, IStage
         }
 
         if (CurrentScene != null)
+        {
             value.Render(CurrentScene, 0, 0);
+            IsDirty = true;
+            //FillStage();
+        }
 
         return value;
     }
 
     public async Task RenderDetailed(Scene scene, int tick, double fps)
     {
+        this.IsDirty = true;
+        //$"RenderDetailed {tick} {Shapes3D.Count()}".WriteInfo();
         Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
         await Task.CompletedTask;
     }
-    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
-    {
-        //$"Render {tick} {Shapes3D.Count()}".WriteInfo();
-        Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
-        return true;
-    }
+    // public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    // {
+    //     $"Render {tick} {Shapes3D.Count()}".WriteInfo();
+    //     Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
+    //     return true;
+    // }
 
 
     private void FillStage()
     {
         if ( CurrentScene  == null) return;
-        
+
+        $"FillStage {CurrentScene.Name}".WriteSuccess();
+
+        IsDirty = true;
         var scene = CurrentScene;
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
