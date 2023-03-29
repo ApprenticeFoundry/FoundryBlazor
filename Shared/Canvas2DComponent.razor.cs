@@ -4,6 +4,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.PubSub;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
@@ -50,6 +51,8 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
             Ctx = await CanvasReference.CreateCanvas2DAsync();
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+
             await CanvasHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSize(CanvasWidth, CanvasHeight);
@@ -98,7 +101,11 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
         CaptureFileAndSend(MouseArgs);
     }
 
-
+    private void OnRefreshUIEvent(RefreshUIEvent e)
+    {
+        InvokeAsync(StateHasChanged);
+        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged".WriteInfo();
+    }
 
     public async Task RenderFrame(double fps)
     {

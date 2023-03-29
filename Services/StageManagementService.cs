@@ -77,10 +77,10 @@ public class StageManagementService : FoComponent, IStageManagement
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
-        CurrentStage().GetMembers<FoMenu3D>()?.ForEach(item =>
-        {
-            list.Add(item);
-        });
+        var stage = CurrentStage();
+        var items = stage.GetMembers<FoMenu3D>();
+        if ( items != null)
+            list.AddRange(items);
         return list;
     }   
 
@@ -146,31 +146,27 @@ public class StageManagementService : FoComponent, IStageManagement
 
     public void ClearMenu3D<U>(string name) where U : FoMenu3D
     {
-        var menu = CurrentStage().Find<U>(name);
+        var stage = CurrentStage();
+        var menu = stage.Find<U>(name);
         menu?.Clear();
     }
 
     public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
     {
-        var menu = CurrentStage().Find<U>(name);
-        if (menu == null)
-        {
-            menu = Activator.CreateInstance(typeof(U), name) as U;
-            this.Add<U>(menu!);
-        }
-        if ( clear )
-            menu?.Clear();
+        var stage = CurrentStage();
+        var menu = stage.EstablishMenu3D<U>(name, clear);
 
         foreach (KeyValuePair<string, Action> item in actions)
         {
             if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
-                menu?.Add<T>(shape);
+                menu.Add<T>(shape);
         }
 
-        //menu!.LayoutHorizontal();
+        //menu.LayoutHorizontal();
 
-        return menu!;
+        return menu;
     }
+
 
 
 

@@ -1,5 +1,6 @@
 using BlazorComponentBus;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.PubSub;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 
@@ -16,38 +17,8 @@ public class MenuManager : ComponentBase
 
     public List<IFoMenu> AllMenus = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        var drawing = Workspace?.GetDrawing();
-        var arena = Workspace?.GetArena();
 
-        drawing?.CreateMenus(JsRuntime!, Navigation!);
-
-        arena?.CreateMenus(JsRuntime!, Navigation!);
-
-        // drawing?.EstablishMenu<FoMenu2D>("Main2D", new Dictionary<string, Action>()
-        // {
-        //     { "New", async () => await OpenNewWindow()},
-        // }, false);
-
-        // arena?.EstablishMenu<FoMenu3D>("Main3D", new Dictionary<string, Action>()
-        // {
-        //     { "New", async () => await OpenNewWindow()},
-        // }, false);
-
-        //arena?.EstablishMenu<FoMenu3D>("BlazorThreeJS", new Dictionary<string, Action>()
-        //{
-        //    { "Example1", async () => await Navigate("example1")},
-        //    { "Example2", async () => await Navigate("example2")},
-        //    { "Example3", async () => await Navigate("example3")},
-        //    { "Example4", async () => await Navigate("example4")},
-        //    { "Example5", async () => await Navigate("example5")},
-        //    { "Viewer 3D", async () => await Navigate("viewer3D")}
-        //}, false);
-
-        await base.OnInitializedAsync();
-    }
-
+ 
     private async Task OpenNewWindow()
     {
         var target = Navigation!.ToAbsoluteUri("/");
@@ -77,11 +48,14 @@ public class MenuManager : ComponentBase
             AllMenus.Clear();
             AllMenus = Workspace.CollectMenus(AllMenus);
 
-            // AllMenus.ForEach(item =>
-            // {
-            //     item.DisplayText().WriteInfo();
-            // });
-
+            AllMenus.ForEach(item =>
+            {
+                item.DisplayText().WriteInfo();
+                item.Buttons().ForEach(but =>
+                {
+                    but.DisplayText().WriteInfo(1);
+                });
+            });
             FoPage2D.RefreshMenus = false;
         }
         return AllMenus;

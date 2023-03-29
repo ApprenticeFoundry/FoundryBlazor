@@ -10,16 +10,9 @@ public class CommandManager : ComponentBase
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
 
-
     public List<IFoCommand> AllCommands = new();
 
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var url = DTARSolution?.GetServerUrl() ?? "";
-    //     Workspace?.CreateCommands(JsRuntime!, Navigation!, url);
-    //     await base.OnInitializedAsync();
-    // }
 
     public List<IFoCommand> GetAllCommands()
     {
@@ -27,8 +20,6 @@ public class CommandManager : ComponentBase
         {
             AllCommands.Clear();
             AllCommands = Workspace.CollectCommands(AllCommands);
-
-            //Workspace?.GetAllCommands().ForEach(item => AllCommands.Add(item) );
 
 
             // AllCommands.ForEach(obj =>
