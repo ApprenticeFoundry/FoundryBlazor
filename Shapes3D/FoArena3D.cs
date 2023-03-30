@@ -24,6 +24,7 @@ public interface IArena
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
+    FoGroup3D Load3DModelFromFile(string folder, string filename);
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -145,10 +146,37 @@ public class FoArena3D : FoGlyph3D, IArena
             Z = 1.5,
         };
 
-        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0)
-            .Position = new FoVector3D();
+        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0);
 
 
+        RenderPlatformToScene(platform);
+
+        return platform;
+    }
+
+    public FoGroup3D Load3DModelFromFile(string folder, string filename)
+    {
+        var name = Path.GetFileNameWithoutExtension(filename);
+        var platform = new FoGroup3D()
+        {
+            GlyphId = Guid.NewGuid().ToString(),
+            PlatformName = folder,
+            Name = name
+        };
+        platform.EstablishBox("Platform", 1, 1, 1);
+
+        var url = $"./{folder}/{filename}";
+        platform.CreateUsing<FoShape3D>("Model")
+        .CreateGlb(url, 1, 2, 3);
+        //shape.Position = new FoVector3D();
+
+
+
+        platform.CreateUsing<FoText3D>("Label-1")
+            .CreateTextAt(name, 0.0, 5.0, 0.0);
+
+
+        PreRenderPlatform(platform);
         RenderPlatformToScene(platform);
 
         return platform;
@@ -204,13 +232,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.Bodies()?.ForEach(body =>
         {
-            $"RenderPlatformToScene Body Name={body.Name}, Type={body.Type}".WriteInfo();
+            $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
-            $"RenderPlatformToScene Label Name={label.Name}, Text={label.Text}".WriteInfo();
+            $"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
             label.Render(Scene, 0, 0);
         });
 

@@ -162,7 +162,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         {
             stage.IsDirty = false;
             await ThreeJSView3D.UpdateScene();
-            $"RenderFrame ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
+            $"RenderFrame stage.IsDirty  so... ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
         }
     }
 

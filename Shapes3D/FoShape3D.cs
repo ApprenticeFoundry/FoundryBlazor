@@ -74,6 +74,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             units = units
         };
         Symbol = url;
+        $"CreateGlb symbol [{Symbol}] ".WriteSuccess();
         return this;
     }
 
@@ -91,7 +92,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     private bool NotImplemented(Scene ctx)
     {
         var message = $"symbol [{Symbol}] Body type [{Type}] NotImplemented";
-        message.WriteLine();
+        message.WriteError();
         var label = new LabelText(message)
         {
             Color = "White",
