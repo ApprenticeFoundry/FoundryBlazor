@@ -113,7 +113,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         InvokeAsync(StateHasChanged);
-        $"Canvas3DComponentBase OnRefreshUIEvent StateHasChanged".WriteInfo();
+        $"Canvas3DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
     }
     public async Task OnObjectLoaded(Object3DArgs e)
     {

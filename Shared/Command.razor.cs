@@ -20,7 +20,7 @@ public class CommandManager : ComponentBase
         {
             AllCommands.Clear();
             AllCommands = Workspace.CollectCommands(AllCommands);
-
+            FoWorkspace.RefreshCommands = false;
 
             // AllCommands.ForEach(obj =>
             // {
@@ -30,8 +30,6 @@ public class CommandManager : ComponentBase
             //         $"AllCommands the but {but.DisplayText()}".WriteLine();
             //     });
             // });
-
-            FoWorkspace.RefreshCommands = false;
         }
 
         return AllCommands;

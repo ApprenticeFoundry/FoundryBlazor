@@ -104,7 +104,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         InvokeAsync(StateHasChanged);
-        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged".WriteInfo();
+        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
     }
 
     public async Task RenderFrame(double fps)

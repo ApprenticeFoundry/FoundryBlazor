@@ -15,6 +15,7 @@ public interface IArena
     void RefreshUI();
     void SetViewer(Viewer viewer, Scene scene);
     Task RenderArena(Scene scene, int tick, double fps);
+    Task ClearArena();
 
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
@@ -67,12 +68,14 @@ public class FoArena3D : FoGlyph3D, IArena
         //$"Arean Render Scene {tick}".WriteInfo();
     }
 
-    // public async Task ClearViewer3D()
-    // {
-    //     "ClearViewer3D".WriteInfo();
-    //     if (Viewer3D != null)
-    //         await Viewer3D.ClearSceneAsync();
-    // }
+    public async Task ClearArena()
+    {
+        if (Viewer3D == null) return;
+
+        "ClearArena".WriteInfo();
+        await Viewer3D.ClearSceneAsync();
+        await Viewer3D.UpdateScene();
+    }
 
     public void SetViewer(Viewer viewer, Scene scene)
     {
@@ -93,16 +96,6 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
     {
-        //EstablishMenu<FoMenu3D>("Main", new Dictionary<string, Action>()
-        //{
-        //    //{ "Clear", () => PageManager?.ClearAll()},
-        //    //{ "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-        //    //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-        //    //{ "Save", () => Command?.Save()},
-        //    //{ "Restore", () => Command?.Restore()},
-        //    //{ "Pan Zoom", () => TogglePanZoomWindow()},
-        //}, true);
-
     }
 
     public void SetDoCreate(Action<CanvasMouseArgs> action)
@@ -129,7 +122,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void RefreshUI()
     {
-        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent());
+        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("one"));
     }
 
     public FoGroup3D MakeAndRenderTestPlatform()

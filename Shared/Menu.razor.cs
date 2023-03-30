@@ -47,16 +47,16 @@ public class MenuManager : ComponentBase
         {
             AllMenus.Clear();
             AllMenus = Workspace.CollectMenus(AllMenus);
-
-            AllMenus.ForEach(item =>
-            {
-                item.DisplayText().WriteInfo();
-                item.Buttons().ForEach(but =>
-                {
-                    but.DisplayText().WriteInfo(1);
-                });
-            });
             FoPage2D.RefreshMenus = false;
+
+            // AllMenus.ForEach(item =>
+            // {
+            //     item.DisplayText().WriteInfo();
+            //     item.Buttons().ForEach(but =>
+            //     {
+            //         but.DisplayText().WriteInfo(1);
+            //     });
+            // });
         }
         return AllMenus;
     }
