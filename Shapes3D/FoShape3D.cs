@@ -323,7 +323,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
           $"PreRenderImport symbol [{Symbol}] ".WriteInfo(1);
         if (string.IsNullOrEmpty(Symbol)) return false;
 
-        var url = Symbol.Replace("http", "https");
+        var url = Symbol.Replace("http:", "https:");
 
         var settings = new ImportSettings
         {
@@ -349,12 +349,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
         $"RenderImport  {Symbol} ".WriteInfo(1);
         if (string.IsNullOrEmpty(Symbol)) return false;
 
-        var url = Symbol.Replace("http", "https");
+        var url = Symbol.Replace("http:", "https:");
         var last = url.Split('/').Last();
 
-         $" Loading(scene, $  {last} ".WriteInfo(1);
+         $" Loading {format} {url} ".WriteInfo(1);
 
-        Loading(scene, $"Loading... {last} {format}");
+        Loading(scene, $"Loading... {last} {url}");
         // Loading(ctx, $"PH");
 
         return true;
