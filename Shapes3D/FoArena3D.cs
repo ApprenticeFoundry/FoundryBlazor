@@ -250,7 +250,7 @@ public class FoArena3D : FoGlyph3D, IArena
         });
 
         //RefreshUI();
-        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
+        // PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
     }
 
     public void PreRenderWorld(FoWorld3D? world)
