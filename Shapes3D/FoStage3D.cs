@@ -20,7 +20,7 @@ public class FoStage3D : FoGlyph3D, IStage
 {
     public static bool RefreshMenus { get; set; } = true;
     public bool IsActive { get; set; } = false;
-    public bool IsDirty { get; set; } = false;
+    public bool IsDirty { get; set; } = false;  // dirty TRUE means we need to update the scene after render
     public double StageMargin { get; set; } = .50;  //meters
     public double StageWidth { get; set; } = 30.0;  //meters
     public double StageHeight { get; set; } = 30.0;  //meters
@@ -177,7 +177,6 @@ public class FoStage3D : FoGlyph3D, IStage
 
     public async Task RenderDetailed(Scene scene, int tick, double fps)
     {
-        this.IsDirty = true;
         //$"RenderDetailed {tick} {Shapes3D.Count()}".WriteInfo();
         Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
         await Task.CompletedTask;

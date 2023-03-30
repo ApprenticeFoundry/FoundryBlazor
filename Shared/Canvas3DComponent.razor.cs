@@ -114,6 +114,12 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     {
         InvokeAsync(StateHasChanged);
         $"Canvas3DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+
+        Task.Run(async () =>
+        {
+            await ThreeJSView3D.UpdateScene();
+            $"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
+        });
     }
     public async Task OnObjectLoaded(Object3DArgs e)
     {
@@ -135,8 +141,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         var arena = Workspace?.GetArena();
         if (arena == null) return;
 
-        // var stage = arena.CurrentStage();
-        // if (stage == null || !stage.IsDirty) return;
+        var stage = arena.CurrentStage();
+        if (stage == null) return;
 
         // $"RenderFrame {tick} {stage.Name} {stage.IsDirty}".WriteError();
 
@@ -152,7 +158,12 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
         //Workspace?.PostRender(tick);
 
-        await ThreeJSView3D.UpdateScene();
+        if ( stage.IsDirty)
+        {
+            stage.IsDirty = false;
+            await ThreeJSView3D.UpdateScene();
+            $"RenderFrame ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
+        }
     }
 
 

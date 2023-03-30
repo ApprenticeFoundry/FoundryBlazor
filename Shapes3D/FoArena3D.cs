@@ -60,8 +60,6 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public async Task RenderArena(Scene scene, int tick, double fps)
     {
-        var stage = StageManager.CurrentStage();
-        stage.IsDirty = true;
         await StageManager.RenderDetailed(scene, tick, fps);
 
         //if the stage is dirty call to update
@@ -180,36 +178,29 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-
-        //await ClearViewer3D();
-        //$"cleared scene".WriteInfo();
-
         $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
-        var platforms = world.Platforms();
-        if (platforms != null)
+
+        world.Platforms()?.ForEach(platform =>
         {
-            foreach (var platform in platforms)
-            {
-                RenderPlatformToScene(platform);
-            }
-        }
+            $"RenderWorldToScene PlatformName: {platform.PlatformName}".WriteInfo();
+            RenderPlatformToScene(platform);
+        });
+
     }
 
     public void RenderPlatformToScene(FoGroup3D? platform)
     {
-        //await ClearViewer3D();
 
-        $"RenderPlatformToScene PlatformName={platform?.PlatformName}".WriteInfo();
+        $"RenderPlatformToScene PlatformName= {platform?.PlatformName}".WriteInfo();
 
-        $"platform={platform}".WriteInfo();
-        if (platform == null)
+        $"platform = {platform}".WriteInfo();
+        if (platform == null || Scene == null)
         {
             $"platform is empty or viewer is not present".WriteError();
             return;
         }
 
-
-
+        $"RenderPlatformToScene Bodies() {platform.Bodies()?.Count}  Labels() {platform.Labels()?.Count}  ".WriteSuccess();
 
         platform.Bodies()?.ForEach(body =>
         {
@@ -230,6 +221,7 @@ public class FoArena3D : FoGlyph3D, IArena
         });
 
         //RefreshUI();
+        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
     }
 
     public void PreRenderWorld(FoWorld3D? world)

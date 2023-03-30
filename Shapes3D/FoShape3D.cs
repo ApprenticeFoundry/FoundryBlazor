@@ -101,7 +101,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return false;
     }
 
-    public bool Loading(Scene ctx, string message)
+    public bool Loading(Scene scene, string message)
     {
         Random rnd = new();
         int y = rnd.Next(-5, 7);
@@ -111,7 +111,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Position = new FoVector3D(-3, y, -2).AsVector3()
         };
         LoadingGUID = label.Uuid;
-        ctx.Add(label);
+        scene.Add(label);
         return true;
     }
 
@@ -319,6 +319,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
+          $"PreRenderImport symbol [{Symbol}] ".WriteInfo(1);
         if (string.IsNullOrEmpty(Symbol)) return false;
 
         var url = Symbol.Replace("http", "https");
@@ -331,24 +332,28 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = Rotation?.AsEuler() ?? new Euler()
         };
 
+        $" Task.Run(async () => PreRenderImport symbol [{url}] ".WriteInfo(1);
         Task.Run(async () =>
         {
-            $"PreRenderImport symbol [{url}] ".WriteLine();
+            $"PreRenderImport symbol [{url}] ".WriteInfo(1);
             PromiseGUID = await viewer.Import3DModelAsync(settings);
-            $"PreRenderImport guid [{PromiseGUID}] ".WriteLine();
+            $"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
         });
         return true;
     }
 
-    private bool RenderImport(Scene ctx, Import3DFormats format)
+    private bool RenderImport(Scene scene, Import3DFormats format)
     {
-        if (!string.IsNullOrEmpty(Symbol)) return false;
+        $"RenderImport  {Symbol} ".WriteInfo(1);
+        if (string.IsNullOrEmpty(Symbol)) return false;
 
         var url = Symbol.Replace("http", "https");
         var last = url.Split('/').Last();
 
-        Loading(ctx, $"Loading... {last}");
+         $" Loading(scene, $  {last} ".WriteInfo(1);
+
+        Loading(scene, $"Loading... {last} {format}");
         // Loading(ctx, $"PH");
 
         return true;
@@ -367,8 +372,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override MeshStandardMaterial GetMaterial()
     {
-
-        if (!string.IsNullOrEmpty(Symbol)) return base.GetMaterial();
+        if (!string.IsNullOrEmpty(Symbol)) 
+            return base.GetMaterial();
 
         var result = new MeshStandardMaterial()
         {
