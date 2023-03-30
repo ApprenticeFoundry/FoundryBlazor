@@ -12,7 +12,7 @@ namespace FoundryBlazor.Shape;
 public interface IArena
 {
 
-    void RefreshUI();
+    //void RefreshUI();
     void SetViewer(Viewer viewer, Scene scene);
     Task RenderArena(Scene scene, int tick, double fps);
     Task ClearArena();
@@ -166,7 +166,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         PreRenderWorld(world);
         RenderWorldToScene(world);
-        RefreshUI();
+        //RefreshUI();
     }
 
 
@@ -229,7 +229,7 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(Scene, 0, 0);
         });
 
-        RefreshUI();
+        //RefreshUI();
     }
 
     public void PreRenderWorld(FoWorld3D? world)
@@ -270,8 +270,9 @@ public class FoArena3D : FoGlyph3D, IArena
         if (shape != null)
         {
 
-            //var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
-            //await Viewer3D!.RemoveByUuidAsync(removeGuid);
+            var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
+            Task.Run(async () => await Viewer3D!.RemoveByUuidAsync(removeGuid));
+
             shape.PromiseGUID = null;
             shape.LoadingGUID = null;
 
