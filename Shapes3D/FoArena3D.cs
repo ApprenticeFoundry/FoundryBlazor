@@ -178,6 +178,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         PreRenderPlatform(platform);
         RenderPlatformToScene(platform);
+        //PostRenderplatform
 
         return platform;
     }
