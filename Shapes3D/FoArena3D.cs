@@ -24,7 +24,7 @@ public interface IArena
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
-    FoGroup3D Load3DModelFromFile(string folder, string filename);
+    FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL);
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
@@ -154,7 +154,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return platform;
     }
 
-    public FoGroup3D Load3DModelFromFile(string folder, string filename)
+    public FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
         var platform = new FoGroup3D()
@@ -165,7 +165,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         platform.EstablishBox("Platform", 1, 1, 1);
 
-        var url = $"./{folder}/{filename}";
+        var url = $"{baseURL}/{folder}/{filename}";
         platform.CreateUsing<FoShape3D>("Model")
         .CreateGlb(url, 1, 2, 3);
         //shape.Position = new FoVector3D();
