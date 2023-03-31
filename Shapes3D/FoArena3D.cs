@@ -20,7 +20,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    void PostRender(Guid guid);
+    bool OnModelLoadComplete(Guid PromiseGuid);
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
@@ -165,13 +165,13 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         platform.EstablishBox("Platform", 1, 1, 1);
 
-        var url = $"{baseURL}/{folder}/{filename}";
+        var url = Path.Join(baseURL,folder,filename);
         platform.CreateUsing<FoShape3D>("Model")
         .CreateGlb(url, 1, 2, 3);
         //shape.Position = new FoVector3D();
 
 
-
+        name = name.Replace("_", " ");
         platform.CreateUsing<FoText3D>("Label-1")
             .CreateTextAt(name, 0.0, 5.0, 0.0);
 
@@ -285,23 +285,25 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    public void PostRender(Guid guid)
+    public override bool OnModelLoadComplete(Guid PromiseGuid)
     {
-        var shape = Find<FoShape3D>(guid.ToString());
+        var shape = Find<FoShape3D>(PromiseGuid.ToString());
         if (shape != null)
         {
 
-            var removeGuid = shape.LoadingGUID ?? Guid.NewGuid();
-            Task.Run(async () => await Viewer3D!.RemoveByUuidAsync(removeGuid));
+            Task.Run(async () => {
+                var removeGuid = shape.LoadingGUID ?? PromiseGuid;
+                await Viewer3D!.RemoveByUuidAsync(removeGuid);
+            });
 
-            shape.PromiseGUID = null;
-            shape.LoadingGUID = null;
-
+            shape.OnModelLoadComplete(PromiseGuid);
+            return true;
         }
         else
         {
-            $"Did not find Shape guid={guid}".WriteError();
+            $"Did not find Shape PromiseGuid={PromiseGuid}".WriteError();
         }
+        return false;
     }
 
 }

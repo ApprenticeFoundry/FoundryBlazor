@@ -101,7 +101,7 @@ public class FoGlyph3D : FoComponent
     {
         return false;
     }
-    public virtual bool PostRender(Scene ctx, Guid guid)
+    public virtual bool OnModelLoadComplete(Guid PromiseGuid)
     {
         return false;
     }

@@ -125,7 +125,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     {
         "OnObjectLoaded Start".WriteInfo();
         var arena = Workspace?.GetArena();
-        arena?.PostRender(e.UUID);
+         "Calling post render Arena".WriteInfo();
+        arena?.OnModelLoadComplete(e.UUID);
         "OnObjectLoaded Before UpdateScene".WriteInfo();
         await ThreeJSView3D.UpdateScene();
     }

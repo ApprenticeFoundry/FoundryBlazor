@@ -23,6 +23,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public Guid? PromiseGUID { get; set; }
     public Guid? LoadingGUID { get; set; }
+    public string? LoadingURL { get; set; }
 
     private Mesh? ShapeMesh { get; set; }
 
@@ -102,7 +103,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return false;
     }
 
-    public bool Loading(Scene scene, string message)
+    public bool CreateLoadingTextLabel(Scene scene, string message)
     {
         Random rnd = new();
         int y = rnd.Next(-5, 7);
@@ -320,44 +321,38 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
-          $"PreRenderImport symbol [{Symbol}] ".WriteInfo(1);
-        if (string.IsNullOrEmpty(Symbol)) return false;
+        if (string.IsNullOrEmpty(LoadingURL)) return false;
+          $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
 
-        var url = Symbol.Replace("http:", "https:");
 
         var settings = new ImportSettings
         {
             Format = format,
-            FileURL = url,
+            FileURL = LoadingURL,
             Position = Position?.AsVector3() ?? new Vector3(),
             Rotation = Rotation?.AsEuler() ?? new Euler()
         };
 
-        $" Task.Run(async () => PreRenderImport symbol [{url}] ".WriteInfo(1);
         Task.Run(async () =>
         {
-            $"PreRenderImport symbol [{url}] ".WriteInfo(1);
+            $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
             PromiseGUID = await viewer.Import3DModelAsync(settings);
             $"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
+            $"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
         });
         return true;
     }
 
     private bool RenderImport(Scene scene, Import3DFormats format)
     {
-        $"RenderImport  {Symbol} ".WriteInfo(1);
-        if (string.IsNullOrEmpty(Symbol)) return false;
+        if (string.IsNullOrEmpty(LoadingURL)) return false;
 
-        var url = Symbol.Replace("http:", "https:");
-        var last = url.Split('/').Last();
+        var last = LoadingURL.Split('/').Last();
 
-         $" Loading {format} {url} ".WriteInfo(1);
+        $"Loading {last} {format} {LoadingURL} ".WriteInfo(1);
 
-        Loading(scene, $"Loading... {last} {url}");
-        // Loading(ctx, $"PH");
-
-        return true;
+        return CreateLoadingTextLabel(scene, $"Loading... {LoadingURL}");
     }
 
 
@@ -396,7 +391,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         //is symbol ends with ....
-
+        LoadingURL = Symbol.Replace("http:", "https:");
         var result = Type switch
         {
             "Collada" => PreRenderImport(arena, viewer, Import3DFormats.Collada),
@@ -432,7 +427,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return result;
     }
 
-    public override bool PostRender(Scene ctx, Guid guid)
+    public override bool OnModelLoadComplete(Guid PromiseGuid)
     {
         //add code to remove the 'loading...'  and then 
         //resolve the guid that was the promise
