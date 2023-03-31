@@ -13,7 +13,7 @@ public class MenuManager : ComponentBase
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
-    [Inject] private ComponentBus? PubSub { get; set; }
+    //[Inject] private ComponentBus? PubSub { get; set; }
 
     public List<IFoMenu> AllMenus = new();
 

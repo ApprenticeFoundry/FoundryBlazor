@@ -234,12 +234,12 @@ namespace FoundryBlazor.Shape;
         return matrix;
     }
 
-    public Point NoTransformPoint(int x, int y) 
+    public static Point NoTransformPoint(int x, int y) 
     {
         var pt = new Point(x, y);
         return pt;
     }
-    public Point NoTransformPoint(Point pt) 
+    public static Point NoTransformPoint(Point pt) 
     {
         return pt;
     }

@@ -2,7 +2,7 @@
 {
     public static class BasicMath
 {
-	public static double toDouble(this string Value)
+	public static double ToDouble(this string Value)
 	{
 		if (Value == null)
 		{
