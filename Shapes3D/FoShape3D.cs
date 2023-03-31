@@ -333,7 +333,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             $"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
             if ( LoadingGUID != null && PromiseGUID != null)
             {
-                await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+                //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
                 await Task.CompletedTask;
                 OnModelLoadComplete((Guid)PromiseGUID!);
             } else {
