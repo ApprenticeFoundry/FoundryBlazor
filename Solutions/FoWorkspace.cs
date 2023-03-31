@@ -179,6 +179,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public string SetCurrentUrl(string url)
     {
         CurrentUrl = url;
+        $"CurrentUrl: {CurrentUrl}".WriteSuccess();
         return CurrentUrl;
     }
 
