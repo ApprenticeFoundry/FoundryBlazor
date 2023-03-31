@@ -399,7 +399,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         //is symbol ends with ....
-        LoadingURL = Symbol.Replace("http:", "https:");
+        //LoadingURL = Symbol.Replace("http:", "https:");
+        LoadingURL = Symbol;
         var result = Type switch
         {
             "Collada" => PreRenderImport(arena, viewer, Import3DFormats.Collada),

@@ -20,7 +20,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    //bool OnModelLoadComplete(Guid PromiseGuid);
+
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
@@ -296,26 +296,6 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    //public override bool OnModelLoadComplete(Guid PromiseGuid)
-    //{
-    //    var shape = Find<FoShape3D>(PromiseGuid.ToString());
-    //    if (shape != null)
-    //    {
-
-    //        Task.Run(async () => {
-    //            var removeGuid = shape.LoadingGUID ?? PromiseGuid;
-    //            //await Viewer3D!.RemoveByUuidAsync(removeGuid);
-    //            await Task.CompletedTask;
-    //        });
-
-    //        shape.OnModelLoadComplete(PromiseGuid);
-    //        return true;
-    //    }
-    //    else
-    //    {
-    //        $"Did not find Shape PromiseGuid={PromiseGuid}".WriteError();
-    //    }
-    //    return false;
-    //}
+    
 
 }

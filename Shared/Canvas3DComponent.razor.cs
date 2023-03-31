@@ -81,7 +81,6 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
             await AnimationHelperReference!.Initialize();
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
-            //ThreeJSView3D.ObjectLoaded += OnObjectLoaded;
 
             var arena = Workspace?.GetArena();
             arena?.SetViewer(ThreeJSView3D, ActiveScene!);
@@ -121,15 +120,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
             $"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
         });
     }
-    //public async Task OnObjectLoaded(Object3DArgs e)
-    //{
-    //    "OnObjectLoaded Start".WriteInfo();
-    //    var arena = Workspace?.GetArena();
-    //     "Calling post render Arena".WriteInfo();
-    //    arena?.OnModelLoadComplete(e.UUID);
-    //    "OnObjectLoaded Before UpdateScene".WriteInfo();
-    //    await ThreeJSView3D.UpdateScene();
-    //}
+
 
 
     public async Task RenderFrame(double fps)
