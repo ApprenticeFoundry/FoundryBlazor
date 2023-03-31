@@ -325,16 +325,16 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         Task.Run(async () =>
         {
-            $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
+            //$"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
             PromiseGUID = await viewer.Import3DModelAsync(settings);
-            $"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
+            //$"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
             //this should trigger a model loaded event ,  but of not!
-            $"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
+            //$"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
             if ( LoadingGUID != null && PromiseGUID != null)
             {
-                //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
-                await Task.CompletedTask;
+                await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+                //await Task.CompletedTask;
                 OnModelLoadComplete((Guid)PromiseGUID!);
             } else {
                 $"Nothing to remove ".WriteInfo(1);

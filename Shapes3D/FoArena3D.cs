@@ -172,8 +172,12 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         platform.EstablishBox("Platform", 1, 1, 1);
 
-        var url = Path.Join(baseURL,folder,filename);
-        platform.CreateUsing<FoShape3D>("Model")
+
+       var url = Path.Join(baseURL,folder,filename);
+       // var url = $"{baseURL}/{folder}/{filename}";
+
+
+        platform.CreateUsing<FoShape3D>(name)
         .CreateGlb(url, 1, 2, 3);
         //shape.Position = new FoVector3D();
 
