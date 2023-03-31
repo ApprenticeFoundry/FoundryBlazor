@@ -16,7 +16,7 @@ public interface IArena
     void SetViewer(Viewer viewer, Scene scene);
     Task RenderArena(Scene scene, int tick, double fps);
     Task ClearArena();
-
+    Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
@@ -73,9 +73,16 @@ public class FoArena3D : FoGlyph3D, IArena
 
         "ClearArena".WriteInfo();
         await Viewer3D.ClearSceneAsync();
-        await Viewer3D.UpdateScene();
+        await UpdateArena();
     }
 
+    public async Task UpdateArena()
+    {
+        if (Viewer3D == null) return;
+
+        "UpdateArena".WriteInfo();
+        await Viewer3D.UpdateScene();
+    }
     public void SetViewer(Viewer viewer, Scene scene)
     {
         Viewer3D = viewer;

@@ -365,6 +365,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
 
             { "Clear", () => ClearAll()},
+
             { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
             // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
 
