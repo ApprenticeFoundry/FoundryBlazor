@@ -21,6 +21,9 @@ public enum InputStyle { None, Drawing, FileDrop }
 
 public interface IWorkspace : IWorkPiece
 {
+    string GetCurrentUrl();
+    string SetCurrentUrl(string url);
+    
     Task InitializedAsync(string defaultHubURI);
     IDrawing GetDrawing();
     IArena GetArena();
@@ -51,6 +54,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
     protected string UserID { get; set; } = "";
+    protected string CurrentUrl { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
 
@@ -164,6 +168,18 @@ public class FoWorkspace : FoComponent, IWorkspace
             UserID = data.GenerateName();
         }
         return UserID;
+    }
+
+    
+    public string GetCurrentUrl()
+    {
+        return CurrentUrl;
+    }
+
+    public string SetCurrentUrl(string url)
+    {
+        CurrentUrl = url;
+        return CurrentUrl;
     }
 
     public IDrawing GetDrawing()
