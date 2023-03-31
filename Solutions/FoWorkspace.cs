@@ -21,8 +21,8 @@ public enum InputStyle { None, Drawing, FileDrop }
 
 public interface IWorkspace : IWorkPiece
 {
-    string GetCurrentUrl();
-    string SetCurrentUrl(string url);
+    string GetBaseUrl();
+    string SetBaseUrl(string url);
     
     Task InitializedAsync(string defaultHubURI);
     IDrawing GetDrawing();
@@ -171,12 +171,12 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
     
-    public string GetCurrentUrl()
+    public string GetBaseUrl()
     {
         return CurrentUrl;
     }
 
-    public string SetCurrentUrl(string url)
+    public string SetBaseUrl(string url)
     {
         CurrentUrl = url;
         $"CurrentUrl: {CurrentUrl}".WriteSuccess();
