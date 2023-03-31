@@ -103,19 +103,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return false;
     }
 
-    public bool CreateLoadingTextLabel(Scene scene, string message)
-    {
-        Random rnd = new();
-        int y = rnd.Next(-5, 7);
-        var label = new LabelText(message)
-        {
-            Color = "Yellow",
-            Position = new FoVector3D(-3, y, -2).AsVector3()
-        };
-        LoadingGUID = label.Uuid;
-        scene.Add(label);
-        return true;
-    }
+
 
     public bool Box(Scene ctx)
     {
@@ -339,11 +327,30 @@ public class FoShape3D : FoGlyph3D, IShape3D
             PromiseGUID = await viewer.Import3DModelAsync(settings);
             $"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
+            //this should trigger a model loaded event ,  but of not!
             $"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
+            if ( LoadingGUID != null && PromiseGUID != null)
+            {
+                await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+                OnModelLoadComplete((Guid)PromiseGUID!);
+            }
         });
         return true;
     }
 
+    private bool CreateLoadingTextLabel(Scene scene, string message)
+    {
+        Random rnd = new();
+        int y = rnd.Next(-5, 7);
+        var label = new LabelText(message)
+        {
+            Color = "Yellow",
+            Position = new FoVector3D(-3, y, -2).AsVector3()
+        };
+        LoadingGUID = label.Uuid;
+        scene.Add(label);
+        return true;
+    }
     private bool RenderImport(Scene scene, Import3DFormats format)
     {
         if (string.IsNullOrEmpty(LoadingURL)) return false;
@@ -442,6 +449,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             _ => false
         };
 
+        if ( PromiseGUID != PromiseGuid)
+        {
+            $"OnModelLoadComplete PromiseGUID != PromiseGuid".WriteError();
+        }   
         PromiseGUID = null;
         LoadingGUID = null;
         return result;
