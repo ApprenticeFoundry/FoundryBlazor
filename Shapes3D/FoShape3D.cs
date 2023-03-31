@@ -334,9 +334,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             if ( LoadingGUID != null && PromiseGUID != null)
             {
                 await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+                await Task.CompletedTask;
                 OnModelLoadComplete((Guid)PromiseGUID!);
             } else {
-
+                $"Nothing to remove ".WriteInfo(1);
             }
         });
         return true;
