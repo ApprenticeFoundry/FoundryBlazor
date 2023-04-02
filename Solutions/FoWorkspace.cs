@@ -294,6 +294,9 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
+        GetSlot<FoMenu2D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
+
         "FoWorkspace CreateMenus".WriteWarning();
         var OpenNew = async () =>
         {
@@ -305,16 +308,16 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        // GetDrawing()?.EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
-        // {
-        //     { "New Window", () => OpenNew()},
-        //     { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
-        //     { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
-        //     { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
-        //   //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-        //     { "Save Drawing", () => Command.Save()},
-        //     { "Restore Drawing", () => Command.Restore()},
-        // }, true);
+        space.EstablishMenu2D<FoMenu2D,FoButton2D>("Main", new Dictionary<string, Action>()
+         {
+             { "New Window", () => OpenNew()},
+             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
+             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
+             { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
+           //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
+             { "Save Drawing", () => Command.Save()},
+             { "Restore Drawing", () => Command.Restore()},
+         }, true);
 
         GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateMenus(space, js, nav));
 
@@ -354,6 +357,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void CreateCommands(IWorkspace space,  IJSRuntime js, NavigationManager nav, string serverUrl)
     {
+        GetSlot<FoCommand2D>()?.Clear();
 
         var OpenDTAR = async () =>
         {
