@@ -44,8 +44,7 @@ public interface IPageManagement: IRender
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
-    U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
-}
+ }
 
 
 public class PageManagementService : FoComponent, IPageManagement
@@ -300,21 +299,7 @@ public class PageManagementService : FoComponent, IPageManagement
         menu?.Clear();
     }
 
-    public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
-    {
-        var page = CurrentPage();
-        var menu = page.EstablishMenu2D<U>(name,clear);
 
-        foreach (KeyValuePair<string, Action> item in actions)
-        {
-            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
-                menu.Add<T>(shape);
-        }
-
-        //menu.LayoutHorizontal();
-
-        return menu;
-    }
 
 
 

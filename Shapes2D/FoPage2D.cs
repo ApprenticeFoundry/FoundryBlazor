@@ -9,7 +9,7 @@ namespace FoundryBlazor.Shape;
 public class FoPage2D : FoGlyph2D
 {
     
-    public static bool RefreshMenus { get; set; } = true;
+
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
     public double PageMargin { get; set; } = .50;  //inches
@@ -91,20 +91,7 @@ public class FoPage2D : FoGlyph2D
         return list;
     }
 
-    public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
-    {
-        var menu = Find<U>(name);
-        if (menu == null)
-        {
-            RefreshMenus = true;
-            menu = Activator.CreateInstance(typeof(U), name) as U;
-            Add<U>(menu!);
-        }
-        if (clear)
-            menu?.Clear();
-
-        return menu!;
-    }
+ 
 
     public override bool Smash(bool force)
     {

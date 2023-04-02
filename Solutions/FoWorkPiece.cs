@@ -9,9 +9,9 @@ namespace FoundryBlazor.Solutions;
 
 public interface IWorkPiece
 {
-    void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl);
+    void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
-    void CreateMenus(IJSRuntime js, NavigationManager nav);
+    void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
     List<IFoMenu> CollectMenus(List<IFoMenu> list);  
     bool SetSignalRHub(HubConnection hub, string panid);
     void PreRender(int tick);
@@ -38,7 +38,7 @@ public class FoWorkPiece: FoComponent, IWorkPiece
     {
         return list;
     }
-    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
     }
 
@@ -47,7 +47,7 @@ public class FoWorkPiece: FoComponent, IWorkPiece
         return list;
     }
 
-    public virtual void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl)
     {
     }
 

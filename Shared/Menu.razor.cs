@@ -43,20 +43,23 @@ public class MenuManager : ComponentBase
 
     public List<IFoMenu> GetAllMenus()
     {
-        if (FoPage2D.RefreshMenus && Workspace != null)
+        "GetAllMenus".WriteWarning(3);
+        if (FoWorkspace.RefreshMenus && Workspace != null)
         {
+            
             AllMenus.Clear();
+            $"Clearing menus {AllMenus.Count}".WriteInfo();
             AllMenus = Workspace.CollectMenus(AllMenus);
-            FoPage2D.RefreshMenus = false;
+            FoWorkspace.RefreshMenus = false;
 
-            // AllMenus.ForEach(item =>
-            // {
-            //     item.DisplayText().WriteInfo();
-            //     item.Buttons().ForEach(but =>
-            //     {
-            //         but.DisplayText().WriteInfo(1);
-            //     });
-            // });
+            AllMenus.ForEach(item =>
+            {
+                item.DisplayText().WriteInfo();
+                // item.Buttons().ForEach(but =>
+                // {
+                //     but.DisplayText().WriteInfo(1);
+                // });
+            });
         }
         return AllMenus;
     }

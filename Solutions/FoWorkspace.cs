@@ -34,7 +34,9 @@ public interface IWorkspace : IWorkPiece
     bool IsViewStyle2D();
     bool IsViewStyle3D();
 
-    FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
+    U EstablishCommand<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoCommand2D;
+    U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
+    U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
 
     void ClearAllWorkPieces();
@@ -50,6 +52,7 @@ public interface IWorkspace : IWorkPiece
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
+    public static bool RefreshMenus { get; set; } = true;
     protected string UserID { get; set; } = "";
     protected string CurrentUrl { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
@@ -190,14 +193,19 @@ public class FoWorkspace : FoComponent, IWorkspace
         return ActiveArena;
     }
 
-    void ClearAllWorkPieces()
+    public void ClearAllWorkPieces()
     {
-        Members<FoWorkPiece>().Clear();
+        Slot<FoWorkPiece>().Clear();
+        FoWorkspace.RefreshCommands = true;
+        FoWorkspace.RefreshMenus = true;
+        "ClearAllWorkPieces".WriteWarning();
     }
 
     public List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece)
     {
         Add<FoWorkPiece>(piece);
+        FoWorkspace.RefreshCommands = true;
+        FoWorkspace.RefreshMenus = true;
         return Members<FoWorkPiece>();
     }
 
@@ -224,10 +232,72 @@ public class FoWorkspace : FoComponent, IWorkspace
         return list;
     }
 
-
-
-    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
+   public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
     {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
+    {
+        var menu = EstablishMenu2D<U>(name,clear);
+
+        foreach (KeyValuePair<string, Action> item in actions)
+        {
+            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+                menu.Add<T>(shape);
+        }
+
+        //menu.LayoutHorizontal();
+
+        return menu;
+    }
+
+    public U EstablishMenu3D<U>(string name, bool clear) where U : FoMenu3D
+    {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
+    {
+        var menu = EstablishMenu3D<U>(name,clear);
+
+        foreach (KeyValuePair<string, Action> item in actions)
+        {
+            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+                menu.Add<T>(shape);
+        }
+
+        //menu.LayoutHorizontal();
+
+        return menu;
+    }
+
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
+    {
+        GetSlot<FoMenu2D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
+
+        "FoWorkspace CreateMenus".WriteWarning();
         var OpenNew = async () =>
         {
             var target = nav!.ToAbsoluteUri("/");
@@ -238,35 +308,43 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        GetDrawing()?.EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
-        {
-            { "New Window", () => OpenNew()},
-            { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
-            { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
-            { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
-          //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-            { "Save Drawing", () => Command.Save()},
-            { "Restore Drawing", () => Command.Restore()},
-        }, true);
+        space.EstablishMenu2D<FoMenu2D,FoButton2D>("Main", new Dictionary<string, Action>()
+         {
+             { "New Window", () => OpenNew()},
+             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
+             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
+             { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
+           //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
+             { "Save Drawing", () => Command.Save()},
+             { "Restore Drawing", () => Command.Restore()},
+         }, true);
 
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateMenus(js, nav));
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateMenus(space, js, nav));
 
-        GetDrawing()?.CreateMenus(js, nav);
-        GetArena()?.CreateMenus(js, nav);
-
+        GetDrawing()?.CreateMenus(space,js, nav);
+        GetArena()?.CreateMenus(space,js, nav);
+        FoWorkspace.RefreshMenus = true;
     }
 
 
-    public FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D
+    public U EstablishCommand<U>(string name, bool clear) where U : FoCommand2D
     {
-        var commandBar = Find<FoCommand2D>(name);
-        if (commandBar == null)
+        var menu = Find<U>(name);
+        if (menu == null)
         {
-            commandBar = Activator.CreateInstance(typeof(FoCommand2D), name) as FoCommand2D;
-            this.Add<FoCommand2D>(commandBar!);
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
         }
         if (clear)
-            commandBar?.Clear();
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishCommand<U,T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U: FoCommand2D
+    {
+        var commandBar = EstablishCommand<U>(name,clear);
 
         foreach (KeyValuePair<string, Action> item in actions)
         {
@@ -277,8 +355,9 @@ public class FoWorkspace : FoComponent, IWorkspace
         return commandBar!;
     }
 
-    public virtual void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IWorkspace space,  IJSRuntime js, NavigationManager nav, string serverUrl)
     {
+        GetSlot<FoCommand2D>()?.Clear();
 
         var OpenDTAR = async () =>
         {
@@ -291,7 +370,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         };
 
 
-        EstablishCommand<FoButton2D>("CMD", new Dictionary<string, Action>()
+        space.EstablishCommand<FoCommand2D,FoButton2D>("CMD", new Dictionary<string, Action>()
         {
             { serverUrl, () => OpenDTAR() },
             { "FileDrop", () => SetFileDropStyle()},
@@ -307,7 +386,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateCommands(js, nav, serverUrl));
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateCommands(space,js, nav, serverUrl));
 
         FoWorkspace.RefreshCommands = true;
     }
@@ -322,12 +401,12 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
     public bool IsViewStyle2D()
     {
-        FoPage2D.RefreshMenus = true;
+        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View2D;
     }
     public bool IsViewStyle3D()
     {
-        FoPage2D.RefreshMenus = true;
+        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View3D;
     }
 

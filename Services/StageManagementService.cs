@@ -20,7 +20,7 @@ public interface IStageManagement
     //T Duplicate<T>(T value) where T : FoGlyph3D;
     //U MorphTo<T, U>(T value) where T : FoGlyph3D where U : FoGlyph3D;
     //T? GroupSelected<T>() where T : FoGlyph3D;
-    U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
+    //U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 }
 
 
@@ -151,21 +151,21 @@ public class StageManagementService : FoComponent, IStageManagement
         menu?.Clear();
     }
 
-    public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
-    {
-        var stage = CurrentStage();
-        var menu = stage.EstablishMenu3D<U>(name, clear);
+    // public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
+    // {
 
-        foreach (KeyValuePair<string, Action> item in actions)
-        {
-            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
-                menu.Add<T>(shape);
-        }
+    //     var menu = EstablishMenu3D<U>(name, clear);
 
-        //menu.LayoutHorizontal();
+    //     foreach (KeyValuePair<string, Action> item in actions)
+    //     {
+    //         if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+    //             menu.Add<T>(shape);
+    //     }
 
-        return menu;
-    }
+    //     //menu.LayoutHorizontal();
+
+    //     return menu;
+    // }
 
 
 
