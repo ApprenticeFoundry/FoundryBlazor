@@ -25,14 +25,14 @@ public interface IDrawing : IRender
     double ToInches(int value);
 
     Rectangle TransformRect(Rectangle rect);
-    void CreateMenus(IJSRuntime js, NavigationManager nav);
+    void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 
     List<FoImage2D> GetAllImages();
     List<FoVideo2D> GetAllVideos();
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
 
-    FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
+    //FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
@@ -343,11 +343,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-    public FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
-    {
-        var result = PageManager.EstablishMenu2D<T, FoButton2D>(name, menu, clear);
-        return result;
-    }
 
 
     public void RefreshHitTest_IfDirty()
@@ -359,9 +354,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-    public virtual void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
-        EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
         {
 
             { "Clear", () => ClearAll()},
@@ -373,7 +368,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
         // https://coastalcreative.com/standard-paper-sizes/
-        EstablishMenu<FoMenu2D>("Page Size", new Dictionary<string, Action>()
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Page Size", new Dictionary<string, Action>()
         {
             { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
             { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
