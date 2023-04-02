@@ -37,14 +37,11 @@ public interface IWorkspace : IWorkPiece
     FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
 
 
+    void ClearAllWorkPieces();
+    List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
     T EstablishWorkPiece<T>() where T : FoWorkPiece;
 
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
-
-    void PreRender(int tick);
-    void PostRender(int tick);
-
-    Task RenderWatermark(Canvas2DContext ctx, int tick);
 
     ComponentBus GetPubSub();
 
@@ -193,6 +190,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return ActiveArena;
     }
 
+    void ClearAllWorkPieces()
+    {
+        Members<FoWorkPiece>().Clear();
+    }
+
     public List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece)
     {
         Add<FoWorkPiece>(piece);
@@ -217,7 +219,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         //if (!IsViewStyle2D())
             GetArena()?.CollectMenus(list);
 
-        Members<FoWorkPiece>().ForEach(item => item.CollectMenus(list));
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.CollectMenus(list));
 
         return list;
     }
@@ -247,7 +249,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Restore Drawing", () => Command.Restore()},
         }, true);
 
-        Members<FoWorkPiece>().ForEach(item => item.CreateMenus(js, nav));
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateMenus(js, nav));
 
         GetDrawing()?.CreateMenus(js, nav);
         GetArena()?.CreateMenus(js, nav);
@@ -305,6 +307,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateCommands(js, nav, serverUrl));
 
         FoWorkspace.RefreshCommands = true;
     }

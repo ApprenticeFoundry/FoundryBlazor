@@ -1,3 +1,4 @@
+using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Shape;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -13,6 +14,9 @@ public interface IWorkPiece
     void CreateMenus(IJSRuntime js, NavigationManager nav);
     List<IFoMenu> CollectMenus(List<IFoMenu> list);  
     bool SetSignalRHub(HubConnection hub, string panid);
+    void PreRender(int tick);
+    void PostRender(int tick);
+    Task RenderWatermark(Canvas2DContext ctx, int tick);
 }
 
 public class FoWorkPiece: FoComponent, IWorkPiece
@@ -50,5 +54,17 @@ public class FoWorkPiece: FoComponent, IWorkPiece
     public virtual bool SetSignalRHub(HubConnection hub, string panid)
     {
         return false;
+    }
+    public virtual void PreRender(int tick)
+    {
+
+    }
+    public virtual void PostRender(int tick)
+    {
+
+    }
+    public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
+    {
+        await Task.CompletedTask;
     }
 }
