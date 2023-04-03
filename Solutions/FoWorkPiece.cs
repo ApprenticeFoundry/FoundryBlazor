@@ -12,7 +12,7 @@ public interface IWorkPiece
     void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);  
+
     bool SetSignalRHub(HubConnection hub, string panid);
     void PreRender(int tick);
     void PostRender(int tick);
@@ -34,10 +34,7 @@ public class FoWorkPiece: FoComponent, IWorkPiece
         JsRuntime = js;
     }  
 
-    public virtual List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        return list;
-    }
+
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
     }

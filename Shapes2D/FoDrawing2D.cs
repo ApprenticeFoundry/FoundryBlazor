@@ -30,9 +30,7 @@ public interface IDrawing : IRender
 
     List<FoImage2D> GetAllImages();
     List<FoVideo2D> GetAllVideos();
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
 
-    //FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
@@ -288,10 +286,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return AllImages;
     }
 
-    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        return PageManager.CollectMenus(list);
-    }
+
     public List<FoVideo2D> GetAllVideos()
     {
         if (FoVideo2D.RefreshVideos)

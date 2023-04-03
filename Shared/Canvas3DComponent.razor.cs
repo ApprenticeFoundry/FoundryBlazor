@@ -128,7 +128,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (ActiveScene == null) return;
         tick++;
 
-        //Workspace?.PreRender(tick);
+        Workspace?.PreRender(tick);
 
         var arena = Workspace?.GetArena();
         if (arena == null) return;
@@ -154,7 +154,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         {
             stage.IsDirty = false;
             await ThreeJSView3D.UpdateScene();
-            $"RenderFrame stage.IsDirty  so... ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
+            //$"RenderFrame stage.IsDirty  so... ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
         }
     }
 

@@ -5,19 +5,35 @@ using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class MenuManager : ComponentBase
+public class MenuManager : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
-    //[Inject] private ComponentBus? PubSub { get; set; }
+
 
     public List<IFoMenu> AllMenus = new();
 
+    protected override void OnInitialized()
+    {
+        if ( Navigation != null)
+            Navigation.LocationChanged += LocationChanged;
+    }
 
+    void IDisposable.Dispose()
+    {
+        if ( Navigation != null)
+            Navigation.LocationChanged -= LocationChanged;
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
  
     private async Task OpenNewWindow()
     {
@@ -43,23 +59,23 @@ public class MenuManager : ComponentBase
 
     public List<IFoMenu> GetAllMenus()
     {
-        "GetAllMenus".WriteWarning(3);
+        //"GetAllMenus".WriteWarning(3);
         if (FoWorkspace.RefreshMenus && Workspace != null)
         {
             
             AllMenus.Clear();
-            $"Clearing menus {AllMenus.Count}".WriteInfo();
+           //$"GetAllMenus() Clearing menus {AllMenus.Count}".WriteInfo();
             AllMenus = Workspace.CollectMenus(AllMenus);
             FoWorkspace.RefreshMenus = false;
 
-            AllMenus.ForEach(item =>
-            {
-                item.DisplayText().WriteInfo();
-                // item.Buttons().ForEach(but =>
-                // {
-                //     but.DisplayText().WriteInfo(1);
-                // });
-            });
+            // AllMenus.ForEach(item =>
+            // {
+            //     item.DisplayText().WriteInfo();
+            //     // item.Buttons().ForEach(but =>
+            //     // {
+            //     //     but.DisplayText().WriteInfo(1);
+            //     // });
+            // });
         }
         return AllMenus;
     }

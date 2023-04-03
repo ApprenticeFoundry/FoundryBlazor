@@ -38,7 +38,7 @@ public interface IWorkspace : IWorkPiece
     U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
-
+    List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkPieces();
     List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
     T EstablishWorkPiece<T>() where T : FoWorkPiece;
@@ -53,6 +53,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
     public static bool RefreshMenus { get; set; } = true;
+
     protected string UserID { get; set; } = "";
     protected string CurrentUrl { get; set; } = "";
     protected ViewStyle viewStyle = ViewStyle.View2D;
@@ -124,10 +125,12 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.PreRender(tick));
     }
 
     public virtual void PostRender(int tick)
     {
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.PostRender(tick));
     }
 
 
@@ -195,7 +198,9 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public void ClearAllWorkPieces()
     {
-        Slot<FoWorkPiece>().Clear();
+        GetSlot<FoWorkPiece>()?.Clear();
+        GetSlot<FoMenu2D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
         FoWorkspace.RefreshCommands = true;
         FoWorkspace.RefreshMenus = true;
         "ClearAllWorkPieces".WriteWarning();
@@ -220,14 +225,6 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
         GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
-
-        //if (!IsViewStyle3D())
-            GetDrawing()?.CollectMenus(list);
-
-        //if (!IsViewStyle2D())
-            GetArena()?.CollectMenus(list);
-
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.CollectMenus(list));
 
         return list;
     }
@@ -323,7 +320,6 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         GetDrawing()?.CreateMenus(space,js, nav);
         GetArena()?.CreateMenus(space,js, nav);
-        FoWorkspace.RefreshMenus = true;
     }
 
 
@@ -401,12 +397,10 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
     public bool IsViewStyle2D()
     {
-        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View2D;
     }
     public bool IsViewStyle3D()
     {
-        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View3D;
     }
 
