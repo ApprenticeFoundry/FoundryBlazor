@@ -1,10 +1,11 @@
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class CommandManager : ComponentBase
+public class CommandManager : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
@@ -12,7 +13,22 @@ public class CommandManager : ComponentBase
 
     public List<IFoCommand> AllCommands = new();
 
+    protected override void OnInitialized()
+    {
+        if ( Navigation != null)
+            Navigation.LocationChanged += LocationChanged;
+    }
 
+    void IDisposable.Dispose()
+    {
+        if ( Navigation != null)
+            Navigation.LocationChanged -= LocationChanged;
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
 
     public List<IFoCommand> GetAllCommands()
     {
