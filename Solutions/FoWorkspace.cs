@@ -125,10 +125,12 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.PreRender(tick));
     }
 
     public virtual void PostRender(int tick)
     {
+        GetMembers<FoWorkPiece>()?.ForEach(item => item.PostRender(tick));
     }
 
 
@@ -318,7 +320,6 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         GetDrawing()?.CreateMenus(space,js, nav);
         GetArena()?.CreateMenus(space,js, nav);
-        FoWorkspace.RefreshMenus = true;
     }
 
 
@@ -396,12 +397,10 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
     public bool IsViewStyle2D()
     {
-        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View2D;
     }
     public bool IsViewStyle3D()
     {
-        FoWorkspace.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View3D;
     }
 
