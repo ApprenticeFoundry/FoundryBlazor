@@ -27,8 +27,6 @@ public interface IArena
     FoGroup3D MakeAndRenderTestPlatform();
     FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL);
 
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
-    //FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D;
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 }
 public class FoArena3D : FoGlyph3D, IArena
@@ -90,16 +88,8 @@ public class FoArena3D : FoGlyph3D, IArena
         Scene = scene;
         CurrentStage().InitScene(scene);
     }
-    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        return StageManager.CollectMenus(list);
-    }
 
-    // public FoMenu3D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu3D
-    // {
-    //     var result = StageManager.EstablishMenu3D<T, FoButton3D>(name, menu, clear);
-    //     return result;
-    // }
+
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {

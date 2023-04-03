@@ -22,7 +22,7 @@ public interface IPageManagement: IRender
 
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
     List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
+
     void RefreshHitTesting(FoPanZoomWindow window);
     bool ToggleHitTestRender();
 
@@ -115,16 +115,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-
-
-    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        var page = CurrentPage();
-        var items = page.GetMembers<FoMenu2D>();
-        if ( items != null)
-            list.AddRange(items);
-        return list;
-    }   
+ 
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Slot<FoPage2D>().ForEach(item => item.CollectImages(list, deep));
