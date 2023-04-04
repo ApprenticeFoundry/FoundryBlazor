@@ -216,7 +216,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public T EstablishWorkPiece<T>() where T : FoWorkPiece
     {
-        var piece = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime) as T;
+        var piece = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime, PubSub) as T;
         AddWorkPiece(piece!);
         return piece!;
     }
