@@ -328,7 +328,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         var menu = Find<U>(name);
         if (menu == null)
         {
-            RefreshMenus = true;
+            RefreshCommands = true;
             menu = Activator.CreateInstance(typeof(U), name) as U;
             Add<U>(menu!);
         }

@@ -1,4 +1,5 @@
 using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -25,13 +26,16 @@ public class FoWorkPiece: FoComponent, IWorkPiece
     protected ICommand Command { get; set; }
     protected DialogService Dialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
+    
+    protected ComponentBus PubSub { get; set; }
 
-    public FoWorkPiece(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js)
+    public FoWorkPiece(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js, ComponentBus pubSub)
     {
         Workspace = space;
         Command = command;
         Dialog = dialog;
         JsRuntime = js;
+        PubSub = pubSub;
     }  
 
 
