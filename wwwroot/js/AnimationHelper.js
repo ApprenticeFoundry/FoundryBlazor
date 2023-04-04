@@ -7,16 +7,14 @@
 /*This is called from the Blazor component's Initialize method*/
 
 function initAnimationJS(instance) {
-    // instance is the Blazor component dotnet reference
-    window.theInstance2 = instance;
+  // instance is the Blazor component dotnet reference
+  window.theInstance2 = instance;
 
-
-
-    // request an animation frame, telling window to call renderJS
-    // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-    window.requestAnimationFrame(renderAnimationJS);
+  // request an animation frame, telling window to call renderJS
+  // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
+  //skip this for now
+  //window.requestAnimationFrame(renderAnimationJS);
 }
-
 
 /*This is called whenever we have requested an animation frame*/
 function renderAnimationJS(timeStamp) {
@@ -28,14 +26,16 @@ function renderAnimationJS(timeStamp) {
 
 /*This is called whenever the browser (and therefore the canvas) is resized*/
 function WindowResized() {
-    // canvasHolder is the ID of the div that wraps the renderfragment
-    // content(Canvas) in the blazor app
-    // find the canvas within the renderfragment
+  // canvasHolder is the ID of the div that wraps the renderfragment
+  // content(Canvas) in the blazor app
+  // find the canvas within the renderfragment
 
-    // Call the blazor component's [JSInvokable] ResizeInBlazor method
-    theInstance2.invokeMethodAsync('ResizeAnimation', window.innerWidth, window.innerHeight);
+  // Call the blazor component's [JSInvokable] ResizeInBlazor method
+  theInstance2.invokeMethodAsync(
+    "ResizeAnimation",
+    window.innerWidth,
+    window.innerHeight
+  );
 }
-
-
 
 window.initAnimationJS = initAnimationJS;
