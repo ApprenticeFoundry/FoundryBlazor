@@ -137,8 +137,13 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
-        await Task.CompletedTask;
-    }
+        var list = GetMembers<FoWorkPiece>();
+        if ( list != null)
+            foreach (var item in list)
+            {
+                await item.RenderWatermark(ctx, tick);
+            }
+     }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
     {
