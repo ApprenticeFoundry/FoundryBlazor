@@ -94,7 +94,7 @@ public class FoStage3D : FoGlyph3D, IStage
             Position = new Vector3(1, 3, 0)
         });
         EstablishBoundry();
-        IsDirty = true;
+        //IsDirty = true;
         
         return scene;
     }
@@ -155,7 +155,7 @@ public class FoStage3D : FoGlyph3D, IStage
         if (CurrentScene != null)
         {
             value.Render(CurrentScene, 0, 0);
-            IsDirty = true;
+            //IsDirty = true;
             //FillStage();
         }
 
@@ -182,7 +182,7 @@ public class FoStage3D : FoGlyph3D, IStage
 
         $"FillStage {CurrentScene.Name}".WriteSuccess();
 
-        IsDirty = true;
+        //IsDirty = true;
         var scene = CurrentScene;
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
