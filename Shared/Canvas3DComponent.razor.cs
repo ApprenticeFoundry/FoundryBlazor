@@ -111,13 +111,13 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
-        InvokeAsync(StateHasChanged);
-        $"Canvas3DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+        //InvokeAsync(StateHasChanged);
+        //$"Canvas3DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
 
         Task.Run(async () =>
         {
             await ThreeJSView3D.UpdateScene();
-            $"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
+            //$"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
         });
     }
 

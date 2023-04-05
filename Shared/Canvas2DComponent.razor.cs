@@ -51,7 +51,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
             Ctx = await CanvasReference.CreateCanvas2DAsync();
-            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            //PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             await CanvasHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
