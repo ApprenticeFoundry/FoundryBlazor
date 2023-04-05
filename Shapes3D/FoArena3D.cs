@@ -21,6 +21,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
+    void RefreshUI();
 
 
     FoStage3D CurrentStage();
