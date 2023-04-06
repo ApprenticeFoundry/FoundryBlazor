@@ -21,7 +21,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    void RefreshUI();
+    //void RefreshUI();
 
 
     FoStage3D CurrentStage();
@@ -71,7 +71,7 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         if (Viewer3D == null) return;
 
-        "ClearArena".WriteInfo();
+        //"ClearArena".WriteInfo();
         await Viewer3D.ClearSceneAsync();
         await UpdateArena();
     }
@@ -80,7 +80,7 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         if (Viewer3D == null) return;
 
-        "UpdateArena".WriteInfo();
+        //"UpdateArena".WriteInfo();
         await Viewer3D.UpdateScene();
     }
     public void SetViewer(Viewer viewer, Scene scene)
@@ -118,10 +118,10 @@ public class FoArena3D : FoGlyph3D, IArena
         }
     }
 
-    public void RefreshUI()
-    {
-        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("one"));
-    }
+    // public void RefreshUI()
+    // {
+    //     PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("one"));
+    // }
 
     public FoGroup3D MakeAndRenderTestPlatform()
     {
@@ -253,7 +253,7 @@ public class FoArena3D : FoGlyph3D, IArena
         });
 
         //RefreshUI();
-        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
+        //PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
     }
 
     public void PreRenderWorld(FoWorld3D? world)

@@ -117,7 +117,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         Task.Run(async () =>
         {
             await ThreeJSView3D.UpdateScene();
-            //$"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
+            $"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
         });
     }
 
