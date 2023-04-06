@@ -154,6 +154,7 @@ public class FoStage3D : FoGlyph3D, IStage
 
         if (CurrentScene != null)
         {
+
             value.Render(CurrentScene, 0, 0);
             //IsDirty = true;
             //FillStage();

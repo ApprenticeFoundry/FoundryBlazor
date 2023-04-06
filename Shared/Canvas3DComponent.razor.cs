@@ -85,6 +85,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
             var arena = Workspace?.GetArena();
             arena?.SetViewer(ThreeJSView3D, ActiveScene!);
 
+            ThreeJSView3D.ObjectLoaded += ThreeJSView3D_ObjectLoaded;
+
             // var ShapeMesh = new Mesh
             // {
             //     Geometry = new BoxGeometry(1, 2, 3),
@@ -108,6 +110,12 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    private async Task ThreeJSView3D_ObjectLoaded(Object3DArgs e)
+    {
+        $"Returned  {e.UUID}".WriteInfo();
+        await Task.CompletedTask;
+
+    }
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {

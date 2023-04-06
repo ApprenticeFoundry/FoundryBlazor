@@ -1,3 +1,4 @@
+using BlazorThreeJS.Core;
 using BlazorThreeJS.Enums;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Labels;
@@ -26,7 +27,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public string? LoadingURL { get; set; }
 
     private Mesh? ShapeMesh { get; set; }
-
+    private Object3D? ShapeObject3D { get; set; }
     public FoShape3D() : base()
     {
     }
@@ -41,9 +42,20 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
     {
-        if (ShapeMesh == null) return false;
-        ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
-        return true;
+        //"Update mesh position".WriteSuccess();
+        if (ShapeMesh != null) 
+        {
+            ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
+            return true;
+        }
+        else if ( ShapeObject3D != null)
+        {
+             "ShapeObject3D Update mesh position".WriteSuccess();
+            ShapeObject3D.Position.Loc(xLoc, yLoc, zLoc);
+            return true;
+        }
+
+        return false;
     }
 
     public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
@@ -329,11 +341,27 @@ public class FoShape3D : FoGlyph3D, IShape3D
             PromiseGUID = await viewer.Import3DModelAsync(settings);
             //$"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
             arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
+
+            Thread.Sleep(10000);
+
+            if ( PromiseGUID != null)
+            {
+                var list = arena.CurrentScene().Children;
+                foreach (var item in list)
+                {
+                    $"Children {PromiseGUID} {item.Uuid} {item.Name} ".WriteInfo(1);
+                }
+                ShapeObject3D = Viewer.GetObjectByUuid((Guid)PromiseGUID!, list);
+                $"Found PreRenderImport {PromiseGUID} {list.Count} ShapeObject3D [{ShapeObject3D}] ".WriteInfo(1);
+            } else {
+                $"PreRenderImport PromiseGUID is null ".WriteInfo(1);
+            }
+             
             //this should trigger a model loaded event ,  but of not!
             //$"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
             if ( LoadingGUID != null && PromiseGUID != null)
             {
-                await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+                //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
                 //await Task.CompletedTask;
                 OnModelLoadComplete((Guid)PromiseGUID!);
             } else {

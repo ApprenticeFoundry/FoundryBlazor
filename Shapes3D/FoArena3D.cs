@@ -21,8 +21,7 @@ public interface IArena
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     void RenderWorld(FoWorld3D? world);
-    //void RefreshUI();
-
+    bool PreRender(FoGlyph3D glyph);
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
@@ -90,7 +89,19 @@ public class FoArena3D : FoGlyph3D, IArena
         CurrentStage().InitScene(scene);
     }
 
+    public Viewer CurrentViewer()
+    {
+        return Viewer3D!;
+    }
+    public Scene CurrentScene()
+    {
+        return Scene!;
+    }
+    public bool PreRender(FoGlyph3D glyph)
+    {
 
+        return glyph.PreRender(this,Viewer3D!);
+    }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
