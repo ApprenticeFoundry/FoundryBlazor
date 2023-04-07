@@ -157,7 +157,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         {
             EstablishDrawingSyncHub(defaultHubURI);
             Command.StartHub();
-            $"Starting SignalR Hub:{defaultHubURI}".WriteWarning();
+            var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+            Command.SendToast(ToastType.Info, note);
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
@@ -373,7 +374,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         space.EstablishCommand<FoCommand2D,FoButton2D>("CMD", new Dictionary<string, Action>()
         {
-            { serverUrl, () => OpenDTAR() },
+            { "Ping", () => DoPing()},
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
             // { "1:1", () => PanZoom.Reset()},
@@ -390,6 +391,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateCommands(space,js, nav, serverUrl));
 
         FoWorkspace.RefreshCommands = true;
+    }
+
+    public void DoPing()
+    {
+        Command.SendToast(ToastType.Info, "Ping");
     }
 
     public ViewStyle GetViewStyle()
