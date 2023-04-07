@@ -158,6 +158,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             EstablishDrawingSyncHub(defaultHubURI);
             Command.StartHub();
             var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+            Toast?.Success(note);
             Command.SendToast(ToastType.Info, note);
         }
 
@@ -417,7 +418,8 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public HubConnection EstablishDrawingSyncHub(string defaultHubURI)
     {
-        if (Command.HasHub()) return Command.GetSignalRHub()!;
+        if (Command.HasHub()) 
+            return Command.GetSignalRHub()!;
 
         var secureHub = defaultHubURI.Replace("http://", "https://");
         var secureHubURI = new Uri(secureHub);
@@ -430,6 +432,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         Command.SetSignalRHub(hub, GetUserID(), Toast);
         SetSignalRHub(hub, GetUserID());
 
+        Toast?.Success($"HubConnection {secureHubURI} ");
 
         return hub;
     }

@@ -41,6 +41,7 @@ public class CommandService : ICommand
     private HubConnection? _DrawingSyncHub;
     protected IDrawing ActiveDrawing { get; init; }
     protected IArena ActiveArena { get; init; }
+    protected IToast? Toast { get; set; }
     private D2D_UserMove? UserLocation { get; set; }
     protected ComponentBus PubSub { get; set; }
 
@@ -83,12 +84,13 @@ public class CommandService : ICommand
 
         UserID = userid;
         GetDrawing()?.SetUserID(UserID);
+        Toast = toast;
         _DrawingSyncHub = hub;
         $"SetSignalRHub of UserID {UserID} CommandService".WriteNote();
 
         PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
         {
-            toast.RenderToast(usertoast);
+            Toast.RenderToast(usertoast);
             SendSyncMessage(usertoast);
         });
 
@@ -160,7 +162,8 @@ public class CommandService : ICommand
         {
             IsRunning = true;
             Task.Run(async () => await _DrawingSyncHub!.StartAsync());
-            $"StartHub {IsRunning}..".WriteNote();
+            var note = $"StartHub {IsRunning}..".WriteNote();
+            Toast?.Success(note);
         }
         return IsRunning;
     }
@@ -170,7 +173,8 @@ public class CommandService : ICommand
         {
             IsRunning = false;
             Task.Run(async () => await _DrawingSyncHub!.StopAsync());
-            $"StopHub {IsRunning}..".WriteNote();
+            var note = $"StopHub {IsRunning}..".WriteNote();
+            Toast?.Error(note);
         }
         return IsRunning;
     }
