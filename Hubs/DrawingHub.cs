@@ -1,9 +1,8 @@
-
-
+using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using Microsoft.AspNetCore.SignalR;
 
-namespace FoundryBlazor.Hubs;
+namespace FoundryBlazor.Solutions;
 
 public interface IDrawingHub
 {
@@ -12,6 +11,10 @@ public interface IDrawingHub
 
 public class DrawingSyncHub : Hub, IDrawingHub
 {
+    public DrawingSyncHub()
+    {
+
+    }
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync();
@@ -23,6 +26,7 @@ public class DrawingSyncHub : Hub, IDrawingHub
     }
     public async Task<string> Ping(string payload)
     {
+        "Sending a ping message to the server".WriteInfo();
         var data = $"DrawingHub: pong message {payload}";
         await Clients.All.SendAsync("Pong", data);
         return data;

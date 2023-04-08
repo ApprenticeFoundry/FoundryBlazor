@@ -119,6 +119,10 @@ public class CommandService : ICommand
         });
 
 
+        hub.On<string>("Pong", (msg) =>
+         {
+            Toast?.Success($"Pong {msg}");
+        });
 
         hub.On<D2D_Create>("Create", (create) =>
          {
@@ -250,16 +254,18 @@ public class CommandService : ICommand
         if (_DrawingSyncHub == null || !IsRunning)
             $"Command Service {IsRunning} {msg.Topic()}..  is NOT Sending".WriteNote();
 
-        if (_DrawingSyncHub == null) return false;
+        if (_DrawingSyncHub == null) 
+              return false;
 
         //$"Sending {IsRunning} {msg.Topic()}..".WriteNote();
 
         if (IsRunning)
             await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
 
-        if ( msg is D2D_UserMove) return IsRunning;
+        if ( msg is D2D_UserMove) 
+            return IsRunning;
 
-        //$"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
+        $"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
 
         return IsRunning;
     }
