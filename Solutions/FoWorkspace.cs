@@ -421,8 +421,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         if (Command.HasHub()) 
             return Command.GetSignalRHub()!;
 
-        var secureHub = defaultHubURI.Replace("http://", "https://");
-        var secureHubURI = new Uri(secureHub);
+        //var secureHub = defaultHubURI.Replace("http://", "https://");
+        var secureHubURI = new Uri(defaultHubURI);
 
 
         var hub = new HubConnectionBuilder()
