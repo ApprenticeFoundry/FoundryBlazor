@@ -13,7 +13,7 @@ public interface ICommand
 {
     IDrawing GetDrawing();
     IArena GetArena();
-
+    Task Ping(string msg);
     D2D_Base SendSyncMessage(D2D_Base msg);
     D2D_UserToast SendToast(ToastType type, string message);
     void SendShapeCreate(FoGlyph2D? shape);
@@ -26,7 +26,7 @@ public interface ICommand
     bool StartHub();
     bool StopHub();
 
-    //Task<bool> Send(D2D_Base msg);
+    Task<bool> Send(D2D_Base msg);
     ValueTask DisposeAsync();
     bool IsConnected { get; }
 
@@ -238,6 +238,16 @@ public class CommandService : ICommand
     {
         var move = new D2D_Move(shape);
         SendSyncMessage(move);
+    }
+
+    public async Task Ping(string msg)
+    {
+        var message = $"Ping {msg} {DateTime.Now}";
+        if (IsRunning && _DrawingSyncHub != null)
+            await _DrawingSyncHub.SendAsync("Ping", message);
+        else
+            $"Command Service {IsRunning} {msg}..  is NOT Sending".WriteNote();
+        
     }
 
     public D2D_Base SendSyncMessage(D2D_Base msg)
