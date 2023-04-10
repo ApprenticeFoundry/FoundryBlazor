@@ -1,5 +1,6 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Enums;
+using BlazorThreeJS.Events;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Labels;
 using BlazorThreeJS.Materials;
@@ -21,8 +22,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public FoVector3D? Rotation { get; set; }
     public FoVector3D? Origin { get; set; }
     public FoVector3D? BoundingBox { get; set; }
-
-    public Guid? PromiseGUID { get; set; }
     public Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
 
@@ -43,14 +42,14 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public override bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
     {
         //"Update mesh position".WriteSuccess();
-        if (ShapeMesh != null) 
+        if (ShapeMesh != null)
         {
             ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
             return true;
         }
-        else if ( ShapeObject3D != null)
+        else if (ShapeObject3D != null)
         {
-             "ShapeObject3D Update mesh position".WriteSuccess();
+            $"ShapeObject3D Update mesh position {xLoc}, {yLoc}, {zLoc}".WriteSuccess();
             ShapeObject3D.Position.Loc(xLoc, yLoc, zLoc);
             return true;
         }
@@ -318,55 +317,48 @@ public class FoShape3D : FoGlyph3D, IShape3D
         });
     }
 
-
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
         if (string.IsNullOrEmpty(LoadingURL)) return false;
-          $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
-
+        $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
 
         var settings = new ImportSettings
         {
+            Uuid = Guid.NewGuid(),
             Format = format,
             FileURL = LoadingURL,
             Position = Position?.AsVector3() ?? new Vector3(),
-            Rotation = Rotation?.AsEuler() ?? new Euler()
+            Rotation = Rotation?.AsEuler() ?? new Euler(),
+            OnComplete = (Scene scene, Object3D object3D) =>
+            {
+                if (object3D != null) this.ShapeObject3D = object3D;
+                else "Unexpected empty object3D".WriteError(1);
+            }
         };
-
-
 
         Task.Run(async () =>
         {
             //$"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
-            PromiseGUID = await viewer.Import3DModelAsync(settings);
+            await viewer.Request3DModel(settings);
+            arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
             //$"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
-            arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
+            // arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
 
-            Thread.Sleep(10000);
+            // Thread.Sleep(1000);
 
-            if ( PromiseGUID != null)
-            {
-                var list = arena.CurrentScene().Children;
-                foreach (var item in list)
-                {
-                    $"Children {PromiseGUID} {item.Uuid} {item.Name} ".WriteInfo(1);
-                }
-                ShapeObject3D = Viewer.GetObjectByUuid((Guid)PromiseGUID!, list);
-                $"Found PreRenderImport {PromiseGUID} {list.Count} ShapeObject3D [{ShapeObject3D}] ".WriteInfo(1);
-            } else {
-                $"PreRenderImport PromiseGUID is null ".WriteInfo(1);
-            }
-             
+
             //this should trigger a model loaded event ,  but of not!
             //$"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
-            if ( LoadingGUID != null && PromiseGUID != null)
-            {
-                //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
-                //await Task.CompletedTask;
-                OnModelLoadComplete((Guid)PromiseGUID!);
-            } else {
-                $"Nothing to remove ".WriteInfo(1);
-            }
+            // if (LoadingGUID != null)
+            // {
+            //     //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
+            //     //await Task.CompletedTask;
+            //     // OnModelLoadComplete((Guid)PromiseGUID!);
+            // }
+            // else
+            // {
+            //     $"Nothing to remove ".WriteInfo(1);
+            // }
         });
         return true;
     }
@@ -404,7 +396,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override MeshStandardMaterial GetMaterial()
     {
-        if (!string.IsNullOrEmpty(Symbol)) 
+        if (!string.IsNullOrEmpty(Symbol))
             return base.GetMaterial();
 
         var result = new MeshStandardMaterial()
@@ -464,28 +456,23 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return result;
     }
 
-    public override bool OnModelLoadComplete(Guid PromiseGuid)
-    {
-        //add code to remove the 'loading...'  and then 
-        //resolve the guid that was the promise
+    // public override bool OnModelLoadComplete(Guid PromiseGuid)
+    // {
+    //     //add code to remove the 'loading...'  and then 
+    //     //resolve the guid that was the promise
 
-        var result = Type switch
-        {
-            "Collada" => true,
-            "Fbx" => true,
-            "Obj" => true,
-            "Stl" => true,
-            "Glb" => true,
-            _ => false
-        };
+    //     var result = Type switch
+    //     {
+    //         "Collada" => true,
+    //         "Fbx" => true,
+    //         "Obj" => true,
+    //         "Stl" => true,
+    //         "Glb" => true,
+    //         _ => false
+    //     };
 
-        if ( PromiseGUID != PromiseGuid)
-        {
-            $"OnModelLoadComplete PromiseGUID != PromiseGuid".WriteError();
-        }   
-        PromiseGUID = null;
-        LoadingGUID = null;
-        return result;
-    }
+    //     LoadingGUID = null;
+    //     return result;
+    // }
 
 }
