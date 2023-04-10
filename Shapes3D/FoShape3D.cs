@@ -338,27 +338,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         Task.Run(async () =>
         {
-            //$"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
             await viewer.Request3DModel(settings);
             arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
-            //$"PreRenderImport guid [{PromiseGUID}] ".WriteInfo(1);
-            // arena.Add<FoShape3D>(PromiseGUID.Value.ToString(), this);
-
-            // Thread.Sleep(1000);
-
-
-            //this should trigger a model loaded event ,  but of not!
-            //$"Model Is Added [{PromiseGUID}] ".WriteInfo(1);
-            // if (LoadingGUID != null)
-            // {
-            //     //await viewer.RemoveByUuidAsync((Guid)LoadingGUID);
-            //     //await Task.CompletedTask;
-            //     // OnModelLoadComplete((Guid)PromiseGUID!);
-            // }
-            // else
-            // {
-            //     $"Nothing to remove ".WriteInfo(1);
-            // }
         });
         return true;
     }
@@ -455,24 +436,4 @@ public class FoShape3D : FoGlyph3D, IShape3D
         };
         return result;
     }
-
-    // public override bool OnModelLoadComplete(Guid PromiseGuid)
-    // {
-    //     //add code to remove the 'loading...'  and then 
-    //     //resolve the guid that was the promise
-
-    //     var result = Type switch
-    //     {
-    //         "Collada" => true,
-    //         "Fbx" => true,
-    //         "Obj" => true,
-    //         "Stl" => true,
-    //         "Glb" => true,
-    //         _ => false
-    //     };
-
-    //     LoadingGUID = null;
-    //     return result;
-    // }
-
 }
