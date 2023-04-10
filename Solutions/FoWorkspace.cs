@@ -46,7 +46,7 @@ public interface IWorkspace : IWorkPiece
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
     ComponentBus GetPubSub();
-
+    void OnDispose();
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
@@ -163,6 +163,14 @@ public class FoWorkspace : FoComponent, IWorkspace
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
+    }
+
+    public void OnDispose()
+    {
+        if (Command.HasHub())
+        {
+            DisconnectDrawingSyncHub();
+        }
     }
 
     private void OnWorkspaceViewStyleChanged(ViewStyle e)
@@ -435,6 +443,16 @@ public class FoWorkspace : FoComponent, IWorkspace
         //Toast?.Success($"HubConnection {secureHubURI} ");
 
         return hub;
+    }
+
+    public void DisconnectDrawingSyncHub()
+    {
+        if (Command.HasHub()) 
+            Command.StopHub();
+
+        // Command.SetSignalRHub(hub, GetUserID(), Toast);
+        // SetSignalRHub(hub, GetUserID());
+
     }
 
     public bool SetSignalRHub(HubConnection hub, string panid)
