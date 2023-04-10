@@ -96,7 +96,7 @@ public class CommandService : ICommand
 
         PubSub.SubscribeTo<CanvasMouseArgs>(args =>
         {
-            SendUserMove(args, true);;
+            SendUserMove(args, true); ;
         });
 
         PubSub.SubscribeTo<FoGlyph2D>(args =>
@@ -121,12 +121,12 @@ public class CommandService : ICommand
 
         hub.On<string>("Pong", (msg) =>
          {
-            Toast?.Success($"Pong {msg}");
-        });
+             Toast?.Success($"Pong {msg}");
+         });
 
         hub.On<D2D_Create>("Create", (create) =>
          {
-            UpdateCreate(create);
+             UpdateCreate(create);
          });
 
         hub.On<D2D_Glue>("Glue", (glue) =>
@@ -215,14 +215,14 @@ public class CommandService : ICommand
 
     public void SendShapeCreate(FoGlyph2D? shape)
     {
-        if ( shape == null) return;
+        if (shape == null) return;
         var create = new D2D_Create(shape);
         SendSyncMessage(create);
     }
 
     public void SendGlue(FoGlue2D? glue)
     {
-        if ( glue == null) return;
+        if (glue == null) return;
         var obj = new D2D_Glue(glue);
         SendSyncMessage(obj);
     }
@@ -247,7 +247,7 @@ public class CommandService : ICommand
             await _DrawingSyncHub.SendAsync("Ping", message);
         else
             $"Command Service {IsRunning} {msg}..  is NOT Sending".WriteNote();
-        
+
     }
 
     public D2D_Base SendSyncMessage(D2D_Base msg)
@@ -264,18 +264,18 @@ public class CommandService : ICommand
         if (_DrawingSyncHub == null || !IsRunning)
             $"Command Service {IsRunning} {msg.Topic()}..  is NOT Sending".WriteNote();
 
-        if (_DrawingSyncHub == null) 
-              return false;
+        if (_DrawingSyncHub == null)
+            return false;
 
         //$"Sending {IsRunning} {msg.Topic()}..".WriteNote();
 
         if (IsRunning)
             await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
 
-        if ( msg is D2D_UserMove) 
+        if (msg is D2D_UserMove)
             return IsRunning;
 
-        $"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
+        // $"Sent {IsRunning} {msg.UserID} {msg.Topic()}..".WriteNote();
 
         return IsRunning;
     }
@@ -298,15 +298,15 @@ public class CommandService : ICommand
         $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
         var type = StorageHelpers.LookupType(create.PayloadType);
-        if ( type == null) return false;
-        
+        if (type == null) return false;
+
         var result = StorageHelpers.HydrateObject(type, create.Payload);
         if (result is not FoGlyph2D newShape) return false;
 
         $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
         GetDrawing().AddShape<FoGlyph2D>(newShape);
 
-       $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
+        $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
 
         return true;
     }
@@ -318,16 +318,16 @@ public class CommandService : ICommand
         shapes?.ForEach(item => item.MoveTo(move.PinX, move.PinY));
         shapes?.ForEach(item => item.RotateTo(move.Angle));
         $"UpdateMove {move.TargetId} {move.PayloadType} {move.UserID}".WriteSuccess();
-  
+
         return shapes != null;
     }
 
     public bool UpdateGlue(D2D_Glue glue)
-    { 
+    {
         var target = Pages().FindShapes(glue.TargetId).FirstOrDefault();
         var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
-        
-        if ( target != null && source is IGlueOwner owner) 
+
+        if (target != null && source is IGlueOwner owner)
         {
             $"UpdateGlue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
             var glueObj = new FoGlue2D(glue.Name);
@@ -343,7 +343,7 @@ public class CommandService : ICommand
         $"UpdateUnglue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
 
         var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
-        if ( source is IGlueOwner owner) 
+        if (source is IGlueOwner owner)
         {
             owner.RemoveGlue(glue.Name);
             return true;
@@ -421,7 +421,7 @@ public class CommandService : ICommand
     public bool Restore()
     {
         var version = LastSavedFileVersion("storage", "model_0000.json");
-        if ( version == null) return false;
+        if (version == null) return false;
         var filename = version.Replace("json", "zip");
         var compress = StorageHelpers.ReadData("storage", filename);
         var json = compress.Decompress();
@@ -430,7 +430,7 @@ public class CommandService : ICommand
 
         var model = StorageHelpers.Hydrate<ModelPersist>(json, false);
         model?.RestorePages(Pages());
-         
+
         SendToast(ToastType.Success, $"{filename} is Restored");
         return true;
     }
