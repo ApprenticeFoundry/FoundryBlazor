@@ -49,7 +49,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         }
         else if (ShapeObject3D != null)
         {
-            $"ShapeObject3D Update mesh position {xLoc}, {yLoc}, {zLoc}".WriteSuccess();
+            //$"ShapeObject3D Update mesh position {xLoc}, {yLoc}, {zLoc}".WriteSuccess();
             ShapeObject3D.Position.Loc(xLoc, yLoc, zLoc);
             return true;
         }
