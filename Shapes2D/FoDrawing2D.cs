@@ -468,8 +468,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
-
-
     }
 
     public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
