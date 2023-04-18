@@ -48,6 +48,16 @@ public class FoImage2D : FoGlyph2D, IImage2D
 
     private int waitcount = 0;
 
+    public FoImage2D() : base()
+    {
+    }
+    public FoImage2D(int width, int height, string color) : base("", width, height, color)
+    {
+    }
+    public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
+    {
+    }
+    
     public override FoImage2D ZoomBy(double factor) 
     { 
         ShrinkBy(factor); return this; 
@@ -135,14 +145,6 @@ public class FoImage2D : FoGlyph2D, IImage2D
         await ctx.RestoreAsync();
         return true;
     }
-    public FoImage2D() : base()
-    {
-    }
-    public FoImage2D(int width, int height, string color) : base("", width, height, color)
-    {
-    }
-    public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
-    {
-    }
+
 
 }
