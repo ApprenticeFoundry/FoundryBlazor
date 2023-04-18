@@ -100,7 +100,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public bool PreRender(FoGlyph3D glyph)
     {
 
-        return glyph.PreRender(this,Viewer3D!);
+        return glyph.PreRender(this, Viewer3D!);
     }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
@@ -156,10 +156,13 @@ public class FoArena3D : FoGlyph3D, IArena
             Z = 1.5,
         };
 
-        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt("Hello", -1.0, 2.0, 1.0);
-
+        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt($"Hello World", -1.0, 2.0, 1.0);
 
         RenderPlatformToScene(platform);
+        Task.Run(async () =>
+        {
+            await UpdateArena();
+        });
 
         return platform;
     }
@@ -176,8 +179,8 @@ public class FoArena3D : FoGlyph3D, IArena
         platform.EstablishBox("Platform", 1, 1, 1);
 
 
-       var url = Path.Join(baseURL,folder,filename);
-       // var url = $"{baseURL}/{folder}/{filename}";
+        var url = Path.Join(baseURL, folder, filename);
+        // var url = $"{baseURL}/{folder}/{filename}";
 
 
         platform.CreateUsing<FoShape3D>(name)
@@ -299,6 +302,6 @@ public class FoArena3D : FoGlyph3D, IArena
         });
     }
 
-    
+
 
 }
