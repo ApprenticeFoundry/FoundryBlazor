@@ -35,7 +35,7 @@ public class FoStage3D : FoGlyph3D, IStage
     protected FoCollection<FoGlyph3D> Pipes3D = new();
     protected FoCollection<FoGlyph3D> Shapes3D = new();
 
-    public FoStage3D(): base()
+    public FoStage3D() : base()
     {
     }
 
@@ -95,7 +95,7 @@ public class FoStage3D : FoGlyph3D, IStage
         });
         EstablishBoundry();
         //IsDirty = true;
-        
+
         return scene;
     }
     public FoStage3D ClearAll()
@@ -107,8 +107,8 @@ public class FoStage3D : FoGlyph3D, IStage
 
     public bool EstablishBoundry()
     {
-        if ( ShapeMesh != null) return false;
-        
+        if (ShapeMesh != null) return false;
+
         Width = ArenaWidth();
         Height = ArenaHeight();
         Depth = ArenaDepth();
@@ -125,7 +125,7 @@ public class FoStage3D : FoGlyph3D, IStage
 
         CurrentScene?.Add(ShapeMesh);
 
-        
+
         //$"EstablishBoundry {Width} {Height} {Depth}".WriteSuccess();
         return true;
     }
@@ -141,12 +141,12 @@ public class FoStage3D : FoGlyph3D, IStage
 
         collection.AddObject(value.Name, value);
 
-        if ( value is IShape3D)
+        if (value is IShape3D)
         {
-            Shapes3D.Add(value);   
+            Shapes3D.Add(value);
             //$"IShape3D Added {value.Name}".WriteSuccess();
         }
-        else if ( value is IPipe3D)
+        else if (value is IPipe3D)
         {
             Pipes3D.Add(value);
             //$"IPipe3D Added {value.Name}".WriteSuccess();
@@ -166,7 +166,7 @@ public class FoStage3D : FoGlyph3D, IStage
     public async Task RenderDetailed(Scene scene, int tick, double fps)
     {
         //$"RenderDetailed {tick} {Shapes3D.Count()}".WriteInfo();
-        Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape,tick));
+        Shapes3D?.ForEach(shape => shape.ContextLink?.Invoke(shape, tick));
         await Task.CompletedTask;
     }
     // public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
@@ -179,7 +179,7 @@ public class FoStage3D : FoGlyph3D, IStage
 
     private void FillStage()
     {
-        if ( CurrentScene  == null) return;
+        if (CurrentScene == null) return;
 
         $"FillStage {CurrentScene.Name}".WriteSuccess();
 

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <Version>1.2.3</Version>
+    <Version>1.2.6</Version>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
   </PropertyGroup>
 
@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.2" />
-    <PackageReference Include="BlazorThreeJS" Version="0.1.12" />
+    <PackageReference Include="BlazorThreeJS" Version="0.2.2" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />

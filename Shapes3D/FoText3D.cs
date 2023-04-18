@@ -1,3 +1,4 @@
+using BlazorThreeJS.Core;
 using BlazorThreeJS.Labels;
 using BlazorThreeJS.Scenes;
 
@@ -7,6 +8,7 @@ public class FoText3D : FoGlyph3D, IShape3D
 {
 
     private string text = "";
+    private LabelText? Label { get; set; }
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
     public List<string>? Details { get; set; }
 
@@ -36,8 +38,8 @@ public class FoText3D : FoGlyph3D, IShape3D
         }
 
         return newValue;
-    }   
-     
+    }
+
     public FoText3D CreateTextAt(string text, double x, double y, double z)
     {
         Position = new FoVector3D(x, y, z);
@@ -61,15 +63,38 @@ public class FoText3D : FoGlyph3D, IShape3D
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         var text = Text ?? "LabelText";
-        //only in BlazorThreeJS
-        var label = new LabelText(text)
+        Label = new LabelText(text)
         {
             Color = "Yellow",
             Position = GetPosition().AsVector3()
         };
-        ctx.Add(label);
+        ctx.Add(Label);
         return true;
     }
 
+    public bool UpdateText(string text)
+    {
+        Text = text;
+        //"Update label text".WriteSuccess();
+        if (Label != null)
+        {
+            Label.Text = Text;
+            return true;
+        }
+
+        return false;
+    }
+
+    public override bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
+    {
+        //"Update label position".WriteSuccess();
+        if (Label != null)
+        {
+            Label.Position.Loc(xLoc, yLoc, zLoc);
+            return true;
+        }
+
+        return false;
+    }
 
 }

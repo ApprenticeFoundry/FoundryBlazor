@@ -22,7 +22,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public FoVector3D? Rotation { get; set; }
     public FoVector3D? Origin { get; set; }
     public FoVector3D? BoundingBox { get; set; }
-    public Guid? LoadingGUID { get; set; }
+    private Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
 
     private Mesh? ShapeMesh { get; set; }
@@ -329,10 +329,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
             FileURL = LoadingURL,
             Position = Position?.AsVector3() ?? new Vector3(),
             Rotation = Rotation?.AsEuler() ?? new Euler(),
-            OnComplete = (Scene scene, Object3D object3D) =>
+            OnComplete = async (Scene scene, Object3D object3D) =>
             {
-                if (object3D != null) this.ShapeObject3D = object3D;
+                if (object3D != null) ShapeObject3D = object3D;
                 else "Unexpected empty object3D".WriteError(1);
+
+                if (LoadingGUID != null) await viewer.RemoveByUuidAsync((Guid)(LoadingGUID));
             }
         };
 
@@ -345,7 +347,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
 
 
-    private bool RenderImportPromse(Scene scene, Import3DFormats format)
+    private bool RenderImportPromise(Scene scene, Import3DFormats format)
     {
         if (string.IsNullOrEmpty(LoadingURL)) return false;
 
@@ -359,7 +361,9 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Color = "Yellow",
             Position = new FoVector3D(-3, y, -2).AsVector3()
         };
+
         LoadingGUID = label.Uuid;
+
         scene.Add(label);
         return true;
     }
@@ -427,11 +431,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Plane" => Plane(ctx),
             "Capsule" => Capsule(ctx),
             "Cone" => Cone(ctx),
-            "Collada" => RenderImportPromse(ctx, Import3DFormats.Collada),
-            "Fbx" => RenderImportPromse(ctx, Import3DFormats.Fbx),
-            "Obj" => RenderImportPromse(ctx, Import3DFormats.Obj),
-            "Stl" => RenderImportPromse(ctx, Import3DFormats.Stl),
-            "Glb" => RenderImportPromse(ctx, Import3DFormats.Gltf),
+            "Collada" => RenderImportPromise(ctx, Import3DFormats.Collada),
+            "Fbx" => RenderImportPromise(ctx, Import3DFormats.Fbx),
+            "Obj" => RenderImportPromise(ctx, Import3DFormats.Obj),
+            "Stl" => RenderImportPromise(ctx, Import3DFormats.Stl),
+            "Glb" => RenderImportPromise(ctx, Import3DFormats.Gltf),
             _ => NotImplemented(ctx)
         };
         return result;
