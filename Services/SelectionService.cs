@@ -1,4 +1,7 @@
+using BlazorComponentBus;
+
 namespace FoundryBlazor.Shape;
+
 
 public interface ISelectionService
 {
@@ -15,7 +18,13 @@ public interface ISelectionService
 
 public class SelectionService : ISelectionService
 {
+    protected ComponentBus PubSub;
     public List<FoGlyph2D> Members { get; set; } = new();
+
+    public SelectionService(ComponentBus pubsub)
+    {
+        PubSub = pubsub;
+    }
 
     public List<FoGlyph2D> Selections()
     {
@@ -29,6 +38,7 @@ public class SelectionService : ISelectionService
     public void ClearAll()
     {
         //"ClearAll".WriteLine(ConsoleColor.Green);
+        PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
 
         Members.ForEach(item => item.IsSelected = false);
         Members.Clear();
@@ -45,6 +55,7 @@ public class SelectionService : ISelectionService
             Members.Add(item);
 
         item.MarkSelected(true);
+        PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
     public void MoveTo(int x, int y)
