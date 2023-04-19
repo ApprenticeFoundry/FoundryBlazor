@@ -52,6 +52,7 @@ public class ShapeDragging : ShapeHovering
             isDraggingShapes = true;
         } 
         else {
+            selectionService.MouseReselect();
             selectionService.ClearAll();
         }
 

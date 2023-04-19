@@ -6,6 +6,7 @@ public enum SelectionState
     Cleared,
     Changed,
     Dropped,
+    Reselected,
 }
 
 public class SelectionChanged
@@ -41,6 +42,17 @@ public class SelectionChanged
         var result = new SelectionChanged()
         {
             State = SelectionState.Dropped,
+            Selections = list
+        };
+        return result;
+    }
+    public static SelectionChanged Reselected(List<FoGlyph2D> selections)
+    {
+        var list = new List<FoGlyph2D>();
+        list.AddRange(selections);
+        var result = new SelectionChanged()
+        {
+            State = SelectionState.Reselected,
             Selections = list
         };
         return result;

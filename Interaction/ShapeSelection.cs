@@ -73,6 +73,8 @@ public class ShapeSelection : ShapeHovering
                 drawing.SetInteraction(InteractionStyle.ShapeDragging);
                 var interact = drawing.GetInteraction();
                 interact.MouseDown(args);
+            } else  {
+                selectionService?.MouseReselect();
             }
         } else {
 
@@ -116,8 +118,6 @@ public class ShapeSelection : ShapeHovering
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
-
-
         if (isFenceSelecting)
         {
             dragArea = panZoomService.HitRectContinue(args, dragArea);

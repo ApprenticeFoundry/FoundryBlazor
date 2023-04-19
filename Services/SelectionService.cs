@@ -10,6 +10,7 @@ public interface ISelectionService
     FoGlyph2D AddItem(FoGlyph2D item);
     List<FoGlyph2D> AddRange(List<FoGlyph2D> list);
     void MouseDropped();
+    void MouseReselect();
     void MoveTo(int x, int y);
     void MoveBy(int dx, int dy);
     void RotateBy(double da);
@@ -61,6 +62,11 @@ public class SelectionService : ISelectionService
         item.MarkSelected(true);
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
+    }
+    public void MouseReselect()
+    {
+        if ( Members.Count > 0)
+            PubSub.Publish<SelectionChanged>(SelectionChanged.Reselected(Members));
     }
     public void MouseDropped()
     {
