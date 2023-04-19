@@ -35,6 +35,7 @@ public interface IBaseInteraction
 }
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
+    public int Priority { get; set; } = 0;
     protected Rectangle dragArea;
     protected FoGlyph2D? selectedShape;
     
