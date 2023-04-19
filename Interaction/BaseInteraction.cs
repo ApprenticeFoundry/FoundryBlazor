@@ -108,6 +108,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     }
     public virtual bool MouseUp(CanvasMouseArgs args)
     {
+        selectionService?.MouseDropped();
         return false;
     }
     public virtual bool MouseMove(CanvasMouseArgs args)

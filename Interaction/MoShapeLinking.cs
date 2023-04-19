@@ -80,11 +80,12 @@ public class MoShapeLinking : ShapeHovering
                 pageManager?.AddShape<FoShape1D>(shapeB);
             }
             
+
             lastHoverTarget?.ForEach(child => child.HoverDraw = null);
             selectedShape = null;
             dragTarget = null;
         }
-
+        selectionService?.MouseDropped();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

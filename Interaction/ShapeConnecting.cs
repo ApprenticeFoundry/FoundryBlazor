@@ -132,9 +132,8 @@ public class ShapeConnecting :  ShapeHovering
         {
             lastHover = found;
             lastHover.ForEach(child => child.HoverDraw = OnHoverTarget);
-         }
+        }
         
-
         return true;
     }
 

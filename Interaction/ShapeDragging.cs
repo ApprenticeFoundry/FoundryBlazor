@@ -63,6 +63,7 @@ public class ShapeDragging : ShapeHovering
         selectedShape?.OnShapeClick(ClickStyle.MouseUp);
         isDraggingShapes = false;
         drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        selectionService?.MouseDropped();
         return true;
     }
 

@@ -9,6 +9,7 @@ public interface ISelectionService
     void ClearAllWhen(bool apply);
     FoGlyph2D AddItem(FoGlyph2D item);
     List<FoGlyph2D> AddRange(List<FoGlyph2D> list);
+    void MouseDropped();
     void MoveTo(int x, int y);
     void MoveBy(int dx, int dy);
     void RotateBy(double da);
@@ -30,11 +31,13 @@ public class SelectionService : ISelectionService
     {
         return Members;
     }
+
     public void ClearAllWhen(bool apply)
     {
         //"ClearAllWhen".WriteLine(ConsoleColor.Green);   
         if ( apply ) ClearAll();
     }
+
     public void ClearAll()
     {
         //"ClearAll".WriteLine(ConsoleColor.Green);
@@ -43,6 +46,7 @@ public class SelectionService : ISelectionService
         Members.ForEach(item => item.IsSelected = false);
         Members.Clear();
     }
+
     public List<FoGlyph2D> AddRange(List<FoGlyph2D> list)
     {
         list.ForEach(item => AddItem(item));
@@ -58,6 +62,12 @@ public class SelectionService : ISelectionService
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
+    public void MouseDropped()
+    {
+        if ( Members.Count > 0)
+            PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
+    }
+
     public void MoveTo(int x, int y)
     {
         Members.ForEach(item => item.MoveTo(x, y));
