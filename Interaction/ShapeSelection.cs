@@ -59,7 +59,7 @@ public class ShapeSelection : ShapeHovering
         var findings = pageManager?.FindGlyph(dragArea);
 
         var hitShape = findings?.LastOrDefault();
-        hitShape?.OnShapeClick(ClickStyle.MouseDown);
+        hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
         
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); 
         if ( hitShape != null) 
