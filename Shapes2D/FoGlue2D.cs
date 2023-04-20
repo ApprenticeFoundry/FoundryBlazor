@@ -23,11 +23,7 @@ public class FoGlue2D : FoBase
         return target == Target;
     }
 
-    public virtual FoGlyph2D? MarkSelected(bool selected)
-    {
-        "FoGlue2D FoGlyph2D?  MarkSelected".WriteInfo();
-        return Source?.MarkSelected(selected);
-    }
+
     
     public bool TargetMoved(FoGlyph2D target)
     {
