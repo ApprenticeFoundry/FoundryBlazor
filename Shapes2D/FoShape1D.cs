@@ -171,7 +171,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     }
 
 
-
+    public override FoGlyph2D MarkSelected(bool value)
+    {
+        "Shape1D mark selected".WriteLine(ConsoleColor.DarkBlue);
+            
+        return base.MarkSelected(value);
+    }
 
     // public override List<FoHandle2D> GetHandles() 
     // {
