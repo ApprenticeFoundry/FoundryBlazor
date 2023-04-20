@@ -40,6 +40,10 @@ public class ShapeDragging : ShapeHovering
         hitShape?.OnShapeClick(ClickStyle.MouseDown);
 
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
+        if ( selectedShape != null ) 
+        {
+            selectionService.MouseReselect();
+        }       
 
         if (selectedShape != null)
         {
@@ -52,7 +56,6 @@ public class ShapeDragging : ShapeHovering
             isDraggingShapes = true;
         } 
         else {
-            selectionService.MouseReselect();
             selectionService.ClearAll();
         }
 
