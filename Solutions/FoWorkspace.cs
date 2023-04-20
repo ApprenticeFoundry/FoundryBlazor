@@ -19,7 +19,7 @@ public enum InputStyle { None, Drawing, FileDrop }
 
 
 
-public interface IWorkspace : IWorkPiece
+public interface IWorkspace : IWorkbook
 {
     string GetBaseUrl();
     string SetBaseUrl(string url);
@@ -41,8 +41,8 @@ public interface IWorkspace : IWorkPiece
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkPieces();
-    List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece);
-    T EstablishWorkPiece<T>() where T : FoWorkPiece;
+    List<FoWorkbook> AddWorkPiece(FoWorkbook piece);
+    T EstablishWorkPiece<T>() where T : FoWorkbook;
 
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
@@ -130,19 +130,19 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.PreRender(tick));
+        GetMembers<FoWorkbook>()?.ForEach(item => item.PreRender(tick));
     }
 
     public virtual void PostRender(int tick)
     {
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.PostRender(tick));
+        GetMembers<FoWorkbook>()?.ForEach(item => item.PostRender(tick));
     }
 
 
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
-        var list = GetMembers<FoWorkPiece>();
+        var list = GetMembers<FoWorkbook>();
         if ( list != null)
             foreach (var item in list)
             {
@@ -223,7 +223,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     
     public void ClearAllWorkPieces()
     {
-        GetSlot<FoWorkPiece>()?.Clear();
+        GetSlot<FoWorkbook>()?.Clear();
         GetSlot<FoMenu2D>()?.Clear();
         GetSlot<FoMenu3D>()?.Clear();
         FoWorkspace.RefreshCommands = true;
@@ -231,15 +231,15 @@ public class FoWorkspace : FoComponent, IWorkspace
         "ClearAllWorkPieces".WriteWarning();
     }
 
-    public List<FoWorkPiece> AddWorkPiece(FoWorkPiece piece)
+    public List<FoWorkbook> AddWorkPiece(FoWorkbook piece)
     {
-        Add<FoWorkPiece>(piece);
+        Add<FoWorkbook>(piece);
         FoWorkspace.RefreshCommands = true;
         FoWorkspace.RefreshMenus = true;
-        return Members<FoWorkPiece>();
+        return Members<FoWorkbook>();
     }
 
-    public T EstablishWorkPiece<T>() where T : FoWorkPiece
+    public T EstablishWorkPiece<T>() where T : FoWorkbook
     {
         var piece = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime, PubSub) as T;
         AddWorkPiece(piece!);
@@ -341,7 +341,7 @@ public class FoWorkspace : FoComponent, IWorkspace
              { "Restore Drawing", () => Command.Restore()},
          }, true);
 
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateMenus(space, js, nav));
+        GetMembers<FoWorkbook>()?.ForEach(item => item.CreateMenus(space, js, nav));
 
         GetDrawing()?.CreateMenus(space,js, nav);
         GetArena()?.CreateMenus(space,js, nav);
@@ -407,7 +407,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
-        GetMembers<FoWorkPiece>()?.ForEach(item => item.CreateCommands(space,js, nav, serverUrl));
+        GetMembers<FoWorkbook>()?.ForEach(item => item.CreateCommands(space,js, nav, serverUrl));
 
         FoWorkspace.RefreshCommands = true;
     }
@@ -467,7 +467,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public bool SetSignalRHub(HubConnection hub, string panid)
     {
-        Members<FoWorkPiece>().ForEach(item => item.SetSignalRHub(hub, panid));
+        Members<FoWorkbook>().ForEach(item => item.SetSignalRHub(hub, panid));
 
         hub.Closed += async (error) =>
        {
@@ -494,7 +494,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
         GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));
-        Members<FoWorkPiece>().ForEach(item => item.CollectCommands(list));
+        Members<FoWorkbook>().ForEach(item => item.CollectCommands(list));
         return list;
     }
 

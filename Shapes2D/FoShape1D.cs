@@ -64,6 +64,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public FoShape1D() : base()
     {
         ShapeDraw = DrawSimpleLine;
+        ShapeDrawSelected = DrawDashedLine;
         this.height = 10;
     }
     public FoShape1D(string name, string color) : base(name, color)
@@ -122,16 +123,13 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var finish = shape!.Finish();
 
         await ctx.SetFillStyleAsync("White");
-        await ctx.SetLineWidthAsync(4);
+        await ctx.SetLineWidthAsync(10);
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
 
         await ctx.BeginPathAsync();
         await ctx.MoveToAsync(start.X, start.Y);
         await ctx.LineToAsync(finish.X, finish.Y);
         await ctx.ClosePathAsync();
-
-        await ctx.SetStrokeStyleAsync(obj.Color);
-        await ctx.SetLineWidthAsync(obj.Thickness);
         await ctx.StrokeAsync();
     };
 
@@ -354,8 +352,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.SaveAsync();
         ShapeDrawSelected?.Invoke(ctx, this);
 
-        await DrawStart(ctx, "Blue");
-        await DrawFinish(ctx, "Cyan");
+        //await DrawStart(ctx, "Blue");
+        //await DrawFinish(ctx, "Cyan");
         //await DrawPin(ctx);
         await ctx.RestoreAsync();
     }

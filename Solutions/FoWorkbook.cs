@@ -8,7 +8,7 @@ using Radzen;
 
 namespace FoundryBlazor.Solutions;
 
-public interface IWorkPiece
+public interface IWorkbook
 {
     void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
@@ -20,7 +20,7 @@ public interface IWorkPiece
     Task RenderWatermark(Canvas2DContext ctx, int tick);
 }
 
-public class FoWorkPiece: FoComponent, IWorkPiece
+public class FoWorkbook: FoComponent, IWorkbook
 {
     protected IWorkspace Workspace { get; set; }
     protected ICommand Command { get; set; }
@@ -29,7 +29,7 @@ public class FoWorkPiece: FoComponent, IWorkPiece
     
     protected ComponentBus PubSub { get; set; }
 
-    public FoWorkPiece(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js, ComponentBus pubSub)
+    public FoWorkbook(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js, ComponentBus pubSub)
     {
         Workspace = space;
         Command = command;
