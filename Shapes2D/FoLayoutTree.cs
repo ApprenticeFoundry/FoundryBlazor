@@ -232,17 +232,23 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             shape1D.Color = "Green";
 
             pageManager.AddShape<U>(shape1D);
-  
 
-            if ( glueStart.Matches("TOP") ||  glueStart.Matches("BOTTOM"))
+
+            if (glueStart.Matches("TOP") || glueStart.Matches("BOTTOM"))
             {
-                shape1D.GlueStartTo(parent,"BOTTOM");
-                shape1D.GlueFinishTo(shape,"TOP");
+                if (shape1D.HasNoGlue(shape, "TOP"))
+                {                    
+                    shape1D.GlueStartTo(parent, "BOTTOM");
+                    shape1D.GlueFinishTo(shape, "TOP");
+                }
             }
             else if ( glueStart.Matches("LEFT") || glueStart.Matches("RIGHT"))
             {
-                shape1D.GlueStartTo(parent,"RIGHT");
-                shape1D.GlueFinishTo(shape,"LEFT");
+                if (shape1D.HasNoGlue(shape, "LEFT"))
+                {
+                    shape1D.GlueStartTo(parent, "RIGHT");
+                    shape1D.GlueFinishTo(shape, "LEFT");
+                }
             } 
             else  
             {

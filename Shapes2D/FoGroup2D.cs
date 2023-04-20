@@ -35,7 +35,7 @@ public class FoGroup2D : FoGlyph2D, IShape2D
         var dx = -LeftEdge();
         var dy = -TopEdge();       
 
-        var members = source.ExtractSelected<T>();
+        var members = source.ExtractSelectedShapes<T>(new List<T>());
         if ( members != null)
         {
             members.ForEach(shape => shape.MoveBy(dx,dy));

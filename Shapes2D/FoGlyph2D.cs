@@ -637,7 +637,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return list;
     }
 
-    public List<T>? ExtractSelected<T>(List<FoGlyph2D> foGlyph2Ds) where T : FoGlyph2D
+    public List<T>? ExtractSelectedShapes<T>(List<T> foGlyph2Ds) where T : FoGlyph2D
     {
         var list = ExtractWhere<T>(child => child.IsSelected);
         return list;
@@ -648,12 +648,12 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         var list = FindWhere<T>(child => child.GlyphId == GlyphId);
         return list;
     }
-    public List<T>? CaptureSelected<T>(FoGlyph2D source) where T : FoGlyph2D
-    {
-        var members = source.ExtractSelected<T>();
-        if (members != null) Slot<T>().AddRange(members);
-        return members;
-    }
+    //public List<T>? CaptureSelected<T>(FoGlyph2D source) where T : FoGlyph2D
+    //{
+    //    var members = source.ExtractSelected<T>();
+    //    if (members != null) Slot<T>().AddRange(members);
+    //    return members;
+    //}
 
     public T CaptureShape<T>(T source, bool inPosition = false) where T : FoGlyph2D
     {

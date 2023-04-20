@@ -169,30 +169,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     }
 
 
-    public override FoGlyph2D MarkSelected(bool value)
-    {
-        "Shape1D mark selected".WriteLine(ConsoleColor.DarkBlue);
-            
-        return base.MarkSelected(value);
-    }
-
-    // public override List<FoHandle2D> GetHandles() 
-    // {
-    //     if ( !this.HasSlot<FoHandle2D>()) 
-    //     {
-    //         var lx = LeftX();
-    //         var ty = TopY();
-    //         var rx = RightX();
-    //         var by = BottomY();
-    //         AddHandle2D(new FoHandle2D("UL", lx, ty, "Green"));
-    //         AddHandle2D(new FoHandle2D("UR", rx, ty, "Green"));
-    //         AddHandle2D(new FoHandle2D("LL", lx, by, "Green"));
-    //         AddHandle2D(new FoHandle2D("LR", rx, by, "Green"));
-    //     }
-    //     var result = this.Members<FoHandle2D>();
-    //     return result;
-    // }
-
 
     public override Matrix2D GetMatrix()
     {
@@ -295,6 +271,14 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.RestoreAsync();
     }
 
+    public bool HasNoGlue(FoGlyph2D? target, string child = "")
+    {
+        if (target == null) return true;
+        var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
+
+        var total = part.Members<FoGlue2D>().Count;
+        return total == 0;
+    }
 
     public FoGlue2D? GlueStartTo(FoGlyph2D? target, string child="")
     {
