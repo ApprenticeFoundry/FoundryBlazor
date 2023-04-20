@@ -637,7 +637,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return list;
     }
 
-    public List<T>? ExtractSelected<T>() where T : FoGlyph2D
+    public List<T>? ExtractSelected<T>(List<FoGlyph2D> foGlyph2Ds) where T : FoGlyph2D
     {
         var list = ExtractWhere<T>(child => child.IsSelected);
         return list;

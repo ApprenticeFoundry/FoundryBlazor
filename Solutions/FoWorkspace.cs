@@ -40,9 +40,9 @@ public interface IWorkspace : IWorkbook
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
-    void ClearAllWorkPieces();
-    List<FoWorkbook> AddWorkPiece(FoWorkbook piece);
-    T EstablishWorkPiece<T>() where T : FoWorkbook;
+    void ClearAllWorkbook();
+    List<FoWorkbook> AddWorkbook(FoWorkbook book);
+    T EstablishWorkbook<T>() where T : FoWorkbook;
 
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
@@ -221,17 +221,17 @@ public class FoWorkspace : FoComponent, IWorkspace
         return SelectionService;
     }
     
-    public void ClearAllWorkPieces()
+    public void ClearAllWorkbook()
     {
         GetSlot<FoWorkbook>()?.Clear();
         GetSlot<FoMenu2D>()?.Clear();
         GetSlot<FoMenu3D>()?.Clear();
         FoWorkspace.RefreshCommands = true;
         FoWorkspace.RefreshMenus = true;
-        "ClearAllWorkPieces".WriteWarning();
+        "ClearAllWorkbook".WriteWarning();
     }
 
-    public List<FoWorkbook> AddWorkPiece(FoWorkbook piece)
+    public List<FoWorkbook> AddWorkbook(FoWorkbook piece)
     {
         Add<FoWorkbook>(piece);
         FoWorkspace.RefreshCommands = true;
@@ -239,11 +239,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return Members<FoWorkbook>();
     }
 
-    public T EstablishWorkPiece<T>() where T : FoWorkbook
+    public T EstablishWorkbook<T>() where T : FoWorkbook
     {
-        var piece = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime, PubSub) as T;
-        AddWorkPiece(piece!);
-        return piece!;
+        var book = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime, PubSub) as T;
+        AddWorkbook(book!);
+        return book!;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)

@@ -348,7 +348,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public async override Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {
-        "Shape1D DrawWhenSelected".WriteNote();
+        //"Shape1D DrawWhenSelected".WriteNote();
         await ctx.SaveAsync();
         ShapeDrawSelected?.Invoke(ctx, this);
 

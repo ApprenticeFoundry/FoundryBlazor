@@ -34,6 +34,7 @@ public interface IPageManagement: IRender
     FoPage2D SetPagePortrait();   
 
 
+    List<FoGlyph2D> CollectSelections();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
     void PageMoveBy(int dx, int dy);
@@ -138,6 +139,15 @@ public class PageManagementService : FoComponent, IPageManagement
     public List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
     {
         Slot<FoPage2D>().ForEach(item => item.CollectVideos(list, deep));
+        return list;
+    }
+
+    public List<FoGlyph2D> CollectSelections()
+    {
+        _selectService.ClearAll();
+        var list = new List<FoGlyph2D>();
+        Slot<FoPage2D>().ForEach(item => item.CollectSelected(list));
+        _selectService.AddRange(list);
         return list;
     }
 

@@ -126,6 +126,24 @@ public class FoPage2D : FoGlyph2D
         return value;
     }
 
+    public List<FoGlyph2D> ExtractSelected(List<FoGlyph2D> list)
+    {
+        var shapes2d = Shapes2D.ExtractWhere(child => child.IsSelected);
+        var shapes1d = Shapes1D.ExtractWhere(child => child.IsSelected);
+        list.AddRange(shapes2d);
+        list.AddRange(shapes1d);
+        return list;
+    }
+
+    public List<FoGlyph2D> CollectSelected(List<FoGlyph2D> list)
+    {
+        var shapes2d = Shapes2D.FindWhere(child => child.IsSelected);
+        var shapes1d = Shapes1D.FindWhere(child => child.IsSelected);
+        list.AddRange(shapes2d);
+        list.AddRange(shapes1d);
+        return list;
+    }
+
     public void DeleteShape(FoGlyph2D shape)
     {
         shape.MarkSelected(false);
