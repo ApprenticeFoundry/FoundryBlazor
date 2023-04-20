@@ -31,6 +31,11 @@ public class FoGlue2D : FoBase
         return Source?.Smash(false) ?? false;
     }
 
+    public bool MarkSelected(bool value)
+    {
+        return (Source?.MarkSelected(value)) != null;
+
+    }
 
     public FoGlue2D GlueTo(IGlueOwner source, FoGlyph2D target) 
     {
