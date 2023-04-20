@@ -1,10 +1,10 @@
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
-public interface IGlueOwner
+public interface IGlueOwner: IGlyph2D
 {
     void AddGlue(FoGlue2D glue);
     void RemoveGlue(FoGlue2D glue);
@@ -12,7 +12,6 @@ public interface IGlueOwner
     string GetName();
     string GetGlyphId();
     bool Smash(bool force);
-
 }
 
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
@@ -64,19 +63,19 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public FoShape1D() : base()
     {
-        ShapeDraw = DrawRect;
+        ShapeDraw = DrawSimpleLine;
         this.height = 10;
     }
     public FoShape1D(string name, string color) : base(name, color)
     {
-        ShapeDraw = DrawRect;
-
+        ShapeDraw = DrawSimpleLine;
+        ShapeDrawSelected = DrawDashedLine;
         this.height = 10;
     }
     public FoShape1D(int x1, int y1, int x2, int y2, int height, string color) : base("", color)
     {
-        ShapeDraw = DrawRect;
-
+        ShapeDraw = DrawSimpleLine;
+        ShapeDrawSelected = DrawDashedLine;
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -87,7 +86,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     public FoShape1D(FoGlyph2D? start, FoGlyph2D? finish, int height, string color) : base("", color)
     {
-        ShapeDraw = DrawRect;
+        ShapeDraw = DrawSimpleLine;
+        ShapeDrawSelected = DrawDashedLine;
         this.x1 = start?.PinX ?? 0;
         this.y1 = start?.PinY ?? 0;
         this.x2 = finish?.PinX ?? 0;
@@ -98,6 +98,42 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
         GlueFinishTo(finish);
     }
+
+    public Action<Canvas2DContext, FoGlyph2D> DrawSimpleLine = async (ctx, obj) =>
+    {
+        var shape = obj as FoShape1D;
+        var start = shape!.Start();
+        var finish = shape!.Finish();
+
+        await ctx.BeginPathAsync();
+        await ctx.MoveToAsync(start.X, start.Y);
+        await ctx.LineToAsync(finish.X, finish.Y);
+        await ctx.ClosePathAsync();
+
+        await ctx.SetStrokeStyleAsync(obj.Color);
+        await ctx.SetLineWidthAsync(obj.Thickness);
+        await ctx.StrokeAsync();
+    };
+
+    public Action<Canvas2DContext, FoGlyph2D> DrawDashedLine = async (ctx, obj) =>
+    {
+        var shape = obj as FoShape1D;
+        var start = shape!.Start();
+        var finish = shape!.Finish();
+
+        await ctx.SetFillStyleAsync("White");
+        await ctx.SetLineWidthAsync(4);
+        await ctx.SetLineDashAsync(new float[] { 10, 10 });
+
+        await ctx.BeginPathAsync();
+        await ctx.MoveToAsync(start.X, start.Y);
+        await ctx.LineToAsync(finish.X, finish.Y);
+        await ctx.ClosePathAsync();
+
+        await ctx.SetStrokeStyleAsync(obj.Color);
+        await ctx.SetLineWidthAsync(obj.Thickness);
+        await ctx.StrokeAsync();
+    };
 
     public override Rectangle Rect()
     {
@@ -137,22 +173,22 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
 
 
-    public override List<FoHandle2D> GetHandles() 
-    {
-        if ( !this.HasSlot<FoHandle2D>()) 
-        {
-            var lx = LeftX();
-            var ty = TopY();
-            var rx = RightX();
-            var by = BottomY();
-            AddHandle2D(new FoHandle2D("UL", lx, ty, "Green"));
-            AddHandle2D(new FoHandle2D("UR", rx, ty, "Green"));
-            AddHandle2D(new FoHandle2D("LL", lx, by, "Green"));
-            AddHandle2D(new FoHandle2D("LR", rx, by, "Green"));
-        }
-        var result = this.Members<FoHandle2D>();
-        return result;
-    }
+    // public override List<FoHandle2D> GetHandles() 
+    // {
+    //     if ( !this.HasSlot<FoHandle2D>()) 
+    //     {
+    //         var lx = LeftX();
+    //         var ty = TopY();
+    //         var rx = RightX();
+    //         var by = BottomY();
+    //         AddHandle2D(new FoHandle2D("UL", lx, ty, "Green"));
+    //         AddHandle2D(new FoHandle2D("UR", rx, ty, "Green"));
+    //         AddHandle2D(new FoHandle2D("LL", lx, by, "Green"));
+    //         AddHandle2D(new FoHandle2D("LR", rx, by, "Green"));
+    //     }
+    //     var result = this.Members<FoHandle2D>();
+    //     return result;
+    // }
 
 
     public override Matrix2D GetMatrix()
@@ -307,7 +343,17 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         // $"{Name} ComputeFinishFor {target.Name}: {FinishX}  {FinishY}:   pin {PinX} {PinY}".WriteInfo();
     }
 
+    public async override Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
+    {
+        "Shape1D DrawWhenSelected".WriteNote();
+        await ctx.SaveAsync();
+        ShapeDrawSelected?.Invoke(ctx, this);
 
+        await DrawStart(ctx, "Blue");
+        await DrawFinish(ctx, "Cyan");
+        //await DrawPin(ctx);
+        await ctx.RestoreAsync();
+    }
 
     public virtual async Task<bool> DrawStraight(Canvas2DContext ctx, string color, int tick)
     {
@@ -363,4 +409,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.RestoreAsync();
         return true;
     }
+
+
 }

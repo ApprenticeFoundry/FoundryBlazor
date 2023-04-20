@@ -126,6 +126,12 @@ public class FoPage2D : FoGlyph2D
         return value;
     }
 
+    public void DeleteShape(FoGlyph2D shape)
+    {
+        shape.MarkSelected(false);
+        ExtractShapes(shape.GlyphId);
+        shape.UnglueAll();
+    }
 
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree) 
     {

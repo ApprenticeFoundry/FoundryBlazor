@@ -71,11 +71,7 @@ public class FoCompoundValue2D : FoGlyph2D, IShape2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));    
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
 
         await ctx.RestoreAsync();

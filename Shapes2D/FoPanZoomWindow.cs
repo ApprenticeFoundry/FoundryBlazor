@@ -99,7 +99,7 @@ public class FoPanZoomWindow : FoGlyph2D
         if ( !IsSelected )
             HoverDraw?.Invoke(ctx, this);
         else 
-            DrawSelected?.Invoke(ctx, this);
+            ShapeDrawSelected?.Invoke(ctx, this);
 
         await ctx.RestoreAsync();
         return true;
@@ -151,12 +151,7 @@ public class FoPanZoomWindow : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            await ctx.SaveAsync();
-            DrawSelected?.Invoke(ctx, this);
-            //await DrawPin(ctx);
-            await ctx.RestoreAsync();
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         await ctx.RestoreAsync();
         return true;

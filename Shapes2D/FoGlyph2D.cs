@@ -56,7 +56,7 @@ public class MeasuredText
 
 public interface IGlyph2D : IHasRectangle
 {
-
+    FoGlyph2D MarkSelected(bool selected);   
 }
 
 public class FoGlyph2D : FoComponent, IGlyph2D, IRender
@@ -114,6 +114,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
     public Action<Canvas2DContext, FoGlyph2D>? ShapeDraw;
+    public Action<Canvas2DContext, FoGlyph2D>? ShapeDrawSelected;
 
     public Action<FoGlyph2D>? DoOnOpenCreate;
     public Action<FoGlyph2D>? DoOnOpenEdit;
@@ -455,7 +456,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public async virtual Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {
         await ctx.SaveAsync();
-        DrawSelected?.Invoke(ctx, this);
+        ShapeDrawSelected?.Invoke(ctx, this);
         GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         GetConnectionPoints()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         //await DrawPin(ctx);
@@ -619,7 +620,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.StrokeAsync();
     };
 
-    public Action<Canvas2DContext, FoGlyph2D> DrawSelected = async (ctx, obj) =>
+    public Action<Canvas2DContext, FoGlyph2D> DrawAsSelected = async (ctx, obj) =>
     {
         await ctx.SetFillStyleAsync("White");
         await ctx.SetLineWidthAsync(4);
@@ -780,9 +781,6 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         this.SmashGlue();
     }
 
-    public virtual void FinalizeDelete(IPageManagement manager)
-    {
-    }
 
 
     public void AddGlue(FoGlue2D glue)

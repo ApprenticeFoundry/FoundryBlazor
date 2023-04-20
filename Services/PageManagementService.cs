@@ -122,10 +122,9 @@ public class PageManagementService : FoComponent, IPageManagement
             if ( shape.IsSelected ) 
             {
                 list.Add(shape);
-                shape.IsSelected = false;
+                shape.MarkSelected(false);
                 ExtractShapes(shape.GlyphId);
                 shape.UnglueAll();
-                shape.FinalizeDelete(this);
             }
         });
         return list;

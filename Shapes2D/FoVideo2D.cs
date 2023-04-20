@@ -125,11 +125,7 @@ public class FoVideo2D : FoGlyph2D, IImage2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            //GetHandles()?.ForEach(async child => await child.Render(ctx, tick, deep));
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if (HoverDraw != null)
         {

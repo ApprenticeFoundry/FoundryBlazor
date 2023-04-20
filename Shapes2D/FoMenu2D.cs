@@ -118,10 +118,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if ( deep )
         {

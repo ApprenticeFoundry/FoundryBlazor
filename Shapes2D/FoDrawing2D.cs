@@ -1,6 +1,4 @@
 
-using System.Diagnostics;
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
@@ -10,6 +8,8 @@ using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
@@ -49,6 +49,9 @@ public interface IDrawing : IRender
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
     void SetUserID(string panID);
     void ClearAll();
+
+    List<FoGlyph2D> Selections();
+    List<FoGlyph2D> DeleteSelections();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -196,6 +199,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         return PageManager.ExtractShapes(GlyphId);
+    }
+
+    public List<FoGlyph2D> DeleteSelections()
+    {
+        return PageManager.DeleteSelections();
+    }
+    public List<FoGlyph2D> Selections()
+    {
+        return PageManager.Selections();
     }
 
     public Point InchesToPixelsInset(double width, double height)
@@ -714,21 +726,21 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return item?.OpenCreate() ?? false;
     }
 
-    public bool DeleteSelections()
-    {
-        PageManager.Selections().ForEach(shape =>
-        {
-            shape.IsSelected = false;
-            shape.AnimatedResizeTo(0, 0).OnComplete(() =>
-            {
-                PageManager.ExtractShapes(shape.GlyphId);
-                shape.UnglueAll();
-                shape.FinalizeDelete(PageManager);
-                PubSub.Publish<D2D_Destroy>(new D2D_Destroy(shape));
-            });
-        });
-        return true;
-    }
+    // public bool DeleteSelectionsWithAnimations()
+    // {
+    //     PageManager.Selections().ForEach(shape =>
+    //     {
+    //         shape.IsSelected = false;
+    //         shape.AnimatedResizeTo(0, 0).OnComplete(() =>
+    //         {
+    //             PageManager.ExtractShapes(shape.GlyphId);
+    //             shape.UnglueAll();
+    //             PubSub.Publish<D2D_Destroy>(new D2D_Destroy(shape));
+    //         });
+    //     });
+    //     return true;
+    // }
+
     public bool DuplicateSelections()
     {
         var Duplicates = new List<FoGlyph2D>();
@@ -757,7 +769,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //$"Key Down ShiftKey?: {args.ShiftKey}, AltKey?: {args.AltKey}, CtrlKey?: {args.CtrlKey}, Key={args.Key} Code={args.Code}".WriteLine(ConsoleColor.Yellow);
 
         var move = args.ShiftKey ? 1 : 5;
-        var success = (args.Code, args.AltKey, args.ShiftKey) switch
+        object success = (args.Code, args.AltKey, args.ShiftKey) switch
         {
             ("ArrowUp", false, true) => MovePanBy(0, -move * 10),
             ("ArrowDown", false, true) => MovePanBy(0, move * 10),
@@ -782,7 +794,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             _ => false
         };
         //$"result {success}".WriteLine(ConsoleColor.Red);
-        return success;
+        return success != null;
     }
 
     public bool KeyUp(CanvasKeyboardEventArgs args)

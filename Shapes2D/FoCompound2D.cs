@@ -161,10 +161,7 @@ public class FoCompound2D : FoGlyph2D, IShape2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if ( deep ) 
         {
