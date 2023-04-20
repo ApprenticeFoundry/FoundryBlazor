@@ -385,18 +385,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     }
 
-    // public void NodeCenterChildren(LayoutStyle style)
-    // {
-    //     if ( !_item.IsVisible) return;
 
-    //     var width = _branchSize.Width / 2;
-    //     _children?.ForEach(child => 
-    //     {
-    //         var shape = child.GetShape();
-    //         shape.MoveBy(-width, 0);
-    //         child.NodeCenterChildren(style);
-    //     });   
-    // }
 
     public FoLayoutTree<V>? AddChildNode(FoLayoutTree<V>? child)
     {
