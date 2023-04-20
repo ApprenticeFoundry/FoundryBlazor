@@ -54,9 +54,12 @@ public class MeasuredText
 
 }
 
+public interface IGlyph2D : IHasRectangle
+{
 
+}
 
-public class FoGlyph2D : FoComponent, IHasRectangle, IRender
+public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
     public static bool ResetHitTesting { get; set; } = false;

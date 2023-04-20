@@ -27,6 +27,7 @@ public interface IWorkspace : IWorkPiece
     Task InitializedAsync(string defaultHubURI);
     IDrawing GetDrawing();
     IArena GetArena();
+    ISelectionService GetSelectionService();
 
     string GetUserID();
     ViewStyle GetViewStyle();
@@ -70,6 +71,8 @@ public class FoWorkspace : FoComponent, IWorkspace
     protected ComponentBus PubSub { get; set; }
     protected DialogService Dialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
+    protected ISelectionService SelectionService { get; set; }
+   
 
     public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
 
@@ -80,6 +83,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public FoWorkspace(
         IToast toast,
         ICommand command,
+        ISelectionService selection,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
@@ -91,6 +95,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
         Toast = toast;
         Command = command;
+        SelectionService = selection;
         ActiveDrawing = drawing;
         ActiveArena = arena;
         PubSub = pubSub;
@@ -211,6 +216,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return ActiveArena;
     }
 
+    public ISelectionService GetSelectionService()
+    {
+        return SelectionService;
+    }
+    
     public void ClearAllWorkPieces()
     {
         GetSlot<FoWorkPiece>()?.Clear();

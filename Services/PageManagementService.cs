@@ -1,9 +1,8 @@
 
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-
 using FoundryBlazor.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Drawing;
 
 
 namespace FoundryBlazor.Shape;
@@ -36,6 +35,7 @@ public interface IPageManagement: IRender
 
 
     List<FoGlyph2D> Selections();
+    List<FoGlyph2D> DeleteSelections();
     void PageMoveBy(int dx, int dy);
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
@@ -114,7 +114,22 @@ public class PageManagementService : FoComponent, IPageManagement
             _hitTestService.Insert(window);
     }
 
-
+    public List<FoGlyph2D> DeleteSelections()
+    {
+        var list = new List<FoGlyph2D>();
+        Selections().ForEach(shape =>
+        {
+            if ( shape.IsSelected ) 
+            {
+                list.Add(shape);
+                shape.IsSelected = false;
+                ExtractShapes(shape.GlyphId);
+                shape.UnglueAll();
+                shape.FinalizeDelete(this);
+            }
+        });
+        return list;
+    }
  
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {

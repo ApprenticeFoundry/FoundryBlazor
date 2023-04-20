@@ -5,16 +5,16 @@ namespace FoundryBlazor.Shape;
 
 public interface ISelectionService
 {
-    void ClearAll();
-    void ClearAllWhen(bool apply);
+    ISelectionService ClearAll();
+    ISelectionService ClearAllWhen(bool apply);
     FoGlyph2D AddItem(FoGlyph2D item);
     List<FoGlyph2D> AddRange(List<FoGlyph2D> list);
     void MouseDropped();
     void MouseReselect();
-    void MoveTo(int x, int y);
-    void MoveBy(int dx, int dy);
-    void RotateBy(double da);
-    void ZoomBy(double factor);
+    ISelectionService MoveTo(int x, int y);
+    ISelectionService MoveBy(int dx, int dy);
+    ISelectionService RotateBy(double da);
+    ISelectionService ZoomBy(double factor);
     List<FoGlyph2D> Selections();
 }
 
@@ -33,33 +33,40 @@ public class SelectionService : ISelectionService
         return Members;
     }
 
-    public void ClearAllWhen(bool apply)
+    public ISelectionService ClearAllWhen(bool apply)
     {
         //"ClearAllWhen".WriteLine(ConsoleColor.Green);   
         if ( apply ) ClearAll();
+        return this;
     }
 
-    public void ClearAll()
+    public ISelectionService ClearAll()
     {
         //"ClearAll".WriteLine(ConsoleColor.Green);
         PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
 
-        Members.ForEach(item => item.IsSelected = false);
+        Members.ForEach(item => item.MarkSelected(false));
         Members.Clear();
+        return this;
     }
 
     public List<FoGlyph2D> AddRange(List<FoGlyph2D> list)
     {
-        list.ForEach(item => AddItem(item));
+        list.ForEach(item => {
+            item.MarkSelected(true);
+            if (Members.IndexOf(item) == -1)
+                Members.Add(item);
+        });
+        PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return list;
     }
 
     public FoGlyph2D AddItem(FoGlyph2D item)
     {
+        item.MarkSelected(true);
         if (Members.IndexOf(item) == -1)
             Members.Add(item);
 
-        item.MarkSelected(true);
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
@@ -74,24 +81,26 @@ public class SelectionService : ISelectionService
             PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
     }
 
-    public void MoveTo(int x, int y)
+    public ISelectionService MoveTo(int x, int y)
     {
         Members.ForEach(item => item.MoveTo(x, y));
+        return this;
     }
-    public void MoveBy(int dx, int dy)
+    public ISelectionService MoveBy(int dx, int dy)
     {
         Members.ForEach(item => item.MoveBy(dx, dy));
+        return this;
     }
 
-
-
-    public void RotateBy(double da)
+    public ISelectionService RotateBy(double da)
     {
         Members.ForEach(item => item.RotateBy(da));
+        return this;
     }
 
-    public void ZoomBy(double factor)
+    public ISelectionService ZoomBy(double factor)
     {
         Members.ForEach(item => item.ZoomBy(factor));
+        return this;
     }
 }
