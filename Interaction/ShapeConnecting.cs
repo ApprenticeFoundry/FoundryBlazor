@@ -17,13 +17,15 @@ public class ShapeConnecting :  ShapeHovering
     public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
     public ShapeConnecting (
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pub,panzoom,select,manager,hitTest)
     {
     }
     public override void Abort()

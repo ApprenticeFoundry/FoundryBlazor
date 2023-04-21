@@ -75,8 +75,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private ComponentBus PubSub { get; set; }
 
 
-
-    protected readonly Dictionary<InteractionStyle, IBaseInteraction> interactionLookup;
+    protected readonly List<BaseInteraction> interactionRules;
+    protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
     protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
     private IBaseInteraction? lastInteraction;
 
@@ -145,19 +145,35 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PubSub = pubSub;
 
 
-
-        interactionLookup = new()
+        interactionRules = new()
         {
-            {InteractionStyle.ReadOnly, new BaseInteraction(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.PagePanAndZoom, new PagePanAndZoom(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeHovering, new ShapeHovering(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeSelection, new ShapeSelection(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeDragging, new ShapeDragging(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeResizing, new ShapeResizing(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeConnecting, new ShapeConnecting(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ModelLinking, new MoShapeLinking(this, pubSub, panzoom, select, manager, hittest)},
-           //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 10, this, pubSub, panzoom, select, manager, hittest)},
+            {new MoShapeLinking(InteractionStyle.ModelLinking, 9, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeResizing(InteractionStyle.ShapeResizing, 7, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(InteractionStyle.ShapeDragging, 6, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(InteractionStyle.ShapeSelection, 5, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(InteractionStyle.ShapeHovering, 4, this, pubSub, panzoom, select, manager, hittest)},
+            {new BaseInteraction(InteractionStyle.ReadOnly, 0, this, pubSub, panzoom, select, manager, hittest)},
         };
+
+        interactionLookup = new();
+        interactionRules.ForEach(x => {
+            interactionLookup.Add(x.Style, x);
+        });
+
+        // interactionLookup = new()
+        // {
+        //     {InteractionStyle.PagePanAndZoom, new PagePanAndZoom(10, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ModelLinking, new MoShapeLinking(9, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ShapeConnecting, new ShapeConnecting(8, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ShapeResizing, new ShapeResizing(7, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ShapeDragging, new ShapeDragging(6, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ShapeSelection, new ShapeSelection(5, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ShapeHovering, new ShapeHovering(4, this, pubSub, panzoom, select, manager, hittest)},
+        //     {InteractionStyle.ReadOnly, new BaseInteraction(0, this, pubSub, panzoom, select, manager, hittest)},
+        //    //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
+        // };
 
 
         InitSubscriptions();
@@ -519,15 +535,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 
-    protected bool TestRule(InteractionStyle style, CanvasMouseArgs args)
+    protected bool TestRule(BaseInteraction interact, CanvasMouseArgs args)
     {
-        var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
         {
-            $"{style} No Match".WriteError();
+            //$"{style} No Match".WriteError();
             return false;
         }
 
+        var style = interact.Style;
         $"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
@@ -535,17 +551,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     protected virtual void SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
-        if (TestRule(InteractionStyle.PagePanAndZoom, args)) return;
-
-        if (TestRule(InteractionStyle.ModelLinking, args)) return;
-
-        if (TestRule(InteractionStyle.ShapeConnecting, args)) return;
-
-        if (TestRule(InteractionStyle.ShapeResizing, args)) return;
-
-        if (TestRule(InteractionStyle.ShapeDragging, args)) return;
-
-        TestRule(InteractionStyle.ShapeSelection, args);
+        foreach (var rule in interactionRules)
+        {
+            if (TestRule(rule, args)) return;    
+        }
+        SetInteraction(InteractionStyle.ReadOnly);
     }
 
     private void ApplyMouseArgs(CanvasMouseArgs args)
