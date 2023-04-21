@@ -12,13 +12,15 @@ public class ShapeResizing : ShapeHovering
 
 
     public ShapeResizing(
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pubsub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
     {
     }
     
