@@ -563,6 +563,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         try
         {
             if (args == null) return;
+            
             SetCurrentlyProcessing(true);
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
