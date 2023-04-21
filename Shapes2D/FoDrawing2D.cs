@@ -544,7 +544,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }
 
         var style = interact.Style;
-        $"{style} Match".WriteSuccess();
+        //$"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
     }
