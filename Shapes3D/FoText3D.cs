@@ -65,7 +65,7 @@ public class FoText3D : FoGlyph3D, IShape3D
         var text = Text ?? "LabelText";
         Label = new LabelText(text)
         {
-            Color = "Yellow",
+            Color = Color ?? "Yellow",
             Position = GetPosition().AsVector3()
         };
         ctx.Add(Label);
