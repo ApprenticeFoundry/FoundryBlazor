@@ -221,7 +221,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         var start = Start();
 
-
         await ctx.SaveAsync();
         await ctx.BeginPathAsync();
 

@@ -531,7 +531,6 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         var loc = PinLocation();
 
-
         int StarWidth = 40;
         int StarHeight = 40;
         int StarCenterX = loc.X;
@@ -557,6 +556,32 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.LineToAsync(left + 140 * scale, top + 230 * scale);
         await ctx.LineToAsync(left + 70 * scale, top + 180 * scale);
         await ctx.LineToAsync(left + 160 * scale, top + 180 * scale);
+        await ctx.FillAsync();
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetStrokeStyleAsync("#003300");
+        await ctx.StrokeAsync();
+
+        await ctx.RestoreAsync();
+    }
+
+   public async Task DrawArrow(Canvas2DContext ctx, int BodyLength, int BodyHeight, string color)
+    {
+        //var loc = PinLocation();
+
+        await ctx.SaveAsync();
+        await ctx.BeginPathAsync();
+
+        await ctx.SetFillStyleAsync(color);
+        await ctx.MoveToAsync(0, Height / 2);
+        await ctx.LineToAsync(BodyLength, Height / 2);
+        await ctx.LineToAsync(BodyLength, (Height / 2) - (BodyHeight / 2));
+        await ctx.LineToAsync(Width, Height / 2);
+        await ctx.LineToAsync(BodyLength, (Height / 2) + (BodyHeight / 2));
+        await ctx.LineToAsync(BodyLength, Height / 2);
+        await ctx.LineToAsync(0, Height / 2);
+        await ctx.ClosePathAsync();
+
         await ctx.FillAsync();
 
         await ctx.SetLineWidthAsync(1);
