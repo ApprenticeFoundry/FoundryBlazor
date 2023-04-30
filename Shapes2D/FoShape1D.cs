@@ -270,7 +270,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.RestoreAsync();
     }
 
-    public bool HasNoGlue(FoGlyph2D? target, string child = "")
+    public static bool HasNoGlue(FoGlyph2D? target, string child = "")
     {
         if (target == null) return true;
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;

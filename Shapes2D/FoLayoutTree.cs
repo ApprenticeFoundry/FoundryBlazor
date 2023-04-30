@@ -236,7 +236,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
             if (glueStart.Matches("TOP") || glueStart.Matches("BOTTOM"))
             {
-                if (shape1D.HasNoGlue(shape, "TOP"))
+                if (FoShape1D.HasNoGlue(shape, "TOP"))
                 {                    
                     shape1D.GlueStartTo(parent, "BOTTOM");
                     shape1D.GlueFinishTo(shape, "TOP");
@@ -244,7 +244,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             }
             else if ( glueStart.Matches("LEFT") || glueStart.Matches("RIGHT"))
             {
-                if (shape1D.HasNoGlue(shape, "LEFT"))
+                if (FoShape1D.HasNoGlue(shape, "LEFT"))
                 {
                     shape1D.GlueStartTo(parent, "RIGHT");
                     shape1D.GlueFinishTo(shape, "LEFT");

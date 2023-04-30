@@ -565,7 +565,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.RestoreAsync();
     }
 
-   public async Task DrawArrow(Canvas2DContext ctx, int BodyLength, int BodyHeight, string color)
+   public async Task DrawArrow(Canvas2DContext ctx, int HeadWidth, int HeadHeight, int BodyWidth, int BodyHeight, int BodyThickness,  string color)
     {
         //var loc = PinLocation();
 
@@ -573,13 +573,30 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
+
+        // await ctx.MoveToAsync(0, Height / 2);
+        // await ctx.LineToAsync(BodyWidth, Height / 2);
+        // await ctx.LineToAsync(BodyWidth, (Height / 2) - (BodyHeight / 2));
+        // await ctx.LineToAsync(Width - HeadWidth, Height / 2);
+        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) - (HeadHeight / 2));
+        // await ctx.LineToAsync(Width, Height / 2);
+        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) + (HeadHeight / 2));
+        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) + (BodyHeight / 2));
+        // await ctx.LineToAsync(BodyWidth, (Height / 2) + (BodyHeight / 2));
+        // await ctx.LineToAsync(BodyWidth, Height / 2);
+        // await ctx.LineToAsync(0, Height / 2);
+
         await ctx.MoveToAsync(0, Height / 2);
-        await ctx.LineToAsync(BodyLength, Height / 2);
-        await ctx.LineToAsync(BodyLength, (Height / 2) - (BodyHeight / 2));
+        await ctx.LineToAsync(BodyWidth, Height / 2);
+        await ctx.LineToAsync(BodyWidth, (Height / 2) - (BodyHeight / 2) + (BodyThickness / 2));
+        await ctx.FillRectAsync(BodyWidth, (Height / 2) - (BodyHeight / 2), Width - HeadWidth - BodyWidth, BodyThickness);
+        await ctx.LineToAsync(Width - HeadWidth, (Height / 2) - (HeadHeight / 2));
         await ctx.LineToAsync(Width, Height / 2);
-        await ctx.LineToAsync(BodyLength, (Height / 2) + (BodyHeight / 2));
-        await ctx.LineToAsync(BodyLength, Height / 2);
-        await ctx.LineToAsync(0, Height / 2);
+        await ctx.LineToAsync(Width - HeadWidth, (Height / 2) + (HeadHeight / 2));
+        await ctx.LineToAsync(BodyWidth, (Height / 2) + (BodyHeight / 2) - (BodyThickness / 2));
+        await ctx.FillRectAsync(BodyWidth, (Height / 2) + (BodyHeight / 2) - BodyThickness, Width - HeadWidth - BodyWidth, BodyThickness);
+        await ctx.LineToAsync(BodyWidth, Height / 2);
+
         await ctx.ClosePathAsync();
 
         await ctx.FillAsync();
