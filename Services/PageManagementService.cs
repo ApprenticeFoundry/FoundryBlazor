@@ -37,6 +37,7 @@ public interface IPageManagement: IRender
     List<FoGlyph2D> CollectSelections();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
+    List<FoGlyph2D> DeleteSelectionsWithAnimations();
     void PageMoveBy(int dx, int dy);
     void SelectionsMoveBy(int dx, int dy);
     void SelectionsRotateBy(double da);
@@ -126,6 +127,25 @@ public class PageManagementService : FoComponent, IPageManagement
                 shape.MarkSelected(false);
                 ExtractShapes(shape.GlyphId);
                 shape.UnglueAll();
+            }
+        });
+        return list;
+    }
+
+    public List<FoGlyph2D> DeleteSelectionsWithAnimations()
+    {
+        var list = new List<FoGlyph2D>();
+        Selections().ForEach(shape =>
+        {
+            if ( shape.IsSelected ) 
+            {
+                list.Add(shape);
+                shape.MarkSelected(false);
+                shape.AnimatedResizeTo(0, 0).OnComplete(() =>
+                {
+                    ExtractShapes(shape.GlyphId);
+                    shape.UnglueAll();
+                });
             }
         });
         return list;

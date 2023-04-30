@@ -221,6 +221,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         return PageManager.DeleteSelections();
     }
+    public List<FoGlyph2D> DeleteSelectionsWithAnimations()
+    {
+        return PageManager.DeleteSelectionsWithAnimations();
+    }
     public List<FoGlyph2D> Selections()
     {
         return PageManager.Selections();
@@ -737,20 +741,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return item?.OpenCreate() ?? false;
     }
 
-    // public bool DeleteSelectionsWithAnimations()
-    // {
-    //     PageManager.Selections().ForEach(shape =>
-    //     {
-    //         shape.IsSelected = false;
-    //         shape.AnimatedResizeTo(0, 0).OnComplete(() =>
-    //         {
-    //             PageManager.ExtractShapes(shape.GlyphId);
-    //             shape.UnglueAll();
-    //             PubSub.Publish<D2D_Destroy>(new D2D_Destroy(shape));
-    //         });
-    //     });
-    //     return true;
-    // }
+
 
     public bool DuplicateSelections()
     {
@@ -801,7 +792,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             ("KeyC", true, false) => OpenCreate(),
 
             ("Insert", false, false) => DuplicateSelections(),
-            ("Delete", false, false) => DeleteSelections(),
+            ("Delete", false, false) => DeleteSelectionsWithAnimations(),
             _ => false
         };
         //$"result {success}".WriteLine(ConsoleColor.Red);
