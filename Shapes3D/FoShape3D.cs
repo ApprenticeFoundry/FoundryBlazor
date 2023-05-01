@@ -103,14 +103,14 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool NotImplemented(Scene ctx)
     {
-        var message = $"symbol [{Symbol}] Body type [{Type}] NotImplemented";
-        message.WriteError();
-        var label = new LabelText(message)
-        {
-            Color = "White",
-            Position = GetPosition().AsVector3()
-        };
-        ctx.Add(label);
+        // var message = $"symbol [{Symbol}] Body type [{Type}] NotImplemented";
+        // message.WriteError();
+        // var label = new LabelText(message)
+        // {
+        //     Color = "White",
+        //     Position = GetPosition().AsVector3()
+        // };
+        // ctx.Add(label);
         return false;
     }
 
@@ -351,6 +351,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
         if (string.IsNullOrEmpty(LoadingURL)) return false;
 
+        // var message = $"{format} Loading... {LoadingURL}";
         var message = $"{format} Loading... {LoadingURL}";
         message.WriteInfo(1);
 
@@ -431,11 +432,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Plane" => Plane(ctx),
             "Capsule" => Capsule(ctx),
             "Cone" => Cone(ctx),
-            "Collada" => RenderImportPromise(ctx, Import3DFormats.Collada),
-            "Fbx" => RenderImportPromise(ctx, Import3DFormats.Fbx),
-            "Obj" => RenderImportPromise(ctx, Import3DFormats.Obj),
-            "Stl" => RenderImportPromise(ctx, Import3DFormats.Stl),
-            "Glb" => RenderImportPromise(ctx, Import3DFormats.Gltf),
+            // "Collada" => RenderImportPromise(ctx, Import3DFormats.Collada),
+            // "Fbx" => RenderImportPromise(ctx, Import3DFormats.Fbx),
+            // "Obj" => RenderImportPromise(ctx, Import3DFormats.Obj),
+            // "Stl" => RenderImportPromise(ctx, Import3DFormats.Stl),
+            // "Glb" => RenderImportPromise(ctx, Import3DFormats.Gltf),
             _ => NotImplemented(ctx)
         };
         return result;
