@@ -1,5 +1,5 @@
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using System.Drawing;
 
 // https://happycoding.io/tutorials/processing/collision-detection
 //  https://bytes.com/topic/c-sharp/insights/880968-generic-quadtree-implementation
@@ -142,9 +142,9 @@ public class QuadTree<T> where T : IHasRectangle
         return count;
     }
 
-    /// <summary>
+
     /// Subdivide this QuadTree and move it's children into the appropriate Quads where applicable.
-    /// </summary>
+
     private void Subdivide()
     {
         // We've reached capacity, subdivide...
@@ -269,40 +269,30 @@ public class QuadTree<T> where T : IHasRectangle
         }
     }
 
-    /// <summary>
+
     /// Insert an item into this QuadTree object.
-    /// </summary>
-    /// <param name="item">The item to insert.</param>
+
     public void Insert(T item)
     {
         // If this quad doesn't intersect the items rectangle, do nothing
         if (!m_rect.IntersectsWith(item.Rect()))
             return;
 
-        if (m_objects == null ||
-            (m_childTL == null && m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE))
-        {
-            // If there's room to add the object, just add it
-            Add(item);
-        }
+        if (m_objects == null || (m_childTL == null && m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE))
+            Add(item); // If there's room to add the object, just add it
         else
         {
             // No quads, create them and bump objects down where appropriate
             if (m_childTL == null)
-            {
                 Subdivide();
-            }
+            
 
             // Find out which tree this object should go in and add it there
-            QuadTree<T> destTree = GetDestinationTree(item);
+            var destTree = GetDestinationTree(item);
             if (destTree == this)
-            {
                 Add(item);
-            }
             else
-            {
                 destTree.Insert(item);
-            }
         }
     }
 
@@ -314,36 +304,29 @@ public class QuadTree<T> where T : IHasRectangle
     public void GetObjects(Rectangle rect, ref List<T> results)
     {
         // We can't do anything if the results list doesn't exist
-        if (results != null)
+        if (results == null) return;
+        
+        if (rect.Contains(m_rect))
         {
-            if (rect.Contains(m_rect))
-            {
-                // If the search area completely contains this quad, just get every object this quad and all it's children have
-                GetAllObjects(ref results);
-            }
-            else if (rect.IntersectsWith(m_rect))
-            {
-                // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
-                if (m_objects != null)
-                {
-                    for (int i = 0; i < m_objects.Count; i++)
-                    {
-                        if (rect.IntersectsWith(m_objects[i].Rect()))
-                        {
-                            results.Add(m_objects[i]);
-                        }
-                    }
-                }
-
-                // Get the objects for the search rectangle from the children
-
-                m_childTL?.GetObjects(rect, ref results);
-                m_childTR?.GetObjects(rect, ref results);
-                m_childBL?.GetObjects(rect, ref results);
-                m_childBR?.GetObjects(rect, ref results);
-
-            }
+            // If the search area completely contains this quad, just get every object this quad and all it's children have
+            GetAllObjects(ref results);
         }
+        else if (rect.IntersectsWith(m_rect))
+        {
+            // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
+            if (m_objects != null)
+                for (int i = 0; i < m_objects.Count; i++)
+                    if (rect.IntersectsWith(m_objects[i].Rect()))
+                        results.Add(m_objects[i]);
+
+            // Get the objects for the search rectangle from the children
+
+            m_childTL?.GetObjects(rect, ref results);
+            m_childTR?.GetObjects(rect, ref results);
+            m_childBL?.GetObjects(rect, ref results);
+            m_childBR?.GetObjects(rect, ref results);
+        }
+        
     }
 
     /// <summary>

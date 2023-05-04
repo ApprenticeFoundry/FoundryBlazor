@@ -80,6 +80,7 @@ public static class StorageHelpers
         {
             IncludeFields = includeFields,
             IgnoreReadOnlyFields = includeFields,
+                        AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -100,6 +101,7 @@ public static class StorageHelpers
         {
             IncludeFields = includeFields,
             IgnoreReadOnlyFields = includeFields,
+                        AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -119,6 +121,7 @@ public static class StorageHelpers
             IncludeFields = includeFields,
             WriteIndented = true,
             IgnoreReadOnlyFields = includeFields,
+                        AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -133,6 +136,7 @@ public static class StorageHelpers
             IncludeFields = includeFields,
             WriteIndented = true,
             IgnoreReadOnlyFields = includeFields,
+                        AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -174,6 +178,7 @@ public static class StorageHelpers
 		var options = new JsonSerializerOptions()
 		{
 			IncludeFields = true,
+            AllowTrailingCommas = true,
 			IgnoreReadOnlyFields = true,
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 		};
@@ -200,6 +205,7 @@ public static class StorageHelpers
 		{
 			IncludeFields = true,
 			IgnoreReadOnlyFields = true,
+                        AllowTrailingCommas = true,
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 		};
 

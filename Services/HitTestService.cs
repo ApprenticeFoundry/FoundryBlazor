@@ -64,9 +64,8 @@ public class HitTestService : IHitTestService
     public List<FoGlyph2D> FindGlyph(Rectangle rect)
     {
         if ( PreviousSearches.Count > 10)
-        {
             PreviousSearches.RemoveRange(0, 6);
-        }
+    
         PreviousSearches.Add(rect);
         //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 
