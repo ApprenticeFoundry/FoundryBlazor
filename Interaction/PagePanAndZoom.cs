@@ -34,11 +34,6 @@ public class PagePanAndZoom : BaseInteraction
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-      //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
-
-        // SendToast(UserToast.Info("the mouse info"));
-
-
         isDraggingPage = true;
         return true;
     }
@@ -50,9 +45,6 @@ public class PagePanAndZoom : BaseInteraction
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
-
-        //$"Mouse Move {loc.X}  {loc.Y}".WriteLine();
-
         if ( isDraggingPage )
             drawing.MovePanBy(args.MovementX, args.MovementY);
 

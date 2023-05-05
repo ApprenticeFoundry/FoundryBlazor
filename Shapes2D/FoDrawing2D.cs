@@ -17,7 +17,7 @@ namespace FoundryBlazor.Shape;
 
 public interface IDrawing : IRender
 {
-    bool SetCurrentlyRendering(bool value);
+    bool SetCurrentlyRendering(bool value, int tick);
     bool SetCurrentlyProcessing(bool value);
     void SetCanvasSize(int width, int height);
     Point InchesToPixelsInset(double width, double height);
@@ -81,33 +81,41 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private IBaseInteraction? lastInteraction;
 
 
-    //private Stopwatch stopwatch = new();
+    private readonly Stopwatch stopwatch = new();
+    private int lastTick = 0;
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
-    public bool SetCurrentlyRendering(bool isRendering)
+
+
+    public bool SetCurrentlyRendering(bool isRendering, int tick)
     {
         var oldValue = IsCurrentlyRendering;
         if (isRendering)
         {
-            //stopwatch.Restart();
+            stopwatch.Restart();
+            lastTick = tick;
         }
 
         if (!isRendering)
         {
+            if ( tick == lastTick)
+            {
+                stopwatch.Stop();
+                var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
+                $"time to render is {stopwatch.ElapsedMilliseconds} ms  FPS: {fps}".WriteInfo();
+            } else {
+                $"skipped a tick {lastTick} {tick}".WriteInfo();
+            }
+
             while (MouseArgQueue.Count > 0)
             {
                 var args = MouseArgQueue.Dequeue();
-                //$"is Dequeueing {args.Topic} ".WriteSuccess(2);
+               // $"is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }
-        if (!isRendering)
-        {
-            //stopwatch.Stop();
-            //var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
-            //$"render time {stopwatch.Elapsed}  {fps}".WriteInfo();
-        }
+
         IsCurrentlyRendering = isRendering;
         return oldValue;
     }
@@ -120,7 +128,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             while (MouseArgQueue.Count > 0)
             {
                 var args = MouseArgQueue.Dequeue();
-                //$"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                $"is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }
@@ -161,20 +169,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         interactionRules.ForEach(x => {
             interactionLookup.Add(x.Style, x);
         });
-
-        // interactionLookup = new()
-        // {
-        //     {InteractionStyle.PagePanAndZoom, new PagePanAndZoom(10, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ModelLinking, new MoShapeLinking(9, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ShapeConnecting, new ShapeConnecting(8, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ShapeResizing, new ShapeResizing(7, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ShapeDragging, new ShapeDragging(6, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ShapeSelection, new ShapeSelection(5, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ShapeHovering, new ShapeHovering(4, this, pubSub, panzoom, select, manager, hittest)},
-        //     {InteractionStyle.ReadOnly, new BaseInteraction(0, this, pubSub, panzoom, select, manager, hittest)},
-        //    //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
-        // };
-
 
         InitSubscriptions();
         PanZoomService.SetOnComplete(() =>
@@ -553,38 +547,34 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
-    protected virtual void SelectInteractionByRuleFor(CanvasMouseArgs args)
+    protected virtual IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
         foreach (var rule in interactionRules)
         {
-            if (TestRule(rule, args)) return;    
+            if (TestRule(rule, args)) 
+                return GetInteraction();    
         }
         SetInteraction(InteractionStyle.ReadOnly);
+        return GetInteraction();    
     }
 
     private void ApplyMouseArgs(CanvasMouseArgs args)
     {
+        if (args == null) return;
+
         try
         {
-            if (args == null) return;
-            
             SetCurrentlyProcessing(true);
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
 
-            if (args.Topic.Matches("ON_MOUSE_DOWN"))
-                SelectInteractionByRuleFor(args);
-
-
-            var interact = GetInteraction();
-
             var isEventHandled = (args.Topic) switch
             {
-                ("ON_MOUSE_DOWN") => interact.MouseDown(args),
-                ("ON_MOUSE_MOVE") => interact.MouseMove(args),
-                ("ON_MOUSE_UP") => interact.MouseUp(args),
-                ("ON_MOUSE_IN") => interact.MouseIn(args),
-                ("ON_MOUSE_OUT") => interact.MouseOut(args),
+                ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
+                ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
+                ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
+                ("ON_MOUSE_IN") => GetInteraction().MouseIn(args),
+                ("ON_MOUSE_OUT") => GetInteraction().MouseOut(args),
                 _ => false
             };
         }
@@ -596,7 +586,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             SetCurrentlyProcessing(false);
         }
-
     }
 
 
@@ -771,31 +760,33 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //$"Key Down ShiftKey?: {args.ShiftKey}, AltKey?: {args.AltKey}, CtrlKey?: {args.CtrlKey}, Key={args.Key} Code={args.Code}".WriteLine(ConsoleColor.Yellow);
 
         var move = args.ShiftKey ? 1 : 5;
-        object success = (args.Code, args.AltKey, args.ShiftKey) switch
+        object success = (args.Code, args.AltKey, args.CtrlKey, args.ShiftKey) switch
         {
-            ("ArrowUp", false, true) => MovePanBy(0, -move * 10),
-            ("ArrowDown", false, true) => MovePanBy(0, move * 10),
-            ("ArrowLeft", false, true) => MovePanBy(-move * 10, 0),
-            ("ArrowRight", false, true) => MovePanBy(move * 10, 0),
+            ("ArrowUp", false, true, true) => MovePanBy(0, -move * 10),
+            ("ArrowDown", false, true, true) => MovePanBy(0, move * 10),
+            ("ArrowLeft", false, true, true) => MovePanBy(-move * 10, 0),
+            ("ArrowRight", false, true, true) => MovePanBy(move * 10, 0),
 
-            ("ArrowUp", false, false) => MoveSelectionsBy(0, -move),
-            ("ArrowDown", false, false) => MoveSelectionsBy(0, move),
-            ("ArrowLeft", false, false) => MoveSelectionsBy(-move, 0),
-            ("ArrowRight", false, false) => MoveSelectionsBy(move, 0),
-            ("ArrowUp", true, false) => ZoomSelectionBy(1.25),
-            ("ArrowDown", true, false) => ZoomSelectionBy(0.75),
+            ("ArrowUp", false, false, _) => MoveSelectionsBy(0, -move),
+            ("ArrowDown", false, false, _) => MoveSelectionsBy(0, move),
+            ("ArrowLeft", false, false, _) => MoveSelectionsBy(-move, 0),
+            ("ArrowRight", false, false, _) => MoveSelectionsBy(move, 0),
 
-            ("KeyG", true, false) => PageManager?.GroupSelected<FoGroup2D>() != null,
-            ("KeyR", true, false) => RotateSelectionsBy(30),
-            ("KeyL", true, false) => LayoutSelections(),
-            ("KeyO", true, false) => OpenEdit(),
-            ("KeyC", true, false) => OpenCreate(),
+            ("ArrowUp", true, false, false) => ZoomSelectionBy(1.25),
+            ("ArrowDown", true, false, false) => ZoomSelectionBy(0.75),
 
-            ("Insert", false, false) => DuplicateSelections(),
-            ("Delete", false, false) => DeleteSelectionsWithAnimations(),
+            ("KeyG", true, false, false) => PageManager?.GroupSelected<FoGroup2D>() != null,
+            ("KeyR", true, false, false) => RotateSelectionsBy(30),
+            ("KeyL", true, false, false) => LayoutSelections(),
+            ("KeyO", true, false, false) => OpenEdit(),
+            ("KeyC", true, false, false) => OpenCreate(),
+
+            ("KeyD", false, true, false) => DuplicateSelections(),
+            ("Insert", false, false, false) => DuplicateSelections(),
+            ("Delete", false, false, false) => DeleteSelections(),
+            ("Delete", false, true, false) => DeleteSelectionsWithAnimations(),
             _ => false
         };
-        //$"result {success}".WriteLine(ConsoleColor.Red);
         return success != null;
     }
 

@@ -16,22 +16,11 @@ namespace FoundryBlazor.Canvas
     /// </summary>
     public partial class CanvasHelper : ComponentBase //, IAsyncDisposable
     {
-        [Inject] private ComponentBus? PubSub { get; set; }
-        /// <summary>
-        /// JS Interop module used to call JavaScript
-        /// </summary>
-        //private Lazy<Task<IJSObjectReference>>? _moduleTask;
-
-        /// <summary>
-        /// Used to calculate the frames per second
-        /// </summary>
         private DateTime _lastRender;
 
-        /// <summary>
-        /// JS Runtime
-        /// </summary>
-        [Inject]
-        protected IJSRuntime? _jsRuntime { get; set; }
+        [Inject] private ComponentBus? PubSub { get; set; }
+
+        [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
 
 
@@ -190,7 +179,6 @@ namespace FoundryBlazor.Canvas
         [JSInvokable]
         public async Task OnMouseEnter(CanvasMouseArgs args)
         {
-            // We *must* fire this when fileInputContainer is hidden after a file is dropped.
             args.Topic = "ON_MOUSE_ENTER";
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseEnter.InvokeAsync(args);
@@ -232,11 +220,7 @@ namespace FoundryBlazor.Canvas
             await KeyDown.InvokeAsync(args);
         }
 
-        /// <summary>
-        /// Handle the JavaScript canvas.keyup event
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
+
         [JSInvokable]
         public async Task OnKeyUp(CanvasKeyboardEventArgs args)
         {
@@ -245,11 +229,7 @@ namespace FoundryBlazor.Canvas
             await KeyUp.InvokeAsync(args);
         }
 
-        /// <summary>
-        /// Handle the JavaScript canvas.keypress event
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
+
         [JSInvokable]
         public async Task OnKeyPress(CanvasKeyboardEventArgs args)
         {
