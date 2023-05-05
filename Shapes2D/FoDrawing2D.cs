@@ -91,27 +91,27 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool SetCurrentlyRendering(bool isRendering, int tick)
     {
         var oldValue = IsCurrentlyRendering;
-        if (isRendering)
-        {
-            stopwatch.Restart();
-            lastTick = tick;
-        }
+        // if (isRendering)
+        // {
+        //     stopwatch.Restart();
+        //     lastTick = tick;
+        // }
 
         if (!isRendering)
         {
-            if ( tick == lastTick)
-            {
-                stopwatch.Stop();
-                var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
-                $"time to render is {stopwatch.ElapsedMilliseconds} ms  FPS: {fps}".WriteInfo();
-            } else {
-                $"skipped a tick {lastTick} {tick}".WriteInfo();
-            }
+            // if ( tick == lastTick)
+            // {
+            //     stopwatch.Stop();
+            //     var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
+            //     $"time to render is {stopwatch.ElapsedMilliseconds} ms  FPS: {fps}".WriteInfo();
+            // } else {
+            //     $"skipped a tick {lastTick} {tick}".WriteInfo();
+            // }
 
             while (MouseArgQueue.Count > 0)
             {
                 var args = MouseArgQueue.Dequeue();
-               // $"is Dequeueing {args.Topic} ".WriteSuccess(2);
+               // $"SetCurrentlyRendering is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }
@@ -128,7 +128,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             while (MouseArgQueue.Count > 0)
             {
                 var args = MouseArgQueue.Dequeue();
-                $"is Dequeueing {args.Topic} ".WriteSuccess(2);
+                //$"SetCurrentlyProcessing Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }
