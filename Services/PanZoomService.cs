@@ -89,15 +89,15 @@ public class PanZoomService : IPanZoomService
 
     public virtual void Smash()
     {
-        this._matrix = null;
-        this._invMatrix = null;
+        this._matrix = Matrix2D.SmashMatrix(this._matrix);
+        this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
     }
 
     public virtual Matrix2D GetMatrix()
     {
         if (_matrix == null)
         {
-            _matrix = new Matrix2D();
+            _matrix = Matrix2D.NewMatrix();
             _matrix.AppendTransform(_pan.X, _pan.Y, _zoom, _zoom, 0.0, 0.0, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
             //"PanZoomService GetMatrix recalculate".WriteLine(ConsoleColor.Yellow);

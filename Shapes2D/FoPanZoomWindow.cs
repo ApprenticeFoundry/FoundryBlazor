@@ -45,7 +45,7 @@ public class FoPanZoomWindow : FoGlyph2D
             var x = PinX / zoom;
             var y = PinY / zoom;
 
-            _matrix = new Matrix2D();
+            _matrix = Matrix2D.NewMatrix();
             x -=  pan.X;
             y -=  pan.Y;
             zoom = 1.0 / zoom;

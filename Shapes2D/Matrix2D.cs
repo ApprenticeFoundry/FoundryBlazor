@@ -1,5 +1,6 @@
 
 
+using FoundryBlazor.Extensions;
 using System.Drawing;
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
@@ -35,6 +36,27 @@ namespace FoundryBlazor.Shape;
     public double d = 1; //Position (1, 1) in a 3x3 affine transformation matrix.
     public double tx = 0; //Position (2, 0) in a 3x3 affine transformation matrix.
     public double ty = 0; //Position (2, 1) in a 3x3 affine transformation matrix.
+
+    private static Queue<Matrix2D> cashe = new Queue<Matrix2D>();
+    public static Matrix2D NewMatrix()
+    {
+        if (cashe.Count == 0)
+            return new Matrix2D();
+
+        var result = cashe.Dequeue();
+        $"Recycle Matrix2D {cashe.Count}".WriteInfo();
+        return result;
+    }
+
+    public static Matrix2D? SmashMatrix(Matrix2D? source)
+    {
+        if (source == null) return null;
+
+        source.Zero();
+        cashe.Enqueue(source);
+        $"Smash Matrix2D {cashe.Count}".WriteNote();
+        return null;
+    }
 
     public Matrix2D() 
     {  
@@ -98,6 +120,17 @@ namespace FoundryBlazor.Shape;
         this.d = d;
         this.tx = tx;
         this.ty = ty;
+        return this;
+    }
+
+    public Matrix2D Zero()
+    {
+        this.a = 0;
+        this.b = 0;
+        this.c = 0;
+        this.d = 0;
+        this.tx = 0;
+        this.ty = 0;
         return this;
     }
 

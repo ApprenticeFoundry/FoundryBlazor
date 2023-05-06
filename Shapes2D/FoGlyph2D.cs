@@ -749,7 +749,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         if (_matrix == null)
         {
-            _matrix = new Matrix2D();
+            _matrix = Matrix2D.NewMatrix();
             _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), 0.0, 0.0, LocPinX(this), LocPinY(this));
             //ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
