@@ -145,7 +145,22 @@ namespace FoundryBlazor.Shape;
         return Prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
     }
 
-    public Matrix2D AppendTransform(double x, double y, double scaleX, double scaleY, double rotation, double skewX, double skewY, double regX, double regY) {
+    public Matrix2D AppendTransform(double x, double y, double scaleX, double scaleY, double rotation, double regX, double regY) {
+
+        var r = rotation * Matrix2D.DEG_TO_RAD;
+        var cos = Math.Cos(r);
+        var sin = Math.Sin(r);
+
+        Append(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, x, y);
+        
+        // append the registration offset:
+        tx -= regX * a + regY * c;
+        ty -= regX * b + regY * d;
+        
+        return this;
+    }  
+
+    public Matrix2D AppendTransformWithSkey(double x, double y, double scaleX, double scaleY, double rotation, double skewX, double skewY, double regX, double regY) {
 
         var r = rotation * Matrix2D.DEG_TO_RAD;
         var cos = Math.Cos(r);

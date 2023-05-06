@@ -119,7 +119,7 @@ public class FoConnector1D : FoShape1D, IShape1D
             _matrix = Matrix2D.NewMatrix();
             if (_matrix != null)
             {
-                _matrix.AppendTransform(x1, y1, 1.0, 1.0, 0, 0.0, 0.0, LocPinX(this), LocPinY(this));
+                _matrix.AppendTransform(x1, y1, 1.0, 1.0, 0, LocPinX(this), LocPinY(this));
             }
             else
                 "GetMatrix Shape1D here is IMPOSSABLE".WriteError();

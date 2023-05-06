@@ -49,7 +49,7 @@ public class FoPanZoomWindow : FoGlyph2D
             x -=  pan.X;
             y -=  pan.Y;
             zoom = 1.0 / zoom;
-            _matrix.AppendTransform(x, y, zoom, zoom, RotationZ(this), 0.0, 0.0, LocPinX(this), LocPinY(this));
+            _matrix.AppendTransform(x, y, zoom, zoom, RotationZ(this), LocPinX(this), LocPinY(this));
             FoGlyph2D.ResetHitTesting = true;
         }
         return _matrix;

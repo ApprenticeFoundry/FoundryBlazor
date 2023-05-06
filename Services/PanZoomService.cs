@@ -98,7 +98,7 @@ public class PanZoomService : IPanZoomService
         if (_matrix == null)
         {
             _matrix = Matrix2D.NewMatrix();
-            _matrix.AppendTransform(_pan.X, _pan.Y, _zoom, _zoom, 0.0, 0.0, 0.0, 0.0, 0.0);
+            _matrix.AppendTransform(_pan.X, _pan.Y, _zoom, _zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
             //"PanZoomService GetMatrix recalculate".WriteLine(ConsoleColor.Yellow);
         }
