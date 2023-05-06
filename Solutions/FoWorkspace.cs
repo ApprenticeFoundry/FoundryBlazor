@@ -161,15 +161,26 @@ public class FoWorkspace : FoComponent, IWorkspace
         if (!Command.HasHub())
         {
             EstablishDrawingSyncHub(defaultHubURI);
-            Command.StartHub();
-            var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
-            //Toast?.Success(note);
-            Command.SendToast(ToastType.Info, note);
         }
 
         await PubSub!.Publish<InputStyle>(InputStyle);
     }
 
+    public void StartHub()
+    {
+        Command.StartHub();
+        var defaultHubURI = Command.GetServerUri().ToString();
+        var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+        Command.SendToast(ToastType.Info, note);
+    }
+
+    public void StopHub()
+    {
+        Command.StopHub();
+        var defaultHubURI = Command.GetServerUri().ToString();
+        var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+        Command.SendToast(ToastType.Info, note);
+    }
     public void OnDispose()
     {
         if (Command.HasHub())
@@ -447,7 +458,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetSignalRHub(hub, GetUserID(), Toast);
+        Command.SetSignalRHub(hub, secureHubURI, GetUserID(), Toast);
         SetSignalRHub(hub, GetUserID());
 
         //Toast?.Success($"HubConnection {secureHubURI} ");

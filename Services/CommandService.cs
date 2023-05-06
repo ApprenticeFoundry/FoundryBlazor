@@ -20,7 +20,8 @@ public interface ICommand
     void SendGlue(FoGlue2D? glue);
 
     HubConnection? GetSignalRHub();
-    bool SetSignalRHub(HubConnection hub, string panid, IToast toast);
+    bool SetSignalRHub(HubConnection hub, Uri uri, string panid, IToast toast);
+    Uri GetServerUri();
     bool HasHub();
 
     bool StartHub();
@@ -36,6 +37,7 @@ public interface ICommand
 
 public class CommandService : ICommand
 {
+    private Uri ServerUri { get; set; }
     private string UserID { get; set; } = "NO User";
     private bool IsRunning = false;
     private HubConnection? _DrawingSyncHub;
@@ -74,7 +76,11 @@ public class CommandService : ICommand
     {
         return _DrawingSyncHub;
     }
-    public bool SetSignalRHub(HubConnection hub, string userid, IToast toast)
+    public Uri GetServerUri()
+    {
+        return ServerUri;
+    }
+    public bool SetSignalRHub(HubConnection hub, Uri uri, string userid, IToast toast)
     {
         if (_DrawingSyncHub != null)
         {
@@ -82,10 +88,11 @@ public class CommandService : ICommand
             return false;
         }
 
+        _DrawingSyncHub = hub;
+        ServerUri = uri;
         UserID = userid;
         GetDrawing()?.SetUserID(UserID);
         Toast = toast;
-        _DrawingSyncHub = hub;
         $"SetSignalRHub of UserID {UserID} CommandService".WriteNote();
 
         PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
@@ -96,18 +103,21 @@ public class CommandService : ICommand
 
         PubSub.SubscribeTo<CanvasMouseArgs>(args =>
         {
-            SendUserMove(args, true); ;
+            if (IsRunning)
+                SendUserMove(args, true); ;
         });
 
         PubSub.SubscribeTo<FoGlyph2D>(args =>
         {
-            SendShapeMoved(args);
+            if (IsRunning)
+                SendShapeMoved(args);
         });
 
         PubSub.SubscribeTo<D2D_Create>(create =>
         {
             SendSyncMessage(create);
         });
+
         PubSub.SubscribeTo<D2D_Move>(move =>
         {
             SendSyncMessage(move);
@@ -261,7 +271,7 @@ public class CommandService : ICommand
     }
     public async Task<bool> Send(D2D_Base msg)
     {
-        if (_DrawingSyncHub == null || !IsRunning)
+        if (!IsRunning)
             $"Command Service {IsRunning} {msg.Topic()}..  is NOT Sending".WriteNote();
 
         if (_DrawingSyncHub == null)
