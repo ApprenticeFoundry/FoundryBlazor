@@ -41,7 +41,10 @@ namespace FoundryBlazor.Shape;
     public static Matrix2D NewMatrix()
     {
         if (cashe.Count == 0)
+        {
+            $"NewMatrix {cashe.Count}".WriteInfo();
             return new Matrix2D();
+        }
 
         var result = cashe.Dequeue();
         $"Recycle Matrix2D {cashe.Count}".WriteInfo();
@@ -125,10 +128,10 @@ namespace FoundryBlazor.Shape;
 
     public Matrix2D Zero()
     {
-        this.a = 0;
+        this.a = 1;
         this.b = 0;
         this.c = 0;
-        this.d = 0;
+        this.d = 1;
         this.tx = 0;
         this.ty = 0;
         return this;

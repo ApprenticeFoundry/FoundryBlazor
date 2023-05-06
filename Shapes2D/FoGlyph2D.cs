@@ -739,8 +739,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         ResetHitTesting = true;
-        this._matrix = null;
-        this._invMatrix = null;
+        this._matrix = Matrix2D.SmashMatrix(this._matrix);
+        this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 
         return this.SmashGlue();
     }
