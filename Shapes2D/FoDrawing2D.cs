@@ -81,8 +81,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private IBaseInteraction? lastInteraction;
 
 
-    private readonly Stopwatch stopwatch = new();
-    private int lastTick = 0;
+    //private readonly Stopwatch stopwatch = new();
+    //private int lastTick = 0;
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();

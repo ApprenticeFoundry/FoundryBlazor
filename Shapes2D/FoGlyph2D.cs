@@ -1,9 +1,8 @@
-using System.Drawing;
-using System.Runtime.CompilerServices;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-
+using System.Drawing;
+using System.Runtime.CompilerServices;
 using Unglide;
 
 namespace FoundryBlazor.Shape;
@@ -40,8 +39,9 @@ public interface IHasRectangle
 
 public interface IRender
 {
-    public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
+    public Task Draw(Canvas2DContext ctx, int tick);
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
+    public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
 }
 
 
@@ -363,15 +363,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return false;
     }
 
-    public bool IsInRegion(Rectangle region)
-    {
-        if (LeftEdge() < region.X) return false;
-        if (RightEdge() > region.Width) return false;
 
-        if (TopEdge() < region.Y) return false;
-        if (BottomEdge() > region.Height) return false;
-        return true;
-    }
 
     public bool ComputeShouldRender(Rectangle region)
     {
@@ -382,6 +374,16 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public bool IntersectsRegion(Rectangle region)
     {
         return region.IntersectsWith(Rect());
+    }
+
+    public bool IsInRegion(Rectangle region)
+    {
+        if (LeftEdge() < region.X) return false;
+        if (RightEdge() > region.Width) return false;
+
+        if (TopEdge() < region.Y) return false;
+        if (BottomEdge() > region.Height) return false;
+        return true;
     }
 
     public virtual async Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region)
@@ -573,18 +575,6 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.BeginPathAsync();
 
         await ctx.SetFillStyleAsync(color);
-
-        // await ctx.MoveToAsync(0, Height / 2);
-        // await ctx.LineToAsync(BodyWidth, Height / 2);
-        // await ctx.LineToAsync(BodyWidth, (Height / 2) - (BodyHeight / 2));
-        // await ctx.LineToAsync(Width - HeadWidth, Height / 2);
-        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) - (HeadHeight / 2));
-        // await ctx.LineToAsync(Width, Height / 2);
-        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) + (HeadHeight / 2));
-        // await ctx.LineToAsync(Width - HeadWidth, (Height / 2) + (BodyHeight / 2));
-        // await ctx.LineToAsync(BodyWidth, (Height / 2) + (BodyHeight / 2));
-        // await ctx.LineToAsync(BodyWidth, Height / 2);
-        // await ctx.LineToAsync(0, Height / 2);
 
         await ctx.MoveToAsync(0, Height / 2);
         await ctx.LineToAsync(BodyWidth, Height / 2);

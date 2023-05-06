@@ -336,7 +336,10 @@ public class PageManagementService : FoComponent, IPageManagement
 
 
 
-
+    public virtual async Task Draw(Canvas2DContext ctx, int tick)
+    {
+        await CurrentPage().Draw(ctx, tick);
+    }
 
 
     public async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
@@ -346,7 +349,7 @@ public class PageManagementService : FoComponent, IPageManagement
         //await page.RenderNoItems(ctx, tick++);
         await page.RenderDetailed(ctx, tick++, deep);
 
-        if ( RenderHitTestTree )
+       if ( RenderHitTestTree )
             await _hitTestService.RenderTree(ctx,true);
 
         return true;
