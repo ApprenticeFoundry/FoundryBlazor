@@ -21,7 +21,7 @@ public interface ICommand
 
     HubConnection? GetSignalRHub();
     bool SetSignalRHub(HubConnection hub, Uri uri, string panid, IToast toast);
-    Uri GetServerUri();
+    Uri? GetServerUri();
     bool HasHub();
 
     bool StartHub();
@@ -37,7 +37,7 @@ public interface ICommand
 
 public class CommandService : ICommand
 {
-    private Uri ServerUri { get; set; }
+    private Uri? ServerUri { get; set; }
     private string UserID { get; set; } = "NO User";
     private bool IsRunning = false;
     private HubConnection? _DrawingSyncHub;
@@ -76,7 +76,7 @@ public class CommandService : ICommand
     {
         return _DrawingSyncHub;
     }
-    public Uri GetServerUri()
+    public Uri? GetServerUri()
     {
         return ServerUri;
     }

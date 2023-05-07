@@ -738,9 +738,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (_matrix == null && !force) return false;
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
+        //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         ResetHitTesting = true;
-        this._matrix = null;
-        this._invMatrix = null;
+        this._matrix = Matrix2D.SmashMatrix(this._matrix);
+        this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 
         return this.SmashGlue();
     }
@@ -749,10 +750,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         if (_matrix == null)
         {
-            _matrix = new Matrix2D();
-            _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), 0.0, 0.0, LocPinX(this), LocPinY(this));
-            //ResetHitTesting = true;
-            //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
+            _matrix = Matrix2D.NewMatrix();
+            _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), LocPinX(this), LocPinY(this));
         }
         return _matrix;
     }
