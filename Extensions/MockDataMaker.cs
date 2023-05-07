@@ -19,7 +19,7 @@ public class MockDataMaker
     {
         var first = new string[]
         {
-            "Ringo","Paul","Johhn","George"
+            "Ringo","Paul","John","George"
         };
         var last = new string[]
         {
