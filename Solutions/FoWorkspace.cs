@@ -290,8 +290,6 @@ public class FoWorkspace : FoComponent, IWorkspace
                 menu.Add<T>(shape);
         }
 
-        //menu.LayoutHorizontal();
-
         return menu;
     }
 

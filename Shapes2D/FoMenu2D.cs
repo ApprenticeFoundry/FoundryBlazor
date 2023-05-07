@@ -9,19 +9,10 @@ namespace FoundryBlazor.Shape;
 
 
 
-public class FoMenu2D : FoGlyph2D, IFoMenu
+public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 {
     private string _layout = "H";
 
-    public string DisplayText()
-    {
-        return Name;
-    }
-
-    public List<IFoButton> Buttons()
-    {
-        return GetMembers<FoButton2D>()?.Select(item => item as IFoButton).ToList() ?? new List<IFoButton>();
-    }
 
 
     public FoMenu2D(string name) : base(name,100,50,"Grey")
@@ -31,12 +22,23 @@ public class FoMenu2D : FoGlyph2D, IFoMenu
     }
 
 
+    public List<IFoButton> Buttons()
+    {
+        return GetMembers<FoButton2D>()?.Select(item => item as IFoButton).ToList() ?? new List<IFoButton>();
+    }
+
 
     public FoMenu2D Clear()
     {
         GetMembers<FoButton2D>()?.Clear();
         return this;
     }
+
+    public string DisplayText()
+    {
+        return Name;
+    }
+
 
     public FoMenu2D ToggleLayout()
     {
