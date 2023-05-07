@@ -57,7 +57,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
 
     public override FoGlyph2D MarkSelected(bool value)
     {
-        "You Clicked the button".WriteLine();
+     //   "You Clicked the button".WriteLine();
         countdown = 10;
         this.PreDraw = this.DoClickAnimation;
 

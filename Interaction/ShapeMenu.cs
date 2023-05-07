@@ -38,7 +38,7 @@ public class ShapeMenu : ShapeDragging
 
         var menu = findings?.LastOrDefault() as FoMenu2D;
         menu?.OnShapeClick(ClickStyle.MouseDown, args);
-        if (menu?.MouseHit(args)) 
+        if (menu?.MouseHit(args) == true) 
             return true;
 
         return base.MouseDown(args);
