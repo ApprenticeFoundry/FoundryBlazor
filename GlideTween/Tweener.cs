@@ -157,7 +157,6 @@ namespace Unglide
                 });
 
                 AddAndRemove();
-                //FoGlyph2D.ResetHitTesting = true;
             }
 
             internal void Remove(Tween glide)

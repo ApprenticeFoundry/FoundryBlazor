@@ -37,17 +37,15 @@ namespace FoundryBlazor.Shape;
     public double tx = 0; //Position (2, 0) in a 3x3 affine transformation matrix.
     public double ty = 0; //Position (2, 1) in a 3x3 affine transformation matrix.
 
-    private static Queue<Matrix2D> cashe = new Queue<Matrix2D>();
+    private static readonly Queue<Matrix2D> cashe = new Queue<Matrix2D>();
     public static Matrix2D NewMatrix()
     {
         if (cashe.Count == 0)
-        {
-            $"NewMatrix {cashe.Count}".WriteInfo();
-            return new Matrix2D();
-        }
+            cashe.Enqueue(new Matrix2D());
+    
 
+        //$"Recycle Matrix2D {cashe.Count}".WriteInfo();
         var result = cashe.Dequeue();
-        $"Recycle Matrix2D {cashe.Count}".WriteInfo();
         return result;
     }
 
@@ -57,7 +55,7 @@ namespace FoundryBlazor.Shape;
 
         source.Zero();
         cashe.Enqueue(source);
-        $"Smash Matrix2D {cashe.Count}".WriteNote();
+       // $"Smash Matrix2D {cashe.Count}".WriteNote();
         return null;
     }
 

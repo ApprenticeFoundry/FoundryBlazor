@@ -190,9 +190,6 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             }
             else
                 "GetMatrix Shape1D here is IMPOSSABLE".WriteError();
-
-            //FoGlyph2D.ResetHitTesting = true;
-            //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
         }
         return _matrix!;
     }
