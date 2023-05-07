@@ -15,6 +15,7 @@ public enum InteractionStyle
     ShapeSelection,
     ShapeHovering,
     ShapeDragging,
+    ShapeMenu,
     ShapeResizing,
     ShapeCreating,
     ShapeConnecting,

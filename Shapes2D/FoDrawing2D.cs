@@ -155,13 +155,14 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         interactionRules = new()
         {
-            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 10, this, pubSub, panzoom, select, manager, hittest)},
-            {new MoShapeLinking(InteractionStyle.ModelLinking, 9, this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 11, this, pubSub, panzoom, select, manager, hittest)},
+            {new MoShapeLinking(InteractionStyle.ModelLinking, 10, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeMenu(InteractionStyle.ShapeMenu, 9, this, pubSub, panzoom, select, manager, hittest)},
             {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8, this, pubSub, panzoom, select, manager, hittest)},
             {new ShapeResizing(InteractionStyle.ShapeResizing, 7, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(InteractionStyle.ShapeDragging, 6, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(InteractionStyle.ShapeSelection, 5, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(InteractionStyle.ShapeHovering, 4, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(InteractionStyle.ShapeDragging, 5, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(InteractionStyle.ShapeSelection, 4, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(InteractionStyle.ShapeHovering, 3, this, pubSub, panzoom, select, manager, hittest)},
             {new BaseInteraction(InteractionStyle.ReadOnly, 0, this, pubSub, panzoom, select, manager, hittest)},
         };
 

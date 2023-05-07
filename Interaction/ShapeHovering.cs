@@ -25,13 +25,13 @@ public class ShapeHovering : BaseInteraction
     {
 
         lastHover?.ForEach(child => child.HoverDraw = null);
-        //lastHover?.ForEach(child => child.LocalMouseHover(args, null));
+        lastHover?.ForEach(child => child.LocalMouseHover(args, null));
 
         var loc = panZoomService.HitRectStart(args);
         lastHover = pageManager!.FindGlyph(loc);
 
         lastHover.ForEach(child => child.HoverDraw = OnHover);
-        //lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
+        lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
         return true;
     }
 
