@@ -34,8 +34,8 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
-    void SetPreRenderAction(Action<Canvas2DContext> action);
-    void SetPostRenderAction(Action<Canvas2DContext> action);
+    void SetPreRenderAction(Func<Canvas2DContext,Task> action);
+    void SetPostRenderAction(Func<Canvas2DContext,Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     V AddShape<V>(V shape) where V : FoGlyph2D;
@@ -63,8 +63,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
 
-    public Action<Canvas2DContext>? PreRender { get; set; }
-    public Action<Canvas2DContext>? PostRender { get; set; }
+    public Func<Canvas2DContext,Task>? PreRender { get; set; }
+    public Func<Canvas2DContext,Task>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
     private IScaledDrawing ScaleDrawing { get; set; }
     private IHitTestService HitTestService { get; set; }
@@ -186,11 +186,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
-    public void SetPreRenderAction(Action<Canvas2DContext> action)
+    public void SetPreRenderAction(Func<Canvas2DContext,Task> action)
     {
         PreRender = action;
     }
-    public void SetPostRenderAction(Action<Canvas2DContext> action)
+    public void SetPostRenderAction(Func<Canvas2DContext,Task> action)
     {
         PostRender = action;
     }
@@ -464,12 +464,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ScaleDrawing.ClearCanvas(ctx);
 
         await ctx.SaveAsync();
-        PreRender?.Invoke(ctx);
 
         var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
 
+        if ( PreRender != null)
+            await PreRender.Invoke(ctx);
+
         await PageManager.RenderDetailed(ctx, tick, true);
-        PostRender?.Invoke(ctx);
+
+        if ( PostRender != null)
+            await PostRender.Invoke(ctx);
 
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
