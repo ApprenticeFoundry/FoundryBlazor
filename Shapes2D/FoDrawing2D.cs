@@ -34,7 +34,8 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
-
+    void SetPreRenderAction(Action<Canvas2DContext> action);
+    void SetPostRenderAction(Action<Canvas2DContext> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     V AddShape<V>(V shape) where V : FoGlyph2D;
@@ -81,6 +82,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
     protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
     private IBaseInteraction? lastInteraction;
+
+
 
 
     //private readonly Stopwatch stopwatch = new();
@@ -183,6 +186,14 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
+    public void SetPreRenderAction(Action<Canvas2DContext> action)
+    {
+        PreRender = action;
+    }
+    public void SetPostRenderAction(Action<Canvas2DContext> action)
+    {
+        PostRender = action;
+    }
     public void AddInteraction(InteractionStyle style, BaseInteraction interaction)
     {
         interactionLookup.Add(style, interaction);
