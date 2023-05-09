@@ -169,7 +169,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public void StartHub()
     {
         Command.StartHub();
-        var defaultHubURI = Command.GetServerUri().ToString();
+        var defaultHubURI = Command.GetServerUri()?.ToString() ?? "GetServerUri Error";
         var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
         Command.SendToast(ToastType.Info, note);
     }
@@ -177,7 +177,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public void StopHub()
     {
         Command.StopHub();
-        var defaultHubURI = Command.GetServerUri().ToString();
+        var defaultHubURI = Command.GetServerUri()?.ToString() ?? "GetServerUri Error";
         var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
         Command.SendToast(ToastType.Info, note);
     }

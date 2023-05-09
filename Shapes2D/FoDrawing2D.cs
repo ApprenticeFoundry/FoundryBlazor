@@ -62,6 +62,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
 
+    public Action<Canvas2DContext>? PreRender { get; set; }
+    public Action<Canvas2DContext>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
     private IScaledDrawing ScaleDrawing { get; set; }
     private IHitTestService HitTestService { get; set; }
@@ -451,9 +453,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ScaleDrawing.ClearCanvas(ctx);
 
         await ctx.SaveAsync();
+        PreRender?.Invoke(ctx);
+
         var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
 
         await PageManager.RenderDetailed(ctx, tick, true);
+        PostRender?.Invoke(ctx);
+
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
         await ctx.RestoreAsync();

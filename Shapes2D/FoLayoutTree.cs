@@ -88,7 +88,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         return _item.GetGlyphId();
     }
 
-    public async Task RenderTree(Canvas2DContext ctx)
+    public async Task RenderLayoutTree(Canvas2DContext ctx)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
@@ -101,7 +101,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         var rect = new Rectangle(_branchULPoint, _branchSize);
         await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
 
-        _children?.ForEach(async item => await item.RenderTree(ctx));
+        _children?.ForEach(async item => await item.RenderLayoutTree(ctx));
 
         await ctx.RestoreAsync();
     }

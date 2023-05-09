@@ -169,7 +169,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return true;
     }
 
-
     private bool Circle(Scene ctx)
     {
         var box = BoundingBox ?? new FoVector3D(1, 1, 1);

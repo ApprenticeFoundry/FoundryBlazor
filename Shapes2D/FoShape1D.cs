@@ -308,9 +308,9 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         IsSelected = false;
         return true;
 
-        //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
     }
 
+        //  $"{Name} ComputeStartFor {target.Name}: {StartX}  {StartY}:  pin {PinX} {PinY}".WriteInfo();
 
 
     public bool ComputeFinishFor(FoGlyph2D? target)
