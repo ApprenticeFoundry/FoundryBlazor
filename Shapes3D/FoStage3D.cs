@@ -93,7 +93,8 @@ public class FoStage3D : FoGlyph3D, IStage
         {
             Position = new Vector3(1, 3, 0)
         });
-        EstablishBoundry();
+
+        //EstablishBoundry();
         //IsDirty = true;
 
         return scene;

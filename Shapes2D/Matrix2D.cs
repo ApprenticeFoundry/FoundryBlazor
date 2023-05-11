@@ -41,8 +41,7 @@ namespace FoundryBlazor.Shape;
     public static Matrix2D NewMatrix()
     {
         if (cashe.Count == 0)
-            cashe.Enqueue(new Matrix2D());
-    
+            return new Matrix2D();
 
         //$"Recycle Matrix2D {cashe.Count}".WriteInfo();
         var result = cashe.Dequeue();

@@ -751,7 +751,13 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (_matrix == null)
         {
             _matrix = Matrix2D.NewMatrix();
-            _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), LocPinX(this), LocPinY(this));
+            try {
+                _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), LocPinX(this), LocPinY(this));
+            } 
+            catch (Exception ex)
+            {
+                $"Error in GetMatrix {ex.Message}".WriteError();
+            }
         }
         return _matrix;
     }
