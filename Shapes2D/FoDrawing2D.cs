@@ -357,6 +357,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
             PanZoomShape.SizeToFit();
+            PanZoomShape.IsVisible  = false;
 
             var page = PageManager.CurrentPage();
             var pt = InchesToPixelsInset(page.PageWidth / 2, 3.0);
