@@ -54,13 +54,15 @@ public static class LayoutRules
 
 public class FoLayoutTree<V> where V : FoGlyph2D
 {
-    public int level = -1;
-    public int index = -1;
+    public int level = 0;
+    public int index = 0;
     public string path = "";
 
     private Size _branchSize = new(10, 10);
     private Point _branchULPoint = new(100, 100);
     private BoxLayoutStyle _layoutStyle = BoxLayoutStyle.None;
+    private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
+
 
     private V _item;
     private FoLayoutTree<V>? _parent;
@@ -88,20 +90,23 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         return _item.GetGlyphId();
     }
 
-    public async Task RenderLayoutTree(Canvas2DContext ctx)
+    public async Task RenderLayoutTree(Canvas2DContext ctx, int tick)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
         await ctx.SaveAsync();
 
+
+        
         await ctx.SetLineWidthAsync(4);
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
-        await ctx.SetStrokeStyleAsync("Red");
+        await ctx.SetStrokeStyleAsync(Colors[level]);
 
         var rect = new Rectangle(_branchULPoint, _branchSize);
+        rect.Inflate(5 * level, 5 * level);
         await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
 
-        _children?.ForEach(async item => await item.RenderLayoutTree(ctx));
+        _children?.ForEach(async item => await item.RenderLayoutTree(ctx,tick));
 
         await ctx.RestoreAsync();
     }
@@ -359,6 +364,13 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     }
 
+    private static Point Relocate(Point pt, V shape)
+    {
+                //return new Point(pt.X, pt.Y);
+        //return new Point(pt.X , pt.Y + shape.LocPinY(shape));
+        return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
+    }
+
     public void ComputeNodeBranchLocation(Point pt, Point margin, List<BoxLayoutStyle>? styleList = null)
     {
         if (!_item.IsVisible) return;
@@ -384,8 +396,10 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         int topEdgeY = 0;
 
         var shape = GetShape();
+        var loc = FoLayoutTree<V>.Relocate(pt, shape);
 
         float delay = (float)((level + index / 10.0) / 2.0);
+
         if (_layoutStyle == BoxLayoutStyle.Horizontal)
         {
             //assume that for horizontal the Pt is center top
@@ -393,8 +407,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             halfWidth = _branchSize.Width / 2;
             stepX = pt.X - halfWidth;
             _branchULPoint = new Point(stepX, pt.Y);
-            // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
-            shape.MoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
+            shape.MoveTo(loc.X - shape.LocPinX(shape), loc.Y);
         }
         else if (_layoutStyle == BoxLayoutStyle.Vertical)
         {
@@ -403,8 +416,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             halfHeight = _branchSize.Height / 2;
             stepY = pt.Y - halfHeight;
             _branchULPoint = new Point(pt.X, stepY);
-            // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
-            shape.MoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
+            shape.MoveTo(loc.X, loc.Y- shape.LocPinY(shape));
         }
         else if (_layoutStyle == BoxLayoutStyle.HorizontalStacked)
         {
@@ -415,8 +427,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             stepX = pt.X - halfWidth;
             stepY = pt.Y + margin.Y;
             _branchULPoint = new Point(stepX, pt.Y);
-            // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
-            shape.MoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
+            shape.MoveTo(loc.X - shape.LocPinX(shape), loc.Y);
         }
         else if (_layoutStyle == BoxLayoutStyle.VerticalStacked)
         {
@@ -427,10 +438,11 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             stepX = pt.X + margin.X;
             stepY = pt.Y - halfHeight;
             _branchULPoint = new Point(pt.X, stepY);
-            // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
-            shape.MoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
+            shape.MoveTo(loc.X, loc.Y- shape.LocPinY(shape));
         }
 
+        // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
+       
 
         _children?.ForEach(child =>
         {
