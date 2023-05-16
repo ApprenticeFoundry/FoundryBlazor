@@ -280,6 +280,15 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return this;
     }
 
+    public Tween AnimatedMoveFrom(int xStart, int yStart, float duration = 2.0F, float delay = 0)
+    {
+        var x = PinX;
+        var y = PinY;
+        PinX = xStart;
+        PinY = yStart;
+        return Animations.Tween(this, new { PinX = x, PinY = y }, duration, delay).Ease(Ease.ElasticInOut);
+    }
+
     public Tween AnimatedMoveTo(int x, int y, float duration = 2.0F, float delay = 0)
     {
         return Animations.Tween(this, new { PinX = x, PinY = y }, duration, delay).Ease(Ease.ElasticInOut);
