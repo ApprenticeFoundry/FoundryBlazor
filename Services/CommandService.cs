@@ -314,9 +314,12 @@ public class CommandService : ICommand
         if (result is not FoGlyph2D newShape) return false;
 
         $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
-        GetDrawing().AddShape<FoGlyph2D>(newShape);
+
+        var drawing = GetDrawing();
+        drawing.AddShape<FoGlyph2D>(newShape);
 
         $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
+        $"Must match {newShape.GetGlyphId()} <=> {create.TargetId} ".WriteSuccess();
 
         return true;
     }
@@ -334,8 +337,10 @@ public class CommandService : ICommand
 
     public bool UpdateGlue(D2D_Glue glue)
     {
-        var target = Pages().FindShapes(glue.TargetId).FirstOrDefault();
-        var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
+        var pages = Pages();
+        $"Glue target {glue.TargetId} target {glue.SourceId}  {glue.Name}".WriteInfo();
+        var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
+        var source = pages.FindShapes(glue.SourceId).FirstOrDefault();
 
         if (target != null && source is IGlueOwner owner)
         {

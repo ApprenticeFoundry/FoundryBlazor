@@ -189,9 +189,9 @@ public class FoArena3D : FoGlyph3D, IArena
             var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
             shape.Position = new FoVector3D()
             {
-                X = data.GenerateDouble(-20, 20),
-                Y = data.GenerateDouble(-20, 20),
-                Z = data.GenerateDouble(-20, 20),
+                X = data.GenerateDouble(-10, 10),
+                Y = data.GenerateDouble(-10, 10),
+                Z = data.GenerateDouble(-10, 10),
             };
             shape.Rotation = new FoVector3D()
             {
@@ -199,6 +199,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 Y = data.GenerateDouble(0, 360),
                 Z = data.GenerateDouble(0, 360),
             };
+            $"key={key} position={shape.Position} rotation={shape.Rotation}".WriteInfo();
         }
 
 

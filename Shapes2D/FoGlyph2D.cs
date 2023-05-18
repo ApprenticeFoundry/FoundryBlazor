@@ -153,6 +153,13 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return GlyphId;
     }
 
+    public bool GlyphIdCompare(string other)
+    {
+        var id = GetGlyphId();
+        var result = id == other;
+        $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        return result;
+    }
 
     public Point ParentAttachTo(Point source)
     {
@@ -686,7 +693,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public List<T>? FindGlyph<T>(string GlyphId) where T : FoGlyph2D
     {
-        var list = FindWhere<T>(child => child.GlyphId == GlyphId);
+        var list = FindWhere<T>(child => child.GlyphIdCompare(GlyphId));
         return list;
     }
     //public List<T>? CaptureSelected<T>(FoGlyph2D source) where T : FoGlyph2D

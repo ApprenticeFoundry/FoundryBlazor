@@ -1,3 +1,4 @@
+using FoundryBlazor.Extensions;
 using Newtonsoft.Json.Linq;
 
 namespace FoundryBlazor;
@@ -132,7 +133,12 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     }
     public List<T> FindWhere(Func<T,bool> whereClause)
     {
-        var extraction = Values().Where(item => whereClause(item)).ToList();
+        var list = Values();
+        var extraction = list.Where(item => whereClause(item)).ToList();
+        foreach (var item in list)
+        {
+            $"FindWhere {item.Name} whereClause = {whereClause(item)}".WriteInfo();
+        }
         return extraction;
     }
     public void Clear()
