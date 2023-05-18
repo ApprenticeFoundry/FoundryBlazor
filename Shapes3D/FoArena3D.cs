@@ -1,4 +1,5 @@
 using BlazorComponentBus;
+using BlazorThreeJS.Enums;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Canvas;
@@ -189,9 +190,9 @@ public class FoArena3D : FoGlyph3D, IArena
             var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
             shape.Position = new FoVector3D()
             {
-                X = data.GenerateDouble(-10, 10),
-                Y = data.GenerateDouble(-10, 10),
-                Z = data.GenerateDouble(-10, 10),
+                X = data.GenerateDouble(-5, 5),
+                Y = data.GenerateDouble(-5, 5),
+                Z = data.GenerateDouble(-5, 5),
             };
             shape.Rotation = new FoVector3D()
             {
@@ -199,7 +200,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 Y = data.GenerateDouble(0, 360),
                 Z = data.GenerateDouble(0, 360),
             };
-            $"key={key} position={shape.Position} rotation={shape.Rotation}".WriteInfo();
+            $"key={key} position={shape.Position.X}, {shape.Position.Y} rotation={shape.Rotation}".WriteInfo();
         }
 
 
@@ -337,14 +338,30 @@ public class FoArena3D : FoGlyph3D, IArena
         //var scene = CurrentStage().GetScene();
         //$"scene={scene}".WriteInfo();
 
+        var platformBodies = platform.Bodies();
 
-        platform.Bodies()?.ForEach(body =>
+        if (platformBodies == null)
+        {
+            return;
+        }
+
+        var glbBodies = platformBodies.Where((body) => body.Type.Matches("Glb")).ToList();
+
+        var bodyDict = glbBodies
+            .GroupBy(item => item.Symbol)
+            .ToDictionary(group => group.Key, group => group.ToList());
+
+        foreach (var keyValuePair in bodyDict)
+        {
+            FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
+        }
+
+        platformBodies.ForEach(body =>
         {
             $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            body.PreRender(this, Viewer3D!);
+            if (!body.Type.Matches("glb")) body.PreRender(this, Viewer3D!);
         });
+
     }
-
-
 
 }

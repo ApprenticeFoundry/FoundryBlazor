@@ -339,8 +339,55 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         //Task.Run(async () =>
         //{
-            viewer.Request3DModel(settings);
-            arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
+        viewer.Request3DModel(settings);
+        arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
+        //});
+        return true;
+    }
+
+    public static bool PreRenderClones(List<FoShape3D> bodies, FoArena3D arena, Viewer viewer, Import3DFormats format)
+    {
+        var settings = new List<ImportSettings>();
+
+        foreach (var body in bodies)
+        {
+            body.LoadingURL = body.Symbol;
+            var setting = new ImportSettings
+            {
+                Uuid = Guid.NewGuid(),
+                Format = format,
+                FileURL = body.LoadingURL,
+                Position = body.Position?.AsVector3() ?? new Vector3(),
+                Rotation = body.Rotation?.AsEuler() ?? new Euler(),
+                OnComplete = (Scene scene, Object3D object3D) =>
+                {
+                    $"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={body.LoadingURL}, position.x={body.Position?.X}".WriteInfo();
+                    if (object3D != null) body.ShapeObject3D = object3D;
+                    else "Unexpected empty object3D".WriteError(1);
+                }
+            };
+            arena.Add<FoShape3D>(setting.Uuid.ToString(), body);
+            settings.Add(setting);
+        }
+
+        var source = settings.ElementAt(0);
+        settings.RemoveAt(0);
+
+        var sourceBody = bodies.ElementAt(0);
+        bodies.RemoveAt(0);
+        source.OnComplete = async (Scene scene, Object3D object3D) =>
+                {
+                    if (object3D != null)
+                    {
+                        sourceBody.ShapeObject3D = object3D;
+                        await viewer.Clone3DModel(object3D.Uuid, settings);
+                    }
+                    else "Unexpected empty object3D".WriteError(1);
+                };
+
+        //Task.Run(async () =>
+        //{
+        viewer.Request3DModel(source);
         //});
         return true;
     }
