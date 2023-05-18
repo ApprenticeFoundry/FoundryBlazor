@@ -337,11 +337,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
             }
         };
 
-        Task.Run(async () =>
-        {
-            await viewer.Request3DModel(settings);
+        //Task.Run(async () =>
+        //{
+            viewer.Request3DModel(settings);
             arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
-        });
+        //});
         return true;
     }
 
