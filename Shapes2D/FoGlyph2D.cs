@@ -157,7 +157,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         var id = GetGlyphId();
         var result = id == other;
-        $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+       // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
         return result;
     }
 

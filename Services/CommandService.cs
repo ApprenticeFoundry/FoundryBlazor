@@ -339,6 +339,7 @@ public class CommandService : ICommand
     {
         var pages = Pages();
         $"Glue target {glue.TargetId} target {glue.SourceId}  {glue.Name}".WriteInfo();
+        var body = pages.FindShapes(glue.BodyId).FirstOrDefault();
         var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
         var source = pages.FindShapes(glue.SourceId).FirstOrDefault();
 
@@ -346,7 +347,7 @@ public class CommandService : ICommand
         {
             $"UpdateGlue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
             var glueObj = new FoGlue2D(glue.Name);
-            glueObj.GlueTo(owner, target);
+            glueObj.GlueTo(owner, target, body);
 
             return true;
         }
