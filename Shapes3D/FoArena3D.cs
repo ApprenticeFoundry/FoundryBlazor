@@ -185,7 +185,8 @@ public class FoArena3D : FoGlyph3D, IArena
 
         for (int i = 0; i < count; i++)
         {
-            var shape = platform.CreateUsing<FoShape3D>(name).CreateGlb(url, 1, 2, 3);
+            var key = $"{name}-{i}";
+            var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
             shape.Position = new FoVector3D()
             {
                 X = data.GenerateDouble(-20, 20),
