@@ -168,11 +168,13 @@ public class FoPage2D : FoGlyph2D
     {
         var result = new List<FoGlyph2D>();
 
-        var found = Shapes1D.FindWhere(child => child.GlyphId == GlyphId);
-        if (found != null) result.AddRange(found);
+        var found = Shapes1D.FindWhere(child => child.GlyphIdCompare(GlyphId));
+        if (found != null && found.Count > 0) 
+            result.AddRange(found);
 
-        found = Shapes2D.FindWhere(child => child.GlyphId == GlyphId);
-        if (found != null) result.AddRange(found);
+        found = Shapes2D.FindWhere(child => child.GlyphIdCompare(GlyphId));
+        if (found != null && found.Count > 0)
+            result.AddRange(found);
 
         return result;
     }

@@ -200,7 +200,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         GetMembers<FoGlue2D>()?.ForEach(glue =>
         {
-            var (source, target) = glue;
+            var (source, target, body) = glue;
             if (source == this && target != null)
             {
                 var found = glue.Name[..3] switch
@@ -282,7 +282,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
 
         var glue = new FoGlue2D($"START_{part.Name}_{gluecount++}");
-        glue.GlueTo(this, part);
+        glue.GlueTo(this, part, target);
         Smash(false);
         return glue;
     }
@@ -293,7 +293,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
 
         var glue = new FoGlue2D($"FINISH_{part.Name}_{gluecount++}");
-        glue.GlueTo(this, part);
+        glue.GlueTo(this, part, target);
         Smash(false);
         return glue;
     }

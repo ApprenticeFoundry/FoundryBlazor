@@ -1,4 +1,5 @@
 using BlazorComponentBus;
+using BlazorThreeJS.Enums;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Canvas;
@@ -25,8 +26,8 @@ public interface IArena
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
+    FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL);
-
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 }
 public class FoArena3D : FoGlyph3D, IArena
@@ -167,6 +168,49 @@ public class FoArena3D : FoGlyph3D, IArena
         return platform;
     }
 
+
+    public FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    {
+        var name = Path.GetFileNameWithoutExtension(filename);
+        var platform = new FoGroup3D()
+        {
+            GlyphId = Guid.NewGuid().ToString(),
+            PlatformName = folder,
+            Name = name
+        };
+        platform.EstablishBox("Platform", 1, 1, 1);
+
+
+        var data = new MockDataMaker();
+        var url = Path.Join(baseURL, folder, filename);
+
+        for (int i = 0; i < count; i++)
+        {
+            var key = $"{name}-{i}";
+            var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
+            shape.Position = new FoVector3D()
+            {
+                X = data.GenerateDouble(-5, 5),
+                Y = data.GenerateDouble(-5, 5),
+                Z = data.GenerateDouble(-5, 5),
+            };
+            shape.Rotation = new FoVector3D()
+            {
+                X = data.GenerateDouble(0, 360),
+                Y = data.GenerateDouble(0, 360),
+                Z = data.GenerateDouble(0, 360),
+            };
+            $"key={key} position={shape.Position.X}, {shape.Position.Y} rotation={shape.Rotation}".WriteInfo();
+        }
+
+
+        PreRenderPlatform(platform);
+        RenderPlatformToScene(platform);
+        //PostRenderplatform
+
+        return platform;
+    }
+
     public FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
@@ -294,14 +338,30 @@ public class FoArena3D : FoGlyph3D, IArena
         //var scene = CurrentStage().GetScene();
         //$"scene={scene}".WriteInfo();
 
+        var platformBodies = platform.Bodies();
 
-        platform.Bodies()?.ForEach(body =>
+        if (platformBodies == null)
+        {
+            return;
+        }
+
+        var glbBodies = platformBodies.Where((body) => body.Type.Matches("Glb")).ToList();
+
+        var bodyDict = glbBodies
+            .GroupBy(item => item.Symbol)
+            .ToDictionary(group => group.Key, group => group.ToList());
+
+        foreach (var keyValuePair in bodyDict)
+        {
+            FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
+        }
+
+        platformBodies.ForEach(body =>
         {
             $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            body.PreRender(this, Viewer3D!);
+            if (!body.Type.Matches("glb")) body.PreRender(this, Viewer3D!);
         });
+
     }
-
-
 
 }

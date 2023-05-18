@@ -153,6 +153,13 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return GlyphId;
     }
 
+    public bool GlyphIdCompare(string other)
+    {
+        var id = GetGlyphId();
+        var result = id == other;
+       // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        return result;
+    }
 
     public Point ParentAttachTo(Point source)
     {
@@ -278,6 +285,15 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         PinX += LocPinX(this) - dx;
         PinY += LocPinY(this) - dy;
         return this;
+    }
+
+    public Tween AnimatedMoveFrom(int xStart, int yStart, float duration = 2.0F, float delay = 0)
+    {
+        var x = PinX;
+        var y = PinY;
+        PinX = xStart;
+        PinY = yStart;
+        return Animations.Tween(this, new { PinX = x, PinY = y }, duration, delay).Ease(Ease.ElasticInOut);
     }
 
     public Tween AnimatedMoveTo(int x, int y, float duration = 2.0F, float delay = 0)
@@ -677,7 +693,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public List<T>? FindGlyph<T>(string GlyphId) where T : FoGlyph2D
     {
-        var list = FindWhere<T>(child => child.GlyphId == GlyphId);
+        var list = FindWhere<T>(child => child.GlyphIdCompare(GlyphId));
         return list;
     }
     //public List<T>? CaptureSelected<T>(FoGlyph2D source) where T : FoGlyph2D
