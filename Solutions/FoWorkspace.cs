@@ -403,6 +403,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         space.EstablishCommand<FoCommand2D,FoButton2D>("CMD", new Dictionary<string, Action>()
         {
             { "Ping", () => DoPing()},
+                        { "Clear", () => DoClear()},
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
             // { "1:1", () => PanZoom.Reset()},
@@ -424,6 +425,11 @@ public class FoWorkspace : FoComponent, IWorkspace
     public void DoPing()
     {
         Command.SendToast(ToastType.Info, "Ping");
+    }
+
+    public void DoClear()
+    {
+        GetDrawing()?.ClearAll();
     }
 
     public ViewStyle GetViewStyle()

@@ -25,8 +25,8 @@ public interface IArena
 
     FoStage3D CurrentStage();
     FoGroup3D MakeAndRenderTestPlatform();
+    FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL);
-
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 }
 public class FoArena3D : FoGlyph3D, IArena
@@ -163,6 +163,47 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             await UpdateArena();
         });
+
+        return platform;
+    }
+
+
+    public FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    {
+        var name = Path.GetFileNameWithoutExtension(filename);
+        var platform = new FoGroup3D()
+        {
+            GlyphId = Guid.NewGuid().ToString(),
+            PlatformName = folder,
+            Name = name
+        };
+        platform.EstablishBox("Platform", 1, 1, 1);
+
+
+        var data = new MockDataMaker();
+        var url = Path.Join(baseURL, folder, filename);
+
+        for (int i = 0; i < count; i++)
+        {
+            var shape = platform.CreateUsing<FoShape3D>(name).CreateGlb(url, 1, 2, 3);
+            shape.Position = new FoVector3D()
+            {
+                X = data.GenerateDouble(-20, 20),
+                Y = data.GenerateDouble(-20, 20),
+                Z = data.GenerateDouble(-20, 20),
+            };
+            shape.Rotation = new FoVector3D()
+            {
+                X = data.GenerateDouble(0, 360),
+                Y = data.GenerateDouble(0, 360),
+                Z = data.GenerateDouble(0, 360),
+            };
+        }
+
+
+        PreRenderPlatform(platform);
+        RenderPlatformToScene(platform);
+        //PostRenderplatform
 
         return platform;
     }
