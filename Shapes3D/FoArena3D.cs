@@ -341,11 +341,10 @@ public class FoArena3D : FoGlyph3D, IArena
         var platformBodies = platform.Bodies();
 
         if (platformBodies == null)
-        {
             return;
-        }
 
         var glbBodies = platformBodies.Where((body) => body.Type.Matches("Glb")).ToList();
+        var otherBodies = platformBodies.Where((body) => !body.Type.Matches("Glb")).ToList();
 
         var bodyDict = glbBodies
             .GroupBy(item => item.Symbol)
@@ -356,11 +355,11 @@ public class FoArena3D : FoGlyph3D, IArena
             FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
         }
 
-        platformBodies.ForEach(body =>
+        foreach (var body in otherBodies)
         {
             $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            if (!body.Type.Matches("glb")) body.PreRender(this, Viewer3D!);
-        });
+            body.PreRender(this, Viewer3D!);
+        };
 
     }
 
