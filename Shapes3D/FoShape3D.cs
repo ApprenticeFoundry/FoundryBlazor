@@ -330,8 +330,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = Rotation?.AsEuler() ?? new Euler(),
             OnComplete = async (Scene scene, Object3D object3D) =>
             {
-                if (object3D != null) ShapeObject3D = object3D;
-                else "Unexpected empty object3D".WriteError(1);
+                if (object3D != null) 
+                    ShapeObject3D = object3D;
+                else 
+                    "Unexpected empty object3D".WriteError(1);
 
                 if (LoadingGUID != null) await viewer.RemoveByUuidAsync((Guid)(LoadingGUID));
             }
@@ -345,28 +347,38 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return true;
     }
 
+    public ImportSettings AsImportSettings(Import3DFormats format)
+    {
+        LoadingURL = Symbol;
+        
+        var setting = new ImportSettings
+        {
+            Uuid = Guid.NewGuid(),
+            Format = format,
+            FileURL = LoadingURL,
+            Position = Position?.AsVector3() ?? new Vector3(),
+            Rotation = Rotation?.AsEuler() ?? new Euler(),
+            OnComplete = (Scene scene, Object3D object3D) =>
+            {
+                //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
+                if (object3D != null) 
+                    ShapeObject3D = object3D;
+                else
+                    "Unexpected empty object3D".WriteError(1);
+            }
+        };  
+        GlyphId = setting.Uuid.ToString();
+        return setting;     
+    }
+
     public static bool PreRenderClones(List<FoShape3D> bodies, FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
         var settings = new List<ImportSettings>();
 
         foreach (var body in bodies)
         {
-            body.LoadingURL = body.Symbol;
-            var setting = new ImportSettings
-            {
-                Uuid = Guid.NewGuid(),
-                Format = format,
-                FileURL = body.LoadingURL,
-                Position = body.Position?.AsVector3() ?? new Vector3(),
-                Rotation = body.Rotation?.AsEuler() ?? new Euler(),
-                OnComplete = (Scene scene, Object3D object3D) =>
-                {
-                    $"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={body.LoadingURL}, position.x={body.Position?.X}".WriteInfo();
-                    if (object3D != null) body.ShapeObject3D = object3D;
-                    else "Unexpected empty object3D".WriteError(1);
-                }
-            };
-            arena.Add<FoShape3D>(setting.Uuid.ToString(), body);
+            var setting = body.AsImportSettings(format);
+            arena.Add<FoShape3D>(body.GetGlyphId(), body);
             settings.Add(setting);
         }
 
@@ -375,20 +387,19 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         var sourceBody = bodies.ElementAt(0);
         bodies.RemoveAt(0);
-        source.OnComplete = async (Scene scene, Object3D object3D) =>
-                {
-                    if (object3D != null)
-                    {
-                        sourceBody.ShapeObject3D = object3D;
-                        await viewer.Clone3DModel(object3D.Uuid, settings);
-                    }
-                    else "Unexpected empty object3D".WriteError(1);
-                };
 
-        //Task.Run(async () =>
-        //{
+        source.OnComplete = async (Scene scene, Object3D object3D) =>
+        {
+            if (object3D != null)
+            {
+                sourceBody.ShapeObject3D = object3D;
+                await viewer.Clone3DModel(object3D.Uuid, settings);
+            }
+            else 
+                "Unexpected empty object3D".WriteError(1);
+        };
+
         viewer.Request3DModel(source);
-        //});
         return true;
     }
 

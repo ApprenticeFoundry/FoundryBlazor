@@ -305,7 +305,7 @@ public class CommandService : ICommand
 
     public bool UpdateCreate(D2D_Create create)
     {
-        $"Create {create.PayloadType} {create.Payload}".WriteNote();
+       // $"Create {create.PayloadType} {create.Payload}".WriteNote();
 
         var type = StorageHelpers.LookupType(create.PayloadType);
         if (type == null) return false;
@@ -313,13 +313,13 @@ public class CommandService : ICommand
         var result = StorageHelpers.HydrateObject(type, create.Payload);
         if (result is not FoGlyph2D newShape) return false;
 
-        $"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
+        //$"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
 
         var drawing = GetDrawing();
         drawing.AddShape<FoGlyph2D>(newShape);
 
-        $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
-        $"Must match {newShape.GetGlyphId()} <=> {create.TargetId} ".WriteSuccess();
+       // $"UpdateCreate {create.TargetId} {create.PayloadType} {create.UserID}".WriteSuccess();
+       // $"Must match {newShape.GetGlyphId()} <=> {create.TargetId} ".WriteSuccess();
 
         return true;
     }
@@ -330,7 +330,7 @@ public class CommandService : ICommand
 
         shapes?.ForEach(item => item.MoveTo(move.PinX, move.PinY));
         shapes?.ForEach(item => item.RotateTo(move.Angle));
-        $"UpdateMove {move.TargetId} {move.PayloadType} {move.UserID}".WriteSuccess();
+       // $"UpdateMove {move.TargetId} {move.PayloadType} {move.UserID}".WriteSuccess();
 
         return shapes != null;
     }
@@ -338,16 +338,27 @@ public class CommandService : ICommand
     public bool UpdateGlue(D2D_Glue glue)
     {
         var pages = Pages();
-        $"Glue target {glue.TargetId} target {glue.SourceId}  {glue.Name}".WriteInfo();
+        //$"Glue target {glue.TargetId} target {glue.SourceId}  {glue.Name}".WriteInfo();
+
         var body = pages.FindShapes(glue.BodyId).FirstOrDefault();
-        var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
+        //var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
         var source = pages.FindShapes(glue.SourceId).FirstOrDefault();
 
-        if (target != null && source is IGlueOwner owner)
+        if (body != null && source is IGlueOwner owner)
         {
             $"UpdateGlue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
+            var child = glue.Name.Split("_")[1];
+
             var glueObj = new FoGlue2D(glue.Name);
-            glueObj.GlueTo(owner, target, body);
+            if ( child.Matches("CENTER") ) 
+            {
+                glueObj.GlueTo(owner, body, body);
+            } 
+            else 
+            {
+                var target = body.FindConnectionPoint(child, true) ?? body;
+                glueObj.GlueTo(owner, target, body);
+            }
 
             return true;
         }
@@ -356,7 +367,7 @@ public class CommandService : ICommand
     }
     public bool UpdateUnglue(D2D_Unglue glue)
     {
-        $"UpdateUnglue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
+        //$"UpdateUnglue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
 
         var source = Pages().FindShapes(glue.SourceId).FirstOrDefault();
         if (source is IGlueOwner owner)
@@ -371,7 +382,7 @@ public class CommandService : ICommand
     public bool UpdateDestroy(D2D_Destroy destroy)
     {
         var shapes = Pages().ExtractShapes(destroy.TargetId);
-        $"UpdateDestroy {destroy.TargetId} {destroy.PayloadType} {destroy.UserID}".WriteSuccess();
+        //$"UpdateDestroy {destroy.TargetId} {destroy.PayloadType} {destroy.UserID}".WriteSuccess();
         return shapes != null;
     }
 

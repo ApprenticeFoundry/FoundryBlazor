@@ -279,9 +279,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public FoGlue2D? GlueStartTo(FoGlyph2D? target, string child="")
     {
         if (target == null) return null;
-        var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
 
-        var glue = new FoGlue2D($"START_{part.Name}_{gluecount++}");
+        var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
+        var name = part != target ? $"START_{part.Name}_{gluecount++}" : $"START_CENTER_{gluecount++}";
+
+        var glue = new FoGlue2D(name);
         glue.GlueTo(this, part, target);
         Smash(false);
         return glue;
@@ -290,9 +292,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public FoGlue2D? GlueFinishTo(FoGlyph2D? target, string child="")
     {
         if (target == null) return null;
+        
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
+        var name = part != target ? $"FINISH_{part.Name}_{gluecount++}" : $"FINISH_CENTER_{gluecount++}";
 
-        var glue = new FoGlue2D($"FINISH_{part.Name}_{gluecount++}");
+        var glue = new FoGlue2D(name);
         glue.GlueTo(this, part, target);
         Smash(false);
         return glue;
