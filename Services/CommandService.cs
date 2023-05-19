@@ -339,15 +339,26 @@ public class CommandService : ICommand
     {
         var pages = Pages();
         $"Glue target {glue.TargetId} target {glue.SourceId}  {glue.Name}".WriteInfo();
+
         var body = pages.FindShapes(glue.BodyId).FirstOrDefault();
-        var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
+        //var target = pages.FindShapes(glue.TargetId).FirstOrDefault();
         var source = pages.FindShapes(glue.SourceId).FirstOrDefault();
 
-        if (target != null && source is IGlueOwner owner)
+        if (body != null && source is IGlueOwner owner)
         {
             $"UpdateGlue {glue.TargetId} {glue.SourceId} {glue.PayloadType} {glue.UserID} - {glue.Name}".WriteSuccess();
+            var child = glue.Name.Split("_")[1];
+
             var glueObj = new FoGlue2D(glue.Name);
-            glueObj.GlueTo(owner, target, body);
+            if ( child.Matches("CENTER") ) 
+            {
+                glueObj.GlueTo(owner, body, body);
+            } 
+            else 
+            {
+                var target = body.FindConnectionPoint(child, true) ?? body;
+                glueObj.GlueTo(owner, target, body);
+            }
 
             return true;
         }
