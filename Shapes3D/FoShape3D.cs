@@ -330,8 +330,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = Rotation?.AsEuler() ?? new Euler(),
             OnComplete = async (Scene scene, Object3D object3D) =>
             {
-                if (object3D != null) ShapeObject3D = object3D;
-                else "Unexpected empty object3D".WriteError(1);
+                if (object3D != null) 
+                    ShapeObject3D = object3D;
+                else 
+                    "Unexpected empty object3D".WriteError(1);
 
                 if (LoadingGUID != null) await viewer.RemoveByUuidAsync((Guid)(LoadingGUID));
             }
@@ -358,7 +360,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = Rotation?.AsEuler() ?? new Euler(),
             OnComplete = (Scene scene, Object3D object3D) =>
             {
-                $"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
+                //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
                 if (object3D != null) 
                     ShapeObject3D = object3D;
                 else
