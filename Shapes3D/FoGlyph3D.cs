@@ -30,6 +30,22 @@ public class FoGlyph3D : FoComponent
         Color = color;
     }
 
+    public string GetGlyphId()
+    {
+        if (string.IsNullOrEmpty(GlyphId))
+            GlyphId = Guid.NewGuid().ToString();
+
+        return GlyphId;
+    }
+
+    public bool GlyphIdCompare(string other)
+    {
+        var id = GetGlyphId();
+        var result = id == other;
+       // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        return result;
+    }
+    
     public FoGlyph3D SetBoundry(int width, int height, int depth)
     {
         (Width, Height, Depth) = (width, height, depth);
