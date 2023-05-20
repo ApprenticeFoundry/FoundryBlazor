@@ -318,32 +318,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
+        var settings = AsImportSettings(format);
+        
         if (string.IsNullOrEmpty(LoadingURL)) return false;
         $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
 
-        var settings = new ImportSettings
-        {
-            Uuid = Guid.NewGuid(),
-            Format = format,
-            FileURL = LoadingURL,
-            Position = Position?.AsVector3() ?? new Vector3(),
-            Rotation = Rotation?.AsEuler() ?? new Euler(),
-            OnComplete = async (Scene scene, Object3D object3D) =>
-            {
-                if (object3D != null) 
-                    ShapeObject3D = object3D;
-                else 
-                    "Unexpected empty object3D".WriteError(1);
-
-                if (LoadingGUID != null) await viewer.RemoveByUuidAsync((Guid)(LoadingGUID));
-            }
-        };
-
-        //Task.Run(async () =>
-        //{
         viewer.Request3DModel(settings);
         arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
-        //});
         return true;
     }
 
