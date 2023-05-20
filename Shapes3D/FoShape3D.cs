@@ -393,7 +393,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
             if (object3D != null)
             {
                 sourceBody.ShapeObject3D = object3D;
-                await viewer.Clone3DModel(object3D.Uuid, settings);
+                if (settings.Count > 0 )
+                    await viewer.Clone3DModel(object3D.Uuid, settings);
             }
             else 
                 "Unexpected empty object3D".WriteError(1);

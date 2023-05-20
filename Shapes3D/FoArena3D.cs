@@ -281,7 +281,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public void RenderPlatformToScene(FoGroup3D? platform)
     {
 
-        $"RenderPlatformToScene PlatformName= {platform?.PlatformName}".WriteInfo();
+        //$"RenderPlatformToScene PlatformName= {platform?.PlatformName}".WriteInfo();
 
         $"platform = {platform}".WriteInfo();
         if (platform == null || Scene == null)
@@ -290,23 +290,23 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        $"RenderPlatformToScene Bodies() {platform.Bodies()?.Count}  Labels() {platform.Labels()?.Count}  ".WriteSuccess();
+        //$"RenderPlatformToScene Bodies() {platform.Bodies()?.Count}  Labels() {platform.Labels()?.Count}  ".WriteSuccess();
 
         platform.Bodies()?.ForEach(body =>
         {
-            $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
+           // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
         });
 
         platform.Labels()?.ForEach(label =>
         {
-            $"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
+            //$"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
             label.Render(Scene, 0, 0);
         });
 
         platform.Datums()?.ForEach(datum =>
         {
-            $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+           // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
             datum.Render(Scene, 0, 0);
         });
 

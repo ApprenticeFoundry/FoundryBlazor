@@ -662,7 +662,6 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public Action<Canvas2DContext, FoGlyph2D> DrawCircle = async (ctx, obj) =>
     {
         await ctx.BeginPathAsync();
-        //await ctx.ArcAsync(obj.X, obj.Y, obj.Width, 0*Math.PI,2*Math.PI);
         await ctx.ArcAsync(obj.Width / 2, obj.Height / 2, obj.Width / 3, 0 * Math.PI, 2 * Math.PI);
         await ctx.FillAsync();
         await ctx.StrokeAsync();
