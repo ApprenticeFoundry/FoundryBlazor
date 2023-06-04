@@ -1,4 +1,5 @@
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Extensions;
 using System.Drawing;
 
 // https://happycoding.io/tutorials/processing/collision-detection
@@ -24,9 +25,12 @@ public class QuadTree<T> where T : IHasRectangle
     public static QuadTree<T> NewQuadTree(int x, int y, int width, int height)
     {
         if (cashe.Count == 0)
-            return new QuadTree<T>(x,y,width,height);
+        {
+            $"New QuadTree {cashe.Count}".WriteInfo();
+            return new QuadTree<T>(x, y, width, height);
+        }
 
-        //$"Recycle Matrix2D {cashe.Count}".WriteInfo();
+        $"Recycle QuadTree {cashe.Count}".WriteInfo();
         var result = cashe.Dequeue();
         result.Reset(x, y, width, height);
         return result;
@@ -38,7 +42,7 @@ public class QuadTree<T> where T : IHasRectangle
 
         source.Clear();
         cashe.Enqueue(source);
-       // $"Smash Matrix2D {cashe.Count}".WriteNote();
+        $"Smash QuadTree {cashe.Count}".WriteNote();
         return null;
     }
 
