@@ -9,6 +9,8 @@ namespace FoundryBlazor.Shape;
 /// <summary>
 /// Interface to define Rect, so that QuadTree knows how to store the object.
 /// </summary>
+/// 
+
 
 
 /// <summary>
@@ -17,6 +19,29 @@ namespace FoundryBlazor.Shape;
 /// <typeparam name="T">Any object iheriting from IHasRect.</typeparam>
 public class QuadTree<T> where T : IHasRectangle
 {
+
+    private static readonly Queue<QuadTree<T>> cashe = new();
+    public static QuadTree<T> NewQuadTree(int x, int y, int width, int height)
+    {
+        if (cashe.Count == 0)
+            return new QuadTree<T>(x,y,width,height);
+
+        //$"Recycle Matrix2D {cashe.Count}".WriteInfo();
+        var result = cashe.Dequeue();
+        result.Reset(x, y, width, height);
+        return result;
+    }
+
+    public static QuadTree<T>? SmashQuadTree(QuadTree<T>? source)
+    {
+        if (source == null) return null;
+
+        source.Clear();
+        cashe.Enqueue(source);
+       // $"Smash Matrix2D {cashe.Count}".WriteNote();
+        return null;
+    }
+
     #region Constants
     // How many objects can exist in a QuadTree before it sub divides itself
     private const int MAX_OBJECTS_PER_NODE = 2;
@@ -80,6 +105,22 @@ public class QuadTree<T> where T : IHasRectangle
     {
         m_rect = new Rectangle(x, y, width, height);
     }
+    public QuadTree<T> Reset(int x, int y, int width, int height)
+    {
+        if ( m_rect == null)
+        {
+            m_rect = new Rectangle(x, y, width, height);
+        }
+        else
+        {
+            m_rect.Width = width;
+            m_rect.Height = height;
+            m_rect.Y = y;
+            m_rect.X = x;
+        }
+        return this;
+    }
+
     #endregion
 
     public async Task Render(Canvas2DContext ctx, bool members = false)
@@ -151,10 +192,10 @@ public class QuadTree<T> where T : IHasRectangle
         Point size = new(m_rect.Width / 2, m_rect.Height / 2);
         Point mid = new(m_rect.X + size.X, m_rect.Y + size.Y);
 
-        m_childTL = new QuadTree<T>(new Rectangle(m_rect.Left, m_rect.Top, size.X, size.Y));
-        m_childTR = new QuadTree<T>(new Rectangle(mid.X, m_rect.Top, size.X, size.Y));
-        m_childBL = new QuadTree<T>(new Rectangle(m_rect.Left, mid.Y, size.X, size.Y));
-        m_childBR = new QuadTree<T>(new Rectangle(mid.X, mid.Y, size.X, size.Y));
+        m_childTL = NewQuadTree(m_rect.Left, m_rect.Top, size.X, size.Y);
+        m_childTR = NewQuadTree(mid.X, m_rect.Top, size.X, size.Y);
+        m_childBL = NewQuadTree(m_rect.Left, mid.Y, size.X, size.Y);
+        m_childBR = NewQuadTree(mid.X, mid.Y, size.X, size.Y);
 
         // If they're completely contained by the quad, bump objects down
         for (int i = 0; i < m_objects?.Count; i++)
@@ -217,17 +258,13 @@ public class QuadTree<T> where T : IHasRectangle
 
 
         // Clear any objects at this level
-        if (m_objects != null)
-        {
-            m_objects.Clear();
-            m_objects = null;
-        }
+        m_objects?.Clear();
 
         // Set the children to null
-        m_childTL = null;
-        m_childTR = null;
-        m_childBL = null;
-        m_childBR = null;
+        m_childTL = SmashQuadTree(m_childTL);
+        m_childTR = SmashQuadTree(m_childTR);
+        m_childBL = SmashQuadTree(m_childBL);
+        m_childBR = SmashQuadTree(m_childBR);
     }
 
     /// <summary>
@@ -261,10 +298,10 @@ public class QuadTree<T> where T : IHasRectangle
                 m_childBL!.Count == 0 &&
                 m_childBR!.Count == 0)
             {
-                m_childTL = null;
-                m_childTR = null;
-                m_childBL = null;
-                m_childBR = null;
+                m_childTL = SmashQuadTree(m_childTL);
+                m_childTR = SmashQuadTree(m_childTR);
+                m_childBL = SmashQuadTree(m_childBL);
+                m_childBR = SmashQuadTree(m_childBR);
             }
         }
     }
