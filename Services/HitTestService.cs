@@ -100,8 +100,8 @@ public class HitTestService : IHitTestService
 
         await ctx.SetLineWidthAsync(4);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
-        await ctx.SetStrokeStyleAsync("Cyan");
-        await Tree.Render(ctx, true);
+
+        await Tree.DrawQuadTree(ctx, false);
 
         await ctx.SetLineWidthAsync(1);
         await ctx.SetLineDashAsync(Array.Empty<float>());

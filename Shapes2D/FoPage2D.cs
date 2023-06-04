@@ -164,6 +164,7 @@ public class FoPage2D : FoGlyph2D
 
     public FoPage2D ClearAll()
     {
+        FoGlyph2D.ResetHitTesting = true;
         Shapes1D.Clear();
         Shapes2D.Clear();
         return this;

@@ -264,7 +264,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
+
         CurrentPage().ClearAll();
     }
     public IPageManagement Pages()

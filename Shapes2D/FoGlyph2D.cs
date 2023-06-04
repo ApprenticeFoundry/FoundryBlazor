@@ -35,6 +35,7 @@ public enum ClickStyle
 public interface IHasRectangle
 {
     Rectangle Rect();
+    bool IsSmashed();
 }
 
 public interface IRender
@@ -246,9 +247,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public virtual Rectangle Rect()
     {
-        var pt = GetMatrix().TransformPoint(0, 0);
-        var sz = new Size(Width, Height);
-        var result = new Rectangle(pt, sz);
+        //this does not work for rotated objects
+        var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
         return result;
     }
 
@@ -746,6 +746,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
         list.ForEach(item => item.TargetMoved(this));
         return true;
+    }
+
+    public bool IsSmashed()
+    {
+        return _matrix == null;
     }
 
     public virtual bool Smash(bool force)

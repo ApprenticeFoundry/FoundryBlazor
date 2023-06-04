@@ -117,10 +117,21 @@ public class QuadTree<T> where T : IHasRectangle
         return this;
     }
 
+    public bool IsSmashed()
+    {
+        var count = m_objects?.Count(item => item.IsSmashed());
+        return count > 0;
+    }
+
     #endregion
 
-    public async Task Render(Canvas2DContext ctx, bool members = false)
+    public async Task DrawQuadTree(Canvas2DContext ctx, bool members = false)
     {
+        if ( IsSmashed() ) 
+            await ctx.SetStrokeStyleAsync("Red");
+        else
+            await ctx.SetStrokeStyleAsync("Cyan");
+
         await ctx.StrokeRectAsync(m_rect.X-3, m_rect.Y-3, m_rect.Width+6, m_rect.Height+6);
 
         if ( members )
@@ -130,10 +141,10 @@ public class QuadTree<T> where T : IHasRectangle
                 await ctx.StrokeRectAsync(rect.X-3, rect.Y-3, rect.Width+6, rect.Height+6);
             });
 
-        if (TopLeftChild != null) await TopLeftChild.Render(ctx);
-        if (TopRightChild != null) await TopRightChild.Render(ctx);
-        if (BottomLeftChild != null) await BottomLeftChild.Render(ctx);
-        if (BottomRightChild != null) await BottomRightChild.Render(ctx);
+        if (TopLeftChild != null) await TopLeftChild.DrawQuadTree(ctx,members);
+        if (TopRightChild != null) await TopRightChild.DrawQuadTree(ctx,members);
+        if (BottomLeftChild != null) await BottomLeftChild.DrawQuadTree(ctx,members);
+        if (BottomRightChild != null) await BottomRightChild.DrawQuadTree(ctx,members);
     }
 
     #region Private Members
@@ -218,19 +229,21 @@ public class QuadTree<T> where T : IHasRectangle
         // If a child can't contain an object, it will live in this Quad
         QuadTree<T> destTree = this;
 
-        if (m_childTL!.QuadRect.Contains(item.Rect()))
+        var rect = item.Rect();
+
+        if (m_childTL!.QuadRect.Contains(rect))
         {
             destTree = m_childTL;
         }
-        else if (m_childTR!.QuadRect.Contains(item.Rect()))
+        else if (m_childTR!.QuadRect.Contains(rect))
         {
             destTree = m_childTR;
         }
-        else if (m_childBL!.QuadRect.Contains(item.Rect()))
+        else if (m_childBL!.QuadRect.Contains(rect))
         {
             destTree = m_childBL;
         }
-        else if (m_childBR!.QuadRect.Contains(item.Rect()))
+        else if (m_childBR!.QuadRect.Contains(rect))
         {
             destTree = m_childBR;
         }
@@ -245,6 +258,8 @@ public class QuadTree<T> where T : IHasRectangle
     /// </summary>
     public QuadTree<T> Clear()
     {
+       // if ( !IsSmashed()) return this;
+
         // Clear out the children, if we have any
 
         m_childTL?.Clear();
