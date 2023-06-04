@@ -1,6 +1,6 @@
 
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using System.Drawing;
 
 
 namespace FoundryBlazor.Shape;
@@ -28,7 +28,9 @@ public class HitTestService : IHitTestService
         _scaled = scaled;
         _panzoom = panzoom;
         Page = new FoPage2D("dummy","White");
-        Tree = new QuadTree<FoGlyph2D>(Rect());
+        var rect = Page.Rect();
+        Tree = Tree != null ? Tree.Clear() : new QuadTree<FoGlyph2D>(rect);
+        Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
     }  
 
     public Rectangle Rect()
@@ -41,7 +43,10 @@ public class HitTestService : IHitTestService
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
         Page = page;
-        Tree = new QuadTree<FoGlyph2D>(Rect());
+        var rect = Page.Rect();
+
+        Tree = Tree != null ? Tree.Clear() : new QuadTree<FoGlyph2D>(rect);
+        Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
 
         Page.InsertShapesToQuadTree(Tree);
 

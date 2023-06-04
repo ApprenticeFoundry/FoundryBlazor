@@ -20,17 +20,16 @@ namespace FoundryBlazor.Shape;
 /// <typeparam name="T">Any object iheriting from IHasRect.</typeparam>
 public class QuadTree<T> where T : IHasRectangle
 {
-
     private static readonly Queue<QuadTree<T>> cashe = new();
     public static QuadTree<T> NewQuadTree(int x, int y, int width, int height)
     {
         if (cashe.Count == 0)
         {
-            $"New QuadTree {cashe.Count}".WriteInfo();
+            //$"New QuadTree {cashe.Count}".WriteInfo();
             return new QuadTree<T>(x, y, width, height);
         }
 
-        $"Recycle QuadTree {cashe.Count}".WriteInfo();
+        //$"Recycle QuadTree {cashe.Count}".WriteInfo();
         var result = cashe.Dequeue();
         result.Reset(x, y, width, height);
         return result;
@@ -42,7 +41,7 @@ public class QuadTree<T> where T : IHasRectangle
 
         source.Clear();
         cashe.Enqueue(source);
-        $"Smash QuadTree {cashe.Count}".WriteNote();
+       // $"Smash QuadTree {cashe.Count}".WriteNote();
         return null;
     }
 
@@ -111,17 +110,10 @@ public class QuadTree<T> where T : IHasRectangle
     }
     public QuadTree<T> Reset(int x, int y, int width, int height)
     {
-        if ( m_rect == null)
-        {
-            m_rect = new Rectangle(x, y, width, height);
-        }
-        else
-        {
-            m_rect.Width = width;
-            m_rect.Height = height;
-            m_rect.Y = y;
-            m_rect.X = x;
-        }
+        m_rect.Width = width;
+        m_rect.Height = height;
+        m_rect.Y = y;
+        m_rect.X = x;   
         return this;
     }
 
@@ -251,7 +243,7 @@ public class QuadTree<T> where T : IHasRectangle
     /// <summary>
     /// Clears the QuadTree of all objects, including any objects living in its children.
     /// </summary>
-    public void Clear()
+    public QuadTree<T> Clear()
     {
         // Clear out the children, if we have any
 
@@ -269,6 +261,7 @@ public class QuadTree<T> where T : IHasRectangle
         m_childTR = SmashQuadTree(m_childTR);
         m_childBL = SmashQuadTree(m_childBL);
         m_childBR = SmashQuadTree(m_childBR);
+        return this;
     }
 
     /// <summary>
@@ -316,7 +309,8 @@ public class QuadTree<T> where T : IHasRectangle
     public void Insert(T item)
     {
         // If this quad doesn't intersect the items rectangle, do nothing
-        if (!m_rect.IntersectsWith(item.Rect()))
+        var source = item.Rect();
+        if (!m_rect.IntersectsWith(source))
             return;
 
         if (m_objects == null || (m_childTL == null && m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE))
