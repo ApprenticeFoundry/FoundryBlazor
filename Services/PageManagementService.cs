@@ -105,7 +105,6 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public bool ToggleHitTestRender()
     {
-        FoGlyph2D.ResetHitTesting = true;
         RenderHitTestTree = !RenderHitTestTree;
         return RenderHitTestTree;
     }
@@ -349,8 +348,9 @@ public class PageManagementService : FoComponent, IPageManagement
         //await page.RenderNoItems(ctx, tick++);
         await page.RenderDetailed(ctx, tick++, deep);
 
-       if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx,true);
+        if ( RenderHitTestTree )
+            await _hitTestService.RenderQuadTree(ctx,true);
+
 
         return true;
     }
@@ -361,7 +361,7 @@ public class PageManagementService : FoComponent, IPageManagement
         await page.RenderConcise(ctx, scale, region);
 
         if ( RenderHitTestTree )
-            await _hitTestService.RenderTree(ctx,false);
+            await _hitTestService.RenderQuadTree(ctx,false);
             
         return true;
     }

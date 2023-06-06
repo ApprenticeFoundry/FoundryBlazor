@@ -12,7 +12,7 @@ public interface IHitTestService
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
-    Task RenderTree(Canvas2DContext ctx, bool showTracks);
+    Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 }
 
 public class HitTestService : IHitTestService
@@ -29,7 +29,7 @@ public class HitTestService : IHitTestService
         _panzoom = panzoom;
         Page = new FoPage2D("dummy","White");
         var rect = Page.Rect();
-        Tree = Tree != null ? Tree.Clear() : new QuadTree<FoGlyph2D>(rect);
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
     }  
 
@@ -45,7 +45,7 @@ public class HitTestService : IHitTestService
         Page = page;
         var rect = Page.Rect();
 
-        Tree = Tree != null ? Tree.Clear() : new QuadTree<FoGlyph2D>(rect);
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
 
         Page.InsertShapesToQuadTree(Tree);
@@ -92,23 +92,23 @@ public class HitTestService : IHitTestService
         return list;
     }
 
-    public async Task RenderTree(Canvas2DContext ctx, bool showTracks)
+    public async Task RenderQuadTree(Canvas2DContext ctx, bool showTracks)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
         await ctx.SaveAsync();
 
-        await ctx.SetLineWidthAsync(4);
+        await ctx.SetLineWidthAsync(2);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
 
         await Tree.DrawQuadTree(ctx, false);
 
-        await ctx.SetLineWidthAsync(1);
-        await ctx.SetLineDashAsync(Array.Empty<float>());
-        await ctx.SetStrokeStyleAsync("Blue");
-
         if (showTracks)
         {
+            await ctx.SetLineWidthAsync(1);
+            await ctx.SetLineDashAsync(Array.Empty<float>());
+            await ctx.SetStrokeStyleAsync("Blue");
+
             PreviousSearches.ForEach(async rect =>
             {
                 //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);

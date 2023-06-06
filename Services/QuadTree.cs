@@ -39,7 +39,7 @@ public class QuadTree<T> where T : IHasRectangle
     {
         if (source == null) return null;
 
-        source.Clear();
+        source.Clear(true);
         cashe.Enqueue(source);
        // $"Smash QuadTree {cashe.Count}".WriteNote();
         return null;
@@ -120,25 +120,30 @@ public class QuadTree<T> where T : IHasRectangle
     public bool IsSmashed()
     {
         var count = m_objects?.Count(item => item.IsSmashed());
-        return count > 0;
+        var smashed = count > 0;
+        if ( !HasSubTrees() ) return smashed;
+
+        if ( m_childTL!.IsSmashed() || m_childTR!.IsSmashed() || m_childBL!.IsSmashed() || m_childBR!.IsSmashed() )
+            smashed = true;
+
+        return smashed;
     }
 
     #endregion
 
     public async Task DrawQuadTree(Canvas2DContext ctx, bool members = false)
     {
-        if ( IsSmashed() ) 
-            await ctx.SetStrokeStyleAsync("Red");
-        else
-            await ctx.SetStrokeStyleAsync("Cyan");
+        var color = IsSmashed()? "Red" : "Cyan";
 
-        await ctx.StrokeRectAsync(m_rect.X-3, m_rect.Y-3, m_rect.Width+6, m_rect.Height+6);
+        await ctx.SetStrokeStyleAsync(color);
+
+        await ctx.StrokeRectAsync(m_rect.X+1, m_rect.Y+1, m_rect.Width-2, m_rect.Height-2);
 
         if ( members )
             m_objects?.ForEach(async item =>
             {
                 var rect = item.Rect();
-                await ctx.StrokeRectAsync(rect.X-3, rect.Y-3, rect.Width+6, rect.Height+6);
+                await ctx.StrokeRectAsync(rect.X+1, rect.Y+1, rect.Width-2, rect.Height-2);
             });
 
         if (TopLeftChild != null) await TopLeftChild.DrawQuadTree(ctx,members);
@@ -256,26 +261,33 @@ public class QuadTree<T> where T : IHasRectangle
     /// <summary>
     /// Clears the QuadTree of all objects, including any objects living in its children.
     /// </summary>
-    public QuadTree<T> Clear()
+    public QuadTree<T> Clear(bool force)
     {
-       // if ( !IsSmashed()) return this;
+        // the question is:  do we want to clear the tree if it has no smashed objects?
 
-        // Clear out the children, if we have any
-
-        m_childTL?.Clear();
-        m_childTR?.Clear();
-        m_childBL?.Clear();
-        m_childBR?.Clear();
-
+        var smashed = IsSmashed();
+        //no smashed objects, no need to clear
+        if ( smashed && !force && !HasSubTrees()) 
+            return this;
 
         // Clear any objects at this level
-        m_objects?.Clear();
+        if ( smashed || force)
+            m_objects?.Clear();
+
+        m_childTL?.Clear(force);
+        m_childTR?.Clear(force);
+        m_childBL?.Clear(force);
+        m_childBR?.Clear(force);
 
         // Set the children to null
-        m_childTL = SmashQuadTree(m_childTL);
-        m_childTR = SmashQuadTree(m_childTR);
-        m_childBL = SmashQuadTree(m_childBL);
-        m_childBR = SmashQuadTree(m_childBR);
+        if ( force )
+        {
+            m_childTL = SmashQuadTree(m_childTL);
+            m_childTR = SmashQuadTree(m_childTR);
+            m_childBL = SmashQuadTree(m_childBL);
+            m_childBR = SmashQuadTree(m_childBR);
+        }
+
         return this;
     }
 
@@ -302,7 +314,7 @@ public class QuadTree<T> where T : IHasRectangle
             m_childBR?.Delete(item);
         }
 
-        if (m_childTL != null)
+        if (HasSubTrees())
         {
             // If all the children are empty, delete all the children
             if (m_childTL!.Count == 0 &&
@@ -319,6 +331,10 @@ public class QuadTree<T> where T : IHasRectangle
     }
 
 
+    public bool HasSubTrees()
+    {
+        return m_childTL != null;
+    }
     /// Insert an item into this QuadTree object.
 
     public void Insert(T item)
@@ -328,12 +344,14 @@ public class QuadTree<T> where T : IHasRectangle
         if (!m_rect.IntersectsWith(source))
             return;
 
-        if (m_objects == null || (m_childTL == null && m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE))
+        if (m_objects == null )
+            Add(item); // If there's room to add the object, just add it       
+        else if ( m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE && HasSubTrees() == false)
             Add(item); // If there's room to add the object, just add it
         else
         {
             // No quads, create them and bump objects down where appropriate
-            if (m_childTL == null)
+            if ( !HasSubTrees() )
                 Subdivide();
             
 

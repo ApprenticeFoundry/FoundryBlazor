@@ -368,13 +368,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void TogglePanZoomWindow()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PanZoomWindow().IsVisible = !PanZoomWindow().IsVisible;
     }
 
     public void ToggleHitTestDisplay()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PageManager.ToggleHitTestRender();
     }
 
@@ -479,6 +477,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
         await ctx.RestoreAsync();
+
 
 
         await GetInteraction().RenderDrawing(ctx, tick);

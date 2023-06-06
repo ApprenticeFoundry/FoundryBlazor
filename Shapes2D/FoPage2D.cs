@@ -154,7 +154,7 @@ public class FoPage2D : FoGlyph2D
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree) 
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-        var count = Shapes2D.Count();
+       // var count = Shapes2D.Count();
         foreach (var item in Shapes2D.Values())
         {
             tree.Insert(item);
