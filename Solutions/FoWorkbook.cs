@@ -24,18 +24,20 @@ public class FoWorkbook: FoComponent, IWorkbook
 {
     protected IWorkspace Workspace { get; set; }
     protected ICommand Command { get; set; }
+    protected IFoundryService Foundry { get; set; }
     protected DialogService Dialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
     
     protected ComponentBus PubSub { get; set; }
 
-    public FoWorkbook(IWorkspace space, ICommand command, DialogService dialog, IJSRuntime js, ComponentBus pubSub)
+    public FoWorkbook(IFoundryService foundry)
     {
-        Workspace = space;
-        Command = command;
-        Dialog = dialog;
-        JsRuntime = js;
-        PubSub = pubSub;
+        Foundry = foundry;
+        Workspace = foundry.Workspace();
+        Command = foundry.Command();
+        Dialog = foundry.Dialog();
+        JsRuntime = foundry.JS();
+        PubSub = foundry.PubSub();
     }  
 
 

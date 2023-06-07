@@ -67,6 +67,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public IPanZoomService PanZoom { get; set; }
 
 
+    protected IFoundryService Foundry { get; set; }
     protected IToast Toast { get; set; }
     protected ComponentBus PubSub { get; set; }
     protected DialogService Dialog { get; set; }
@@ -80,34 +81,24 @@ public class FoWorkspace : FoComponent, IWorkspace
     protected Action SetDrawingStyle { get; set; }
     protected Action SetFileDropStyle { get; set; }
 
-    public FoWorkspace(
-        IToast toast,
-        ICommand command,
-        ISelectionService selection,
-        IPanZoomService panzoom,
-        IDrawing drawing,
-        IArena arena,
-        IJSRuntime js,
-        DialogService dialog,
-        ComponentBus pubSub
-        )
+    public FoWorkspace(IFoundryService foundry)
     {
-
-        Toast = toast;
-        Command = command;
-        SelectionService = selection;
-        ActiveDrawing = drawing;
-        ActiveArena = arena;
-        PubSub = pubSub;
-        PanZoom = panzoom;
-        Dialog = dialog;
-        JsRuntime = js;
+        Foundry = foundry;
+        Toast = foundry.Toast();
+        Command = foundry.Command();
+        SelectionService = foundry.Selection();
+        ActiveDrawing = foundry.Drawing();
+        ActiveArena = foundry.Arena();
+        PubSub = foundry.PubSub();
+        PanZoom = foundry.PanZoom();
+        Dialog = foundry.Dialog();
+        JsRuntime = foundry.JS();
 
         SetDrawingStyle = async () =>
         {
             try
             {
-                await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
+                await JsRuntime.InvokeVoidAsync("CanvasFileInput.HideFileInput");
                 InputStyle = InputStyle.Drawing;
                 await PubSub!.Publish<InputStyle>(InputStyle);
                 "SetDrawingStyle".WriteWarning();
@@ -119,7 +110,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         {
             try
             {
-                await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
+                await JsRuntime.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
                 InputStyle = InputStyle.FileDrop;
                 await PubSub!.Publish<InputStyle>(InputStyle);
                 "SetFileDropStyle".WriteWarning();
