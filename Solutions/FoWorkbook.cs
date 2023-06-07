@@ -30,10 +30,10 @@ public class FoWorkbook: FoComponent, IWorkbook
     
     protected ComponentBus PubSub { get; set; }
 
-    public FoWorkbook(IFoundryService foundry)
+    public FoWorkbook(IWorkspace space, IFoundryService foundry)
     {
+        Workspace = space;
         Foundry = foundry;
-        Workspace = foundry.Workspace();
         Command = foundry.Command();
         Dialog = foundry.Dialog();
         JsRuntime = foundry.JS();

@@ -11,7 +11,6 @@ namespace FoundryBlazor.Solutions;
 
 public interface IFoundryService
 {
-    IWorkspace Workspace();
     ICommand Command();
     DialogService Dialog();
     IJSRuntime JS();
@@ -26,7 +25,6 @@ public interface IFoundryService
 public class FoundryService : IFoundryService
 {
     protected IToast toast { get; set; }
-    protected IWorkspace space { get; set; }
     protected ICommand cmd { get; set; }
     protected IDrawing drawing { get; set; }
     protected IArena arena { get; set; }
@@ -38,7 +36,6 @@ public class FoundryService : IFoundryService
 
     public FoundryService(
         IToast toast,
-        IWorkspace space,
         ICommand command,
         ISelectionService selection,
         IPanZoomService panzoom,
@@ -48,7 +45,6 @@ public class FoundryService : IFoundryService
         IJSRuntime js,
         ComponentBus pubsub)
     {
-        this.space = space;
         this.cmd = command;
         this.dialog = dialog;
         this.js = js;
@@ -60,10 +56,6 @@ public class FoundryService : IFoundryService
         this.selection = selection;
     }
 
-    public IWorkspace Workspace()
-    {
-        return space;
-    }
 
     public ICommand Command()
     {

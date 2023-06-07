@@ -243,7 +243,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public T EstablishWorkbook<T>() where T : FoWorkbook
     {
-        var book = Activator.CreateInstance(typeof(T), this, Command, Dialog, JsRuntime, PubSub) as T;
+        var book = Activator.CreateInstance(typeof(T), this, Foundry) as T;
         AddWorkbook(book!);
         return book!;
     }
