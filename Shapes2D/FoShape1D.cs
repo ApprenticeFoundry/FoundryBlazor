@@ -100,6 +100,17 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         GlueFinishTo(finish);
     }
 
+    public (int, int) ComputeLocation(double percent)
+    {
+        if ( percent <= 0)
+            return (StartX, StartY);
+        if ( percent >= 1)
+            return (FinishX, FinishY);
+
+        var x = (int)(StartX + (FinishX - StartX) * percent);
+        var y = (int)(StartY + (FinishY - StartY) * percent);
+        return (x, y);
+    }
     public Action<Canvas2DContext, FoGlyph2D> DrawSimpleLine = async (ctx, obj) =>
     {
         var shape = obj as FoShape1D;
