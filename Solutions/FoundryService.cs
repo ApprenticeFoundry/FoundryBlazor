@@ -20,6 +20,7 @@ public interface IFoundryService
     IArena Arena();
     IPanZoomService PanZoom();
     ISelectionService Selection();
+    IHitTestService HitTest();
 }
 
 public class FoundryService : IFoundryService
@@ -30,6 +31,7 @@ public class FoundryService : IFoundryService
     protected IArena arena { get; set; }
     protected IPanZoomService panzoom { get; set; }
     protected ISelectionService selection { get; set; }
+    protected IHitTestService hittest { get; set; }
     protected DialogService dialog { get; set; }
     protected IJSRuntime js { get; set; }
     protected ComponentBus pubsub { get; set; }
@@ -38,6 +40,7 @@ public class FoundryService : IFoundryService
         IToast toast,
         ICommand command,
         ISelectionService selection,
+        IHitTestService hittest,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
@@ -54,6 +57,7 @@ public class FoundryService : IFoundryService
         this.arena = arena;
         this.panzoom = panzoom;
         this.selection = selection;
+        this.hittest = hittest;
     }
 
 
@@ -96,7 +100,10 @@ public class FoundryService : IFoundryService
     {
         return panzoom;
     }
-
+    public IHitTestService HitTest()
+    {
+        return hittest;
+    }
     public ISelectionService Selection()
     {
         return selection;
