@@ -463,8 +463,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         }
 
-        if (GetMembers<FoGlue2D>()?.Count > 0)
-            await DrawTriangle(ctx, "Black");
+        // if (GetMembers<FoGlue2D>()?.Count > 0)
+        //     await DrawTriangle(ctx, "Black");
 
 
         await ctx.RestoreAsync();
