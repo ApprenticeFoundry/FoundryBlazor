@@ -8,16 +8,18 @@ public class FoShape2D : FoGlyph2D, IShape2D
     {
         ShapeDraw = DrawRect;
     }
+    public FoShape2D(string name, string color) : base(name, color)
+    {
+        ShapeDraw = DrawRect;
+    }
 
     public FoShape2D(int width, int height, string color) : base("", width, height, color)
     {
-        PinX = PinY = 0;
         ShapeDraw = DrawRect;
     }
 
     public FoShape2D(string name, int width, int height, string color) : base(name, width, height, color)
     {
-        PinX = PinY = 0;
         ShapeDraw = DrawRect;
     }
 

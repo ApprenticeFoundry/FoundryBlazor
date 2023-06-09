@@ -70,7 +70,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public bool ShouldRender { get; set; } = true;
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
-
+    public int Index { get; set; } = 0;
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId
     {
@@ -316,6 +316,12 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         Width = 0;
         Height = 0;
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
+    }
+
+    public FoGlyph2D SetBeforeRefresh(Action<FoGlyph2D,int> action)
+    {
+        ContextLink = action;
+        return this;
     }
 
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)

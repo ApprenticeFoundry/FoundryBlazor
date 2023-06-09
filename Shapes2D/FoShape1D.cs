@@ -104,6 +104,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     {
         if ( percent <= 0)
             return (StartX, StartY);
+
         if ( percent >= 1)
             return (FinishX, FinishY);
 
@@ -111,6 +112,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         var y = (int)(StartY + (FinishY - StartY) * percent);
         return (x, y);
     }
+    
     public Action<Canvas2DContext, FoGlyph2D> DrawSimpleLine = async (ctx, obj) =>
     {
         var shape = obj as FoShape1D;
