@@ -16,7 +16,7 @@ public class FoPage2D : FoGlyph2D
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
 
-    protected IScaledDrawing? _ScaledDrawing;
+    protected ScaledPage CurrentScale = new();
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
@@ -46,15 +46,15 @@ public class FoPage2D : FoGlyph2D
 
     public int DrawingWidth()
     {
-        return _ScaledDrawing?.ToPixels(PageWidth) ?? 0;
+        return CurrentScale?.ToPixels(PageWidth) ?? 0;
     }
     public int DrawingHeight()
     {
-        return _ScaledDrawing?.ToPixels(PageHeight) ?? 0;
+        return CurrentScale?.ToPixels(PageHeight) ?? 0;
     }
     public int DrawingMargin()
     {
-        return _ScaledDrawing?.ToPixels(PageMargin) ?? 0;  //margin all around
+        return CurrentScale?.ToPixels(PageMargin) ?? 0;  //margin all around
     }
 
      public string DrawingWH()
@@ -62,10 +62,10 @@ public class FoPage2D : FoGlyph2D
         return $"Drawing Size [{PageWidth}x{PageHeight} ({PageMargin})]in";
     }   
 
-    public virtual void SetScaledDrawing(IScaledDrawing scaledDrawing)
+    public virtual void SetScale(ScaledPage scale)
     {
-        _ScaledDrawing = scaledDrawing;
-        scaledDrawing.SetPageDefaults(this);
+        CurrentScale = scale;
+        CurrentScale.SetPageDefaults(this);
     }
 
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
@@ -211,11 +211,9 @@ public class FoPage2D : FoGlyph2D
     {
         await ctx.SaveAsync();
 
-        if (_ScaledDrawing != null)
-        {
-            await _ScaledDrawing.DrawHorizontalGrid(ctx, 0.5, 2.0);
-            await _ScaledDrawing.DrawVerticalGrid(ctx, 0.5, 2.0);
-        }
+
+        await ScaledPage.DrawHorizontalGrid(ctx, 0.5, 2.0);
+        await ScaledPage.DrawVerticalGrid(ctx, 0.5, 2.0);
 
         await ctx.RestoreAsync();
     }
@@ -290,11 +288,10 @@ public class FoPage2D : FoGlyph2D
         await ctx.SetStrokeStyleAsync("Black");
         await ctx.SetLineWidthAsync(50.0F);
 
-        if (_ScaledDrawing != null)
-        {
-            var win = _ScaledDrawing.UserWindow();
-            await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
-        }
+
+        var win = ScaledPage.UserWindow();
+        await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
+        
 
         await ctx.RestoreAsync();
         return true;
