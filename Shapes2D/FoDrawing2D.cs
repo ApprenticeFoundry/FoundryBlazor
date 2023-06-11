@@ -495,7 +495,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.SetFontAsync("18px consolas");
         //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
-        await ctx.FillTextAsync($"fps: {fps:0.00}", offsetX, offsetY + 25);
+        await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
         await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
 
         int loc = 130;

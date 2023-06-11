@@ -41,7 +41,11 @@ public class FoPage2D : FoGlyph2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-
+    public virtual void SetScale(ScaledPage scale)
+    {
+        CurrentScale = scale;
+        CurrentScale.SetPageDefaults(this);
+    }
  
 
     public int DrawingWidth()
@@ -62,11 +66,7 @@ public class FoPage2D : FoGlyph2D
         return $"Drawing Size [{PageWidth}x{PageHeight} ({PageMargin})]in";
     }   
 
-    public virtual void SetScale(ScaledPage scale)
-    {
-        CurrentScale = scale;
-        CurrentScale.SetPageDefaults(this);
-    }
+
 
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
@@ -212,8 +212,8 @@ public class FoPage2D : FoGlyph2D
         await ctx.SaveAsync();
 
 
-        await ScaledPage.DrawHorizontalGrid(ctx, 0.5, 2.0);
-        await ScaledPage.DrawVerticalGrid(ctx, 0.5, 2.0);
+        await CurrentScale.DrawHorizontalGrid(ctx, 0.5, 2.0);
+        await CurrentScale.DrawVerticalGrid(ctx, 0.5, 2.0);
 
         await ctx.RestoreAsync();
     }
@@ -289,7 +289,7 @@ public class FoPage2D : FoGlyph2D
         await ctx.SetLineWidthAsync(50.0F);
 
 
-        var win = ScaledPage.UserWindow();
+        var win = CurrentScale.UserWindow();
         await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
         
 

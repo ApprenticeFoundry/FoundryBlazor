@@ -28,6 +28,8 @@ public interface IScaledDrawing
 
     Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major);
     Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major);
+
+    ScaledPage CreateScaledPage();
 }
 
 public class ScaledDrawing : IScaledDrawing
@@ -44,6 +46,11 @@ public class ScaledDrawing : IScaledDrawing
 
     public ScaledDrawing()
     {
+    }
+
+    public ScaledPage CreateScaledPage()
+    {
+        return new ScaledPage();
     }
 
     public Rectangle Rect()

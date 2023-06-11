@@ -209,7 +209,7 @@ public class PageManagementService : FoComponent, IPageManagement
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
-                found.SetScaledDrawing(_ScaledDrawing);
+                found.SetScale(_ScaledDrawing.CreateScaledPage());
                 AddPage(found);
             }
             ActivePage = found;

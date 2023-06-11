@@ -20,6 +20,11 @@ public class ScaledPage : IScaledDrawing
     {
     }
 
+    public ScaledPage CreateScaledPage()
+    {
+        return new ScaledPage();
+    }
+
     public Rectangle Rect()
     {
         //make sure any shape on the canvas is in the hittest
