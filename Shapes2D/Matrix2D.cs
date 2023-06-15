@@ -299,6 +299,13 @@ namespace FoundryBlazor.Shape;
         var pt = new Point((int)X, (int)Y);
         return pt;
     }
+    public Rectangle TransformRectangle(int x, int y, int width, int height) 
+    {
+        var X = x * this.a + y * this.c + this.tx;
+        var Y = x * this.b + y * this.d + this.ty;
+        var rect = new Rectangle((int)X, (int)Y,width,height);
+        return rect;
+    }
     public Point TransformPoint(Point pt) 
     {
         return TransformPoint(pt.X,pt.Y);

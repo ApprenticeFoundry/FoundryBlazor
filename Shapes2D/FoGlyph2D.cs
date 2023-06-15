@@ -35,6 +35,7 @@ public enum ClickStyle
 public interface IHasRectangle
 {
     Rectangle Rect();
+    bool IsSmashed();
 }
 
 public interface IRender
@@ -69,7 +70,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public bool ShouldRender { get; set; } = true;
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
-
+    public int Index { get; set; } = 0;
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId
     {
@@ -246,9 +247,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public virtual Rectangle Rect()
     {
-        var pt = GetMatrix().TransformPoint(0, 0);
-        var sz = new Size(Width, Height);
-        var result = new Rectangle(pt, sz);
+        //this does not work for rotated objects
+        var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
         return result;
     }
 
@@ -316,6 +316,12 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         Width = 0;
         Height = 0;
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
+    }
+
+    public FoGlyph2D SetBeforeRefresh(Action<FoGlyph2D,int> action)
+    {
+        ContextLink = action;
+        return this;
     }
 
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
@@ -463,8 +469,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         }
 
-        if (GetMembers<FoGlue2D>()?.Count > 0)
-            await DrawTriangle(ctx, "Black");
+        // if (GetMembers<FoGlue2D>()?.Count > 0)
+        //     await DrawTriangle(ctx, "Black");
 
 
         await ctx.RestoreAsync();
@@ -746,6 +752,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
         list.ForEach(item => item.TargetMoved(this));
         return true;
+    }
+
+    public bool IsSmashed()
+    {
+        return _matrix == null;
     }
 
     public virtual bool Smash(bool force)

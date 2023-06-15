@@ -1,16 +1,17 @@
 using Blazor.Extensions;
+using Blazor.Extensions.Canvas;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
-using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using Radzen.Blazor.Rendering;
+
 
 namespace FoundryBlazor.Shared;
 

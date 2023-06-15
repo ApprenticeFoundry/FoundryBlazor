@@ -264,7 +264,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
+
         CurrentPage().ClearAll();
     }
     public IPageManagement Pages()
@@ -368,13 +368,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void TogglePanZoomWindow()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PanZoomWindow().IsVisible = !PanZoomWindow().IsVisible;
     }
 
     public void ToggleHitTestDisplay()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PageManager.ToggleHitTestRender();
     }
 
@@ -481,6 +479,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.RestoreAsync();
 
 
+
         await GetInteraction().RenderDrawing(ctx, tick);
 
 
@@ -496,7 +495,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.SetFontAsync("18px consolas");
         //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
-        await ctx.FillTextAsync($"fps: {fps:0.00}", offsetX, offsetY + 25);
+        await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
         await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
 
         int loc = 130;

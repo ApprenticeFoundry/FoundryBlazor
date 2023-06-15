@@ -59,7 +59,7 @@ public class PanZoomService : IPanZoomService
         _lastZoom = _zoom;
         _zoom = 1.0;
         _pan = new(0, 0);
-        Smash();
+        Smash(true);
         OnComplete?.Invoke();
     }
 
@@ -87,10 +87,17 @@ public class PanZoomService : IPanZoomService
         return _Delta;
     }
 
-    public virtual void Smash()
+    public virtual bool Smash(bool force)
     {
+        if (_matrix == null && !force) return false;
+
+        //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
+        FoGlyph2D.ResetHitTesting = true;
+
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
+
+        return true;
     }
 
     public virtual Matrix2D GetMatrix()
@@ -175,7 +182,7 @@ public class PanZoomService : IPanZoomService
     {
         _lastZoom = _zoom;
         _zoom *= delta < 0 ? 1.1 : 0.9;
-        Smash();
+        Smash(true);
         OnComplete?.Invoke();
         return _zoom;
     }
@@ -217,7 +224,7 @@ public class PanZoomService : IPanZoomService
     {
         _lastZoom = _zoom;
         _zoom = zoom;
-         Smash();
+         Smash(true);
         OnComplete?.Invoke();
         return _zoom;
     }
@@ -239,7 +246,7 @@ public class PanZoomService : IPanZoomService
     {
         _pan.X += dx;
         _pan.Y += dy;
-         Smash();
+        Smash(true);
         OnComplete?.Invoke();
         return _pan;
     }
@@ -248,7 +255,7 @@ public class PanZoomService : IPanZoomService
     public Point SetPan(int x, int y)
     {
         _pan = new(x, y);
-         Smash();
+         Smash(true);
         OnComplete?.Invoke();
         return _pan;
     }

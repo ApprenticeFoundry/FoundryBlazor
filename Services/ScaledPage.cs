@@ -3,36 +3,8 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public interface IScaledDrawing
-{
-    Rectangle Rect();
-    Rectangle UserWindow();
-    Rectangle SetUserWindow(Size size);
-    Rectangle SetUserWindow(Point loc);
-    void SetPageDefaults(FoPage2D page);
-    double ConvertToPixels(double inches);
-    int ToPixels(double inches);
-    double ToInches(int value);
-    double ConvertToInches(double pixels);
-    double GetPixelsPerInch();
-    Task ClearCanvas(Canvas2DContext ctx);
-    string CanvasWH();
-    void SetCanvasSize(int width, int height);
-    Size CanvasSize();
 
-    void SetPageSizeInches(double width, double height);
-    void SetPageLandscape();
-    void SetPagePortrait();
-
-    Point InchesToPixelInset(double width, double height);
-
-    Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major);
-    Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major);
-
-    ScaledPage CreateScaledPage();
-}
-
-public class ScaledDrawing : IScaledDrawing
+public class ScaledPage : IScaledDrawing
 {
     public int TrueCanvasWidth = 0;
     public int TrueCanvasHeight = 0;
@@ -44,7 +16,7 @@ public class ScaledDrawing : IScaledDrawing
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 6.0;  //inches
 
-    public ScaledDrawing()
+    public ScaledPage()
     {
     }
 
