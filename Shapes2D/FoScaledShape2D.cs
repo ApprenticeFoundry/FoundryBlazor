@@ -1,11 +1,16 @@
 
-using UnitsNet;
+
+using IoBTMessage.Units;
+
 namespace FoundryBlazor.Shape;
 
 public class FoScaledShape2D : FoShape2D, IShape2D
 {
-    public Length Units { get; set; }
-
+    public Length PinXU = new(30, "mm");
+    public Length PinYU = new(30, "mm");
+    public Angle AngleU = new(0);
+    public Length WidthU = new(30,"mm");
+    public Length HeightU = new(20, "mm");
     public FoScaledShape2D() : base()
     {
         ShapeDraw = DrawRect;
@@ -15,9 +20,6 @@ public class FoScaledShape2D : FoShape2D, IShape2D
         ShapeDraw = DrawRect;
     }
 
-    public virtual void SetUnits(Length data)
-    {
-        Units = data;
-    }
+
 }
 
