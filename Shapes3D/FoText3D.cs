@@ -1,6 +1,7 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Labels;
 using BlazorThreeJS.Scenes;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 

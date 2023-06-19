@@ -3,7 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public interface IScaledDrawing
+public interface IScaledCanvas
 {
     Rectangle Rect();
     Rectangle UserWindow();
@@ -29,15 +29,15 @@ public interface IScaledDrawing
     Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major);
     Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major);
 
-    ScaledPage CreateScaledPage();
+    ScaledCanvas CreateScaledPage();
 }
 
-public class ScaledDrawing : IScaledDrawing
+public class ScaledDrawing : IScaledCanvas
 {
     public int TrueCanvasWidth = 0;
     public int TrueCanvasHeight = 0;
 
-    private Rectangle userWindow  { get; set; } = new Rectangle(0, 0, 1500, 400);
+    private Rectangle userWindow { get; set; } = new Rectangle(0, 0, 1500, 400);
 
     public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
     public double PageMargin { get; set; } = .50;  //inches
@@ -48,9 +48,9 @@ public class ScaledDrawing : IScaledDrawing
     {
     }
 
-    public ScaledPage CreateScaledPage()
+    public ScaledCanvas CreateScaledPage()
     {
-        return new ScaledPage();
+        return new ScaledCanvas();
     }
 
     public Rectangle Rect()
@@ -89,7 +89,7 @@ public class ScaledDrawing : IScaledDrawing
     }
     public Size CanvasSize()
     {
-        return new Size(TrueCanvasWidth,TrueCanvasHeight);
+        return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
 
     public void SetPageSizeInches(double width, double height)
@@ -100,13 +100,15 @@ public class ScaledDrawing : IScaledDrawing
 
     public void SetPageLandscape()
     {
-        if ( PageWidth < PageHeight) {
+        if (PageWidth < PageHeight)
+        {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
     }
     public void SetPagePortrait()
     {
-        if ( PageWidth > PageHeight) {
+        if (PageWidth > PageHeight)
+        {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
     }
@@ -121,7 +123,7 @@ public class ScaledDrawing : IScaledDrawing
     public string CanvasWH()
     {
         return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{PixelsPerInch}";
-    }   
+    }
     public double GetPixelsPerInch()
     {
         return PixelsPerInch;
@@ -149,10 +151,10 @@ public class ScaledDrawing : IScaledDrawing
         await ctx.ClearRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
         await ctx.SetFillStyleAsync("#98AFC7");
         await ctx.FillRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
-   
+
         await ctx.SetStrokeStyleAsync("Black");
         await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
-   }
+    }
 
     public async Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major)
     {
@@ -167,7 +169,7 @@ public class ScaledDrawing : IScaledDrawing
 
         await ctx.SetLineWidthAsync(1);
         await ctx.SetLineDashAsync(new float[] { 5, 1 });
- 
+
 
         await ctx.SetStrokeStyleAsync("White");
 
@@ -212,7 +214,7 @@ public class ScaledDrawing : IScaledDrawing
 
         await ctx.SetLineWidthAsync(1);
         await ctx.SetLineDashAsync(new float[] { 5, 1 });
- 
+
 
         await ctx.SetStrokeStyleAsync("White");
 
@@ -234,8 +236,8 @@ public class ScaledDrawing : IScaledDrawing
         while (x <= dHeight)
         {
             await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(dMargin,x);
-            await ctx.LineToAsync(dWidth,x);
+            await ctx.MoveToAsync(dMargin, x);
+            await ctx.LineToAsync(dWidth, x);
             await ctx.StrokeAsync();
             x += dMajor;
         }

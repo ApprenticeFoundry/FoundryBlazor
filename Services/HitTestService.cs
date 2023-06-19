@@ -17,21 +17,21 @@ public interface IHitTestService
 
 public class HitTestService : IHitTestService
 {
-    private FoPage2D Page { get; set; } 
+    private FoPage2D Page { get; set; }
     private QuadTree<FoGlyph2D> Tree { get; set; }
 
     private readonly List<Rectangle> PreviousSearches = new();
-    private readonly IScaledDrawing _scaled;
+    private readonly IScaledCanvas _scaled;
     private readonly IPanZoomService _panzoom;
-    public HitTestService(IScaledDrawing scaled, IPanZoomService panzoom)
+    public HitTestService(IScaledCanvas scaled, IPanZoomService panzoom)
     {
         _scaled = scaled;
         _panzoom = panzoom;
-        Page = new FoPage2D("dummy","White");
+        Page = new FoPage2D("dummy", "White");
         var rect = Page.Rect();
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
-    }  
+    }
 
     public Rectangle Rect()
     {
@@ -55,7 +55,7 @@ public class HitTestService : IHitTestService
 
     public bool InsertRange(List<FoGlyph2D> list)
     {
-        if ( Tree != null)
+        if (Tree != null)
             list.ForEach(child => Tree.Insert(child));
         return Tree != null;
     }
@@ -68,9 +68,9 @@ public class HitTestService : IHitTestService
 
     public List<FoGlyph2D> FindGlyph(Rectangle rect)
     {
-        if ( PreviousSearches.Count > 10)
+        if (PreviousSearches.Count > 10)
             PreviousSearches.RemoveRange(0, 6);
-    
+
         PreviousSearches.Add(rect);
         //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 

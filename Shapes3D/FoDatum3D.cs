@@ -1,3 +1,5 @@
+using IoBTMessage.Models;
+
 namespace FoundryBlazor.Shape;
 public class FoDatum3D : FoGlyph3D
 	{

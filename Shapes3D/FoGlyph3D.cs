@@ -2,6 +2,7 @@ using BlazorThreeJS.Materials;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 
