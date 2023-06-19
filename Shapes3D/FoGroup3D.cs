@@ -38,16 +38,10 @@ public class FoGroup3D : FoGlyph3D
     }
 
 
-    public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+    public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         this.Name = name;
-        BoundingBox = new FoVector3D()
-        {
-            units = units,
-            X = width,
-            Y = height,
-            Z = depth,
-        };
+        BoundingBox = new FoVector3D(width, height, depth);
         Position = new FoVector3D();
         Offset = new FoVector3D();
         return this;
@@ -60,34 +54,34 @@ public class FoGroup3D : FoGlyph3D
         return CreateUsing<T>(obj.Name, obj.GlyphId);
     }
 
-    public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+    public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateCylinder(obj.Name, width, height, depth, units);
+        return result.CreateCylinder(obj.Name, width, height, depth);
     }
 
-    public FoShape3D CreateBlock(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+    public FoShape3D CreateBlock(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateBox(obj.Name, width, height, depth, units);
+        return result.CreateBox(obj.Name, width, height, depth);
     }
 
-    public FoShape3D CreateSphere(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+    public FoShape3D CreateSphere(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateSphere(obj.Name, width, height, depth, units);
+        return result.CreateSphere(obj.Name, width, height, depth);
     }
 
-    public FoShape3D CreateGlb(FoGlyph3D obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+    public FoShape3D CreateGlb(FoGlyph3D obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateGlb(url, width, height, depth, units);
+        return result.CreateGlb(url, width, height, depth);
     }
 
-    public FoText3D CreateLabel(FoGlyph3D obj, string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
+    public FoText3D CreateLabel(FoGlyph3D obj, string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0)
     {
         var result = CreateUsingDTBASE<FoText3D>(obj);
-        return result.CreateTextAt(text, xLoc, yLoc, zLoc, units);
+        return result.CreateTextAt(text, xLoc, yLoc, zLoc);
     }
 
 

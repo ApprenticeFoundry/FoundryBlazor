@@ -98,13 +98,12 @@ public class FoGlyph3D : FoComponent
 
     public FoGlyph3D MoveTo(int x, int y, int z) 
     {
-        var pos = GetPosition();
-        pos.Loc(x, y, z);
+        var pos = GetPosition(x, y, z);
         return this; 
     }
-    public virtual FoVector3D GetPosition()
+    public virtual FoVector3D GetPosition(int x=0, int y=0, int z=0)
     {
-        var result = new FoVector3D(0, 0, 0);
+        var result = new FoVector3D(x, y, z);
         return result;
     }
 

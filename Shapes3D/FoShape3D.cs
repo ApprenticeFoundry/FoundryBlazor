@@ -58,46 +58,34 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return false;
     }
 
-    public FoShape3D CreateBox(string name, double width, double height, double depth, string units = "m")
+    public FoShape3D CreateBox(string name, double width, double height, double depth)
     {
         Type = "Box";
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
+        BoundingBox = new FoVector3D(width, height, depth);
         Name = name;
         return this;
     }
-    public FoShape3D CreateCylinder(string name, double width, double height, double depth, string units = "m")
+    public FoShape3D CreateCylinder(string name, double width, double height, double depth)
     {
         Type = "Cylinder";
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
+        BoundingBox = new FoVector3D(width, height, depth);
         Name = name;
         return this;
     }
 
-    public FoShape3D CreateGlb(string url, double width, double height, double depth, string units = "m")
+    public FoShape3D CreateGlb(string url, double width, double height, double depth)
     {
         Type = "Glb";
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
+        BoundingBox = new FoVector3D(width, height, depth);
         Symbol = url;
         $"CreateGlb symbol [{Symbol}] ".WriteSuccess();
         return this;
     }
 
-    public FoShape3D CreateSphere(string name, double width, double height, double depth, string units = "m")
+    public FoShape3D CreateSphere(string name, double width, double height, double depth)
     {
         Type = "Sphere";
-        BoundingBox = new FoVector3D(width, height, depth)
-        {
-            units = units
-        };
+        BoundingBox = new FoVector3D(width, height, depth);
         Name = name;
         return this;
     }
@@ -434,9 +422,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
 
 
-    public override FoVector3D GetPosition()
+    public override FoVector3D GetPosition(int x = 0, int y = 0, int z = 0)
     {
-        if (Position == null) return base.GetPosition();
+        if (Position == null) 
+            return base.GetPosition(x,y,z);
         return Position;
     }
 

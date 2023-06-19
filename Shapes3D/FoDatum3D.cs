@@ -14,51 +14,33 @@ public class FoDatum3D : FoGlyph3D
 		{
 		}
 
-		public FoDatum3D CreateTextAt(string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
+		public FoDatum3D CreateTextAt(string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0)
 		{
 			this.Text = text.Trim();
 
-			Position = new FoVector3D()
-			{
-				units = units,
-				X = xLoc,
-				Y = yLoc,
-				Z = zLoc
-			};
+			Position = new FoVector3D(xLoc, yLoc, zLoc);
+
 			return this;
 		}
 
-		public FoDatum3D CreateLabelAt(string text, List<string>? details = null, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0, string units = "m")
+		public FoDatum3D CreateLabelAt(string text, List<string>? details = null, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0)
 		{
-			this.Text = text.Trim();
 			this.Details = details;
-
-			Position = new FoVector3D()
-			{
-				units = units,
-                X = xLoc,
-                Y = yLoc,
-                Z = zLoc
-            };
-			return this;
+            return CreateTextAt(text, xLoc, yLoc, zLoc);
 		}
-		public FoDatum3D EstablishBox(double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoDatum3D EstablishBox(double width = 1.0, double height = 1.0, double depth = 1.0)
 		{
 			BoundingBox ??= new FoVector3D();
 
-
-        	BoundingBox.X = width;
-		    BoundingBox.Y = height;
-			BoundingBox.Z = depth;
-			BoundingBox.units = units;
+        	BoundingBox.Set(width, height, depth);
 
 			return this;
 		}
 
-		public FoDatum3D CreateShape(string shape, double width = 1.0, double height = 1.0, double depth = 1.0, string units = "m")
+		public FoDatum3D CreateShape(string shape, double width = 1.0, double height = 1.0, double depth = 1.0)
 		{
 			this.Shape = shape;
-			return EstablishBox(width, height, depth, units);
+			return EstablishBox(width, height, depth);
 		}
 	}
 

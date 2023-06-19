@@ -47,16 +47,12 @@ public class FoText3D : FoGlyph3D, IShape3D
         Text = text;
         return this;
     }
-    public FoText3D CreateTextAt(string text, double x, double y, double z, string units)
-    {
-        Position = new FoVector3D(x, y, z) { units = units };
-        Text = text;
-        return this;
-    }
 
-    public override FoVector3D GetPosition()
+
+    public override FoVector3D GetPosition(int x = 0, int y = 0, int z = 0)
     {
-        if (Position == null) return base.GetPosition();
+        if (Position == null) 
+            return base.GetPosition(x,y,z);
 
         var result = Position;
         return result;
