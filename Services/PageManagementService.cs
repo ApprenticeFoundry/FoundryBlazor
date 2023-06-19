@@ -7,14 +7,14 @@ using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
-public interface IPageManagement: IRender
+public interface IPageManagement : IRender
 {
 
     List<FoGlyph2D> FindShapes(string GlyphId);
     List<FoGlyph2D> ExtractShapes(string GlyphId);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllObjects();
-    
+
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
     FoPage2D AddPage(FoPage2D page);
@@ -31,7 +31,7 @@ public interface IPageManagement: IRender
 
     FoPage2D SetPageSizeInches(double width, double height);
     FoPage2D SetPageLandscape();
-    FoPage2D SetPagePortrait();   
+    FoPage2D SetPagePortrait();
 
 
     List<FoGlyph2D> CollectSelections();
@@ -46,7 +46,7 @@ public interface IPageManagement: IRender
     T Duplicate<T>(T value) where T : FoGlyph2D;
     U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D;
     T? GroupSelected<T>() where T : FoGroup2D;
- }
+}
 
 
 public class PageManagementService : FoComponent, IPageManagement
@@ -56,11 +56,11 @@ public class PageManagementService : FoComponent, IPageManagement
     private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledDrawing _ScaledDrawing;
+    private readonly IScaledCanvas _ScaledDrawing;
 
     public PageManagementService(
         IHitTestService hit,
-        IScaledDrawing help,
+        IScaledCanvas help,
         ISelectionService sel)
     {
         _hitTestService = hit;
@@ -120,7 +120,7 @@ public class PageManagementService : FoComponent, IPageManagement
         var list = new List<FoGlyph2D>();
         Selections().ForEach(shape =>
         {
-            if ( shape.IsSelected ) 
+            if (shape.IsSelected)
             {
                 list.Add(shape);
                 shape.MarkSelected(false);
@@ -136,7 +136,7 @@ public class PageManagementService : FoComponent, IPageManagement
         var list = new List<FoGlyph2D>();
         Selections().ForEach(shape =>
         {
-            if ( shape.IsSelected ) 
+            if (shape.IsSelected)
             {
                 list.Add(shape);
                 shape.MarkSelected(false);
@@ -149,7 +149,7 @@ public class PageManagementService : FoComponent, IPageManagement
         });
         return list;
     }
- 
+
     public List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Slot<FoPage2D>().ForEach(item => item.CollectImages(list, deep));
@@ -194,7 +194,7 @@ public class PageManagementService : FoComponent, IPageManagement
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var found = ActivePage.AddShape(value);
-        if ( found != null)
+        if (found != null)
             _hitTestService.Insert(value);
 
         return found!;
@@ -348,8 +348,8 @@ public class PageManagementService : FoComponent, IPageManagement
         //await page.RenderNoItems(ctx, tick++);
         await page.RenderDetailed(ctx, tick++, deep);
 
-        if ( RenderHitTestTree )
-            await _hitTestService.RenderQuadTree(ctx,true);
+        if (RenderHitTestTree)
+            await _hitTestService.RenderQuadTree(ctx, true);
 
 
         return true;
@@ -360,11 +360,11 @@ public class PageManagementService : FoComponent, IPageManagement
         var page = CurrentPage();
         await page.RenderConcise(ctx, scale, region);
 
-        if ( RenderHitTestTree )
-            await _hitTestService.RenderQuadTree(ctx,false);
-            
+        if (RenderHitTestTree)
+            await _hitTestService.RenderQuadTree(ctx, false);
+
         return true;
     }
 
- 
+
 }

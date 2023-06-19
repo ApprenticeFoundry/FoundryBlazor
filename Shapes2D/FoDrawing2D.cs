@@ -34,8 +34,8 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
-    void SetPreRenderAction(Func<Canvas2DContext,int,Task> action);
-    void SetPostRenderAction(Func<Canvas2DContext,int,Task> action);
+    void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
+    void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     V AddShape<V>(V shape) where V : FoGlyph2D;
@@ -63,10 +63,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
 
-    public Func<Canvas2DContext,int,Task>? PreRender { get; set; }
-    public Func<Canvas2DContext,int,Task>? PostRender { get; set; }
+    public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
+    public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
-    private IScaledDrawing ScaleDrawing { get; set; }
+    private IScaledCanvas ScaleDrawing { get; set; }
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -116,7 +116,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             while (MouseArgQueue.Count > 0)
             {
                 var args = MouseArgQueue.Dequeue();
-               // $"SetCurrentlyRendering is Dequeueing {args.Topic} ".WriteSuccess(2);
+                // $"SetCurrentlyRendering is Dequeueing {args.Topic} ".WriteSuccess(2);
                 ApplyMouseArgs(args);
             }
         }
@@ -145,7 +145,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
-        IScaledDrawing scaled,
+        IScaledCanvas scaled,
         IHitTestService hittest,
         ComponentBus pubSub
         )
@@ -172,7 +172,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         };
 
         interactionLookup = new();
-        interactionRules.ForEach(x => {
+        interactionRules.ForEach(x =>
+        {
             interactionLookup.Add(x.Style, x);
         });
 
@@ -186,11 +187,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
-    public void SetPreRenderAction(Func<Canvas2DContext,int,Task> action)
+    public void SetPreRenderAction(Func<Canvas2DContext, int, Task> action)
     {
         PreRender = action;
     }
-    public void SetPostRenderAction(Func<Canvas2DContext,int,Task> action)
+    public void SetPostRenderAction(Func<Canvas2DContext, int, Task> action)
     {
         PostRender = action;
     }
@@ -357,7 +358,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         {
             PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
             PanZoomShape.SizeToFit();
-            PanZoomShape.IsVisible  = false;
+            PanZoomShape.IsVisible = false;
 
             var page = PageManager.CurrentPage();
             var pt = InchesToPixelsInset(page.PageWidth / 2, 3.0);
@@ -466,13 +467,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
 
-        if ( PreRender != null)
-            await PreRender.Invoke(ctx,tick);
+        if (PreRender != null)
+            await PreRender.Invoke(ctx, tick);
 
         await PageManager.RenderDetailed(ctx, tick, true);
 
-        if ( PostRender != null)
-            await PostRender.Invoke(ctx,tick);
+        if (PostRender != null)
+            await PostRender.Invoke(ctx, tick);
 
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
@@ -573,11 +574,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         foreach (var rule in interactionRules)
         {
-            if (TestRule(rule, args)) 
-                return GetInteraction();    
+            if (TestRule(rule, args))
+                return GetInteraction();
         }
         SetInteraction(InteractionStyle.ReadOnly);
-        return GetInteraction();    
+        return GetInteraction();
     }
 
     private void ApplyMouseArgs(CanvasMouseArgs args)

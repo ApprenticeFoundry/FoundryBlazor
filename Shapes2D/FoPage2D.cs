@@ -6,9 +6,18 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
-public class FoPage2D : FoGlyph2D
+
+public interface IFoPage2D
 {
-    
+    void SetScale(ScaledCanvas scale);
+    int DrawingWidth();
+    int DrawingHeight();
+    int DrawingMargin();
+}
+
+public class FoPage2D : FoGlyph2D, IFoPage2D
+{
+
 
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
@@ -16,7 +25,7 @@ public class FoPage2D : FoGlyph2D
     public double PageWidth { get; set; } = 10.0;  //inches
     public double PageHeight { get; set; } = 4.0;  //inches
 
-    protected ScaledPage CurrentScale = new();
+    protected ScaledCanvas CurrentScale = new();
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
@@ -41,12 +50,12 @@ public class FoPage2D : FoGlyph2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-    public virtual void SetScale(ScaledPage scale)
+    public virtual void SetScale(ScaledCanvas scale)
     {
         CurrentScale = scale;
         CurrentScale.SetPageDefaults(this);
     }
- 
+
 
     public int DrawingWidth()
     {
@@ -61,10 +70,10 @@ public class FoPage2D : FoGlyph2D
         return CurrentScale?.ToPixels(PageMargin) ?? 0;  //margin all around
     }
 
-     public string DrawingWH()
+    public string DrawingWH()
     {
         return $"Drawing Size [{PageWidth}x{PageHeight} ({PageMargin})]in";
-    }   
+    }
 
 
 
@@ -91,11 +100,11 @@ public class FoPage2D : FoGlyph2D
         return list;
     }
 
- 
+
 
     public override bool Smash(bool force)
     {
-        if ( _matrix == null && !force) return false;
+        if (_matrix == null && !force) return false;
         $"Smashing Page {Name} {GetType().Name}".WriteInfo(2);
 
         return base.Smash(force);
@@ -111,12 +120,12 @@ public class FoPage2D : FoGlyph2D
 
         collection.AddObject(value.Name, value);
 
-        if ( value is IShape2D)
+        if (value is IShape2D)
         {
-            Shapes2D.Add(value);   
+            Shapes2D.Add(value);
             //$"IShape2D Added {value.Name}".WriteSuccess();
         }
-        else if ( value is IShape1D)
+        else if (value is IShape1D)
         {
             Shapes1D.Add(value);
             // $"IShape1D Added {value.Name}".WriteSuccess();
@@ -151,10 +160,10 @@ public class FoPage2D : FoGlyph2D
         shape.UnglueAll();
     }
 
-    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree) 
+    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-       // var count = Shapes2D.Count();
+        // var count = Shapes2D.Count();
         foreach (var item in Shapes2D.Values())
         {
             tree.Insert(item);
@@ -175,7 +184,7 @@ public class FoPage2D : FoGlyph2D
         var result = new List<FoGlyph2D>();
 
         var found = Shapes1D.FindWhere(child => child.GlyphIdCompare(GlyphId));
-        if (found != null && found.Count > 0) 
+        if (found != null && found.Count > 0)
             result.AddRange(found);
 
         found = Shapes2D.FindWhere(child => child.GlyphIdCompare(GlyphId));
@@ -200,7 +209,7 @@ public class FoPage2D : FoGlyph2D
     }
 
 
-   public new bool ComputeShouldRender(Rectangle region)
+    public new bool ComputeShouldRender(Rectangle region)
     {
         Shapes1D.ForEach(child => child.ComputeShouldRender(region));
         Shapes2D.ForEach(child => child.ComputeShouldRender(region));
@@ -283,7 +292,7 @@ public class FoPage2D : FoGlyph2D
         //only render members inside the region
 
         Shapes2D.ForEach(async child => await child.RenderConcise(ctx, scale, region));
-   
+
         // draw the current window
         await ctx.SetStrokeStyleAsync("Black");
         await ctx.SetLineWidthAsync(50.0F);
@@ -291,7 +300,7 @@ public class FoPage2D : FoGlyph2D
 
         var win = CurrentScale.UserWindow();
         await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
-        
+
 
         await ctx.RestoreAsync();
         return true;
@@ -310,7 +319,7 @@ public class FoPage2D : FoGlyph2D
         await ctx.RestoreAsync();
     }
 
-  public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
+    public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
         if (!IsVisible) return false;
 

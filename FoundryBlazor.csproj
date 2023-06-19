@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <Version>1.4.6</Version>
+    <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
@@ -17,15 +17,15 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
-    <!--<PackageReference Include="BlazorThreeJS" Version="0.4.1" />-->
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
-    <PackageReference Include="UnitsNet" Version="5.16.0" />
+
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\IoBT\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
   </ItemGroup>
 </Project>
