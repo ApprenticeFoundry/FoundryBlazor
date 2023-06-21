@@ -1,3 +1,4 @@
+using BlazorThreeJS.Maths;
 using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
@@ -7,8 +8,8 @@ public class FoDatum3D : FoGlyph3D
 		public string? Shape { get; set; }
 		public string? Text { get; set; }
 		public List<string>? Details { get; set; }
-		public FoVector3D? Position { get; set; }
-		public FoVector3D? BoundingBox { get; set; }
+		public Vector3? Position { get; set; }
+		public Vector3? BoundingBox { get; set; }
 
 		public FoDatum3D() : base()
 		{
@@ -18,7 +19,7 @@ public class FoDatum3D : FoGlyph3D
 		{
 			this.Text = text.Trim();
 
-			Position = new FoVector3D(xLoc, yLoc, zLoc);
+			Position = new Vector3(xLoc, yLoc, zLoc);
 
 			return this;
 		}
@@ -30,7 +31,7 @@ public class FoDatum3D : FoGlyph3D
 		}
 		public FoDatum3D EstablishBox(double width = 1.0, double height = 1.0, double depth = 1.0)
 		{
-			BoundingBox ??= new FoVector3D();
+			BoundingBox ??= new Vector3();
 
         	BoundingBox.Set(width, height, depth);
 

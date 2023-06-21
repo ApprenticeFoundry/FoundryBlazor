@@ -80,7 +80,8 @@ public class FoWorld3D : FoGlyph3D
             platform.Flush();
 
             //TODO: Why are TextLabels being added to Bodies?  If we can prevent that then we don't need to check obj.Type != null
-            Bodies()?.Where(obj => obj.IsSamePlatform(platform) && obj.Type != null)
+            var bodies = Bodies();
+            bodies?.Where(obj => obj.IsSamePlatform(platform) && obj.Type != null)
                     .Select(obj => platform.Add<FoShape3D>(obj)).ToList();
 
             Labels()?.Where(obj => obj.IsSamePlatform(platform))

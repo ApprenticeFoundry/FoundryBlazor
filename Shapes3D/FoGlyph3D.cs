@@ -1,4 +1,5 @@
 using BlazorThreeJS.Materials;
+using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
@@ -101,9 +102,9 @@ public class FoGlyph3D : FoComponent
         var pos = GetPosition(x, y, z);
         return this; 
     }
-    public virtual FoVector3D GetPosition(int x=0, int y=0, int z=0)
+    public virtual Vector3 GetPosition(int x=0, int y=0, int z=0)
     {
-        var result = new FoVector3D(x, y, z);
+        var result = new Vector3(x, y, z);
         return result;
     }
 

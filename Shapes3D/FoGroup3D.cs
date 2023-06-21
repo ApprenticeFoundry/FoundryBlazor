@@ -1,3 +1,4 @@
+using BlazorThreeJS.Maths;
 using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
@@ -5,9 +6,9 @@ namespace FoundryBlazor.Shape;
 public class FoGroup3D : FoGlyph3D
 {
 
-    public FoVector3D? Position { get; set; }
-    public FoVector3D? BoundingBox { get; set; }
-    public FoVector3D? Offset { get; set; }
+    public Vector3? Position { get; set; }
+    public Vector3? BoundingBox { get; set; }
+    public Vector3? Offset { get; set; }
 
 
     public FoGroup3D() : base()
@@ -41,9 +42,9 @@ public class FoGroup3D : FoGlyph3D
     public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         this.Name = name;
-        BoundingBox = new FoVector3D(width, height, depth);
-        Position = new FoVector3D();
-        Offset = new FoVector3D();
+        BoundingBox = new Vector3(width, height, depth);
+        Position = new Vector3();
+        Offset = new Vector3();
         return this;
     }
 
@@ -85,7 +86,7 @@ public class FoGroup3D : FoGlyph3D
     }
 
 
-    public FoGroup3D SetPositionTo(FoVector3D loc)
+    public FoGroup3D SetPositionTo(Vector3 loc)
     {
         Position = loc;
         return this;

@@ -1,6 +1,8 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Labels;
+using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
+using FoundryBlazor.Extensions;
 using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
@@ -13,7 +15,7 @@ public class FoText3D : FoGlyph3D, IShape3D
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
     public List<string>? Details { get; set; }
 
-    public FoVector3D? Position { get; set; }
+    public Vector3? Position { get; set; }
 
     public FoText3D() : base()
     {
@@ -43,13 +45,13 @@ public class FoText3D : FoGlyph3D, IShape3D
 
     public FoText3D CreateTextAt(string text, double x, double y, double z)
     {
-        Position = new FoVector3D(x, y, z);
+        Position = new Vector3(x, y, z);
         Text = text;
         return this;
     }
 
 
-    public override FoVector3D GetPosition(int x = 0, int y = 0, int z = 0)
+    public override Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
     {
         if (Position == null) 
             return base.GetPosition(x,y,z);
@@ -63,7 +65,7 @@ public class FoText3D : FoGlyph3D, IShape3D
         Label = new LabelText(text)
         {
             Color = Color ?? "Yellow",
-            Position = GetPosition().AsVector3()
+            Position = GetPosition()
         };
         ctx.Add(Label);
         return true;
@@ -87,7 +89,7 @@ public class FoText3D : FoGlyph3D, IShape3D
         //"Update label position".WriteSuccess();
         if (Label != null)
         {
-            Label.Position.Loc(xLoc, yLoc, zLoc);
+            Label.Position.Set(xLoc, yLoc, zLoc);
             return true;
         }
 

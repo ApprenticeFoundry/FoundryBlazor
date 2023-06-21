@@ -10,7 +10,8 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
+
 
 namespace FoundryBlazor.Shape;
 
@@ -19,10 +20,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public string Symbol { get; set; } = "";
     public string Type { get; set; } = "";
-    public FoVector3D? Position { get; set; }
-    public FoVector3D? Rotation { get; set; }
-    public FoVector3D? Origin { get; set; }
-    public FoVector3D? BoundingBox { get; set; }
+    public Vector3? Position { get; set; }
+    public Euler? Rotation { get; set; }
+    public Vector3? Origin { get; set; }
+    public Vector3? BoundingBox { get; set; }
     private Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
 
@@ -45,13 +46,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
         //"Update mesh position".WriteSuccess();
         if (ShapeMesh != null)
         {
-            ShapeMesh.Position.Loc(xLoc, yLoc, zLoc);
+            ShapeMesh.Position.Set(xLoc, yLoc, zLoc);
             return true;
         }
         else if (ShapeObject3D != null)
         {
             //$"ShapeObject3D Update mesh position {xLoc}, {yLoc}, {zLoc}".WriteSuccess();
-            ShapeObject3D.Position.Loc(xLoc, yLoc, zLoc);
+            ShapeObject3D.Position.Set(xLoc, yLoc, zLoc);
             return true;
         }
 
@@ -61,14 +62,14 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public FoShape3D CreateBox(string name, double width, double height, double depth)
     {
         Type = "Box";
-        BoundingBox = new FoVector3D(width, height, depth);
+        BoundingBox = new Vector3(width, height, depth);
         Name = name;
         return this;
     }
     public FoShape3D CreateCylinder(string name, double width, double height, double depth)
     {
         Type = "Cylinder";
-        BoundingBox = new FoVector3D(width, height, depth);
+        BoundingBox = new Vector3(width, height, depth);
         Name = name;
         return this;
     }
@@ -76,7 +77,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public FoShape3D CreateGlb(string url, double width, double height, double depth)
     {
         Type = "Glb";
-        BoundingBox = new FoVector3D(width, height, depth);
+        BoundingBox = new Vector3(width, height, depth);
         Symbol = url;
         $"CreateGlb symbol [{Symbol}] ".WriteSuccess();
         return this;
@@ -85,7 +86,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public FoShape3D CreateSphere(string name, double width, double height, double depth)
     {
         Type = "Sphere";
-        BoundingBox = new FoVector3D(width, height, depth);
+        BoundingBox = new Vector3(width, height, depth);
         Name = name;
         return this;
     }
@@ -107,11 +108,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public bool Box(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -120,11 +121,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public bool Boundary(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetWireframe()
         };
         ctx.Add(ShapeMesh);
@@ -133,11 +134,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Cylinder(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
         {
             Geometry = new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -146,12 +147,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Sphere(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new SphereGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -160,12 +161,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Circle(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new CircleGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -174,12 +175,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Capsule(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new CapsuleGeometry(radius: box.X / 2, box.Y),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -188,12 +189,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Cone(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new ConeGeometry(radius: box.X / 2, height: box.Y),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -202,12 +203,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Dodecahedron(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new DodecahedronGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -216,12 +217,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Icosahedron(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new IcosahedronGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -230,12 +231,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Octahedron(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new OctahedronGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -243,12 +244,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
     private bool Tetrahedron(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new TetrahedronGeometry(radius: box.X / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -256,12 +257,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
     private bool Plane(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new PlaneGeometry(width: box.X, height: box.Y),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -270,12 +271,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private bool Ring(Scene ctx)
     {
-        var box = BoundingBox ?? new FoVector3D(1, 1, 1);
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
         {
             Geometry = new RingGeometry(innerRadius: box.X / 2, outerRadius: box.Y / 2),
-            Position = GetPosition().AsVector3(),
+            Position = GetPosition(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -326,8 +327,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Uuid = Guid.NewGuid(),
             Format = format,
             FileURL = LoadingURL,
-            Position = Position?.AsVector3() ?? new Vector3(),
-            Rotation = Rotation?.AsEuler() ?? new Euler(),
+            Position = Position ?? new Vector3(),
+            Rotation = Rotation ?? new Euler(),
             OnComplete = (Scene scene, Object3D object3D) =>
             {
                 //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
@@ -388,7 +389,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         var label = new LabelText(message)
         {
             Color = "Yellow",
-            Position = new FoVector3D(-3, y, -2).AsVector3()
+            Position = new Vector3(-3, y, -2)
         };
 
         LoadingGUID = label.Uuid;
@@ -422,7 +423,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
 
 
-    public override FoVector3D GetPosition(int x = 0, int y = 0, int z = 0)
+    public override Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
     {
         if (Position == null) 
             return base.GetPosition(x,y,z);

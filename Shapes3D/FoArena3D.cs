@@ -1,5 +1,6 @@
 using BlazorComponentBus;
 using BlazorThreeJS.Enums;
+using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Canvas;
@@ -148,10 +149,10 @@ public class FoArena3D : FoGlyph3D, IArena
         platform.EstablishBox("Platform", 1, 1, 1);
 
         var largeBlock = platform.CreateUsing<FoShape3D>("LargeBlock").CreateBox("Large", 3, 1, 2);
-        largeBlock.Position = new FoVector3D();
+        largeBlock.Position = new Vector3();
 
         var smallBlock = platform.CreateUsing<FoShape3D>("SmallBlock").CreateBox("SmallBlock", 1.5, .5, 1);
-        smallBlock.Position = new FoVector3D()
+        smallBlock.Position = new Vector3()
         {
             X = -2.25,  //might need to changes sign
             Y = 0.75,
@@ -189,13 +190,13 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             var key = $"{name}-{i}";
             var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
-            shape.Position = new FoVector3D()
+            shape.Position = new Vector3()
             {
                 X = data.GenerateDouble(-5, 5),
                 Y = data.GenerateDouble(-5, 5),
                 Z = data.GenerateDouble(-5, 5),
             };
-            shape.Rotation = new FoVector3D()
+            shape.Rotation = new Euler()
             {
                 X = data.GenerateDouble(0, 360),
                 Y = data.GenerateDouble(0, 360),
@@ -230,7 +231,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         platform.CreateUsing<FoShape3D>(name)
         .CreateGlb(url, 1, 2, 3);
-        //shape.Position = new FoVector3D();
+        //shape.Position = new Vector3();
 
 
         name = name.Replace("_", " ");
