@@ -67,15 +67,16 @@ public class FoWorld3D : FoGlyph3D
     // 	return null;
     // }
 
-    public FoWorld3D FlushPlatforms()
+    public FoWorld3D FlushPlatformsObsolite()
     {
         Platforms()?.ForEach(platform => platform.Flush());
         return this;
     }
 
-    public List<FoGroup3D>? FillPlatforms()
+    public List<FoGroup3D>? FillPlatformsObsolite()
     {
-        Platforms()?.ForEach(platform =>
+        var platforms = Platforms();
+        platforms?.ForEach(platform =>
         {
             platform.Flush();
 
@@ -90,7 +91,7 @@ public class FoWorld3D : FoGlyph3D
             Datums()?.Where(obj => obj.IsSamePlatform(platform))
                     .Select(obj => platform.Add<FoDatum3D>(obj)).ToList();
         });
-        return Platforms();
+        return platforms;
     }
 
     //public FoWorld3D FillWorldFromPlatform(FoGroup3D platform)

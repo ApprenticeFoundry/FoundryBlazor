@@ -23,13 +23,13 @@ public interface IArena
     Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    void RenderWorld(FoWorld3D? world);
+    bool RenderWorldToScene(FoWorld3D? world);
+    bool RenderWorld(FoWorld3D? world);
     bool PreRender(FoGlyph3D glyph);
 
     FoStage3D CurrentStage();
-    FoGroup3D MakeAndRenderTestPlatform();
-    FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
-    FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL);
+    FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
+    FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 }
 public class FoArena3D : FoGlyph3D, IArena
@@ -132,181 +132,154 @@ public class FoArena3D : FoGlyph3D, IArena
         }
     }
 
-    // public void RefreshUI()
-    // {
-    //     PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("one"));
-    // }
-
-    public FoGroup3D MakeAndRenderTestPlatform()
-    {
-
-        var platform = new FoGroup3D()
-        {
-            GlyphId = Guid.NewGuid().ToString(),
-            PlatformName = "RonTest",
-            Name = "RonTest"
-        };
-        platform.EstablishBox("Platform", 1, 1, 1);
-
-        var largeBlock = platform.CreateUsing<FoShape3D>("LargeBlock").CreateBox("Large", 3, 1, 2);
-        largeBlock.Position = new Vector3();
-
-        var smallBlock = platform.CreateUsing<FoShape3D>("SmallBlock").CreateBox("SmallBlock", 1.5, .5, 1);
-        smallBlock.Position = new Vector3()
-        {
-            X = -2.25,  //might need to changes sign
-            Y = 0.75,
-            Z = 1.5,
-        };
-
-        platform.CreateUsing<FoText3D>("Label-1").CreateTextAt($"Hello World", -1.0, 2.0, 1.0);
-
-        RenderPlatformToScene(platform);
-        Task.Run(async () =>
-        {
-            await UpdateArena();
-        });
-
-        return platform;
-    }
 
 
-    public FoGroup3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
-        var platform = new FoGroup3D()
-        {
-            GlyphId = Guid.NewGuid().ToString(),
-            PlatformName = folder,
-            Name = name
-        };
-        platform.EstablishBox("Platform", 1, 1, 1);
 
 
+        var world3D = new UDTO_World();
         var data = new MockDataMaker();
         var url = Path.Join(baseURL, folder, filename);
 
+        var root = new DT_Hero();
+
         for (int i = 0; i < count; i++)
         {
-            var key = $"{name}-{i}";
-            var shape = platform.CreateUsing<FoShape3D>(key).CreateGlb(url, 1, 2, 3);
-            shape.Position = new Vector3()
-            {
-                X = data.GenerateDouble(-5, 5),
-                Y = data.GenerateDouble(-5, 5),
-                Z = data.GenerateDouble(-5, 5),
-            };
-            shape.Rotation = new Euler()
-            {
-                X = data.GenerateDouble(0, 360),
-                Y = data.GenerateDouble(0, 360),
-                Z = data.GenerateDouble(0, 360),
-            };
-            $"key={key} position={shape.Position.X}, {shape.Position.Y} rotation={shape.Rotation}".WriteInfo();
-        }
+            root.name = $"{name}-{i}";
+            var shape = world3D.CreateGlb(root, url, 1, 2, 3);
+            shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
+            shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
+        };
 
+        var world = MapToWorld3D(world3D);
+        RenderWorld(world);
 
-        PreRenderPlatform(platform);
-        RenderPlatformToScene(platform);
         //PostRenderplatform
 
-        return platform;
+        return world;
     }
 
-    public FoGroup3D Load3DModelFromFile(string folder, string filename, string baseURL)
+    public FoWorld3D MapToWorld3D(UDTO_World world)
+    {
+        var newWorld = new FoWorld3D();
+        world.platforms.ForEach(item =>
+        {
+            var group = new FoGroup3D()
+            {
+                PlatformName = item.platformName,
+                GlyphId = item.uniqueGuid,
+                Name = item.name,
+            };
+            newWorld.Slot<FoGroup3D>().Add(group);
+        });
+
+        world.bodies.ForEach(item =>
+        {
+            var pos = item.position;
+            var box = item.boundingBox;
+            var shape3D = new FoShape3D()
+            {
+                PlatformName = item.platformName,
+                GlyphId = item.uniqueGuid,
+                Name = item.name,
+                Symbol = item.symbol,
+                Type = item.type,
+                Position = pos?.LocAsVector3(),
+                Rotation = pos?.AngAsVector3(),
+                BoundingBox = box?.BoxAsVector3(),
+                Origin = box?.PinAsVector3(),
+            };
+            newWorld.Slot<FoShape3D>().Add(shape3D);
+            $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
+
+        });
+
+        world.labels.ForEach(item =>
+        {
+            var pos = item.position;
+            var text3D = new FoText3D()
+            {
+                PlatformName = item.platformName,
+                GlyphId = item.uniqueGuid,
+                Name = item.name,
+                Position = pos?.LocAsVector3(),
+                Text = item.text,
+                Details = item.details
+            };
+            newWorld.Slot<FoText3D>().Add(text3D);
+        });
+
+        return newWorld;
+    }
+
+    public FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
-        var platform = new FoGroup3D()
-        {
-            GlyphId = Guid.NewGuid().ToString(),
-            PlatformName = folder,
-            Name = name
-        };
-        platform.EstablishBox("Platform", 1, 1, 1);
-
 
         var url = Path.Join(baseURL, folder, filename);
         // var url = $"{baseURL}/{folder}/{filename}";
 
+        var root = new DT_Hero
+        {
+            name = name
+        };
 
-        platform.CreateUsing<FoShape3D>(name)
-        .CreateGlb(url, 1, 2, 3);
-        //shape.Position = new Vector3();
-
-
-        name = name.Replace("_", " ");
-        platform.CreateUsing<FoText3D>("Label-1")
-            .CreateTextAt(name, 0.0, 5.0, 0.0);
+        var world3D = new UDTO_World();
+        world3D.CreateGlb(root,url, 1, 2, 3);
 
 
-        PreRenderPlatform(platform);
-        RenderPlatformToScene(platform);
-        //PostRenderplatform
+        var text = name.Replace("_", " ");
+        world3D.CreateLabel(root, text, 0.0, 5.0, 0.0);
 
-        return platform;
+
+
+        var world = MapToWorld3D(world3D);
+        RenderWorld(world);
+
+
+        return world;
     }
 
-    public void RenderWorld(FoWorld3D? world)
+    public bool RenderWorld(FoWorld3D? world)
     {
-        if (world == null) return;
-        world.FillPlatforms();
+        if (world == null) return false;
 
         $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
 
-
         PreRenderWorld(world);
-        RenderWorldToScene(world);
-        //RefreshUI();
+        return RenderWorldToScene(world);
     }
 
 
 
-    public void RenderWorldToScene(FoWorld3D? world)
+
+
+    public bool RenderWorldToScene(FoWorld3D? world)
     {
-        $"world={world}".WriteInfo();
-        if (world == null)
+
+        if (world == null || Scene == null)
         {
             $"world is empty or viewer is not present".WriteError();
-            return;
-        }
-
-        $"Platforms Count={world.Platforms()?.Count}".WriteInfo();
-
-        world.Platforms()?.ForEach(platform =>
-        {
-            $"RenderWorldToScene PlatformName: {platform.PlatformName}".WriteInfo();
-            RenderPlatformToScene(platform);
-        });
-
-    }
-
-    public void RenderPlatformToScene(FoGroup3D? platform)
-    {
-
-        //$"RenderPlatformToScene PlatformName= {platform?.PlatformName}".WriteInfo();
-
-        $"platform = {platform}".WriteInfo();
-        if (platform == null || Scene == null)
-        {
-            $"platform is empty or viewer is not present".WriteError();
-            return;
+            return false;
         }
 
         //$"RenderPlatformToScene Bodies() {platform.Bodies()?.Count}  Labels() {platform.Labels()?.Count}  ".WriteSuccess();
 
-        platform.Bodies()?.ForEach(body =>
+        world.Bodies()?.ForEach(body =>
         {
            // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
         });
 
-        platform.Labels()?.ForEach(label =>
+        world.Labels()?.ForEach(label =>
         {
             //$"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
             label.Render(Scene, 0, 0);
         });
 
-        platform.Datums()?.ForEach(datum =>
+        world.Datums()?.ForEach(datum =>
         {
            // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
             datum.Render(Scene, 0, 0);
@@ -314,6 +287,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         //RefreshUI();
         //PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
+        return true;
     }
 
     public void PreRenderWorld(FoWorld3D? world)
@@ -325,25 +299,13 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        world.Platforms()?.ForEach(PreRenderPlatform);
+        var bodies = world.Bodies();
+        if (bodies != null)
+            PreRenderBodies(bodies);
     }
 
-    public void PreRenderPlatform(FoGroup3D? platform)
+    public void PreRenderBodies(List<FoShape3D> platformBodies)
     {
-        $"PreRenderPlatform platform={platform}".WriteInfo();
-        if (platform == null)
-        {
-            $"platform is empty or viewer is not present".WriteError();
-            return;
-        }
-
-        //var scene = CurrentStage().GetScene();
-        //$"scene={scene}".WriteInfo();
-
-        var platformBodies = platform.Bodies();
-
-        if (platformBodies == null)
-            return;
 
         var glbBodies = platformBodies.Where((body) => body.Type.Matches("Glb")).ToList();
         var otherBodies = platformBodies.Where((body) => !body.Type.Matches("Glb")).ToList();
