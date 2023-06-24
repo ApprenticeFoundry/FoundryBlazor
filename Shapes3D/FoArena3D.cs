@@ -23,8 +23,8 @@ public interface IArena
     Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    bool RenderWorldToScene(FoWorld3D? world);
-    bool RenderWorld(FoWorld3D? world);
+    bool RenderWorld3DToScene(FoWorld3D? world);
+    bool RenderWorld3D(FoWorld3D? world);
     bool PreRender(FoGlyph3D glyph);
 
     FoStage3D CurrentStage();
@@ -154,7 +154,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
 
         var world = MapToWorld3D(world3D);
-        RenderWorld(world);
+        RenderWorld3D(world);
 
         //PostRenderplatform
 
@@ -227,7 +227,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
 
         var world3D = new UDTO_World();
-        world3D.CreateGlb(root,url, 1, 2, 3);
+        world3D.CreateGlb(root, url, 1, 2, 3);
 
 
         var text = name.Replace("_", " ");
@@ -236,27 +236,27 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
         var world = MapToWorld3D(world3D);
-        RenderWorld(world);
+        RenderWorld3D(world);
 
 
         return world;
     }
 
-    public bool RenderWorld(FoWorld3D? world)
+    public bool RenderWorld3D(FoWorld3D? world)
     {
         if (world == null) return false;
 
         $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
 
-        PreRenderWorld(world);
-        return RenderWorldToScene(world);
+        PreRenderWorld3D(world);
+        return RenderWorld3DToScene(world);
     }
 
 
 
 
 
-    public bool RenderWorldToScene(FoWorld3D? world)
+    public bool RenderWorld3DToScene(FoWorld3D? world)
     {
 
         if (world == null || Scene == null)
@@ -269,7 +269,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         world.Bodies()?.ForEach(body =>
         {
-           // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
+            // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
         });
 
@@ -281,7 +281,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         world.Datums()?.ForEach(datum =>
         {
-           // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
+            // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
             datum.Render(Scene, 0, 0);
         });
 
@@ -290,7 +290,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
-    public void PreRenderWorld(FoWorld3D? world)
+    public void PreRenderWorld3D(FoWorld3D? world)
     {
         $"PreRenderWorld world={world}".WriteInfo();
         if (world == null)
@@ -301,14 +301,14 @@ public class FoArena3D : FoGlyph3D, IArena
 
         var bodies = world.Bodies();
         if (bodies != null)
-            PreRenderBodies(bodies);
+            PreRenderShape3D(bodies);
     }
 
-    public void PreRenderBodies(List<FoShape3D> platformBodies)
+    public void PreRenderShape3D(List<FoShape3D> shapes)
     {
 
-        var glbBodies = platformBodies.Where((body) => body.Type.Matches("Glb")).ToList();
-        var otherBodies = platformBodies.Where((body) => !body.Type.Matches("Glb")).ToList();
+        var glbBodies = shapes.Where((body) => body.Type.Matches("Glb")).ToList();
+        var otherBodies = shapes.Where((body) => !body.Type.Matches("Glb")).ToList();
 
         var bodyDict = glbBodies
             .GroupBy(item => item.Symbol)
