@@ -113,6 +113,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -126,6 +127,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetWireframe()
         };
         ctx.Add(ShapeMesh);
@@ -139,6 +141,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -153,6 +156,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new SphereGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -167,6 +171,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CircleGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -181,6 +186,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CapsuleGeometry(radius: box.X / 2, box.Y),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -195,6 +201,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new ConeGeometry(radius: box.X / 2, height: box.Y),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -209,6 +216,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new DodecahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -223,6 +231,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new IcosahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -237,6 +246,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new OctahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -250,6 +260,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new TetrahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -263,6 +274,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new PlaneGeometry(width: box.X, height: box.Y),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -277,6 +289,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new RingGeometry(innerRadius: box.X / 2, outerRadius: box.Y / 2),
             Position = GetPosition(),
+            Rotation = GetRotation(),
             Material = GetMaterial()
         };
         ctx.Add(ShapeMesh);
@@ -290,6 +303,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new TorusGeometry(radius: 0.6f, tube: 0.4f, radialSegments: 12, tubularSegments: 12),
             Position = new Vector3(4, 0, -4),
+            Rotation = new Euler(0, 0, 0),
             Material = new MeshStandardMaterial()
             {
                 Color = "lightgreen"
@@ -327,8 +341,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Uuid = Guid.NewGuid(),
             Format = format,
             FileURL = LoadingURL,
-            Position = Position ?? new Vector3(),
-            Rotation = Rotation ?? new Euler(),
+            Position = GetPosition(),
+            Rotation = GetRotation(),
             OnComplete = (Scene scene, Object3D object3D) =>
             {
                 //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
@@ -430,7 +444,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return Position;
     }
 
-
+    public override Euler GetRotation(int x = 0, int y = 0, int z = 0)
+    {
+        if (Rotation == null)
+            return base.GetRotation(x, y, z);
+        return Rotation;
+    }
 
     public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {

@@ -3,6 +3,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
 using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
@@ -108,6 +109,11 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
+    public virtual Euler GetRotation(int x = 0, int y = 0, int z = 0)
+    {
+        var result = new Euler(x, y, z);
+        return result;
+    }
 
     public virtual bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {

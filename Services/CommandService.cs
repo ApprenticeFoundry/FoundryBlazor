@@ -4,6 +4,7 @@ using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Persistence;
 using FoundryBlazor.Shared;
+using IoBTMessage.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -310,7 +311,7 @@ public class CommandService : ICommand
         var type = StorageHelpers.LookupType(create.PayloadType);
         if (type == null) return false;
 
-        var result = StorageHelpers.HydrateObject(type, create.Payload);
+        var result = CodingExtensions.HydrateObject(type, create.Payload);
         if (result is not FoGlyph2D newShape) return false;
 
         //$"newShape {newShape.GetType().Name} {newShape.Name}".WriteNote();
@@ -436,7 +437,7 @@ public class CommandService : ICommand
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());
 
-        var json = StorageHelpers.Dehydrate<ModelPersist>(model, false);
+        var json = CodingExtensions.Dehydrate<ModelPersist>(model, false);
         StorageHelpers.WriteData("storage", version.Filename, json);
 
         var filename = version.Filename.Replace("json", "zip");
@@ -455,7 +456,7 @@ public class CommandService : ICommand
 
         //var json = SettingsHelpers.ReadData("storage", version.filename);
 
-        var model = StorageHelpers.Hydrate<ModelPersist>(json, false);
+        var model = CodingExtensions.Hydrate<ModelPersist>(json, false);
         model?.RestorePages(Pages());
 
         SendToast(ToastType.Success, $"{filename} is Restored");

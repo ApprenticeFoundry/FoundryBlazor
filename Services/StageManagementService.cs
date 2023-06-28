@@ -1,5 +1,6 @@
 using BlazorThreeJS.Scenes;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -123,8 +124,8 @@ public class StageManagementService : FoComponent, IStageManagement
 
     public U MorphTo<T, U>(T value) where T : FoGlyph3D where U : FoGlyph3D
     {
-        var body = StorageHelpers.Dehydrate<T>(value, false);
-        var shape = StorageHelpers.Hydrate<U>(body, false);
+        var body = CodingExtensions.Dehydrate<T>(value, false);
+        var shape = CodingExtensions.Hydrate<U>(body, false);
 
         shape!.Name = "";
         //shape!.GlyphId = "";

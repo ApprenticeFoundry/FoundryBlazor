@@ -1,6 +1,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using Unglide;
@@ -208,7 +209,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             var color = result.Failure ? ConsoleColor.Red : ConsoleColor.Green;
 
             result.Width = (int)textMetrics.Width;
-            $"FoText2D ComputeSize {count} {Fragment} {result.Width} {result.Height}  FONT:{ctx.Font}  SPEC:{FontSpec}".WriteLine(color);
+            $"FoText2D ComputeSize {count} {Fragment} {result.Width} {result.Height}  FONT:{ctx.Font}  SPEC:{FontSpec}".WriteInfo();
         }
         while (result.Failure && count < 3);
 
