@@ -1,6 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 
@@ -236,8 +237,8 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public T Duplicate<T>(T value) where T : FoGlyph2D
     {
-        var body = StorageHelpers.Dehydrate<T>(value, false);
-        var shape = StorageHelpers.Hydrate<T>(body, false);
+        var body = CodingExtensions.Dehydrate<T>(value, false);
+        var shape = CodingExtensions.Hydrate<T>(body, false);
 
         shape.Name = "";
         shape.GlyphId = "";
@@ -253,8 +254,8 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public U MorphTo<T, U>(T value) where T : FoGlyph2D where U : FoGlyph2D
     {
-        var body = StorageHelpers.Dehydrate<T>(value, false);
-        var shape = StorageHelpers.Hydrate<U>(body, false);
+        var body = CodingExtensions.Dehydrate<T>(value, false);
+        var shape = CodingExtensions.Hydrate<U>(body, false);
 
         shape.Name = "";
         shape.GlyphId = "";
@@ -302,7 +303,7 @@ public class PageManagementService : FoComponent, IPageManagement
         var first = _selectService.Selections().FirstOrDefault();
         if (first == null) return null;
 
-        $"GroupSelected {first}".WriteLine(ConsoleColor.White);
+        $"GroupSelected {first}".WriteNote();
 
         if (Activator.CreateInstance(typeof(T)) is not T group) return null;
 

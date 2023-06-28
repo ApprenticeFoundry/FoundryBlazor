@@ -7,6 +7,7 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
+using IoBTMessage.Extensions;
 using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -128,7 +129,7 @@ public class FoArena3D : FoGlyph3D, IArena
         }
         catch (System.Exception ex)
         {
-            $" DoCreate {action.Method.Name} {ex.Message}".WriteLine();
+            $" DoCreate {action.Method.Name} {ex.Message}".WriteNote();
         }
     }
 
@@ -246,7 +247,7 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         if (world == null) return false;
 
-        $"RenderWorld {world.Name}".WriteLine(ConsoleColor.Blue);
+        $"RenderWorld {world.Name}".WriteNote();
 
         PreRenderWorld3D(world);
         return RenderWorld3DToScene(world);

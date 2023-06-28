@@ -1,5 +1,6 @@
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Shape;
+using IoBTMessage.Extensions;
 
 namespace FoundryBlazor.Message;
 
@@ -15,7 +16,7 @@ public class D2D_ModelCreate : D2D_Base
     public D2D_ModelCreate(string guid, object data)
     {
         TargetId = guid;
-        Payload = StorageHelpers.Dehydrate(data, false);
+        Payload = CodingExtensions.Dehydrate(data, false);
         PayloadType = data.GetType().Name;
     }
 

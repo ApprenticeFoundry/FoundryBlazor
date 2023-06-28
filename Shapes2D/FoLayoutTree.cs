@@ -1,6 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
@@ -495,7 +496,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             // $"Adding Shape {tag} {shape.Name}".WriteLine(ConsoleColor.Green);
         } else 
         {
-            $"Child is empty {child}".WriteLine(ConsoleColor.Green);
+            $"Child is empty {child}".WriteSuccess();
         }
         return child;
     }

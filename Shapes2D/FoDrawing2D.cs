@@ -8,7 +8,7 @@ using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Diagnostics;
+using IoBTMessage.Extensions;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
@@ -302,7 +302,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }
         catch (System.Exception ex)
         {
-            $" DoCreate {action.Method.Name} {ex.Message}".WriteLine();
+            $" DoCreate {action.Method.Name} {ex.Message}".WriteNote();
         }
     }
 
@@ -338,7 +338,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             AllVideos.ForEach(item =>
             {
                 var data = item.ImageUrl;
-                $"{data}".WriteLine();
+                $"{data}".WriteNote();
             });
             FoVideo2D.RefreshVideos = false;
         }
@@ -603,7 +603,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }
         catch (Exception ex)
         {
-            $" {args.Topic} {ex.Message}".WriteLine();
+            $" {args.Topic} {ex.Message}".WriteNote();
         }
         finally
         {
@@ -638,7 +638,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
 
@@ -657,7 +657,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
              }
              catch (Exception ex)
              {
-                 $" {args.Topic} {ex.Message}".WriteLine();
+                 $" {args.Topic} {ex.Message}".WriteNote();
              }
          });
 
@@ -673,7 +673,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
 
@@ -689,7 +689,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
     }
