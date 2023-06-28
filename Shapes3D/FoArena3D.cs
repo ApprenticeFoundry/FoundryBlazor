@@ -187,6 +187,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 Name = item.name,
                 Symbol = item.symbol,
                 Type = item.type,
+                Color =  string.IsNullOrEmpty(item.material) ? "Green" : item.material,
                 Position = pos?.LocAsVector3(),
                 Rotation = pos?.AngAsVector3(),
                 BoundingBox = box?.BoxAsVector3(),
