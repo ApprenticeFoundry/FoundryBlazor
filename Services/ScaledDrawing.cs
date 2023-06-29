@@ -35,7 +35,7 @@ public class ScaledDrawing : IScaledCanvas
 
     private Rectangle userWindow { get; set; } = new Rectangle(0, 0, 1500, 400);
 
-    public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
+
     public Length PageMargin { get; set; } = new Length(.50, "in"); //inches
     public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
     public Length PageHeight { get; set; } = new Length(6.0, "in");  //inches
@@ -77,12 +77,7 @@ public class ScaledDrawing : IScaledCanvas
         return (int)inches.AsPixels();
     }
 
-    // public Point InchesToPixelInset(Length width, Length height)
-    // {
-    //     var w = (int)ToPixels(width + PageMargin);
-    //     var h = (int)ToPixels(height + PageMargin);
-    //     return new Point(w, h);
-    // }
+
 
 
     public void SetCanvasPixelSize(int width, int height)
@@ -125,29 +120,10 @@ public class ScaledDrawing : IScaledCanvas
     }
     public string CanvasWH()
     {
-        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{PixelsPerInch}";
-    }
-    public double GetPixelsPerInch()
-    {
-        return PixelsPerInch;
-    }
-    public int ToPixels(double inches)
-    {
-        return (int)(PixelsPerInch * inches);
-    }
-    public double ToInches(int value)
-    {
-        return (double)(value / PixelsPerInch);
-    }
-    public double ConvertToPixels(double inches)
-    {
-        return PixelsPerInch * inches;
+        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} ";
     }
 
-    public double ConvertToInches(double pixels)
-    {
-        return pixels / PixelsPerInch;
-    }
+
 
     public async Task ClearCanvas(Canvas2DContext ctx)
     {
@@ -163,11 +139,11 @@ public class ScaledDrawing : IScaledCanvas
     {
         await ctx.SaveAsync();
 
-        var dMinor = ToPixels(minor);
-        var dMajor = ToPixels(major);
-        var dMargin = ToPixels(PageMargin);
-        var dWidth = ToPixels(PageWidth) + dMargin;
-        var dHeight = ToPixels(PageHeight) + dMargin;
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
 
 
         await ctx.SetLineWidthAsync(1);
@@ -208,11 +184,11 @@ public class ScaledDrawing : IScaledCanvas
     {
         await ctx.SaveAsync();
 
-        var dMinor = ToPixels(minor);
-        var dMajor = ToPixels(major);
-        var dMargin = ToPixels(PageMargin);
-        var dWidth = ToPixels(PageWidth) + dMargin;
-        var dHeight = ToPixels(PageHeight) + dMargin;
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
 
 
         await ctx.SetLineWidthAsync(1);

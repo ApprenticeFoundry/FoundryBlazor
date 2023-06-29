@@ -119,11 +119,11 @@ public class ScaledCanvas : IScaledCanvas
     {
         await ctx.SaveAsync();
 
-        var dMinor = ToPixels(minor);
-        var dMajor = ToPixels(major);
-        var dMargin = ToPixels(PageMargin);
-        var dWidth = ToPixels(PageWidth) + dMargin;
-        var dHeight = ToPixels(PageHeight) + dMargin;
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
 
 
         await ctx.SetLineWidthAsync(1);
@@ -141,6 +141,9 @@ public class ScaledCanvas : IScaledCanvas
             await ctx.StrokeAsync();
             x += dMinor;
         }
+
+        await ctx.SetFillStyleAsync("RED");
+        await ctx.FillTextAsync($"DW {dWidth}", x + 1, 200);
 
 
         await ctx.SetLineDashAsync(Array.Empty<float>());
@@ -164,11 +167,11 @@ public class ScaledCanvas : IScaledCanvas
     {
         await ctx.SaveAsync();
 
-        var dMinor = ToPixels(minor);
-        var dMajor = ToPixels(major);
-        var dMargin = ToPixels(PageMargin);
-        var dWidth = ToPixels(PageWidth) + dMargin;
-        var dHeight = ToPixels(PageHeight) + dMargin;
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
 
 
         await ctx.SetLineWidthAsync(1);
