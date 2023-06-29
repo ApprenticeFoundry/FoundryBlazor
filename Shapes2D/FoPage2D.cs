@@ -321,8 +321,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextAlignAsync(TextAlign.Left);
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
+        var text = $"Page: {Name} W:{PageWidth.AsString("in")} x H:{PageHeight.AsString("in")}  ({PageMargin.AsString("in")})";
+        
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.FillTextAsync(text, PinX + 5, PinY + 5);
         await ctx.RestoreAsync();
     }
 
