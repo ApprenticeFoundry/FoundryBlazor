@@ -32,17 +32,15 @@ public class StageManagementService : FoComponent, IStageManagement
     //private readonly FoCollection<FoStage3D> Stages = new();
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledArena _ScaledArena;
+
 
     public StageManagementService
     (
         IHitTestService hit,
-        IScaledArena scaled,
         ISelectionService sel)
     {
         _hitTestService = hit;
         _selectService = sel;
-        _ScaledArena = scaled;
 
         ActiveStage = CurrentStage();
     }
@@ -95,7 +93,6 @@ public class StageManagementService : FoComponent, IStageManagement
             if (found == null)
             {
                 found = new FoStage3D("Stage-1",10,10,10,"Red");
-                found.SetScaledArena(_ScaledArena);
                 AddStage(found);
             }
             ActiveStage = found;

@@ -11,10 +11,10 @@ public class FoPanZoomWindow : FoGlyph2D
     private readonly IPageManagement PageManager;
     private readonly IPanZoomService PanZoomService;
     private readonly IHitTestService _hitTestService;
-    private readonly IScaledCanvas _scaled;
+    private readonly IDrawing _scaled;
 
 
-    public FoPanZoomWindow(IPageManagement manager, IPanZoomService panzoom, IHitTestService hitTest, IScaledCanvas scaled, string color) : base("Pan Zoom", color)
+    public FoPanZoomWindow(IPageManagement manager, IPanZoomService panzoom, IHitTestService hitTest, IDrawing scaled, string color) : base("Pan Zoom", color)
     {
         PageManager = manager;
         PanZoomService = panzoom;

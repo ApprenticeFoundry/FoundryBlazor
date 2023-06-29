@@ -57,16 +57,13 @@ public class PageManagementService : FoComponent, IPageManagement
     private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
-    private readonly IScaledCanvas _ScaledDrawing;
 
     public PageManagementService(
         IHitTestService hit,
-        IScaledCanvas help,
         ISelectionService sel)
     {
         _hitTestService = hit;
         _selectService = sel;
-        _ScaledDrawing = help;
 
         ActivePage = CurrentPage();
     }
@@ -82,24 +79,21 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public FoPage2D SetPageSizeInches(double width, double height)
     {
-        _ScaledDrawing.SetPageSizeInches(width, height);
 
         var page = CurrentPage();
-        _ScaledDrawing.SetPageDefaults(page);
+        page.SetPageSizeInches(width, height);
         return page;
     }
     public FoPage2D SetPageLandscape()
     {
         var page = CurrentPage();
-        _ScaledDrawing.SetPageLandscape();
-        _ScaledDrawing.SetPageDefaults(page);
+        page.SetPageLandscape();
         return page;
     }
     public FoPage2D SetPagePortrait()
     {
         var page = CurrentPage();
-        _ScaledDrawing.SetPagePortrait();
-        _ScaledDrawing.SetPageDefaults(page);
+        page.SetPagePortrait();
         return page;
     }
 
@@ -210,7 +204,6 @@ public class PageManagementService : FoComponent, IPageManagement
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
-                found.SetScale(_ScaledDrawing.CreateScaledPage());
                 AddPage(found);
             }
             ActivePage = found;

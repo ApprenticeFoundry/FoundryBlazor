@@ -22,7 +22,7 @@ public interface IDrawing : IRender
     bool SetCurrentlyProcessing(bool value);
     void SetCanvasPixelSize(int width, int height);
 
-
+    Size TrueCanvasSize();
     Rectangle TransformRect(Rectangle rect);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
@@ -56,6 +56,10 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
+    public int TrueCanvasWidth = 0;
+    public int TrueCanvasHeight = 0;
+    private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
+
     private string UserID = "";
     private InputStyle InputStyle = InputStyle.None;
     private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
@@ -65,7 +69,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
     public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
-    private IScaledCanvas ScaleDrawing { get; set; }
+
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -144,12 +148,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
-        IScaledCanvas scaled,
         IHitTestService hittest,
         ComponentBus pubSub
         )
     {
-        ScaleDrawing = scaled;
         HitTestService = hittest;
         SelectionService = select;
         PanZoomService = panzoom;
@@ -216,6 +218,21 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return lastInteraction;
     }
 
+    public Rectangle UserWindow()
+    {
+        return UserWindowRect;
+    }
+
+    public Rectangle SetUserWindow(Size size)
+    {
+        UserWindowRect = new Rectangle(UserWindowRect.Location, size);
+        return UserWindowRect;
+    }
+    public Rectangle SetUserWindow(Point loc)
+    {
+        UserWindowRect = new Rectangle(-loc.X, -loc.Y, UserWindowRect.Width, UserWindowRect.Height);
+        return UserWindowRect;
+    }
     public void SetUserID(string panID)
     {
         UserID = panID;
@@ -246,7 +263,22 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void SetCanvasPixelSize(int width, int height)
     {
-        ScaleDrawing.SetCanvasPixelSize(width, height);
+        TrueCanvasWidth = width;
+        TrueCanvasHeight = height;
+    }
+    public Size TrueCanvasSize()
+    {
+        return new Size(TrueCanvasWidth, TrueCanvasHeight);
+    }
+
+    public async Task ClearCanvas(Canvas2DContext ctx)
+    {
+        await ctx.ClearRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+        await ctx.SetFillStyleAsync("#98AFC7");
+        await ctx.FillRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+
+        await ctx.SetStrokeStyleAsync("Black");
+        await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
     }
 
     public void ClearAll()
@@ -283,7 +315,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 OffsetY = page.FractionY(0.15) + 20
             });
 
-            var region = ScaleDrawing.UserWindow();
+            var region = UserWindow();
             page.ComputeShouldRender(region);
         }
         catch (System.Exception ex)
@@ -342,7 +374,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         if (PanZoomShape == null)
         {
-            PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
+            PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, this, "Silver");
             PanZoomShape.SizeToFit();
             PanZoomShape.IsVisible = false;
 
@@ -415,7 +447,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public bool UserWindowMovedTo(Point loc)
     {
-        var region = ScaleDrawing.SetUserWindow(loc);
+        var region = SetUserWindow(loc);
         var page = PageManager.CurrentPage();
         page.ComputeShouldRender(region);
 
@@ -424,8 +456,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
     public bool UserWindowResized(Size size)
     {
-        var region = ScaleDrawing.SetUserWindow(size);
+        var region = SetUserWindow(size);
         var page = PageManager.CurrentPage();
+
         page.ComputeShouldRender(region);
 
         //  $"UserWindowResized {rect.X} {rect.Y} {rect.Width} {rect.Height} ---".WriteLine(ConsoleColor.Blue);
@@ -447,7 +480,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
 
-        await ScaleDrawing.ClearCanvas(ctx);
+        await ClearCanvas(ctx);
 
         await ctx.SaveAsync();
 
@@ -483,7 +516,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.SetFontAsync("18px consolas");
         //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
         await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
-        await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
+        //await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
 
         int loc = 130;
 
@@ -538,7 +571,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // draw the current window
         await ctx.SetStrokeStyleAsync("Black");
         await ctx.SetLineWidthAsync(10.0F);
-        var win = ScaleDrawing.UserWindow();
+        var win = UserWindow();
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 

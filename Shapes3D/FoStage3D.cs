@@ -25,7 +25,7 @@ public class FoStage3D : FoGlyph3D, IStage
     public double StageWidth { get; set; } = 30.0;  //meters
     public double StageHeight { get; set; } = 30.0;  //meters
     public double StageDepth { get; set; } = 30.0;  //meters
-    protected IScaledArena? _ScaledArena;
+
 
     private Scene? CurrentScene { get; set; }
     private Mesh? ShapeMesh { get; set; }
@@ -53,30 +53,6 @@ public class FoStage3D : FoGlyph3D, IStage
         SetBoundry(width, height, depth);
     }
 
-
-
-    public double ArenaWidth()
-    {
-        return _ScaledArena?.ToUnits(StageWidth) ?? 0;
-    }
-    public double ArenaHeight()
-    {
-        return _ScaledArena?.ToUnits(StageHeight) ?? 0;
-    }
-    public double ArenaDepth()
-    {
-        return _ScaledArena?.ToUnits(StageDepth) ?? 0;
-    }
-    public double ArenaMargin()
-    {
-        return _ScaledArena?.ToUnits(StageMargin) ?? 0;  //margin all around
-    }
-
-    public virtual void SetScaledArena(IScaledArena scaledArena)
-    {
-        _ScaledArena = scaledArena;
-        scaledArena.SetStageDefaults(this);
-    }
 
     public Scene SetScene(Scene scene)
     {
@@ -110,9 +86,7 @@ public class FoStage3D : FoGlyph3D, IStage
     {
         if (ShapeMesh != null) return false;
 
-        Width = ArenaWidth();
-        Height = ArenaHeight();
-        Depth = ArenaDepth();
+
         ShapeMesh = new Mesh
         {
             Geometry = new BoxGeometry(Width, Height, Depth),

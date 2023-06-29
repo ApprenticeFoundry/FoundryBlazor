@@ -10,18 +10,18 @@ namespace FoundryBlazor.Shape;
 
 public interface IFoPage2D
 {
-    void SetScale(ScaledCanvas scale);
-    int DrawingWidth();
-    int DrawingHeight();
-    int DrawingMargin();
+    //void SetScale(ScaledCanvas scale);
+    // int DrawingWidth();
+    // int DrawingHeight();
+    // int DrawingMargin();
 }
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
 {
 
-
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
+
     public Length PageMargin { get; set; } = new Length(.50, "in");  //inches
     public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
     public Length PageHeight { get; set; } = new Length(4.0, "in"); //inches
@@ -32,7 +32,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length GridMajorV { get; set; } = new Length(4.0, "in"); //inches
     public Length GridMinorV { get; set; } = new Length(0.5, "in"); //inches
 
-    protected ScaledCanvas CurrentScale = new();
+    //protected ScaledCanvas CurrentScale = new();
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
@@ -57,12 +57,6 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-    public virtual void SetScale(ScaledCanvas scale)
-    {
-        CurrentScale = scale;
-        CurrentScale.SetPageDefaults(this);
-    }
-
 
     public int DrawingWidth()
     {
@@ -79,11 +73,30 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public string DrawingWH()
     {
-        return $"Drawing Size [{PageWidth.As("in")}x{PageHeight.As("in")} ({PageMargin.As("in")})]in";
+        return $"Drawing Size [{PageWidth.AsString("in")} x {PageHeight.AsString("in")} ({PageMargin.AsString("in")})]";
     }
 
+    public void SetPageLandscape()
+    {
+        if (PageWidth < PageHeight)
+        {
+            (PageWidth, PageHeight) = (PageHeight, PageWidth);
+        }
+    }
+    public void SetPagePortrait()
+    {
+        if (PageWidth > PageHeight)
+        {
+            (PageWidth, PageHeight) = (PageHeight, PageWidth);
+        }
+    }
 
-
+    public void SetPageSizeInches(double width, double height)
+    {
+        PageWidth.Assign(width, "in");
+        PageHeight.Assign(height, "in");
+    }
+    
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Shapes2D.ForEach(item => item.CollectImages(list, deep));
@@ -228,8 +241,101 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SaveAsync();
 
 
-        await CurrentScale.DrawHorizontalGrid(ctx, GridMinorH, GridMajorH);
-        await CurrentScale.DrawVerticalGrid(ctx, GridMinorV, GridMajorV);
+        await DrawHorizontalGrid(ctx, GridMinorH, GridMajorH);
+        await DrawVerticalGrid(ctx, GridMinorV, GridMajorV);
+
+        await ctx.RestoreAsync();
+    }
+
+
+    public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length minor, Length major)
+    {
+        await ctx.SaveAsync();
+
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
+
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetLineDashAsync(new float[] { 5, 1 });
+
+
+        await ctx.SetStrokeStyleAsync("White");
+
+        var x = dMargin; //left;
+        while (x <= dWidth)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(x, dMargin);
+            await ctx.LineToAsync(x, dHeight);
+            await ctx.StrokeAsync();
+            x += dMinor;
+        }
+
+        await ctx.SetFillStyleAsync("RED");
+        await ctx.FillTextAsync($"DW {dWidth}", x + 1, 200);
+
+
+        await ctx.SetLineDashAsync(Array.Empty<float>());
+        await ctx.SetStrokeStyleAsync("Black");
+
+        x = dMargin; //left;
+        while (x <= dWidth)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(x, dMargin);
+            await ctx.LineToAsync(x, dHeight);
+            await ctx.StrokeAsync();
+            x += dMajor;
+        }
+
+        await ctx.RestoreAsync();
+    }
+
+
+    public async Task DrawVerticalGrid(Canvas2DContext ctx, Length minor, Length major)
+    {
+        await ctx.SaveAsync();
+
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
+
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetLineDashAsync(new float[] { 5, 1 });
+
+
+        await ctx.SetStrokeStyleAsync("White");
+
+        var x = dMargin; //left;
+        while (x <= dHeight)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(dMargin, x);
+            await ctx.LineToAsync(dWidth, x);
+            await ctx.StrokeAsync();
+            x += dMinor;
+        }
+
+
+        await ctx.SetLineDashAsync(Array.Empty<float>());
+        await ctx.SetStrokeStyleAsync("Black");
+
+        x = dMargin; //left;
+        while (x <= dHeight)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(dMargin, x);
+            await ctx.LineToAsync(dWidth, x);
+            await ctx.StrokeAsync();
+            x += dMajor;
+        }
 
         await ctx.RestoreAsync();
     }
@@ -305,8 +411,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetLineWidthAsync(50.0F);
 
 
-        var win = CurrentScale.UserWindow();
-        await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
+        //var win = CurrentScale.UserWindow();
+        //await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
 
 
         await ctx.RestoreAsync();

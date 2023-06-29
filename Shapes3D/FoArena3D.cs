@@ -38,7 +38,6 @@ public class FoArena3D : FoGlyph3D, IArena
     public Viewer? Viewer3D { get; set; }
     public Scene? Scene { get; set; }
     private IStageManagement StageManager { get; set; }
-    private IScaledArena ScaledArena { get; set; }
 
     public ComponentBus PubSub { get; set; }
 
@@ -47,13 +46,11 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
     public FoArena3D(
-        IScaledArena scaled,
         IStageManagement manager,
         ComponentBus pubSub)
     {
         StageManager = manager;
         PubSub = pubSub;
-        ScaledArena = scaled;
     }
 
     public FoStage3D CurrentStage()
