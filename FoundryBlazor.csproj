@@ -7,6 +7,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
+    <Version>9.0.0</Version>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
@@ -25,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\IoBT\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
+    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
   </ItemGroup>
 </Project>
