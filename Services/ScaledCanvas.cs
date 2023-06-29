@@ -1,5 +1,6 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using IoBTMessage.Units;
 
 namespace FoundryBlazor.Shape;
 
@@ -11,10 +12,9 @@ public class ScaledCanvas : IScaledCanvas
 
     private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
 
-    public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
-    public double PageMargin { get; set; } = .50;  //inches
-    public double PageWidth { get; set; } = 10.0;  //inches
-    public double PageHeight { get; set; } = 6.0;  //inches
+    public Length PageMargin { get; set; } = new Length(.50, "in");  //inches
+    public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
+    public Length PageHeight { get; set; } = new Length(6.00, "in");  //inches
 
     public ScaledCanvas()
     {
@@ -47,27 +47,29 @@ public class ScaledCanvas : IScaledCanvas
         UserWindowRect = new Rectangle(-loc.X, -loc.Y, UserWindowRect.Width, UserWindowRect.Height);
         return UserWindowRect;
     }
-    public Point InchesToPixelInset(double width, double height)
-    {
-        var w = (int)ConvertToPixels(width + PageMargin);
-        var h = (int)ConvertToPixels(height + PageMargin);
-        return new Point(w, h);
-    }
+    // public Point InchesToPixelInset(Length width, Length height)
+    // {
+    //     var w = (int)ToPixels(width + PageMargin);
+    //     var h = (int)ToPixels(height + PageMargin);
+    //     return new Point(w, h);
+    // }
 
-    public void SetCanvasSize(int width, int height)
+
+
+    public void SetCanvasPixelSize(int width, int height)
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
     }
-    public Size CanvasSize()
+    public Size TrueCanvasSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
 
     public void SetPageSizeInches(double width, double height)
     {
-        PageWidth = width;
-        PageHeight = height;
+        PageWidth.Assign(width, "in");
+        PageHeight.Assign(height, "in");
     }
 
     public void SetPageLandscape()
@@ -94,29 +96,14 @@ public class ScaledCanvas : IScaledCanvas
     }
     public string CanvasWH()
     {
-        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight} DPI:{PixelsPerInch}";
-    }
-    public double GetPixelsPerInch()
-    {
-        return PixelsPerInch;
-    }
-    public int ToPixels(double inches)
-    {
-        return (int)(PixelsPerInch * inches);
-    }
-    public double ToInches(int value)
-    {
-        return (double)(value / PixelsPerInch);
-    }
-    public double ConvertToPixels(double inches)
-    {
-        return PixelsPerInch * inches;
+        return $"Canvas W:{TrueCanvasWidth} H:{TrueCanvasHeight}";
     }
 
-    public double ConvertToInches(double pixels)
+    public static int ToPixels(Length inches)
     {
-        return pixels / PixelsPerInch;
+        return (int)inches.AsPixels();
     }
+
 
     public async Task ClearCanvas(Canvas2DContext ctx)
     {
@@ -128,7 +115,7 @@ public class ScaledCanvas : IScaledCanvas
         await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
     }
 
-    public async Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major)
+    public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length minor, Length major)
     {
         await ctx.SaveAsync();
 
@@ -173,7 +160,7 @@ public class ScaledCanvas : IScaledCanvas
     }
 
 
-    public async Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major)
+    public async Task DrawVerticalGrid(Canvas2DContext ctx, Length minor, Length major)
     {
         await ctx.SaveAsync();
 
@@ -216,4 +203,6 @@ public class ScaledCanvas : IScaledCanvas
 
         await ctx.RestoreAsync();
     }
+
+
 }

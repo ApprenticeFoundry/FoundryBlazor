@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using IoBTMessage.Extensions;
 using System.Drawing;
+using IoBTMessage.Units;
 
 namespace FoundryBlazor.Shape;
 
@@ -19,10 +20,8 @@ public interface IDrawing : IRender
 {
     bool SetCurrentlyRendering(bool value, int tick);
     bool SetCurrentlyProcessing(bool value);
-    void SetCanvasSize(int width, int height);
-    Point InchesToPixelsInset(double width, double height);
-    int ToPixels(double width);
-    double ToInches(int value);
+    void SetCanvasPixelSize(int width, int height);
+
 
     Rectangle TransformRect(Rectangle rect);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
@@ -239,28 +238,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return PageManager.Selections();
     }
 
-    public Point InchesToPixelsInset(double width, double height)
-    {
-        return ScaleDrawing.InchesToPixelInset(width, height);
-    }
 
-    public int ToPixels(double width)
-    {
-        return ScaleDrawing.ToPixels(width);
-    }
-
-    public double ToInches(int value)
-    {
-        return ScaleDrawing.ToInches(value);
-    }
     public Rectangle TransformRect(Rectangle rect)
     {
         return PanZoomService.TransformRect(rect);
     }
 
-    public void SetCanvasSize(int width, int height)
+    public void SetCanvasPixelSize(int width, int height)
     {
-        ScaleDrawing.SetCanvasSize(width, height);
+        ScaleDrawing.SetCanvasPixelSize(width, height);
     }
 
     public void ClearAll()
@@ -361,7 +347,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             PanZoomShape.IsVisible = false;
 
             var page = PageManager.CurrentPage();
-            var pt = InchesToPixelsInset(page.PageWidth / 2, 3.0);
+            var pt = new Point(page.PageWidth.AsPixels() / 2, new Length(3.0, "in").AsPixels());
             PanZoomShape.MoveTo(pt.X, pt.Y);
         }
         return PanZoomShape;

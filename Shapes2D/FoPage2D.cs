@@ -4,6 +4,7 @@ using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Units;
 
 namespace FoundryBlazor.Shape;
 
@@ -21,9 +22,15 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
-    public double PageMargin { get; set; } = .50;  //inches
-    public double PageWidth { get; set; } = 10.0;  //inches
-    public double PageHeight { get; set; } = 4.0;  //inches
+    public Length PageMargin { get; set; } = new Length(.50, "in");  //inches
+    public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
+    public Length PageHeight { get; set; } = new Length(4.0, "in"); //inches
+
+    public Length GridMajorH { get; set; } = new Length(2.0, "in"); //inches
+    public Length GridMinorH { get; set; } = new Length(0.5, "in"); //inches
+
+    public Length GridMajorV { get; set; } = new Length(4.0, "in"); //inches
+    public Length GridMinorV { get; set; } = new Length(0.5, "in"); //inches
 
     protected ScaledCanvas CurrentScale = new();
 
@@ -59,20 +66,20 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public int DrawingWidth()
     {
-        return CurrentScale?.ToPixels(PageWidth) ?? 0;
+        return PageWidth.AsPixels();
     }
     public int DrawingHeight()
     {
-        return CurrentScale?.ToPixels(PageHeight) ?? 0;
+        return PageHeight.AsPixels();
     }
     public int DrawingMargin()
     {
-        return CurrentScale?.ToPixels(PageMargin) ?? 0;  //margin all around
+        return PageMargin.AsPixels();  //margin all around
     }
 
     public string DrawingWH()
     {
-        return $"Drawing Size [{PageWidth}x{PageHeight} ({PageMargin})]in";
+        return $"Drawing Size [{PageWidth.As("in")}x{PageHeight.As("in")} ({PageMargin.As("in")})]in";
     }
 
 
@@ -221,8 +228,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SaveAsync();
 
 
-        await CurrentScale.DrawHorizontalGrid(ctx, 0.5, 2.0);
-        await CurrentScale.DrawVerticalGrid(ctx, 0.5, 2.0);
+        await CurrentScale.DrawHorizontalGrid(ctx, GridMinorH, GridMajorH);
+        await CurrentScale.DrawVerticalGrid(ctx, GridMinorV, GridMajorV);
 
         await ctx.RestoreAsync();
     }

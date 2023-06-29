@@ -1,5 +1,6 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using IoBTMessage.Units;
 
 namespace FoundryBlazor.Shape;
 
@@ -10,24 +11,19 @@ public interface IScaledCanvas
     Rectangle SetUserWindow(Size size);
     Rectangle SetUserWindow(Point loc);
     void SetPageDefaults(FoPage2D page);
-    double ConvertToPixels(double inches);
-    int ToPixels(double inches);
-    double ToInches(int value);
-    double ConvertToInches(double pixels);
-    double GetPixelsPerInch();
+
     Task ClearCanvas(Canvas2DContext ctx);
     string CanvasWH();
-    void SetCanvasSize(int width, int height);
-    Size CanvasSize();
+    void SetCanvasPixelSize(int width, int height);
+    Size TrueCanvasSize();
 
     void SetPageSizeInches(double width, double height);
     void SetPageLandscape();
     void SetPagePortrait();
 
-    Point InchesToPixelInset(double width, double height);
 
-    Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major);
-    Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major);
+    Task DrawHorizontalGrid(Canvas2DContext ctx, Length minor, Length major);
+    Task DrawVerticalGrid(Canvas2DContext ctx, Length minor, Length major);
 
     ScaledCanvas CreateScaledPage();
 }
@@ -40,9 +36,9 @@ public class ScaledDrawing : IScaledCanvas
     private Rectangle userWindow { get; set; } = new Rectangle(0, 0, 1500, 400);
 
     public double PixelsPerInch { get; set; } = 50; // 70; pixels per in or SRS machine
-    public double PageMargin { get; set; } = .50;  //inches
-    public double PageWidth { get; set; } = 10.0;  //inches
-    public double PageHeight { get; set; } = 6.0;  //inches
+    public Length PageMargin { get; set; } = new Length(.50, "in"); //inches
+    public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
+    public Length PageHeight { get; set; } = new Length(6.0, "in");  //inches
 
     public ScaledDrawing()
     {
@@ -75,39 +71,46 @@ public class ScaledDrawing : IScaledCanvas
         userWindow = new Rectangle(-loc.X, -loc.Y, userWindow.Width, userWindow.Height);
         return userWindow;
     }
-    public Point InchesToPixelInset(double width, double height)
+
+    public static int ToPixels(Length inches)
     {
-        var w = (int)ConvertToPixels(width + PageMargin);
-        var h = (int)ConvertToPixels(height + PageMargin);
-        return new Point(w, h);
+        return (int)inches.AsPixels();
     }
 
-    public void SetCanvasSize(int width, int height)
+    // public Point InchesToPixelInset(Length width, Length height)
+    // {
+    //     var w = (int)ToPixels(width + PageMargin);
+    //     var h = (int)ToPixels(height + PageMargin);
+    //     return new Point(w, h);
+    // }
+
+
+    public void SetCanvasPixelSize(int width, int height)
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
     }
-    public Size CanvasSize()
+    public Size TrueCanvasSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
 
     public void SetPageSizeInches(double width, double height)
     {
-        PageWidth = width;
-        PageHeight = height;
+        PageWidth.Assign(width, "in");
+        PageHeight.Assign(height, "in");
     }
 
     public void SetPageLandscape()
     {
-        if (PageWidth < PageHeight)
+        if (PageWidth.Value() < PageHeight.Value())
         {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
     }
     public void SetPagePortrait()
     {
-        if (PageWidth > PageHeight)
+        if (PageWidth.Value() > PageHeight.Value())
         {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
@@ -156,7 +159,7 @@ public class ScaledDrawing : IScaledCanvas
         await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
     }
 
-    public async Task DrawHorizontalGrid(Canvas2DContext ctx, double minor, double major)
+    public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length minor, Length major)
     {
         await ctx.SaveAsync();
 
@@ -201,7 +204,7 @@ public class ScaledDrawing : IScaledCanvas
     }
 
 
-    public async Task DrawVerticalGrid(Canvas2DContext ctx, double minor, double major)
+    public async Task DrawVerticalGrid(Canvas2DContext ctx, Length minor, Length major)
     {
         await ctx.SaveAsync();
 

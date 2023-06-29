@@ -15,8 +15,8 @@ public interface IScaledArena
     double GetUnitsPerMeter();
 
     string CanvasWH();
-    void SetCanvasSize(int width, int height);
-    Size CanvasSize();
+    void SetCanvasPixelSize(int width, int height);
+    Size CanvasPixelSize();
 
 
     Point MetersToPixelInset(double width, double height);
@@ -53,12 +53,12 @@ public class ScaledArena : IScaledArena
         return new Point(w, h);
     }
 
-    public void SetCanvasSize(int width, int height)
+    public void SetCanvasPixelSize(int width, int height)
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
     }
-    public Size CanvasSize()
+    public Size CanvasPixelSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
     }
