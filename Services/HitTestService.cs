@@ -21,11 +21,10 @@ public class HitTestService : IHitTestService
     private QuadTree<FoGlyph2D> Tree { get; set; }
 
     private readonly List<Rectangle> PreviousSearches = new();
-    private readonly IScaledCanvas _scaled;
     private readonly IPanZoomService _panzoom;
-    public HitTestService(IScaledCanvas scaled, IPanZoomService panzoom)
+
+    public HitTestService(IPanZoomService panzoom)
     {
-        _scaled = scaled;
         _panzoom = panzoom;
         Page = new FoPage2D("dummy", "White");
         var rect = Page.Rect();
@@ -33,13 +32,17 @@ public class HitTestService : IHitTestService
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
     }
 
-    public Rectangle Rect()
-    {
-        //make sure any shape on the canvas is in the hittest
-        var canvas = _scaled.Rect();
-        canvas = _panzoom.AntiScaleRect(canvas);
-        return canvas;
-    }
+    // public Rectangle Rect()
+    // {
+    //     //make sure any shape on the canvas is in the hittest
+
+    //     var size = _drawing.TrueCanvasSize();
+    //     var canvas = new Rectangle(0, 0, size.Width, size.Height);
+
+    //     canvas = _panzoom.AntiScaleRect(canvas);
+    //     return canvas;
+    // }
+
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
         Page = page;

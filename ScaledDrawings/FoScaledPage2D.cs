@@ -33,8 +33,5 @@ public class FoScaledPage2D : FoScaledGlyph2D, IFoPage2D
         throw new NotImplementedException();
     }
 
-    public void SetScale(ScaledCanvas scale)
-    {
-        throw new NotImplementedException();
-    }
+
 }

@@ -56,7 +56,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
 
             await CanvasHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
-            drawing?.SetCanvasSize(CanvasWidth, CanvasHeight);
+            drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 
 
             PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
@@ -119,7 +119,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
         if (drawing == null) return;
 
         //if you are already rendering then skip it this cycle
-        if (drawing.SetCurrentlyRendering(true,tick)) return;
+        if (drawing.SetCurrentlyRendering(true, tick)) return;
         await Ctx.BeginBatchAsync();
         await Ctx.SaveAsync();
 
@@ -128,7 +128,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
 
         await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
-        drawing.SetCurrentlyRendering(false,tick);
+        drawing.SetCurrentlyRendering(false, tick);
 
         Workspace?.PostRender(tick);
     }

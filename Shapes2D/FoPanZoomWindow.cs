@@ -11,10 +11,10 @@ public class FoPanZoomWindow : FoGlyph2D
     private readonly IPageManagement PageManager;
     private readonly IPanZoomService PanZoomService;
     private readonly IHitTestService _hitTestService;
-    private readonly IScaledCanvas _scaled;
+    private readonly IDrawing _scaled;
 
 
-    public FoPanZoomWindow(IPageManagement manager, IPanZoomService panzoom, IHitTestService hitTest, IScaledCanvas scaled, string color) : base("Pan Zoom", color)
+    public FoPanZoomWindow(IPageManagement manager, IPanZoomService panzoom, IHitTestService hitTest, IDrawing scaled, string color) : base("Pan Zoom", color)
     {
         PageManager = manager;
         PanZoomService = panzoom;
@@ -79,7 +79,7 @@ public class FoPanZoomWindow : FoGlyph2D
         await ctx.ScaleAsync(ViewScale, ViewScale);
 
         //this is the size of the canvas the window should scale to fit
-        var canvas = _scaled.CanvasSize();
+        var canvas = _scaled.TrueCanvasSize();
         await ctx.SetFillStyleAsync("#98AFC7");
         await ctx.FillRectAsync(0, 0, canvas.Width, canvas.Height);
         await ctx.SetStrokeStyleAsync("Black");
@@ -120,7 +120,7 @@ public class FoPanZoomWindow : FoGlyph2D
         await ctx.ScaleAsync(ViewScale, ViewScale);
 
         //this is the size of the canvas the window should scale to fit
-        var canvas = _scaled.CanvasSize();
+        var canvas = _scaled.TrueCanvasSize();
         await ctx.SetFillStyleAsync("#98AFC7");
         await ctx.FillRectAsync(0, 0, canvas.Width, canvas.Height);
         await ctx.SetStrokeStyleAsync("Black");
@@ -161,7 +161,7 @@ public class FoPanZoomWindow : FoGlyph2D
 
     public void SizeToFit()
     {
-        var size = _scaled.CanvasSize();
+        var size = _scaled.TrueCanvasSize();
         var max = Math.Max(size.Width, size.Height);
         if (max != 0)
         {
