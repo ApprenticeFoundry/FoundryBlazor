@@ -45,10 +45,10 @@ public class FoGlyph3D : FoComponent
     {
         var id = GetGlyphId();
         var result = id == other;
-       // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
         return result;
     }
-    
+
     public FoGlyph3D SetBoundry(int width, int height, int depth)
     {
         (Width, Height, Depth) = (width, height, depth);
@@ -98,12 +98,18 @@ public class FoGlyph3D : FoComponent
         return false;
     }
 
-    public FoGlyph3D MoveTo(int x, int y, int z) 
+    public FoGlyph3D MoveTo(int x, int y, int z)
     {
         var pos = GetPosition(x, y, z);
-        return this; 
+        return this;
     }
-    public virtual Vector3 GetPosition(int x=0, int y=0, int z=0)
+    public virtual Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
+    {
+        var result = new Vector3(x, y, z);
+        return result;
+    }
+
+    public virtual Vector3 GetPivot(int x = 0, int y = 0, int z = 0)
     {
         var result = new Vector3(x, y, z);
         return result;
