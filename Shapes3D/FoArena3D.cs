@@ -184,11 +184,11 @@ public class FoArena3D : FoGlyph3D, IArena
                 Name = item.name,
                 Symbol = item.symbol,
                 Type = item.type,
-                Color =  string.IsNullOrEmpty(item.material) ? "Green" : item.material,
+                Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
                 Position = pos?.LocAsVector3(),
                 Rotation = pos?.AngAsVector3(),
                 BoundingBox = box?.BoxAsVector3(),
-                Origin = box?.PinAsVector3(),
+                Pivot = box?.PinAsVector3(),
             };
             newWorld.Slot<FoShape3D>().Add(shape3D);
             $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
