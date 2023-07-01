@@ -58,18 +58,18 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     }
 
 
-    public int DrawingWidth()
-    {
-        return PageWidth.AsPixels();
-    }
-    public int DrawingHeight()
-    {
-        return PageHeight.AsPixels();
-    }
-    public int DrawingMargin()
-    {
-        return PageMargin.AsPixels();  //margin all around
-    }
+    // public int DrawingWidth()
+    // {
+    //     return PageWidth.AsPixels();
+    // }
+    // public int DrawingHeight()
+    // {
+    //     return PageHeight.AsPixels();
+    // }
+    // public int DrawingMargin()
+    // {
+    //     return PageMargin.AsPixels();  //margin all around
+    // }
 
     public string DrawingWH()
     {
@@ -348,9 +348,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await UpdateContext(ctx, tick);
 
-        var margin = DrawingMargin();
-        Width = DrawingWidth() + 2 * margin;
-        Height = DrawingHeight() + 2 * margin;
+        var margin = PageMargin.AsPixels();
+        Width = (PageWidth + 2 * margin).AsPixels();
+        Height = (PageHeight + 2 * margin).AsPixels();
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -364,7 +364,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.SetFillStyleAsync("Grey");
         await ctx.SetGlobalAlphaAsync(0.75F);
-        await ctx.FillRectAsync(margin, margin, DrawingWidth(), DrawingHeight());
+        await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
 
@@ -380,9 +380,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await UpdateContext(ctx, 0);
 
-        var margin = DrawingMargin();
-        Width = DrawingWidth() + 2 * margin;
-        Height = DrawingHeight() + 2 * margin;
+        var margin = PageMargin.AsPixels();
+        Width = PageWidth.AsPixels() + 2 * margin;
+        Height = PageHeight.AsPixels() + 2 * margin;
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -396,7 +396,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.SetFillStyleAsync("Blue");
         await ctx.SetGlobalAlphaAsync(0.80F);
-        await ctx.FillRectAsync(margin, margin, DrawingWidth(), DrawingHeight());
+        await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
 
@@ -443,9 +443,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await UpdateContext(ctx, tick);
 
-        var margin = DrawingMargin();
-        Width = DrawingWidth() + 2 * margin;
-        Height = DrawingHeight() + 2 * margin;
+  
+        var margin = PageMargin.AsPixels();
+        Width = (PageWidth + 2.0 * margin).AsPixels();
+        Height = (PageHeight + 2.0 * margin).AsPixels();
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -454,7 +455,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(0.75F);
-        await ctx.FillRectAsync(margin, margin, DrawingWidth(), DrawingHeight());
+        await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
 

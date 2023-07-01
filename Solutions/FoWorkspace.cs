@@ -67,7 +67,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public IPanZoomService PanZoom { get; set; }
 
 
-    protected IFoundryService Foundry { get; set; }
+    public IFoundryService Foundry { get; set; }
     protected IToast Toast { get; set; }
     protected ComponentBus PubSub { get; set; }
     protected DialogService Dialog { get; set; }

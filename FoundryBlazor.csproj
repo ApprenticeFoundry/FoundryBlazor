@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
+    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
   </ItemGroup>
 </Project>
