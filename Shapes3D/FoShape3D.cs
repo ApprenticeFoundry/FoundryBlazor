@@ -21,8 +21,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public string Symbol { get; set; } = "";
     public string Type { get; set; } = "";
     public Vector3? Position { get; set; }
+    public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
-    public Vector3? Origin { get; set; }
     public Vector3? BoundingBox { get; set; }
     private Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
@@ -113,6 +113,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -127,6 +128,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetWireframe()
         };
@@ -141,6 +143,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CylinderGeometry(radiusTop: box.X / 2, radiusBottom: box.X / 2, height: box.Y),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -156,6 +159,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new SphereGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -171,6 +175,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CircleGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -186,6 +191,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new CapsuleGeometry(radius: box.X / 2, box.Y),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -201,6 +207,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new ConeGeometry(radius: box.X / 2, height: box.Y),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -216,6 +223,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new DodecahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -231,6 +239,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new IcosahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -246,6 +255,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new OctahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -260,6 +270,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new TetrahedronGeometry(radius: box.X / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -274,6 +285,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new PlaneGeometry(width: box.X, height: box.Y),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -289,6 +301,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             Geometry = new RingGeometry(innerRadius: box.X / 2, outerRadius: box.Y / 2),
             Position = GetPosition(),
+            Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
         };
@@ -323,7 +336,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
         var settings = AsImportSettings(format);
-        
+
         if (string.IsNullOrEmpty(LoadingURL)) return false;
         $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
 
@@ -335,7 +348,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public ImportSettings AsImportSettings(Import3DFormats format)
     {
         LoadingURL = Symbol;
-        
+
         var setting = new ImportSettings
         {
             Uuid = Guid.NewGuid(),
@@ -343,17 +356,18 @@ public class FoShape3D : FoGlyph3D, IShape3D
             FileURL = LoadingURL,
             Position = GetPosition(),
             Rotation = GetRotation(),
+            Pivot = GetPivot(),
             OnComplete = (Scene scene, Object3D object3D) =>
             {
                 //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
-                if (object3D != null) 
+                if (object3D != null)
                     ShapeObject3D = object3D;
                 else
                     "Unexpected empty object3D".WriteError(1);
             }
-        };  
+        };
         GlyphId = setting.Uuid.ToString();
-        return setting;     
+        return setting;
     }
 
     public static bool PreRenderClones(List<FoShape3D> bodies, FoArena3D arena, Viewer viewer, Import3DFormats format)
@@ -378,10 +392,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             if (object3D != null)
             {
                 sourceBody.ShapeObject3D = object3D;
-                if (settings.Count > 0 )
+                if (settings.Count > 0)
                     await viewer.Clone3DModel(object3D.Uuid, settings);
             }
-            else 
+            else
                 "Unexpected empty object3D".WriteError(1);
         };
 
@@ -439,9 +453,16 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
     {
-        if (Position == null) 
-            return base.GetPosition(x,y,z);
+        if (Position == null)
+            return base.GetPosition(x, y, z);
         return Position;
+    }
+
+    public override Vector3 GetPivot(int x = 0, int y = 0, int z = 0)
+    {
+        if (Pivot == null)
+            return base.GetPivot(x, y, z);
+        return Pivot;
     }
 
     public override Euler GetRotation(int x = 0, int y = 0, int z = 0)
