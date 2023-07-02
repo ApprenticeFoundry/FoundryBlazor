@@ -423,23 +423,24 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // https://coastalcreative.com/standard-paper-sizes/
         space.EstablishMenu2D<FoMenu2D, FoButton2D>("Page Size", new Dictionary<string, Action>()
         {
-            { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
-            { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
-            { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
-            { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
-            { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
+            // { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
+            // { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
+            // { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
+            // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
+            // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
+            { "A0", () => PageManager.SetPageSizeMM(841,1189)}, 
+            { "A1", () => PageManager.SetPageSizeMM(594,841)}, 
+            { "A2", () => PageManager.SetPageSizeMM(420,594)},
+            { "A3", () => PageManager.SetPageSizeMM(297,420)}, 
+            { "A4", () => PageManager.SetPageSizeMM(210,297)}, 
             { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom();} },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
         .ToggleLayout().MoveTo(0, 80);
 
 
-        PageManager.SetPageSizeInches(34, 44);
-        //PanZoomService.SetZoom(0.5);
-        //PanZoomService.SetPan(75, 25);
-        //PageManager.SetPageLandscape();
-        //ResetPanZoom();
-        //PanZoomWindow().IsVisible = false;
+        //A0 841 x 1189 mm 33.1 x 46.8 in
+        PageManager.SetPageSizeMM(841, 1189);
     }
 
 

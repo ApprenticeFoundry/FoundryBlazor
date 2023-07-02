@@ -5,8 +5,160 @@ using System.Linq;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using IoBTMessage.Units;
+using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shape;
+
+public class FoScale2D
+{
+    public Length Drawing { get; set; } = new Length(1.0, "cm");  //cm
+    public Length World { get; set; } = new Length(1.0, "m");  //cm
+
+    public string Display ()
+    {
+        var result = World / Drawing;
+        return $"{World} = {Drawing} scale {result}:1";
+    }
+}
+
+public class FoHorizontalRuler2D
+{
+    public FoScale2D Scale { get; set; } 
+    public FoPage2D Page { get; set; }
+
+    public  FoHorizontalRuler2D(FoScale2D scale2D, FoPage2D page2D)
+    {
+        Scale = scale2D;
+        Page = page2D;
+    }
+    public async Task DrawRuler(Canvas2DContext ctx, Length minor, Length major)
+    {
+        await ctx.SaveAsync();
+
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = Page.PageMargin.AsPixels();
+        var dWidth = Page.PageWidth.AsPixels() + dMargin;
+        var dHalf = dMargin / 2.0;
+
+        var background = "Orange";
+        await ctx.SetFillStyleAsync(background);
+        await ctx.FillRectAsync(dMargin, dHalf, dWidth, dHalf);
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetFontAsync("8 px Segoe UI");
+        await ctx.SetTextAlignAsync(TextAlign.Center);
+        await ctx.SetTextBaselineAsync(TextBaseline.Bottom);
+
+
+        var x = dMargin; //left;
+        int i = 0;
+        var cnt = 0.0;
+        while (x <= dWidth)
+        {
+            if (i % 10 != 0) {
+                await ctx.SetStrokeStyleAsync("White");
+                await ctx.BeginPathAsync();
+                await ctx.MoveToAsync(x, dHalf);
+                await ctx.LineToAsync(x, dMargin);
+                await ctx.StrokeAsync();
+                await ctx.SetFillStyleAsync("Black");
+                await ctx.FillTextAsync($"{cnt:F1}", x, dMargin-5);
+            }
+            x += dMinor;
+            cnt += 0.1;
+            i++;
+        }
+        await ctx.SetFontAsync("Bold 22 px Segoe UI");
+
+        x = dMargin; //left;
+        cnt = 0.0;
+        while (x <= dWidth)
+        {
+            await ctx.SetStrokeStyleAsync("Black");
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(x, dMargin - 10);
+            await ctx.LineToAsync(x, dMargin);
+            await ctx.StrokeAsync();
+            await ctx.SetFillStyleAsync("Black");
+            await ctx.FillTextAsync($"{cnt:F1}", x, dMargin - 10);
+            x += dMajor;
+            cnt += 1.0;
+        }
+
+        await ctx.RestoreAsync();
+    }
+}
+
+public class FoVerticalRuler2D
+{
+    public FoScale2D Scale { get; set; }
+    public FoPage2D Page { get; set; }
+
+    public FoVerticalRuler2D(FoScale2D scale2D, FoPage2D page2D)
+    {
+        Scale = scale2D;
+        Page = page2D;
+    }
+    public async Task DrawRuler(Canvas2DContext ctx, Length minor, Length major)
+    {
+        await ctx.SaveAsync();
+
+        var dMinor = minor.AsPixels();
+        var dMajor = major.AsPixels();
+        var dMargin = Page.PageMargin.AsPixels();
+        var dHeight = Page.PageHeight.AsPixels() + dMargin;
+        var dHalf = dMargin / 2.0;
+
+        var background = "Orange";
+        await ctx.SetFillStyleAsync(background);
+        await ctx.FillRectAsync(dHalf, dMargin, dHalf, dHeight);
+
+        await ctx.SetLineWidthAsync(1);
+        await ctx.SetFontAsync("8 px Segoe UI");
+        await ctx.SetTextAlignAsync(TextAlign.Center);
+        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+
+
+        var y = dMargin; //top;
+        int i = 0;
+        var cnt = 0.0;
+        while (y <= dHeight)
+        {
+            if (i % 10 != 0)
+            {
+                await ctx.SetStrokeStyleAsync("White");
+                await ctx.BeginPathAsync();
+                await ctx.MoveToAsync(dHalf,y);
+                await ctx.LineToAsync(dMargin,y);
+                await ctx.StrokeAsync();
+                await ctx.SetFillStyleAsync("Black");
+                await ctx.FillTextAsync($"{cnt:F1}", dHalf+15, y);
+            }
+            y += dMinor;
+            cnt += 0.1;
+            i++;
+        }
+        await ctx.SetFontAsync("Bold 22 px Segoe UI");
+
+        y = dMargin; //top;
+        cnt = 0.0;
+        while (y <= dHeight)
+        {
+            await ctx.SetStrokeStyleAsync("Black");
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(dMargin - 10,y);
+            await ctx.LineToAsync(dMargin,y);
+            await ctx.StrokeAsync();
+            await ctx.SetFillStyleAsync("Black");
+            await ctx.FillTextAsync($"{cnt:F1}", dHalf+10, y);
+            y += dMajor;
+            cnt += 1.0;
+        }
+
+        await ctx.RestoreAsync();
+    }
+}
 
 public interface IFoPage2D
 {
@@ -22,17 +174,25 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
 
-    public Length PageMargin { get; set; } = new Length(.50, "in");  //inches
-    public Length PageWidth { get; set; } = new Length(10.0, "in");  //inches
-    public Length PageHeight { get; set; } = new Length(4.0, "in"); //inches
+    public Length PageMargin { get; set; } = new Length(1, "cm");  //inches
+    public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
+    public Length PageHeight { get; set; } = new Length(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = new Length(2.0, "in"); //inches
-    public Length GridMinorH { get; set; } = new Length(0.5, "in"); //inches
+    public Length GridMajorH { get; set; } = new Length(10.0, "cm"); //inches
+    public Length GridMinorH { get; set; } = new Length(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = new Length(4.0, "in"); //inches
-    public Length GridMinorV { get; set; } = new Length(0.5, "in"); //inches
+    public Length GridMajorV { get; set; } = new Length(10.0, "cm"); //inches
+    public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
-    //protected ScaledCanvas CurrentScale = new();
+
+    public FoScale2D Scale2D { get; set; } = new FoScale2D()
+    {
+        Drawing = new Length(1.0, "cm"),
+        World = new Length(1.0, "m")
+    };
+
+    public FoHorizontalRuler2D HRuler2D { get; set; }
+    public FoVerticalRuler2D VRuler2D { get; set; }
 
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
@@ -50,31 +210,20 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public FoPage2D(string name, string color) : base(name, color)
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
+        HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
+        VRuler2D = new FoVerticalRuler2D(Scale2D, this);
     }
 
     public FoPage2D(string name, int width, int height, string color) : base(name, width, height, color)
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
+        HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
+        VRuler2D = new FoVerticalRuler2D(Scale2D, this);
     }
 
 
-    // public int DrawingWidth()
-    // {
-    //     return PageWidth.AsPixels();
-    // }
-    // public int DrawingHeight()
-    // {
-    //     return PageHeight.AsPixels();
-    // }
-    // public int DrawingMargin()
-    // {
-    //     return PageMargin.AsPixels();  //margin all around
-    // }
 
-    public string DrawingWH()
-    {
-        return $"Drawing Size [{PageWidth.AsString("in")} x {PageHeight.AsString("in")} ({PageMargin.AsString("in")})]";
-    }
+
 
     public void SetPageLandscape()
     {
@@ -96,7 +245,11 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         PageWidth.Assign(width, "in");
         PageHeight.Assign(height, "in");
     }
-    
+    public void SetPageSizeMM(double width, double height)
+    {
+        PageWidth.Assign(width, "mm");
+        PageHeight.Assign(height, "mm");
+    }
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Shapes2D.ForEach(item => item.CollectImages(list, deep));
@@ -242,7 +395,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
 
         await DrawHorizontalGrid(ctx, GridMinorH, GridMajorH);
+        await HRuler2D.DrawRuler(ctx, GridMinorH, GridMajorH);
+
         await DrawVerticalGrid(ctx, GridMinorV, GridMajorV);
+        await VRuler2D.DrawRuler(ctx, GridMinorH, GridMajorH);
 
         await ctx.RestoreAsync();
     }
@@ -422,13 +578,14 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public async Task DrawPageName(Canvas2DContext ctx)
     {
         await ctx.SaveAsync();
+        var text = $"Page: {Name} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
+        text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
+
+
         //Draw the page name at the top
         await ctx.SetFontAsync("16px Segoe UI");
         await ctx.SetTextAlignAsync(TextAlign.Left);
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
-
-        var text = $"Page: {Name} W:{PageWidth.AsString("in")} x H:{PageHeight.AsString("in")}  ({PageMargin.AsString("in")})";
-        text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
 
         await ctx.SetFillStyleAsync("Black");
         await ctx.FillTextAsync(text, PinX + 5, PinY + 5);
