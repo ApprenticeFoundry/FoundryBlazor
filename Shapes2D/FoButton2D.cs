@@ -16,7 +16,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
     private string text = "";
     public string Text { get { return this.text; } set { this.text = AssignText(value, text); } }
 
-    private string fontsize = "30";
+    private string fontsize = "16";
     public string FontSize { get { return this.fontsize; } set { this.fontsize = AssignText(value, fontsize); } }
 
     private string font = "Segoe UI";
@@ -74,7 +74,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
 
     public FoButton2D(string command, Action action) : base(command, "Orange")
     {
-        FontSize = "20";
+        FontSize = "16";
         Font = "Segoe UI";
         Text = command;
         OnClick = action;
@@ -89,6 +89,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
 
         await ctx.FillRectAsync(0, 0, Width, Height);
 
+        await ctx.SetFontAsync($"{FontSize}px {Font}");
         await ctx.SetTextAlignAsync(TextAlign.Left);
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 

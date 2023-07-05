@@ -58,7 +58,8 @@ public class MeasuredText
 
 public interface IGlyph2D : IHasRectangle
 {
-    FoGlyph2D MarkSelected(bool selected);   
+    FoGlyph2D MarkSelected(bool selected);
+    bool IsSelectable();
 }
 
 public class FoGlyph2D : FoComponent, IGlyph2D, IRender
@@ -66,6 +67,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public static Tweener Animations { get; set; } = new Tweener();
     public static bool ResetHitTesting { get; set; } = false;
     public float Thickness { get; set; }
+    public bool Selectable { get; set; } = true;
     public bool IsSelected { get; set; } = false;
     public bool IsVisible { get; set; } = true;
     public bool ShouldRender { get; set; } = true;
@@ -235,9 +237,14 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return list;
     }
 
+    public bool IsSelectable()
+    {
+        return Selectable;
+    }
     public virtual FoGlyph2D MarkSelected(bool value)
     {
-        this.IsSelected = value;
+        if (Selectable )
+            this.IsSelected = value;
         return this;
     }
 

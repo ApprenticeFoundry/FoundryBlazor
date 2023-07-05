@@ -10,9 +10,6 @@ using Radzen.Blazor.Rendering;
 namespace FoundryBlazor.Shape;
 
 
-
-
-
 public interface IFoPage2D
 {
     //void SetScale(ScaledCanvas scale);
@@ -192,7 +189,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         // var count = Shapes2D.Count();
         foreach (var item in Shapes2D.Values())
         {
-            tree.Insert(item);
+            if (item.IsSelectable()) 
+                tree.Insert(item);
         }
 
     }
@@ -249,7 +247,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await DrawHorizontalGrid(ctx, GridMinorH, false);
         //await DrawHorizontalGrid(ctx, GridMajorH, true);
-        //await HRuler2D.DrawRuler(ctx, GridMinorH, GridMajorH);
+        await HRuler2D.DrawRuler(ctx, GridMinorH, false);
 
         await DrawVerticalGrid(ctx, GridMinorV, false);
         //await VRuler2D.DrawRuler(ctx, GridMinorH, GridMajorH);
