@@ -23,7 +23,7 @@ public interface IPageManagement : IRender
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
     List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
 
-    void RefreshHitTesting(FoPanZoomWindow window);
+    void RefreshHitTesting(FoPanZoomWindow? window);
     bool ToggleHitTestRender();
 
 
@@ -111,7 +111,7 @@ public class PageManagementService : FoComponent, IPageManagement
         RenderHitTestTree = !RenderHitTestTree;
         return RenderHitTestTree;
     }
-    public void RefreshHitTesting(FoPanZoomWindow window)
+    public void RefreshHitTesting(FoPanZoomWindow? window)
     {
         _hitTestService.RefreshTree(CurrentPage());
         if (window != null)

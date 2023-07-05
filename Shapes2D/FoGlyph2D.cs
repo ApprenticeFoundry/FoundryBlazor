@@ -504,6 +504,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
+            await ctx.RotateAsync(AntiRotation);
             await ctx.SetFillStyleAsync("Black");
             await ctx.FillTextAsync(Tag, LeftX() + 2, TopY() + 3);
             await ctx.RestoreAsync();
