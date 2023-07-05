@@ -495,7 +495,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.RestoreAsync();
     }
 
-    public async Task DrawTag(Canvas2DContext ctx)
+    public async Task DrawTag(Canvas2DContext ctx, float rotation = 0)
     {
         if (!string.IsNullOrEmpty(Tag))
         {
@@ -504,7 +504,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
-            await ctx.RotateAsync(AntiRotation);
+            await ctx.RotateAsync(rotation);
             await ctx.SetFillStyleAsync("Black");
             await ctx.FillTextAsync(Tag, LeftX() + 2, TopY() + 3);
             await ctx.RestoreAsync();
