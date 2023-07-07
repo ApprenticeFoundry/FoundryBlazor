@@ -27,6 +27,8 @@ public class FoHorizontalRuler2D
     public FoScale2D Scale { get; set; } 
     public FoPage2D Page { get; set; }
 
+    public Length ZeroPoint { get; set; } = new Length(0.0, "cm");  //cm
+
     public  FoHorizontalRuler2D(FoScale2D scale2D, FoPage2D page2D)
     {
         Scale = scale2D;
@@ -59,7 +61,6 @@ public class FoHorizontalRuler2D
 
         await ctx.SetStrokeStyleAsync(hash);
         var x = dMargin; //left;
-        int i = 0;
         while (x <= dWidth)
         {
             await ctx.BeginPathAsync();
@@ -67,12 +68,11 @@ public class FoHorizontalRuler2D
             await ctx.LineToAsync(x, dMargin);
             await ctx.StrokeAsync();          
             x += dStep;
-            i++;
         }
 
         await ctx.SetFillStyleAsync("Black");
         x = dMargin; //left;
-        i = 0;
+        int i = 0;
         while (x <= dWidth)
         {
             var cnt = Scale.World.Value() * i;
@@ -92,67 +92,67 @@ public class FoVerticalRuler2D
     public FoScale2D Scale { get; set; }
     public FoPage2D Page { get; set; }
 
+    public Length ZeroPoint { get; set; } = new Length(0.0, "cm");  //cm
+
     public FoVerticalRuler2D(FoScale2D scale2D, FoPage2D page2D)
     {
         Scale = scale2D;
         Page = page2D;
     }
-    public async Task DrawRuler(Canvas2DContext ctx, Length minor, Length major)
+
+    public async Task DrawRuler(Canvas2DContext ctx, Length step, bool major)
     {
         await ctx.SaveAsync();
 
-        var dMinor = minor.AsPixels();
-        var dMajor = major.AsPixels();
+        var dStep = step.AsPixels();
         var dMargin = Page.PageMargin.AsPixels();
         var dHeight = Page.PageHeight.AsPixels() + dMargin;
         var dHalf = dMargin / 2.0;
 
         var background = "Orange";
+        var hash = "White";
         await ctx.SetFillStyleAsync(background);
         await ctx.FillRectAsync(dHalf, dMargin, dHalf, dHeight);
 
         await ctx.SetLineWidthAsync(1);
-        await ctx.SetFontAsync("8 px Segoe UI");
         await ctx.SetTextAlignAsync(TextAlign.Center);
-        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+        await ctx.SetTextBaselineAsync(TextBaseline.Bottom);
 
-
-        var y = dMargin; //top;
-        int i = 0;
-        var cnt = 0.0;
-        while (y <= dHeight)
+        if (!major)
         {
-            if (i % 10 != 0)
-            {
-                await ctx.SetStrokeStyleAsync("White");
-                await ctx.BeginPathAsync();
-                await ctx.MoveToAsync(dHalf,y);
-                await ctx.LineToAsync(dMargin,y);
-                await ctx.StrokeAsync();
-                await ctx.SetFillStyleAsync("Black");
-                await ctx.FillTextAsync($"{cnt:F1}", dHalf+15, y);
-            }
-            y += dMinor;
-            cnt += 0.1;
-            i++;
+            await ctx.SetFontAsync("8 px Segoe UI");
         }
-        await ctx.SetFontAsync("Bold 22 px Segoe UI");
-
-        y = dMargin; //top;
-        cnt = 0.0;
-        while (y <= dHeight)
+        else
         {
-            await ctx.SetStrokeStyleAsync("Black");
+            await ctx.SetFontAsync("Bold 22 px Segoe UI");
+        }
+
+
+        await ctx.SetStrokeStyleAsync(hash);
+        var y = dHeight; //bottom;
+        while (y >= dMargin)
+        {
             await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(dMargin - 10,y);
-            await ctx.LineToAsync(dMargin,y);
+            await ctx.MoveToAsync(dHalf, y);
+            await ctx.LineToAsync(dMargin, y);
             await ctx.StrokeAsync();
-            await ctx.SetFillStyleAsync("Black");
-            await ctx.FillTextAsync($"{cnt:F1}", dHalf+10, y);
-            y += dMajor;
-            cnt += 1.0;
+            y -= dStep;
+        }
+
+        await ctx.SetFillStyleAsync("Black");
+        y = dHeight; //bottom;
+        int i = 0;
+        while (y >= dMargin)
+        {
+            var cnt = Scale.World.Value() * i;
+            await ctx.FillTextAsync($"{cnt:F1}", dHalf+15, y);
+
+            y -= dStep;
+            i++;
         }
 
         await ctx.RestoreAsync();
     }
 }
+
+

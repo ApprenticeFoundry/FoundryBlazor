@@ -250,7 +250,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await HRuler2D.DrawRuler(ctx, GridMinorH, false);
 
         await DrawVerticalGrid(ctx, GridMinorV, false);
-        //await VRuler2D.DrawRuler(ctx, GridMinorH, GridMajorH);
+        await VRuler2D.DrawRuler(ctx, GridMinorV, false);
 
         await ctx.RestoreAsync();
     }
@@ -312,16 +312,15 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             await ctx.SetStrokeStyleAsync("Black");
         }
 
-        var x = dMargin; //left;
-        while (x <= dHeight)
+        var x = dHeight; //left;
+        while (x >= dMargin)
         {
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(dMargin, x);
             await ctx.LineToAsync(dWidth, x);
             await ctx.StrokeAsync();
-            x += dStep;
+            x -= dStep;
         }
-
 
         await ctx.RestoreAsync();
     }

@@ -440,7 +440,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
         //A0 841 x 1189 mm 33.1 x 46.8 in
-        PageManager.SetPageSizeMM(841, 1189);
+        //PageManager.SetPageSizeMM(841, 1189);
+        PageManager.SetPageSizeMM(210, 297);
     }
 
 
