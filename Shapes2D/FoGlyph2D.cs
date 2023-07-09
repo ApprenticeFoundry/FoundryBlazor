@@ -114,7 +114,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
     public Action<FoGlyph2D, int>? ContextLink;
-    public Action<FoGlyph2D>? AfterMatrixRefresh;
+    public Action<FoGlyph2D>? OnMatrixRefresh;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
@@ -330,6 +330,12 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public FoGlyph2D BeforeShapeRefresh(Action<FoGlyph2D,int> action)
     {
         ContextLink = action;
+        return this;
+    }
+
+    public FoGlyph2D AfterMatricRefresh(Action<FoGlyph2D> action)
+    {
+        OnMatrixRefresh = action;
         return this;
     }
 
@@ -794,7 +800,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             {
                 $"Error in GetMatrix {ex.Message}".WriteError();
             }
-            AfterMatrixRefresh?.Invoke(this);
+            OnMatrixRefresh?.Invoke(this);
         }
         return _matrix;
     }
