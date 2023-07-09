@@ -124,7 +124,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var pHeight = PageHeight.AsPixels();
         var m = PageMargin.AsPixels();
-        var size = Scale2D.PixelToDrawing(value - pHeight - m);
+        var size = Scale2D.PixelToDrawing(pHeight - value - m);
         var scale = Scale2D.ScaleToWorld();
         var result = size * scale;
         return result;

@@ -333,7 +333,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return this;
     }
 
-    public FoGlyph2D AfterMatricRefresh(Action<FoGlyph2D> action)
+    public FoGlyph2D AfterMatrixRefresh(Action<FoGlyph2D> action)
     {
         OnMatrixRefresh = action;
         return this;
