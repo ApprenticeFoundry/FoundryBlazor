@@ -126,6 +126,7 @@ public class FoConnector1D : FoShape1D, IShape1D
 
             //FoGlyph2D.ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);
+            OnMatrixRefresh?.Invoke(this);
         }
         return _matrix!;
     }

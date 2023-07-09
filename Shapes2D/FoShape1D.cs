@@ -203,6 +203,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             }
             else
                 "GetMatrix Shape1D here is IMPOSSABLE".WriteError();
+
+            OnMatrixRefresh?.Invoke(this);
         }
         return _matrix!;
     }
