@@ -29,7 +29,7 @@ public class FoScale2D
 
     public double PixelToDrawing(int pixels)
     {
-        var result = Drawing.Value() * pixels / Drawing.AsPixels();
+        var result = Drawing.FromPixels(pixels);
         return result;
     }
 }
