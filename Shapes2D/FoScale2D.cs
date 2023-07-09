@@ -14,12 +14,24 @@ public class FoScale2D
         return $"{World} = {Drawing} scale {result}:1";
     }
 
-    public double Scale()
+
+
+    public double ScaleToWorld()
     {
         var result = World / Drawing;
         return result;
     }
+    public double ScaleToDrawing()
+    {
+        var result = Drawing / World;
+        return result;
+    }
 
+    public double PixelToDrawing(int pixels)
+    {
+        var result = Drawing / World;
+        return result;
+    }
 }
 
 public class FoHorizontalRuler2D

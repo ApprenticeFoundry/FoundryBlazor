@@ -428,11 +428,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             // { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
             // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
             // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
-            { "A0", () => PageManager.SetPageSizeMM(841,1189)}, 
-            { "A1", () => PageManager.SetPageSizeMM(594,841)}, 
-            { "A2", () => PageManager.SetPageSizeMM(420,594)},
-            { "A3", () => PageManager.SetPageSizeMM(297,420)}, 
-            { "A4", () => PageManager.SetPageSizeMM(210,297)}, 
+            { "A0", () => PageManager.SetPageSizeMM(840,1120)}, 
+            { "A1", () => PageManager.SetPageSizeMM(600,840)}, 
+            { "A2", () => PageManager.SetPageSizeMM(420,600)},
+            { "A3", () => PageManager.SetPageSizeMM(300,420)}, 
+            { "A4", () => PageManager.SetPageSizeMM(200,300)}, 
             { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom();} },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
@@ -440,8 +440,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
         //A0 841 x 1189 mm 33.1 x 46.8 in
-        //PageManager.SetPageSizeMM(841, 1189);
-        PageManager.SetPageSizeMM(210, 297);
+        //PageManager.SetPageSizeMM(840,1120);
+        PageManager.SetPageSizeMM(200, 300);
+        // PageManager.SetPageLandscape(); 
+        // ResetPanZoom();
     }
 
 

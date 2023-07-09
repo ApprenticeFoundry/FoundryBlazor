@@ -12,10 +12,14 @@ namespace FoundryBlazor.Shape;
 
 public interface IFoPage2D
 {
-    //void SetScale(ScaledCanvas scale);
-    // int DrawingWidth();
-    // int DrawingHeight();
-    // int DrawingMargin();
+
+    int MapToPageXScale(Length value);
+    int MapToPageYScale(Length value);
+
+    int MapToPageXLoc(Length value);
+    int MapToPageYLoc(Length value);
+    double MapToModelXLoc(int value);
+    double MapToModelYLoc(int value);
 }
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
@@ -72,9 +76,59 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     }
 
 
+    public int MapToPageXScale(Length value)
+    {
+        var scale = Scale2D.ScaleToDrawing();
+        var pos = scale * value;
+        var result = pos.AsPixels();
+       // $"PageXScale PW: {PageWidth} W: {value} D: {pos} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        return result;    
+    }
 
+    public int MapToPageXLoc(Length value)
+    {
+        var m = PageMargin.AsPixels();
+        var result = m + MapToPageXScale(value);
+       // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        return result;    
+    }
 
+    public int MapToPageYScale(Length value)
+    {
+        var scale = Scale2D.ScaleToDrawing();
+        var pos = scale * value;
+        var result = pos.AsPixels();
+        //$"PageYScale PH: {PageHeight} W: {value} D: {pos}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        return result;    
+    }
 
+    public int MapToPageYLoc(Length value)
+    {
+        var m = PageMargin.AsPixels();
+        var loc = MapToPageYScale(value);
+        var result = m + PageHeight.AsPixels() - loc;
+       // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+
+        return result;    
+    }
+
+    public double MapToModelXLoc(int value)
+    {
+        var m = PageMargin.AsPixels();
+        var size = Scale2D.PixelToDrawing(value - m);
+        var scale = Scale2D.ScaleToWorld();
+        var result = size * scale;
+        return result;
+    }
+    public double MapToModelYLoc(int value)
+    {
+        var pHeight = PageHeight.AsPixels();
+        var m = PageMargin.AsPixels();
+        var size = Scale2D.PixelToDrawing(value - pHeight - m);
+        var scale = Scale2D.ScaleToWorld();
+        var result = size * scale;
+        return result;
+    }
     public void SetPageLandscape()
     {
         if (PageWidth < PageHeight)

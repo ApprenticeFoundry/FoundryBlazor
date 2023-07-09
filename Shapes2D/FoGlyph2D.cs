@@ -114,6 +114,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
     public Action<FoGlyph2D, int>? ContextLink;
+    public Action<FoGlyph2D>? AfterMatrixRefresh;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
@@ -326,7 +327,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
     }
 
-    public FoGlyph2D SetBeforeRefresh(Action<FoGlyph2D,int> action)
+    public FoGlyph2D BeforeShapeRefresh(Action<FoGlyph2D,int> action)
     {
         ContextLink = action;
         return this;
@@ -397,7 +398,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public bool ComputeShouldRender(Rectangle region)
     {
-        ShouldRender = IntersectsRegion(region);
+        ShouldRender = true; // IntersectsRegion(region);
         return ShouldRender;
     }
 
@@ -793,6 +794,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             {
                 $"Error in GetMatrix {ex.Message}".WriteError();
             }
+            AfterMatrixRefresh?.Invoke(this);
         }
         return _matrix;
     }
