@@ -40,7 +40,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public int ScaleAxisX { get; set; } = 1;
     public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
-     public int ScaleAxisY { get; set; } = -1;
+     public int ScaleAxisY { get; set; } = 1;
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
@@ -159,7 +159,13 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         PageWidth.Assign(width, "mm");
         PageHeight.Assign(height, "mm");
         //set the zero point to the bottom left
-        SetPageAxisMM(0, 0);
+        //SetPageAxisMM(0, -height);
+
+        ScaleAxisX = 1;
+        ZeroPointX.Assign(0, "mm");
+
+        ScaleAxisY = -1;
+        ZeroPointY.Assign(height, "mm");
     }
     public void SetPageAxisMM(double locx, double locy)
     {

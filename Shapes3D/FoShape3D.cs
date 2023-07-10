@@ -24,6 +24,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
     public Vector3? BoundingBox { get; set; }
+    public List<Vector3>? Path { get; set; }
     private Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
 
@@ -78,6 +79,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Type = "Tube";
         BoundingBox = new Vector3(radius, 0, 0);
         Name = name;
+        Path = path;
         return this;
     }
 
@@ -174,6 +176,22 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return true;
     }
 
+    private bool Tube(Scene ctx)
+    {
+        var box = BoundingBox ?? new Vector3(1, 1, 1);
+
+
+        ShapeMesh = new Mesh
+        {
+            Geometry = new TubeGeometry(radius: box.X / 2, path: Path!, 8, 10),
+            Position = GetPosition(),
+            Pivot = GetPivot(),
+            Rotation = GetRotation(),
+            Material = GetMaterial()
+        };
+        ctx.Add(ShapeMesh);
+        return true;
+    }
     private bool Circle(Scene ctx)
     {
         var box = BoundingBox ?? new Vector3(1, 1, 1);

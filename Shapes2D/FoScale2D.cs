@@ -5,10 +5,8 @@ namespace FoundryBlazor.Shape;
 
 public class FoScale2D
 {
-    
-
     public Length Drawing { get; set; } = new Length(1.0, "cm");  //cm
-    public Length World { get; set; } = new Length(1.0, "m");  //cm
+    public Length World { get; set; } = new Length(1.0, "m");  //m
 
     public string Display ()
     {
@@ -74,7 +72,7 @@ public class FoHorizontalRuler2D
             await ctx.SetFontAsync("Bold 22 px Segoe UI");
         }
 
-        int i = -1 * (int)(dir* dZero / dStep);
+        int i = -1 * (int)(dir * dZero / dStep);
         var left = dMargin;
         var right = dWidth;
 
@@ -147,7 +145,7 @@ public class FoVerticalRuler2D
             await ctx.SetFontAsync("Bold 22 px Segoe UI");
         }
 
-        int i = (int)(dir* dZero / dStep);
+        int i = -(int)(dir* dZero / dStep);
         var top = dMargin;
         var bottom = dHeight;
 
