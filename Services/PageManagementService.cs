@@ -32,6 +32,7 @@ public interface IPageManagement : IRender
 
     FoPage2D SetPageSizeInches(double width, double height);
     FoPage2D SetPageSizeMM(double width, double height);
+    FoPage2D SetPageAxisMM(double width, double height);
     FoPage2D SetPageLandscape();
     FoPage2D SetPagePortrait();
 
@@ -87,9 +88,14 @@ public class PageManagementService : FoComponent, IPageManagement
     }
     public FoPage2D SetPageSizeMM(double width, double height)
     {
-
         var page = CurrentPage();
         page.SetPageSizeMM(width, height);
+        return page;
+    }
+    public FoPage2D SetPageAxisMM(double width, double height)
+    {
+        var page = CurrentPage();
+        page.SetPageAxisMM(width, height);
         return page;
     }
     public FoPage2D SetPageLandscape()

@@ -53,6 +53,8 @@ public class FoHorizontalRuler2D
 
         var dStep = step.AsPixels();
         var dMargin = Page.PageMargin.AsPixels();
+        var dir = Page.ScaleAxisX;
+        var inc = Scale.World.Value();
         var dZero = Page.ZeroPointX.AsPixels() + dMargin;
         var dWidth = Page.PageWidth.AsPixels() + dMargin;
         var dHalf = dMargin / 2.0;
@@ -72,27 +74,29 @@ public class FoHorizontalRuler2D
             await ctx.SetFontAsync("Bold 22 px Segoe UI");
         }
 
+        int i = -1 * (int)(dir* dZero / dStep);
+        var left = dMargin;
+        var right = dWidth;
 
         await ctx.SetStrokeStyleAsync(hash);
-        var x = dMargin; //left;
-        while (x <= dWidth)
+        var x = left; //left;
+        while (x <= right)
         {
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(x, dHalf);
             await ctx.LineToAsync(x, dMargin);
             await ctx.StrokeAsync();          
-            x += dStep;
+            x += dir * dStep;
         }
 
         await ctx.SetFillStyleAsync("Black");
-        x = dMargin; //left;
-        int i = 0;
-        while (x <= dWidth)
+        x = left; //left;
+        while (x <= right)
         {
-            var cnt = Scale.World.Value() * i;
+            var cnt = inc * i;
             await ctx.FillTextAsync($"{cnt:F1}", x, dMargin - 5);
 
-            x += dStep;
+            x += dir * dStep;
             i++;
         }
 
@@ -119,6 +123,8 @@ public class FoVerticalRuler2D
 
         var dStep = step.AsPixels();
         var dMargin = Page.PageMargin.AsPixels();
+        var dir = Page.ScaleAxisY;
+        var inc = Scale.World.Value();
         var dZero = Page.ZeroPointY.AsPixels() + dMargin;
         var dHeight = Page.PageHeight.AsPixels() + dMargin;
         var dHalf = dMargin / 2.0;
@@ -141,27 +147,28 @@ public class FoVerticalRuler2D
             await ctx.SetFontAsync("Bold 22 px Segoe UI");
         }
 
+        int i = (int)(dir* dZero / dStep);
+        var top = dMargin;
+        var bottom = dHeight;
 
         await ctx.SetStrokeStyleAsync(hash);
-        var y = dHeight; //bottom;
-        while (y >= dMargin)
+        var y = bottom; //bottom;
+        while (y >= top)
         {
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(dHalf, y);
             await ctx.LineToAsync(dMargin, y);
             await ctx.StrokeAsync();
-            y -= dStep;
+            y += dir * dStep;
         }
 
         await ctx.SetFillStyleAsync("Black");
-        y = dHeight; //bottom;
-        int i = 0;
-        while (y >= dMargin)
+        y = bottom; //bottom;
+        while (y >= top)
         {
-            var cnt = Scale.World.Value() * i;
+            var cnt = inc * i;
             await ctx.FillTextAsync($"{cnt:F1}", dHalf+15, y);
-
-            y -= dStep;
+            y += dir * dStep;
             i++;
         }
 

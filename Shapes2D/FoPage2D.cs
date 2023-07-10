@@ -38,7 +38,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length GridMajorV { get; set; } = new Length(1.0, "m"); //inches
     public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
+    public int ScaleAxisX { get; set; } = 1;
     public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
+     public int ScaleAxisY { get; set; } = -1;
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
@@ -90,7 +92,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public int MapToPageXLoc(Length value)
     {
         var m = PageMargin.AsPixels();
-        var result = m + MapToPageXScale(value);
+        var loc = m + MapToPageXScale(value);
+        var result = m + ZeroPointX.AsPixels() + ScaleAxisX * loc;
        // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;    
     }
@@ -108,7 +111,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var m = PageMargin.AsPixels();
         var loc = MapToPageYScale(value);
-        var result = m + PageHeight.AsPixels() - loc;
+        var result = m + ZeroPointY.AsPixels() + ScaleAxisY *  loc;
        // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
 
         return result;    
@@ -156,8 +159,16 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         PageWidth.Assign(width, "mm");
         PageHeight.Assign(height, "mm");
         //set the zero point to the bottom left
-        ZeroPointX.Assign(0, "mm");
-        ZeroPointY.Assign(height, "mm");
+        SetPageAxisMM(0, 0);
+    }
+    public void SetPageAxisMM(double locx, double locy)
+    {
+        //set the zero point to the bottom left
+        ScaleAxisX = (int)(locx / double.Abs(locx));
+        ZeroPointX.Assign(double.Abs(locx), "mm");
+
+        ScaleAxisY = (int)(locy / double.Abs(locy));
+        ZeroPointY.Assign(double.Abs(locy), "mm");
     }
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
