@@ -5,6 +5,8 @@ namespace FoundryBlazor.Shape;
 
 public class FoScale2D
 {
+    
+
     public Length Drawing { get; set; } = new Length(1.0, "cm");  //cm
     public Length World { get; set; } = new Length(1.0, "m");  //cm
 
@@ -39,7 +41,6 @@ public class FoHorizontalRuler2D
     public FoScale2D Scale { get; set; } 
     public FoPage2D Page { get; set; }
 
-    public Length ZeroPoint { get; set; } = new Length(0.0, "cm");  //cm
 
     public  FoHorizontalRuler2D(FoScale2D scale2D, FoPage2D page2D)
     {
@@ -52,6 +53,7 @@ public class FoHorizontalRuler2D
 
         var dStep = step.AsPixels();
         var dMargin = Page.PageMargin.AsPixels();
+        var dZero = Page.ZeroPointX.AsPixels() + dMargin;
         var dWidth = Page.PageWidth.AsPixels() + dMargin;
         var dHalf = dMargin / 2.0;
 
@@ -104,7 +106,6 @@ public class FoVerticalRuler2D
     public FoScale2D Scale { get; set; }
     public FoPage2D Page { get; set; }
 
-    public Length ZeroPoint { get; set; } = new Length(0.0, "cm");  //cm
 
     public FoVerticalRuler2D(FoScale2D scale2D, FoPage2D page2D)
     {
@@ -118,6 +119,7 @@ public class FoVerticalRuler2D
 
         var dStep = step.AsPixels();
         var dMargin = Page.PageMargin.AsPixels();
+        var dZero = Page.ZeroPointY.AsPixels() + dMargin;
         var dHeight = Page.PageHeight.AsPixels() + dMargin;
         var dHalf = dMargin / 2.0;
 

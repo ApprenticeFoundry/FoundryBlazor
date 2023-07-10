@@ -73,6 +73,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Name = name;
         return this;
     }
+    public FoShape3D CreateTube(string name, double radius, List<Vector3> path)
+    {
+        Type = "Tube";
+        BoundingBox = new Vector3(radius, 0, 0);
+        Name = name;
+        return this;
+    }
 
     public FoShape3D CreateGlb(string url, double width, double height, double depth)
     {

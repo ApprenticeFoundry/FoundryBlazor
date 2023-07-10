@@ -38,6 +38,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length GridMajorV { get; set; } = new Length(1.0, "m"); //inches
     public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
+    public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
+    public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
@@ -153,6 +155,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         PageWidth.Assign(width, "mm");
         PageHeight.Assign(height, "mm");
+        //set the zero point to the bottom left
+        ZeroPointX.Assign(0, "mm");
+        ZeroPointY.Assign(height, "mm");
     }
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
