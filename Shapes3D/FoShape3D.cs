@@ -527,6 +527,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Plane" => Plane(ctx),
             "Capsule" => Capsule(ctx),
             "Cone" => Cone(ctx),
+            "Tube" => Tube(ctx),
             // "Collada" => RenderImportPromise(ctx, Import3DFormats.Collada),
             // "Fbx" => RenderImportPromise(ctx, Import3DFormats.Fbx),
             // "Obj" => RenderImportPromise(ctx, Import3DFormats.Obj),
