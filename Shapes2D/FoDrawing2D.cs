@@ -433,7 +433,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             { "A2", () => PageManager.SetPageSize(420, 600, "mm")},
             { "A3", () => PageManager.SetPageSize(300, 420, "mm")}, 
             { "A4", () => PageManager.SetPageSize(200, 300, "mm")}, 
-            { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom();} },
+            { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom(); } },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
         .ToggleLayout().MoveTo(0, 80);
