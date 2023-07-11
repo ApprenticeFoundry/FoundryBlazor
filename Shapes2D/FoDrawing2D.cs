@@ -429,10 +429,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
             // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
             { "A0", () => PageManager.SetPageSize(840,1120, "mm")}, 
-            { "A1", () => PageManager.SetPageSize(600,840, "mm")}, 
-            { "A2", () => PageManager.SetPageSize(420,600, "mm")},
-            { "A3", () => PageManager.SetPageSize(300,420, "mm")}, 
-            { "A4", () => PageManager.SetPageSize(200,300, "mm")}, 
+            { "A1", () => PageManager.SetPageSize(600, 840, "mm")}, 
+            { "A2", () => PageManager.SetPageSize(420, 600, "mm")},
+            { "A3", () => PageManager.SetPageSize(300, 420, "mm")}, 
+            { "A4", () => PageManager.SetPageSize(200, 300, "mm")}, 
             { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom();} },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
