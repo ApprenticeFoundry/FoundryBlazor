@@ -429,27 +429,27 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
 
 
-    private bool RenderImportPromise(Scene scene, Import3DFormats format)
-    {
-        if (string.IsNullOrEmpty(LoadingURL)) return false;
+    //private bool RenderImportPromise(Scene scene, Import3DFormats format)
+    //{
+    //    if (string.IsNullOrEmpty(LoadingURL)) return false;
 
-        // var message = $"{format} Loading... {LoadingURL}";
-        var message = $"{format} Loading... {LoadingURL}";
-        message.WriteInfo(1);
+    //    // var message = $"{format} Loading... {LoadingURL}";
+    //    var message = $"{format} Loading... {LoadingURL}";
+    //    message.WriteInfo(1);
 
-        Random rnd = new();
-        int y = rnd.Next(-5, 7);
-        var label = new LabelText(message)
-        {
-            Color = "Yellow",
-            Position = new Vector3(-3, y, -2)
-        };
+    //    Random rnd = new();
+    //    int y = rnd.Next(-5, 7);
+    //    var label = new LabelText(message)
+    //    {
+    //        Color = "Yellow",
+    //        Position = new Vector3(-3, y, -2)
+    //    };
 
-        LoadingGUID = label.Uuid;
+    //    LoadingGUID = label.Uuid;
 
-        scene.Add(label);
-        return true;
-    }
+    //    scene.Add(label);
+    //    return true;
+    //}
 
 
     public MeshStandardMaterial GetWireframe()
@@ -528,11 +528,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Capsule" => Capsule(ctx),
             "Cone" => Cone(ctx),
             "Tube" => Tube(ctx),
-            // "Collada" => RenderImportPromise(ctx, Import3DFormats.Collada),
-            // "Fbx" => RenderImportPromise(ctx, Import3DFormats.Fbx),
-            // "Obj" => RenderImportPromise(ctx, Import3DFormats.Obj),
-            // "Stl" => RenderImportPromise(ctx, Import3DFormats.Stl),
-            // "Glb" => RenderImportPromise(ctx, Import3DFormats.Gltf),
             _ => NotImplemented(ctx)
         };
         return result;

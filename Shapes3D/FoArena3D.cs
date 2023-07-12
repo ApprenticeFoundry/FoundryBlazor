@@ -28,6 +28,9 @@ public interface IArena
     bool RenderWorld3D(FoWorld3D? world);
     bool PreRender(FoGlyph3D glyph);
 
+
+    V AddShape<V>(V shape) where V : FoGlyph3D;
+
     FoStage3D CurrentStage();
     FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL);
@@ -65,6 +68,11 @@ public class FoArena3D : FoGlyph3D, IArena
 
         //if the stage is dirty call to update
         //$"Arean Render Scene {tick}".WriteInfo();
+    }
+
+    public V AddShape<V>(V shape) where V : FoGlyph3D
+    {
+        return StageManager.AddShape<V>(shape);
     }
 
     public async Task ClearArena()

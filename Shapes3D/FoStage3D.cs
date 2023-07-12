@@ -119,7 +119,7 @@ public class FoStage3D : FoGlyph3D, IStage
         if (value is IShape3D)
         {
             Shapes3D.Add(value);
-            //$"IShape3D Added {value.Name}".WriteSuccess();
+            $"IShape3D Added {value.Name}".WriteSuccess();
         }
         else if (value is IPipe3D)
         {

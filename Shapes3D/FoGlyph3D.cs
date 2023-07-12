@@ -4,7 +4,7 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 

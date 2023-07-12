@@ -11,6 +11,7 @@ public interface IStageManagement
     FoStage3D SetCurrentStage(FoStage3D page);
     FoStage3D AddStage(FoStage3D page);
 
+    V AddShape<V>(V shape) where V : FoGlyph3D;
 
     void ClearAll();
     int StageCount();

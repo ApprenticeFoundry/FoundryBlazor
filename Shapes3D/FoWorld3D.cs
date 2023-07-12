@@ -13,6 +13,8 @@ public class FoWorld3D : FoGlyph3D
         GetSlot<FoShape3D>();
         GetSlot<FoText3D>();
         GetSlot<FoDatum3D>();
+        GetSlot<FoMenu3D>();
+        GetSlot<FoPathway3D>();
         GetSlot<FoRelationship3D>();
     }
 
