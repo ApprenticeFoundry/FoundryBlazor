@@ -25,7 +25,7 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
         return GetMembers<FoButton3D>()?.Select(item => item as IFoButton).ToList() ?? new List<IFoButton>();
     }
 
-    public FoMenu3D(string name) : base(name,"Grey")
+    public FoMenu3D(string name) : base(name, "Grey")
     {
         //ResetLocalPin((obj) => 0, (obj) => 0);
     }
@@ -40,15 +40,15 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public FoMenu3D ToggleLayout()
     {
-        if ( _layout.Matches("V"))
+        if (_layout.Matches("V"))
             LayoutHorizontal();
         else
             LayoutVertical();
-            
+
         return this;
     }
 
-    public FoMenu3D LayoutHorizontal(int width=95, int height=40)
+    public FoMenu3D LayoutHorizontal(int width = 95, int height = 40)
     {
         // var x = 0;
         // var y = 18;
@@ -63,7 +63,7 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
         return this;
     }
 
-    public FoMenu3D LayoutVertical(int width=95, int height=40)
+    public FoMenu3D LayoutVertical(int width = 95, int height = 40)
     {
         // var x = 3;
         // var y = 18;
@@ -80,11 +80,12 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public bool Menu3D(Scene ctx)
     {
-        var box = new Vector3(10, 20, 30);
+        var box = new Vector3(1, 2, 3);
+        Color = "blue";
         var mesh = new BlazorThreeJS.Objects.Mesh
         {
             Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-            Position = GetPosition(),
+            Position = new Vector3(0, 0, 0),
             Pivot = GetPivot(),
             Rotation = GetRotation(),
             Material = GetMaterial()
