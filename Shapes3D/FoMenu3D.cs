@@ -8,6 +8,7 @@ using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 using IoBTMessage.Extensions;
 using IoBTMessage.Models;
+using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;
 
@@ -82,15 +83,27 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
     {
         var box = new Vector3(1, 2, 3);
         Color = "blue";
-        var mesh = new BlazorThreeJS.Objects.Mesh
-        {
-            Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-            Position = new Vector3(0, 0, 0),
-            Pivot = GetPivot(),
-            Rotation = GetRotation(),
-            Material = GetMaterial()
+        var buttons = new List<Button>() {
+            new Button("BTN1", "Button 1"),
+            new Button("BTN1","Button 2"),
+            new Button("BTN1","Button 3")
         };
-        ctx.Add(mesh);
+        var menu = new Menu
+        {
+            Buttons = buttons
+        };
+
+        ctx.Add(menu);
+
+        // var mesh = new BlazorThreeJS.Objects.Mesh
+        // {
+        //     Geometry = new BoxGeometry(box.X, box.Y, box.Z),
+        //     Position = new Vector3(0, 0, 0),
+        //     Pivot = GetPivot(),
+        //     Rotation = GetRotation(),
+        //     Material = GetMaterial()
+        // };
+        // ctx.Add(mesh);
         return true;
     }
 
