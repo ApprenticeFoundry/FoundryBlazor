@@ -84,8 +84,12 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
         var box = new Vector3(1, 2, 3);
         Color = "blue";
         var buttons = new List<Button>() {
-            new Button("BTN1", "Button 1"),
-            new Button("BTN1","Button 2"),
+            new Button("BTN1", "Button 1") {
+                OnClick = ()=>Console.WriteLine("Clicked Button1")
+            },
+            new Button("BTN1","Button 2"){
+                OnClick = ()=>Console.WriteLine("Clicked Button2")
+            },
             new Button("BTN1","Button 3")
         };
         var menu = new Menu
