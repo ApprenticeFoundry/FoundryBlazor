@@ -28,6 +28,7 @@ public interface IWorkspace : IWorkbook
     IDrawing GetDrawing();
     IArena GetArena();
     ISelectionService GetSelectionService();
+    IFoundryService GetFoundryService();
 
     string GetUserID();
     ViewStyle GetViewStyle();
@@ -117,6 +118,11 @@ public class FoWorkspace : FoComponent, IWorkspace
             }
             catch { }
         };
+    }
+
+    public IFoundryService GetFoundryService()
+    {
+        return Foundry;
     }
 
     public virtual void PreRender(int tick)
