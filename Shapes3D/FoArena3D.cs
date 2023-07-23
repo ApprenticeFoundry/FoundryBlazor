@@ -28,7 +28,8 @@ public interface IArena
     bool RenderWorld3D(FoWorld3D? world);
     bool PreRender(FoGlyph3D glyph);
 
-
+    FoWorld3D MapToWorld3D(UDTO_World world);
+    
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
