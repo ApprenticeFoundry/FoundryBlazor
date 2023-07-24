@@ -15,7 +15,7 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
     private FoLayoutNode<V>? _source;
     private FoLayoutNode<V>? _sink;
 
-    public FoLayoutLink(V link)
+    public FoLayoutLink(U link)
     {
         _item = link;
     }
@@ -24,6 +24,7 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
     {
         _source = node1;
         _sink = node2;
+        return this;
     }
 
     public void ClearAll()
@@ -32,7 +33,7 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
         _sink = null;
     }
 
-    public V GetShape()
+    public U GetShape()
     {
         return _item;
     }
