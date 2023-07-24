@@ -15,9 +15,13 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
     private FoLayoutNode<V>? _source;
     private FoLayoutNode<V>? _sink;
 
-    public FoLayoutLink(FoLayoutNode<V> node1, FoLayoutNode<V> node2)
+    public FoLayoutLink(V link)
     {
-        _item = Activator.CreateInstance<U>();
+        _item = link;
+    }
+
+    public FoLayoutLink<U,V> Connect(FoLayoutNode<V> node1, FoLayoutNode<V> node2)
+    {
         _source = node1;
         _sink = node2;
     }
@@ -28,6 +32,10 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
         _sink = null;
     }
 
+    public V GetShape()
+    {
+        return _item;
+    }
     public string GetSourceGlyphId()
     {
         return _source.GetGlyphId();

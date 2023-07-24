@@ -17,8 +17,19 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     private List<FoLayoutLink<U,V>>? _links;
     private List<FoLayoutNode<V>>? _nodes;
 
-    public FoLayoutNetwork(DT_System system)
+    public FoLayoutNetwork()
     {
+        _links = new List<FoLayoutLink<U,V>>();
+        _nodes = new List<FoLayoutNode<V>>();
+    }
+
+    public void AddLink(FoLayoutLink<U,V> link)
+    {
+        _links.Add(link);
+    }
+    public void AddNode(FoLayoutNode<V> node)
+    {
+        _nodes.Add(node);
     }
 
     public void ClearAll()

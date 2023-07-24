@@ -30,6 +30,11 @@ public class FoLayoutNode<V> where V : FoGlyph2D
         return _item.GetGlyphId();
     }
 
+    public V GetShape()
+    {
+        return _item;
+    }
+
     public async Task RenderLayoutNetwork(Canvas2DContext ctx, int tick)
     {
 
