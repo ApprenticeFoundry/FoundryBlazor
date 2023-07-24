@@ -10,6 +10,7 @@ namespace FoundryBlazor.Shape;
 
 public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
 {
+    public double Length { get; set; }
 
     private U _item;
     private FoLayoutNode<V>? _source;
@@ -24,6 +25,8 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
     {
         _source = node1;
         _sink = node2;
+        _item.GlueStartTo(node1.GetShape());
+        _item.GlueFinishTo(node2.GetShape());
         return this;
     }
 

@@ -36,7 +36,11 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     {
     }
 
-
+    public FoLayoutNode<V>? FindTarget(string guid)
+    {
+        var found  = _nodes?.FirstOrDefault(t => t.GetGlyphId().Matches(guid));
+        return found;
+    }
 
     public async Task RenderLayoutNetwork(Canvas2DContext ctx, int tick)
     {

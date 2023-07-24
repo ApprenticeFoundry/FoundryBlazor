@@ -11,7 +11,11 @@ public class FoLayoutNode<V> where V : FoGlyph2D
 {
 
     private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
-
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Mass { get; }
+    public double Dx { get; set; }
+    public double Dy { get; set; }
 
     private V _item;
 
@@ -55,6 +59,5 @@ public class FoLayoutNode<V> where V : FoGlyph2D
     {
         return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
     }
-
 
 }
