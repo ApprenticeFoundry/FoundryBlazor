@@ -81,16 +81,14 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public bool Menu3D(Scene ctx)
     {
-        var box = new Vector3(1, 2, 3);
-        Color = "blue";
         var buttons = new List<Button>() {
             new Button("BTN1", "Button 1") {
-                OnClick = ()=>Console.WriteLine("Clicked Button1")
+                OnClick = (Button btn)=>Console.WriteLine("Clicked Button1")
             },
-            new Button("BTN1","Button 2"){
-                OnClick = ()=>Console.WriteLine("Clicked Button2")
+            new Button("BTN2","Button 2"){
+                OnClick = (Button btn)=>Console.WriteLine("Clicked Button2")
             },
-            new Button("BTN1","Button 3")
+            new Button("BTN3","Button 3")
         };
         var menu = new Menu
         {
@@ -98,16 +96,6 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
         };
 
         ctx.Add(menu);
-
-        // var mesh = new BlazorThreeJS.Objects.Mesh
-        // {
-        //     Geometry = new BoxGeometry(box.X, box.Y, box.Z),
-        //     Position = new Vector3(0, 0, 0),
-        //     Pivot = GetPivot(),
-        //     Rotation = GetRotation(),
-        //     Material = GetMaterial()
-        // };
-        // ctx.Add(mesh);
         return true;
     }
 
