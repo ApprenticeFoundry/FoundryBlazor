@@ -51,15 +51,14 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     public async Task RenderLayoutNetwork(Canvas2DContext ctx, int tick)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
-
         await ctx.SaveAsync();
 
-
-        
-        await ctx.SetLineWidthAsync(4);
+        await ctx.BeginPathAsync();
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
-       // await ctx.SetStrokeStyleAsync(Colors[level]);
-
+        await ctx.SetLineWidthAsync(3);
+        await ctx.SetStrokeStyleAsync("Red");
+        await ctx.StrokeRectAsync(Boundary.X, Boundary.Y, Boundary.Width, Boundary.Height);
+        await ctx.StrokeAsync();
 
         await ctx.RestoreAsync();
     }
@@ -104,7 +103,11 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         sink.Dy -= fy / sink.Mass;
     }
 
-   public void DoLayoutStep(int tick)
+    public void DoLayoutStep(int tick)
+    {
+    }
+
+   public void DoLayoutStepXXX(int tick)
     {
 
         if (temperature <= 0.1)
