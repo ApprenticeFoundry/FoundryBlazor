@@ -1,168 +1,155 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
-namespace DTARClient.Model;
+namespace ForceDirectedGraphLayout {
 
-public class Node
-{
-    public int Id { get; }
+  class Node {
+    public string Id { get; set; }
+    public double Mass { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
-    public double Mass { get; }
-    public double Dx { get; set; }
-    public double Dy { get; set; }
 
-    public Node(int id, double mass = 1.0)
-    {
-        Id = id;
-        X = 0;
-        Y = 0;
-        Mass = mass;
-        Dx = 0;
-        Dy = 0;
+    public Node(string id, double mass, double x, double y) {
+      Id = id;
+      Mass = mass;
+      X = x;
+      Y = y; 
     }
-}
+  }
 
-public class Link
-{
-    public Node Source { get; }
-    public Node Target { get; }
-    public double Length { get; }
+  class Edge {
+    public Node Node1 { get; set; }
+    public Node Node2 { get; set; }
+    public double Length { get; set; }
+    public double Strength { get; set; }
 
-    public Link(Node source, Node target)
-    {
-        Source = source;
-        Target = target;
-        Length = Math.Sqrt(Math.Pow(Target.X - Source.X, 2) + Math.Pow(Target.Y - Source.Y, 2));
+    public Edge(Node node1, Node node2, double length, double strength) {
+      Node1 = node1;
+      Node2 = node2;
+      Length = length;
+      Strength = strength;
     }
-}
+  }
 
-public class ForceLayout
-{
-    private List<Node> nodes;
-    private List<Link> links;
-    private double k;
-    private double temperature;
-    private double coolingFactor;
+  class ForceDirectedGraph {
+    
+    private List<Node> nodes = new List<Node>();
+    private List<Edge> edges = new List<Edge>();
 
-    public ForceLayout(List<Node> nodes, List<Link> links, double k = 0.1, double temperature = 200, double coolingFactor = 0.99)
-    {
-        this.nodes = nodes;
-        this.links = links;
-        this.k = k;
-        this.temperature = temperature;
-        this.coolingFactor = coolingFactor;
+    private double SpringConstant = 0.2;
+    private double RepulsionConstant = 10000; 
+    private double Damping = 0.95;
+    
+    public ForceDirectedGraph() {
     }
 
-    private double CalculateDistance(Node a, Node b)
-    {
-        return Math.Max(Math.Sqrt(Math.Pow(b.X - a.X, 2) + Math.Pow(b.Y - a.Y, 2)), 0.001);
+    public void AddNode(string id, double mass, double x, double y) {
+      nodes.Add(new Node(id, mass, x, y));
     }
 
-    private void ApplyCoulombForces(Node node, List<Node> allNodes)
-    {
-        foreach (Node otherNode in allNodes)
-        {
-            if (node != otherNode)
-            {
-                double dx = otherNode.X - node.X;
-                double dy = otherNode.Y - node.Y;
-                double distance = CalculateDistance(node, otherNode);
-                double force = k * k / distance;
-                node.Dx += dx / distance * force / node.Mass;
-                node.Dy += dy / distance * force / node.Mass;
-            }
+    public void AddEdge(string id1, string id2, double length, double strength) {
+      var node1 = nodes.Find(n => n.Id == id1);
+      var node2 = nodes.Find(n => n.Id == id2);
+      edges.Add(new Edge(node1, node2, length, strength)); 
+    }
+
+    private void ApplyForces() {
+      foreach (var edge in edges) {
+        ApplySpringForce(edge);  
+      }
+
+      foreach (var node1 in nodes) {
+        foreach (var node2 in nodes) {
+          if (node1 != node2) {
+            ApplyRepulsionForce(node1, node2);
+          }
         }
+      }
     }
 
-    private void ApplyHookesLaw(Link link)
-    {
-        double dx = link.Target.X - link.Source.X;
-        double dy = link.Target.Y - link.Source.Y;
-        double distance = CalculateDistance(link.Target, link.Source);
-        double force = distance * distance / k;
-        double fx = dx / distance * force;
-        double fy = dy / distance * force;
-        link.Source.Dx += fx / link.Source.Mass;
-        link.Source.Dy += fy / link.Source.Mass;
-        link.Target.Dx -= fx / link.Target.Mass;
-        link.Target.Dy -= fy / link.Target.Mass;
+    private void ApplySpringForce(Edge edge) {
+      double deltaX = edge.Node1.X - edge.Node2.X;
+      double deltaY = edge.Node1.Y - edge.Node2.Y;
+      
+      double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+      if (distance == 0) return;
+
+      double directionX = deltaX / distance; 
+      double directionY = deltaY / distance;
+
+      double springForce = (distance - edge.Length) * (SpringConstant * edge.Strength);
+
+      edge.Node1.X -= directionX * springForce;
+      edge.Node1.Y -= directionY * springForce;
+
+      edge.Node2.X += directionX * springForce;
+      edge.Node2.Y += directionY * springForce;
     }
 
-    public void Layout()
-    {
-        Random random = new();
-        foreach (Node node in nodes)
-        {
-            node.X = random.NextDouble();
-            node.Y = random.NextDouble();
-        }
+    private void ApplyRepulsionForce(Node node1, Node node2) {
+      double deltaX = node1.X - node2.X;
+      double deltaY = node1.Y - node2.Y;
+      
+      double distanceSquared = deltaX * deltaX + deltaY * deltaY;
+      if (distanceSquared == 0) return;
 
-        while (temperature > 0.1)
-        {
-            foreach (Node node in nodes)
-            {
-                node.Dx = 0;
-                node.Dy = 0;
-                ApplyCoulombForces(node, nodes);
-            }
+      double distance = Math.Sqrt(distanceSquared);
+      double directionX = deltaX / distance;
+      double directionY = deltaY / distance;
 
-            foreach (Link link in links)
-            {
-                ApplyHookesLaw(link);
-            }
+      double repulsionForce = RepulsionConstant * node1.Mass * node2.Mass / distanceSquared;
+      
+      node1.X -= directionX * repulsionForce;
+      node1.Y -= directionY * repulsionForce;
 
-            // Move nodes based on the accumulated forces
-            foreach (Node node in nodes)
-            {
-                // Damping factor helps to stabilize the layout
-                node.X += node.Dx * temperature;
-                node.Y += node.Dy * temperature;
-
-                // Avoid node collisions
-                foreach (Node otherNode in nodes)
-                {
-                    if (node != otherNode)
-                    {
-                        double dx = otherNode.X - node.X;
-                        double dy = otherNode.Y - node.Y;
-                        double distance = CalculateDistance(node, otherNode);
-                        double collisionDistance = 0.1; // Minimum distance to avoid collision
-                        if (distance < collisionDistance)
-                        {
-                            double moveDistance = (collisionDistance - distance) / distance * 0.5;
-                            node.X -= dx * moveDistance;
-                            node.Y -= dy * moveDistance;
-                        }
-                    }
-                }
-            }
-
-            // Cool down the system by reducing the temperature
-            temperature *= coolingFactor;
-        }
+      node2.X += directionX * repulsionForce;
+      node2.Y += directionY * repulsionForce;
     }
-}
 
-public class SampleProgram
-{
-    static void Main()
-    {
-        Node node1 = new Node(1);
-        Node node2 = new Node(2);
-        Node node3 = new Node(3);
-        List<Node> nodes = new List<Node> { node1, node2, node3 };
+    public void Layout(int numIterations) {
+      var random = new Random();
+      
+      foreach (var node in nodes) {
+        node.X = random.NextDouble() * 1000;
+        node.Y = random.NextDouble() * 1000;
+      }
 
-        Link link1 = new Link(node1, node2);
-        Link link2 = new Link(node2, node3);
-        List<Link> links = new List<Link> { link1, link2 };
-
-        ForceLayout forceLayout = new ForceLayout(nodes, links, k: 0.1, temperature: 200, coolingFactor: 0.99);
-        forceLayout.Layout();
-
-        foreach (Node node in nodes)
-        {
-            Console.WriteLine($"Node {node.Id} - X: {node.X}, Y: {node.Y}");
-        }
+      for (int i = 0; i < numIterations; i++) {
+        ApplyForces();
+        UpdatePositions();
+      }
     }
+
+    private void UpdatePositions() {
+      foreach (var node in nodes) {
+        node.X += (500 - node.X) * Damping;
+        node.Y += (500 - node.Y) * Damping;
+      }
+    }
+
+  }
+
+//   class Program {
+//     static void Main(string[] args) {
+      
+//       var graph = new ForceDirectedGraph();
+      
+//       graph.AddNode("A", 2, 0, 0);
+//       graph.AddNode("B", 1, 0, 0);
+//       graph.AddNode("C", 3, 0, 0);
+      
+//       graph.AddEdge("A", "B", 70, 1);
+//       graph.AddEdge("B", "C", 80, 1); 
+//       graph.AddEdge("A", "C", 100, 1);
+
+//       graph.Layout(100);
+
+//       // Print node positions
+//       foreach (var node in graph.nodes) {
+//         Console.WriteLine($"{node.Id}: ({node.X}, {node.Y})");
+//       }
+//     }
+//   }
+
 }

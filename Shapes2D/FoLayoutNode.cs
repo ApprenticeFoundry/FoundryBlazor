@@ -11,22 +11,35 @@ public class FoLayoutNode<V> where V : FoGlyph2D
 {
 
     private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Mass { get; }
-    public double Dx { get; set; }
-    public double Dy { get; set; }
+    public double X { get; set; } = 110.0;
+    public double Y { get; set; } = 110.0;
+    public double Mass { get; } = 1.0;
+    public double Dx { get; set; }= 0.0;
+    public double Dy { get; set; }= 0.0;
 
     private V _item;
 
-    public FoLayoutNode(V node)
+    public FoLayoutNode(V node, double x, double y)
     {
         _item = node;
+        X = x; Y = y;
     }
 
     public void ClearAll()
     {
         _item = null!;
+    }
+
+    public void MoveTo(int x, int y) 
+    { 
+        (X, Y) = (x, y); 
+        GetShape().MoveTo(x, y);
+    }
+
+    public void MoveBy(int dx, int dy)
+    { 
+        (X, Y) = (X+dx, Y+dy); 
+        GetShape().MoveBy(dx, dy);
     }
 
     public string GetGlyphId()

@@ -8,9 +8,9 @@ using System;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
+public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
 {
-    public double Length { get; set; }
+
 
     private U _item;
     private FoLayoutNode<V>? _source;
@@ -21,13 +21,21 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
         _item = link;
     }
 
-    public FoLayoutLink<U,V> Connect(FoLayoutNode<V> node1, FoLayoutNode<V> node2)
+    public FoLayoutLink<U, V> Connect(FoLayoutNode<V> node1, FoLayoutNode<V> node2)
     {
         _source = node1;
         _sink = node2;
         _item.GlueStartTo(node1.GetShape());
         _item.GlueFinishTo(node2.GetShape());
         return this;
+    }
+
+    public double GetLength()
+    {
+        if (_source == null || _sink == null)
+            return 0.0;
+        var result = Math.Sqrt(Math.Pow(_source.X - _sink.X, 2) + Math.Pow(_source.Y - _sink.Y, 2));
+        return result;
     }
 
     public void ClearAll()
@@ -40,25 +48,34 @@ public class FoLayoutLink<U,V> where V : FoShape2D where U : FoShape1D
     {
         return _item;
     }
+
+    public FoLayoutNode<V>? GetSource()
+    {
+        return _source;
+    }
+    public FoLayoutNode<V>? GetSink()
+    {
+        return _sink;
+    }
     public string GetSourceGlyphId()
     {
-        return _source.GetGlyphId();
+        return _source?.GetGlyphId() ?? "";
     }
     public string GetSinkGlyphId()
     {
-        return _sink.GetGlyphId();
+        return _sink?.GetGlyphId() ?? "";
     }
     public async Task RenderLayoutNetwork(Canvas2DContext ctx, int tick)
     {
 
 
         await ctx.SaveAsync();
-        
+
         await ctx.SetLineWidthAsync(4);
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
         //await ctx.SetStrokeStyleAsync(Colors[level]);
 
-  
+
         await ctx.RestoreAsync();
     }
 
