@@ -7,12 +7,13 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutNode<V> where V : FoGlyph2D
+public class FoLayoutNode<V>: IHasRectangle where V : FoGlyph2D
 {
 
     private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
     public double X { get; set; } = 110.0;
     public double Y { get; set; } = 110.0;
+    public double Radius { get; set; } = 50.0;
     public double Mass { get; } = 1.0;
     public double Dx { get; set; }= 0.0;
     public double Dy { get; set; }= 0.0;
@@ -23,6 +24,16 @@ public class FoLayoutNode<V> where V : FoGlyph2D
     {
         _item = node;
         X = x; Y = y;
+    }
+
+    public Rectangle Rect()
+    {
+        return _item.Rect();
+    }
+
+    public bool IsSmashed()
+    {
+        return _item.IsSmashed();
     }
 
     public void ClearAll()
@@ -72,5 +83,6 @@ public class FoLayoutNode<V> where V : FoGlyph2D
     {
         return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
     }
+
 
 }
