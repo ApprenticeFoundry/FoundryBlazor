@@ -16,15 +16,14 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     public Rectangle Boundary = new (100, 100, 700, 700);
 
-    private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
 
     private double alpha = 1.0;
 
     private double alphaDamping = 0.9;
 
-    private double velocityDecay = 0.6;
-    private double springFactor = 0.1;
-    private double chargeFactor = 0.1;
+    private double repellingForce = 1.0;
+    private double springConstant = 1.0;
+    private double centerForce =1.0;
      
     private int iterations = 0;
     private int maxIterations = 0;
@@ -32,6 +31,11 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private List<FoLayoutLink<U,V>> _links = new();
     private List<FoLayoutNode<V>> _nodes = new();
+
+    public bool ApplyCenter { get; set; } = true;
+    public bool ApplyBoundary { get;  set; } = true;
+    public bool ApplyAttract { get;  set; } = true;
+    public bool ApplyRepel { get;  set; } = true;
 
     public FoLayoutNetwork()
     {
@@ -73,15 +77,46 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         await ctx.RestoreAsync();
     }
 
-    private static double CalculateDistance(FoLayoutNode<V> a, FoLayoutNode<V> b)
+    public void ToggleBoundryRule()
     {
-        return Math.Max(Math.Sqrt(Math.Pow(b.X - a.X, 2) + Math.Pow(b.Y - a.Y, 2)), 0.001);
+        ApplyBoundary = !ApplyBoundary;
+        ApplyBoundaryForces();
+        ApplyLocationToShape(0);
+    }
+
+    public void ToggleCenterRule()
+    {
+        ApplyCenter = !ApplyCenter;
+        ApplyCenterForces();
+        ApplyLocationToShape(0);
+    }
+    public void ToggleAttractRule()
+    {
+        ApplyAttract = !ApplyAttract;
+        ResetNodes();
+        // Apply forces
+        ApplySpringForces();
+
+        // Update node positions
+        UpdatePositions(1);
+        ApplyLocationToShape(0);
+    }
+    public void ToggleRepelRule()
+    {
+        ApplyRepel = !ApplyRepel;
+        ResetNodes();
+
+        // Apply forces
+        ApplyRepellingForces();
+
+        // Update node positions
+        UpdatePositions(1);
+        ApplyLocationToShape(0);
     }
 
     private void ApplyCenterForces()
     {
-        var strength = 0.1;
-
+        "ApplyCenterForces".WriteInfo();
         // Calculate center of mass
         var sx = 0.0;
         var sy = 0.0;
@@ -95,8 +130,8 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
             sy += p.Y;
         }
 
-        sx = (sx / _nodes.Count - cx) * strength;
-        sy = (sy / _nodes.Count - cy) * strength;
+        sx = (sx / _nodes.Count - cx) * centerForce;
+        sy = (sy / _nodes.Count - cy) * centerForce;
 
         foreach (var node in _nodes)
         {
@@ -107,7 +142,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     public void ApplyBoundaryForces()
     {
-
+        "ApplyBoundaryForces".WriteInfo();
         foreach(var node in _nodes)
         {
             // Check if node is outside x bounds
@@ -121,6 +156,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
  
     private void  ApplyLocationToShape(int tick) 
     {
+        "ApplyLocationToShape".WriteInfo();
         foreach (var node in _nodes)
         {
             var shape = node.GetShape();
@@ -131,8 +167,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
   private void ApplySpringForces()
     {
-        double springConstant = 0.1;
-
+        "ApplySpringForces".WriteInfo();
         foreach (var edge in _links)
         {
             var sourceNode = edge.GetSource();
@@ -152,6 +187,14 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         }
     }
 
+    private void Reset()
+    {
+        "Reset".WriteInfo();
+        alpha = 1.0;
+        alphaDamping = 0.9;
+        ResetNodes();
+    }
+
     private void ResetNodes()
     {
         foreach (var item in _nodes)
@@ -162,14 +205,14 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     }
     private void UpdatePositions(double alpha)
     {
+        "UpdatePositions".WriteInfo();
         foreach (var node in _nodes)
             node.UpdatePosition(alpha);
     }
 
     private void ApplyRepellingForces()
     {
-        double repellingForce = 50.0;
-
+        "ApplyRepellingForces".WriteInfo();
         for (int i = 0; i < _nodes.Count; i++)
         {
             for (int j = i + 1; j < _nodes.Count; j++)
@@ -218,15 +261,21 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         ResetNodes();
 
         // Apply forces
-        ApplySpringForces();
-        ApplyRepellingForces();
+        if ( ApplyRepel == true)
+            ApplyRepellingForces();
+        if ( ApplyAttract == true)
+            ApplySpringForces();
+
 
         // Update node positions
         UpdatePositions(alpha);
 
 
-        ApplyCenterForces();
-        ApplyBoundaryForces();
+        if ( ApplyCenter == true)
+            ApplyCenterForces();
+
+        if ( ApplyBoundary == true)
+            ApplyBoundaryForces();
 
         ApplyLocationToShape(tick);
         

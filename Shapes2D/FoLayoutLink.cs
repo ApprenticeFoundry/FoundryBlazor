@@ -30,7 +30,7 @@ public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
         return this;
     }
 
-    public double GetLength()
+    public double CalculateLength()
     {
         if (_source == null || _sink == null)
             return 0.0;

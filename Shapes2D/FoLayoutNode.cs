@@ -27,6 +27,10 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
         Y = y;
     }
 
+    public double CalculateDistance(FoLayoutNode<V> b)
+    {
+        return Math.Max(Math.Sqrt(Math.Pow(b.X - X, 2) + Math.Pow(b.Y - Y, 2)), 0.001);
+    }
 
     public Rectangle Rect()
     {
