@@ -7,7 +7,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutNode<V>: IHasRectangle where V : FoGlyph2D
+public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
 {
 
     private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
@@ -15,16 +15,18 @@ public class FoLayoutNode<V>: IHasRectangle where V : FoGlyph2D
     public double Y { get; set; } = 110.0;
     public double Radius { get; set; } = 50.0;
     public double Mass { get; } = 1.0;
-    public double Dx { get; set; }= 0.0;
-    public double Dy { get; set; }= 0.0;
+    public double Dx { get; set; } = 0.0;
+    public double Dy { get; set; } = 0.0;
 
     private V _item;
 
     public FoLayoutNode(V node, double x, double y)
     {
         _item = node;
-        X = x; Y = y;
+        X = x; 
+        Y = y;
     }
+
 
     public Rectangle Rect()
     {
@@ -34,6 +36,20 @@ public class FoLayoutNode<V>: IHasRectangle where V : FoGlyph2D
     public bool IsSmashed()
     {
         return _item.IsSmashed();
+    }
+
+    public void ApplyForce(double fx, double fy)
+    {
+        Dx += fx / Mass;
+        Dy += fy / Mass;
+    }
+
+    public void UpdatePosition(double damping)
+    {
+        Dx *= damping;
+        Dy *= damping;
+        X += Dx;
+        Y += Dy;
     }
 
     public void ClearAll()

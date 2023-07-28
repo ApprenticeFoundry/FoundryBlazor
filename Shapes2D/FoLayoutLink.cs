@@ -49,13 +49,13 @@ public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
         return _item;
     }
 
-    public FoLayoutNode<V>? GetSource()
+    public FoLayoutNode<V> GetSource()
     {
-        return _source;
+        return _source!;
     }
-    public FoLayoutNode<V>? GetSink()
+    public FoLayoutNode<V> GetSink()
     {
-        return _sink;
+        return _sink!;
     }
     public string GetSourceGlyphId()
     {

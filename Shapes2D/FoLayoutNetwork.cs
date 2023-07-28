@@ -19,14 +19,15 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     private readonly string[] Colors = new string[] { "Red", "White", "Purple", "Green", "Grey", "Purple", "Pink", "Brown", "Grey", "Black", "White", "Crimson", "Indigo", "Violet", "Magenta", "Turquoise", "Teal", "SlateGray", "DarkSlateGray", "SaddleBrown", "Sienna", "DarkKhaki", "Goldenrod", "DarkGoldenrod", "FireBrick", "DarkRed", "RosyBrown", "DarkMagenta", "DarkOrchid", "DeepSkyBlue" };
 
     private double alpha = 1.0;
-    private double alphaMin = 0.001;
-    private double alphaDecay = 1;
-    private double alphaTarget = 0;
+
+    private double alphaDamping = 0.9;
 
     private double velocityDecay = 0.6;
     private double springFactor = 0.1;
     private double chargeFactor = 0.1;
-
+     
+    private int iterations = 0;
+    private int maxIterations = 0;
 
 
     private List<FoLayoutLink<U,V>> _links = new();
@@ -34,7 +35,6 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     public FoLayoutNetwork()
     {
-        alphaDecay = 1 - Math.Pow(alphaMin, 1 / 300);
     }
 
     public void AddLink(FoLayoutLink<U,V> link)
@@ -78,7 +78,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         return Math.Max(Math.Sqrt(Math.Pow(b.X - a.X, 2) + Math.Pow(b.Y - a.Y, 2)), 0.001);
     }
 
-    private void ApplyCenterForces(List<FoLayoutNode<V>> allNodes)
+    private void ApplyCenterForces()
     {
         var strength = 0.1;
 
@@ -89,26 +89,26 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         var cx = Boundary.X + Boundary.Width / 2;
         var cy = Boundary.Y + Boundary.Height / 2;
 
-        foreach (var p in allNodes)
+        foreach (var p in _nodes)
         {
             sx += p.X;
             sy += p.Y;
         }
 
-        sx = (sx / allNodes.Count - cx) * strength;
-        sy = (sy / allNodes.Count - cy) * strength;
+        sx = (sx / _nodes.Count - cx) * strength;
+        sy = (sy / _nodes.Count - cy) * strength;
 
-        foreach (var node in allNodes)
+        foreach (var node in _nodes)
         {
             node.X -= sx; 
             node.Y -= sy;
         }
     }
 
-    public void ApplyBoundaryForces(List<FoLayoutNode<V>> allNodes)
+    public void ApplyBoundaryForces()
     {
 
-        foreach(var node in allNodes)
+        foreach(var node in _nodes)
         {
             // Check if node is outside x bounds
             node.X = Math.Clamp(node.X, Boundary.X, Boundary.X + Boundary.Width);
@@ -119,9 +119,9 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
  
 
  
-    private void  ApplyLocationToShape(List<FoLayoutNode<V>> allNodes, int tick) 
+    private void  ApplyLocationToShape(int tick) 
     {
-        foreach (var node in allNodes)
+        foreach (var node in _nodes)
         {
             var shape = node.GetShape();
             $"{tick} Node {shape.Name} - X: {node.X}, Y: {node.Y}   {shape.PinX}  {shape.PinY}".WriteInfo();
@@ -129,77 +129,113 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         }
     }
 
-    private void ApplyCoulombForces(FoLayoutNode<V> node, List<FoLayoutNode<V>> allNodes)
+  private void ApplySpringForces()
     {
-        foreach (var otherNode in allNodes)
-        {
-            if (node != otherNode)
-            {
-                double distance = CalculateDistance(node, otherNode);
-                double force = chargeFactor * chargeFactor / distance;
+        double springConstant = 0.1;
 
-                double dx = otherNode.X - node.X;
-                double dy = otherNode.Y - node.Y;
-                node.Dx += dx / distance * force / node.Mass;
-                node.Dy += dy / distance * force / node.Mass;
+        foreach (var edge in _links)
+        {
+            var sourceNode = edge.GetSource();
+            var targetNode = edge.GetSink();
+
+            var dx = targetNode.X - sourceNode.X;
+            var dy = targetNode.Y - sourceNode.Y;
+            var distance = Math.Sqrt(dx * dx + dy * dy);
+
+            var force = (distance - springConstant) / distance;
+
+            var fx = force * dx;
+            var fy = force * dy;
+
+            sourceNode.ApplyForce(fx, fy);
+            targetNode.ApplyForce(-fx, -fy);
+        }
+    }
+
+    private void ResetNodes()
+    {
+        foreach (var item in _nodes)
+        {
+            item.Dx = 0;
+            item.Dy = 0;
+        }
+    }
+    private void UpdatePositions(double alpha)
+    {
+        foreach (var node in _nodes)
+            node.UpdatePosition(alpha);
+    }
+
+    private void ApplyRepellingForces()
+    {
+        double repellingForce = 50.0;
+
+        for (int i = 0; i < _nodes.Count; i++)
+        {
+            for (int j = i + 1; j < _nodes.Count; j++)
+            {
+                var nodeA = _nodes[i];
+                var nodeB = _nodes[j];
+
+                var dx = nodeB.X - nodeA.X;
+                var dy = nodeB.Y - nodeA.Y;
+                var distance = Math.Sqrt(dx * dx + dy * dy);
+
+                if (distance > 0)
+                {
+                    var force = repellingForce / (distance * distance);
+
+                    var fx = force * dx;
+                    var fy = force * dy;
+
+                    nodeA.ApplyForce(-fx, -fy);
+                    nodeB.ApplyForce(fx, fy);
+                }
             }
         }
     }
 
-    private void ApplyHookesLaw(FoLayoutLink<U,V> link)
+    public void DoIteration(int count)
     {
-        var source = link.GetSource();
-        var sink = link.GetSink();
-        if (source == null || sink == null)
-            return;
-            
-        double distance = CalculateDistance(sink, source);
-        double force = distance * distance / springFactor;
-
-        double dx = sink.X - source.X;
-        double dy = sink.Y - source.Y;
-        double fx = dx / distance * force;
-        double fy = dy / distance * force;
-        source.Dx -= fx / source.Mass;
-        source.Dy -= fy / source.Mass;
-        sink.Dx -= fx / sink.Mass;
-        sink.Dy -= fy / sink.Mass;
+        iterations = 0;
+        maxIterations = count;
     }
 
     public void DoLayoutStep(int tick)
     {
+
         if (_nodes.Count == 0) 
             return;
 
-        if (alpha < alphaMin)
+        iterations++;
+        if (iterations > maxIterations)
             return;
 
-        $"{tick} alpha {alpha} {alphaMin}  decay {alphaDecay}".WriteNote();
+        $"{tick} alpha {alpha} {iterations}".WriteNote();
 
-        foreach (var node in _nodes)
-            node.Dx = node.Dy = 0;
 
-        //foreach (var node in _nodes)
-        //    ApplyCoulombForces(node, _nodes);
+        // Reset forces
+        ResetNodes();
+
+        // Apply forces
+        ApplySpringForces();
+        ApplyRepellingForces();
+
+        // Update node positions
+        UpdatePositions(alpha);
+
+
+        ApplyCenterForces();
+        ApplyBoundaryForces();
+
+        ApplyLocationToShape(tick);
         
-        foreach (var link in _links)
-            ApplyHookesLaw(link);
-
-        foreach (var node in _nodes)
-        {
-            // Damping factor helps to stabilize the layout
-            node.X += node.Dx * velocityDecay;
-            node.Y += node.Dy * velocityDecay;
-        }
-
-        alpha += (alphaTarget - alpha) * alphaDecay;
-
-        ApplyCenterForces(_nodes);
-        ApplyBoundaryForces(_nodes);
-
-        ApplyLocationToShape(_nodes, tick);
+        // Reduce the simulation's effect (alpha damping)
+        alpha *= alphaDamping;
+        
     }
 
+ 
 
 
 }
