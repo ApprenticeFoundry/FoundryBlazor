@@ -20,16 +20,23 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
 
     private V _item;
 
-    public FoLayoutNode(V node, double x, double y)
+    public FoLayoutNode(V node, int x, int y)
     {
         _item = node;
-        X = x; 
-        Y = y;
+        MoveTo(x, y);
     }
 
-    public double CalculateDistance(FoLayoutNode<V> b)
+    public double CalculateLength(FoLayoutNode<V> b)
     {
         return Math.Max(Math.Sqrt(Math.Pow(b.X - X, 2) + Math.Pow(b.Y - Y, 2)), 0.001);
+    }
+
+    public (double dx, double dy, double distance) CalculateForceVector(FoLayoutNode<V> b)
+    {
+        var dx = X - b.X;
+        var dy = Y - b.Y;
+        var distance = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+        return (dx/distance, dy/distance, distance);
     }
 
     public Rectangle Rect()
@@ -48,12 +55,13 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
         Dy += fy / Mass;
     }
 
-    public void UpdatePosition(double damping)
+    public void UpdatePositionUsingForceValues(double damping)
     {
         Dx *= damping;
         Dy *= damping;
         X += Dx;
         Y += Dy;
+        Dx = Dy = 0;
     }
 
     public void ClearAll()

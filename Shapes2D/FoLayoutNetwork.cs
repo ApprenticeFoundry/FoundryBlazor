@@ -21,9 +21,9 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private double alphaDamping = 0.9;
 
-    private double repellingForce = 1.0;
-    private double springConstant = 1.0;
-    private double centerForce =1.0;
+    private double RepellingForce = 1000000.0;
+    private double AttractionForce = 10000.0;
+    private double CenterForce = 1.0;
      
     private int iterations = 0;
     private int maxIterations = 0;
@@ -32,19 +32,25 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     private List<FoLayoutLink<U,V>> _links = new();
     private List<FoLayoutNode<V>> _nodes = new();
 
-    public bool ApplyCenter { get; set; } = true;
-    public bool ApplyBoundary { get;  set; } = true;
-    public bool ApplyAttract { get;  set; } = true;
-    public bool ApplyRepel { get;  set; } = true;
 
     public FoLayoutNetwork()
     {
+    }
+
+    public List<FoLayoutLink<U,V>> GetLinks()
+    {
+        return _links;
+    }
+    public List<FoLayoutNode<V>> GetNodes()
+    {
+        return _nodes;
     }
 
     public void AddLink(FoLayoutLink<U,V> link)
     {
         _links.Add(link);
     }
+
     public void AddNode(FoLayoutNode<V> node)
     {
         _nodes.Add(node);
@@ -54,6 +60,15 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     {
         _links.Clear();
         _nodes.Clear();
+    }
+
+    public int XCenter()
+    {
+        return Boundary.X + Boundary.Width / 2;
+    }
+    public int YCenter()
+    {
+        return Boundary.Y + Boundary.Height / 2;
     }
 
     public FoLayoutNode<V>? FindTarget(string guid)
@@ -74,25 +89,31 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         await ctx.StrokeRectAsync(Boundary.X, Boundary.Y, Boundary.Width, Boundary.Height);
         await ctx.StrokeAsync();
 
+        var offsetY = 300;
+        var offsetX = 1000;
+
+        await ctx.SetFontAsync("18px consolas");
+        await ctx.FillTextAsync($"Center X: {XCenter()} Y: {YCenter()}", offsetX, offsetY);
+        await ctx.FillTextAsync($"Repelling {RepellingForce:0.00} Attraction {AttractionForce:0.00} alpha {alpha}", offsetX, offsetY + 25);
+
         await ctx.RestoreAsync();
     }
 
     public void ToggleBoundryRule()
     {
-        ApplyBoundary = !ApplyBoundary;
+        ResetNodes();
         ApplyBoundaryForces();
         ApplyLocationToShape(0);
     }
 
     public void ToggleCenterRule()
     {
-        ApplyCenter = !ApplyCenter;
+        ResetNodes();
         ApplyCenterForces();
         ApplyLocationToShape(0);
     }
     public void ToggleAttractRule()
     {
-        ApplyAttract = !ApplyAttract;
         ResetNodes();
         // Apply forces
         ApplySpringForces();
@@ -103,7 +124,6 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     }
     public void ToggleRepelRule()
     {
-        ApplyRepel = !ApplyRepel;
         ResetNodes();
 
         // Apply forces
@@ -130,8 +150,8 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
             sy += p.Y;
         }
 
-        sx = (sx / _nodes.Count - cx) * centerForce;
-        sy = (sy / _nodes.Count - cy) * centerForce;
+        sx = (sx / _nodes.Count - cx) * CenterForce;
+        sy = (sy / _nodes.Count - cy) * CenterForce;
 
         foreach (var node in _nodes)
         {
@@ -160,8 +180,9 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         foreach (var node in _nodes)
         {
             var shape = node.GetShape();
-            $"{tick} Node {shape.Name} - X: {node.X}, Y: {node.Y}   {shape.PinX}  {shape.PinY}".WriteInfo();
+           // $"{tick} Node {shape.Name} - X: {node.X}, Y: {node.Y}   {shape.PinX}  {shape.PinY}".WriteWarning();
             node.MoveTo((int)node.X, (int)node.Y);
+            $"{tick} {shape.PinX}  {shape.PinY}".WriteSuccess();
         }
     }
 
@@ -173,17 +194,18 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
             var sourceNode = edge.GetSource();
             var targetNode = edge.GetSink();
 
-            var dx = targetNode.X - sourceNode.X;
-            var dy = targetNode.Y - sourceNode.Y;
-            var distance = Math.Sqrt(dx * dx + dy * dy);
 
-            var force = (distance - springConstant) / distance;
+            var (dx, dy, distance) = edge.CalculateForceVector();
+
+            var force = AttractionForce / distance;
 
             var fx = force * dx;
             var fy = force * dy;
 
-            sourceNode.ApplyForce(fx, fy);
-            targetNode.ApplyForce(-fx, -fy);
+            $"Sprin Forces {force} {fx} {fy}".WriteNote();
+
+            sourceNode.ApplyForce(-fx, -fy);
+            targetNode.ApplyForce(+fx, +fy);
         }
     }
 
@@ -191,7 +213,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     {
         "Reset".WriteInfo();
         alpha = 1.0;
-        alphaDamping = 0.9;
+        alphaDamping = 0.94;
         ResetNodes();
     }
 
@@ -207,7 +229,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     {
         "UpdatePositions".WriteInfo();
         foreach (var node in _nodes)
-            node.UpdatePosition(alpha);
+            node.UpdatePositionUsingForceValues(alpha);
     }
 
     private void ApplyRepellingForces()
@@ -215,21 +237,25 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         "ApplyRepellingForces".WriteInfo();
         for (int i = 0; i < _nodes.Count; i++)
         {
-            for (int j = i + 1; j < _nodes.Count; j++)
+            for (int j = 0; j < _nodes.Count; j++)
             {
+                if ( i == j ) 
+                    continue;
+
                 var nodeA = _nodes[i];
                 var nodeB = _nodes[j];
 
-                var dx = nodeB.X - nodeA.X;
-                var dy = nodeB.Y - nodeA.Y;
-                var distance = Math.Sqrt(dx * dx + dy * dy);
+                var (dx,dy,distance) = nodeB.CalculateForceVector(nodeA);
 
                 if (distance > 0)
                 {
-                    var force = repellingForce / (distance * distance);
+                    var force = RepellingForce / (distance * distance);
 
                     var fx = force * dx;
                     var fy = force * dy;
+
+
+                    $"Repel Forces {force} {fx} {fy}".WriteNote();
 
                     nodeA.ApplyForce(-fx, -fy);
                     nodeB.ApplyForce(fx, fy);
@@ -240,6 +266,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     public void DoIteration(int count)
     {
+        alpha = 1.0;
         iterations = 0;
         maxIterations = count;
     }
@@ -250,38 +277,34 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         if (_nodes.Count == 0) 
             return;
 
+        if (iterations >= maxIterations)
+            return;
+
         iterations++;
-        if (iterations > maxIterations)
+        if (alpha < 0.002)
             return;
 
         $"{tick} alpha {alpha} {iterations}".WriteNote();
-
 
         // Reset forces
         ResetNodes();
 
         // Apply forces
-        if ( ApplyRepel == true)
-            ApplyRepellingForces();
-        if ( ApplyAttract == true)
-            ApplySpringForces();
+        ApplyRepellingForces();
+        ApplySpringForces();
 
 
         // Update node positions
         UpdatePositions(alpha);
-
-
-        if ( ApplyCenter == true)
-            ApplyCenterForces();
-
-        if ( ApplyBoundary == true)
-            ApplyBoundaryForces();
-
-        ApplyLocationToShape(tick);
-        
         // Reduce the simulation's effect (alpha damping)
         alpha *= alphaDamping;
-        
+
+
+        ApplyCenterForces();
+
+        ApplyBoundaryForces();
+
+        ApplyLocationToShape(tick);
     }
 
  

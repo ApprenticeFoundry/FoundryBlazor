@@ -34,8 +34,20 @@ public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
     {
         if (_source == null || _sink == null)
             return 0.0;
+
         var result = Math.Sqrt(Math.Pow(_source.X - _sink.X, 2) + Math.Pow(_source.Y - _sink.Y, 2));
         return result;
+    }
+
+    public (double dx, double dy, double distance) CalculateForceVector()
+    {
+        if (_source == null || _sink == null)
+            return (0, 0, 0);
+
+        var dx = _source.X - _sink.X;
+        var dy = _source.Y - _sink.Y;
+        var distance = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+        return (dx/distance, dy/distance, distance);
     }
 
     public void ClearAll()
