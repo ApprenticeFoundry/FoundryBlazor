@@ -32,16 +32,6 @@ public class HitTestService : IHitTestService
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
     }
 
-    // public Rectangle Rect()
-    // {
-    //     //make sure any shape on the canvas is in the hittest
-
-    //     var size = _drawing.TrueCanvasSize();
-    //     var canvas = new Rectangle(0, 0, size.Width, size.Height);
-
-    //     canvas = _panzoom.AntiScaleRect(canvas);
-    //     return canvas;
-    // }
 
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
@@ -51,7 +41,7 @@ public class HitTestService : IHitTestService
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
         Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
 
-        Page.InsertShapesToQuadTree(Tree);
+        Page.InsertShapesToQuadTree(Tree,_panzoom);
 
         return AllShapesEverywhere();
     }
@@ -59,13 +49,13 @@ public class HitTestService : IHitTestService
     public bool InsertRange(List<FoGlyph2D> list)
     {
         if (Tree != null)
-            list.ForEach(child => Tree.Insert(child));
+            list.ForEach(child => Tree.Insert(child, child.Rect()));
         return Tree != null;
     }
 
     public bool Insert(FoGlyph2D glyph)
     {
-        Tree?.Insert(glyph);
+        Tree?.Insert(glyph, glyph.Rect());
         return Tree != null;
     }
 

@@ -1,5 +1,6 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using Radzen.Blazor.Rendering;
 using System.Drawing;
 
 // https://happycoding.io/tutorials/processing/collision-detection
@@ -212,13 +213,14 @@ public class QuadTree<T> where T : IHasRectangle
         // If they're completely contained by the quad, bump objects down
         for (int i = 0; i < m_objects?.Count; i++)
         {
-            QuadTree<T> destTree = GetDestinationTree(m_objects[i]);
+            var item = m_objects[i];
+            QuadTree<T> destTree = GetDestinationTree(item);
 
             if (destTree != this)
             {
                 // Insert to the appropriate tree, remove the object, and back up one in the loop
-                destTree.Insert(m_objects[i]);
-                Remove(m_objects[i]);
+                destTree.Insert(item, item.Rect());
+                Remove(item);
                 i--;
             }
         }
@@ -337,11 +339,11 @@ public class QuadTree<T> where T : IHasRectangle
     }
     /// Insert an item into this QuadTree object.
 
-    public void Insert(T item)
+    public void Insert(T item, Rectangle itemRect)
     {
+        //var itemRect = item.Rect();
         // If this quad doesn't intersect the items rectangle, do nothing
-        var source = item.Rect();
-        if (!m_rect.IntersectsWith(source))
+        if (!m_rect.IntersectsWith(itemRect))
             return;
 
         if (m_objects == null )
@@ -360,7 +362,7 @@ public class QuadTree<T> where T : IHasRectangle
             if (destTree == this)
                 Add(item);
             else
-                destTree.Insert(item);
+                destTree.Insert(item,itemRect);
         }
     }
 

@@ -257,14 +257,17 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         shape.UnglueAll();
     }
 
-    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree)
+    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree, IPanZoomService panzoom)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
         // var count = Shapes2D.Count();
         foreach (var item in Shapes2D.Values())
         {
-            if (item.IsSelectable()) 
-                tree.Insert(item);
+            if (!item.IsSelectable()) 
+                continue;
+
+            var rect = item.Rect();
+            tree.Insert(item, rect);
         }
 
     }
