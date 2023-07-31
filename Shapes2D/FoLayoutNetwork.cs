@@ -204,7 +204,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
   private void ApplySpringForces()
     {
-        "ApplySpringForces".WriteInfo();
+        //"ApplySpringForces".WriteInfo();
         foreach (var edge in _links)
         {
             var sourceNode = edge.GetSource();
@@ -215,13 +215,13 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
             if ( distance == 0 )
                 continue;
-                
+
             var force = AttractionForce / distance;
 
             var fx = force * dx;
             var fy = force * dy;
 
-            $"Sprin Forces {force} {fx} {fy}".WriteNote();
+            //$"Sprin Forces {force} {fx} {fy}".WriteNote();
 
             sourceNode.ApplyForce(-fx, -fy);
             targetNode.ApplyForce(+fx, +fy);
@@ -253,7 +253,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private void ApplyRepellingForces()
     {
-        "ApplyRepellingForces".WriteInfo();
+        //"ApplyRepellingForces".WriteInfo();
         for (int i = 0; i < _nodes.Count; i++)
         {
             for (int j = 0; j < _nodes.Count; j++)
@@ -274,7 +274,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
                     var fy = force * dy;
 
 
-                    $"Repel Forces {force} {fx} {fy}".WriteNote();
+                    //$"Repel Forces {force} {fx} {fy}".WriteNote();
 
                     nodeA.ApplyForce(-fx, -fy);
                     nodeB.ApplyForce(fx, fy);
