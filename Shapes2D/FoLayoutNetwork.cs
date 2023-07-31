@@ -21,7 +21,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private double alphaDamping = 0.9;
 
-    private double RepellingForce = 1000000.0;
+    private double RepellingForce = 500000.0;
     private double AttractionForce = 10000.0;
     private double CenterForce = 1.0;
      
@@ -29,8 +29,8 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     private int maxIterations = 0;
 
 
-    private List<FoLayoutLink<U,V>> _links = new();
-    private List<FoLayoutNode<V>> _nodes = new();
+    private readonly List<FoLayoutLink<U,V>> _links = new();
+    private readonly List<FoLayoutNode<V>> _nodes = new();
 
 
     public FoLayoutNetwork()
@@ -99,20 +99,27 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         await ctx.RestoreAsync();
     }
 
-    public void ToggleBoundryRule()
+    public void DoRandomRule()
+    {
+        ResetNodes();
+        ApplyRandomForces();
+        ApplyLocationToShape(0);
+    }
+
+    public void DoBoundryRule()
     {
         ResetNodes();
         ApplyBoundaryForces();
         ApplyLocationToShape(0);
     }
 
-    public void ToggleCenterRule()
+    public void DoCenterRule()
     {
         ResetNodes();
         ApplyCenterForces();
         ApplyLocationToShape(0);
     }
-    public void ToggleAttractRule()
+    public void DoAttractRule()
     {
         ResetNodes();
         // Apply forces
@@ -122,7 +129,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         UpdatePositions(1);
         ApplyLocationToShape(0);
     }
-    public void ToggleRepelRule()
+    public void DoRepellRule()
     {
         ResetNodes();
 
@@ -171,7 +178,16 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
         }
     }
 
- 
+     public void ApplyRandomForces()
+    {
+        "ApplyRandomForces".WriteInfo();
+        var rand = new Random();
+        foreach(var node in _nodes)
+        {
+            node.X = rand.Next(Boundary.X, Boundary.X + Boundary.Width);
+            node.Y = rand.Next(Boundary.Y, Boundary.Y + Boundary.Height);
+        }
+    }
 
  
     private void  ApplyLocationToShape(int tick) 
