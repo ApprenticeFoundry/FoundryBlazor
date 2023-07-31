@@ -192,13 +192,13 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
  
     private void  ApplyLocationToShape(int tick) 
     {
-        "ApplyLocationToShape".WriteInfo();
+        //"ApplyLocationToShape".WriteInfo();
         foreach (var node in _nodes)
         {
             var shape = node.GetShape();
            // $"{tick} Node {shape.Name} - X: {node.X}, Y: {node.Y}   {shape.PinX}  {shape.PinY}".WriteWarning();
             node.MoveTo((int)node.X, (int)node.Y);
-            $"{tick} {shape.PinX}  {shape.PinY}".WriteSuccess();
+            //$"{tick} {shape.PinX}  {shape.PinY}".WriteSuccess();
         }
     }
 
