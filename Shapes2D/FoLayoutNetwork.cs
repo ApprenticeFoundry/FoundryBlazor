@@ -213,6 +213,9 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
             var (dx, dy, distance) = edge.CalculateForceVector();
 
+            if ( distance == 0 )
+                continue;
+                
             var force = AttractionForce / distance;
 
             var fx = force * dx;
