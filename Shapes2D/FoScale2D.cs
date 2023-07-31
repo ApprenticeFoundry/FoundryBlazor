@@ -36,6 +36,7 @@ public class FoScale2D
 
 public class FoHorizontalRuler2D
 {
+    public bool IsVisible { get; set; } = false;
     public FoScale2D Scale { get; set; } 
     public FoPage2D Page { get; set; }
 
@@ -47,6 +48,8 @@ public class FoHorizontalRuler2D
     }
     public async Task DrawRuler(Canvas2DContext ctx, Length step, bool major)
     {
+        if ( !IsVisible ) return;
+        
         await ctx.SaveAsync();
 
         var dStep = step.AsPixels();
@@ -105,6 +108,7 @@ public class FoHorizontalRuler2D
 
 public class FoVerticalRuler2D
 {
+    public bool IsVisible { get; set; } = false;
     public FoScale2D Scale { get; set; }
     public FoPage2D Page { get; set; }
 
@@ -117,6 +121,8 @@ public class FoVerticalRuler2D
 
     public async Task DrawRuler(Canvas2DContext ctx, Length step, bool major)
     {
+        if ( !IsVisible ) return;
+
         await ctx.SaveAsync();
 
         var dStep = step.AsPixels();

@@ -276,7 +276,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         FoGlyph2D.ResetHitTesting = true;
         Shapes1D.Clear();
+        var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
         Shapes2D.Clear();
+        
+        foreach (var item in menus)
+            Shapes2D.Add(item); 
+
         return this;
     }
 
@@ -323,7 +328,6 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
 
         await DrawHorizontalGrid(ctx, GridMinorH, false);
-        //await DrawHorizontalGrid(ctx, GridMajorH, true);
         await HRuler2D.DrawRuler(ctx, GridMinorH, false);
 
         await DrawVerticalGrid(ctx, GridMinorV, false);
