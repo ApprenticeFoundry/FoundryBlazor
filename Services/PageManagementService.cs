@@ -80,7 +80,7 @@ public class PageManagementService : FoComponent, IPageManagement
     public FoPage2D SetPageSize(double width, double height, string units)
     {
         var page = CurrentPage();
-        page.SetPageSize(width, height,units);
+        page.SetPageSize(width, height, units);
         return page;
     }
 
