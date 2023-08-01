@@ -482,7 +482,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var page = PageManager.CurrentPage();
 
-        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
+//        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
 
         await ClearCanvas(ctx);
 

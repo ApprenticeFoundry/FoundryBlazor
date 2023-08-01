@@ -94,7 +94,15 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public double Angle { get { return this.angle; } set { this.angle = AssignDouble(value, angle); } }
     public float Opacity { get; set; } = 1.0F;
 
-    public string Color { get; set; }
+    public string color = "pink";
+    public string Color
+    {
+        get { return this.color; }
+        set
+        {
+            this.color = value;
+        }
+    }
 
     public Func<FoGlyph2D?> GetParent = () => null;
 
@@ -162,7 +170,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         var id = GetGlyphId();
         var result = id == other;
-       // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
         return result;
     }
 
@@ -244,7 +252,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
     public virtual FoGlyph2D MarkSelected(bool value)
     {
-        if (Selectable )
+        if (Selectable)
             this.IsSelected = value;
         return this;
     }
@@ -327,7 +335,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return Animations.Tween(this, new { Width = w, Height = h }, duration).Ease(Ease.ElasticInOut);
     }
 
-    public FoGlyph2D BeforeShapeRefresh(Action<FoGlyph2D,int> action)
+    public FoGlyph2D BeforeShapeRefresh(Action<FoGlyph2D, int> action)
     {
         ContextLink = action;
         return this;
@@ -605,7 +613,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.RestoreAsync();
     }
 
-   public async Task DrawArrow(Canvas2DContext ctx, int HeadWidth, int HeadHeight, int BodyWidth, int BodyHeight, int BodyThickness,  string color)
+    public async Task DrawArrow(Canvas2DContext ctx, int HeadWidth, int HeadHeight, int BodyWidth, int BodyHeight, int BodyThickness, string color)
     {
         //var loc = PinLocation();
 
@@ -793,9 +801,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (_matrix == null)
         {
             _matrix = Matrix2D.NewMatrix();
-            try {
+            try
+            {
                 _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), LocPinX(this), LocPinY(this));
-            } 
+            }
             catch (Exception ex)
             {
                 $"Error in GetMatrix {ex.Message}".WriteError();

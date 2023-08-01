@@ -14,7 +14,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 
 
 
-    public FoMenu2D(string name) : base(name,100,50,"Grey")
+    public FoMenu2D(string name) : base(name,100,50,"Purple")
     {
         ShapeDraw = DrawRect;
         ResetLocalPin((obj) => 0, (obj) => 0);

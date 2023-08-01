@@ -40,7 +40,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public int ScaleAxisX { get; set; } = 1;
     public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
-     public int ScaleAxisY { get; set; } = 1;
+    public int ScaleAxisY { get; set; } = 1;
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
@@ -85,8 +85,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var scale = Scale2D.ScaleToDrawing();
         var pos = scale * value;
         var result = pos.AsPixels();
-       // $"PageXScale PW: {PageWidth} W: {value} D: {pos} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
-        return result;    
+        // $"PageXScale PW: {PageWidth} W: {value} D: {pos} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        return result;
     }
 
     public int MapToPageXLoc(Length value)
@@ -94,8 +94,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var m = PageMargin.AsPixels();
         var loc = m + MapToPageXScale(value);
         var result = m + ZeroPointX.AsPixels() + ScaleAxisX * loc;
-       // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
-        return result;    
+        // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        return result;
     }
 
     public int MapToPageYScale(Length value)
@@ -104,17 +104,17 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var pos = scale * value;
         var result = pos.AsPixels();
         //$"PageYScale PH: {PageHeight} W: {value} D: {pos}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
-        return result;    
+        return result;
     }
 
     public int MapToPageYLoc(Length value)
     {
         var m = PageMargin.AsPixels();
         var loc = MapToPageYScale(value);
-        var result = m + ZeroPointY.AsPixels() + ScaleAxisY *  loc;
-       // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        var result = m + ZeroPointY.AsPixels() + ScaleAxisY * loc;
+        // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
 
-        return result;    
+        return result;
     }
 
     public double MapToModelXLoc(int value)
@@ -156,7 +156,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         PageHeight.Assign(height, units);
         //set the zero point to the bottom left
         //SetPageAxisMM(0, -height);
-       
+
         SetPageAxisX(1, 0, units);
         SetPageAxisY(-1, height, units);
     }
@@ -263,7 +263,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         // var count = Shapes2D.Count();
         foreach (var item in Shapes2D.Values())
         {
-            if (!item.IsSelectable()) 
+            if (!item.IsSelectable())
                 continue;
 
             var rect = item.Rect();
@@ -278,9 +278,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         Shapes1D.Clear();
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
         Shapes2D.Clear();
-        
+
         foreach (var item in menus)
-            Shapes2D.Add(item); 
+            Shapes2D.Add(item);
 
         return this;
     }
@@ -347,11 +347,14 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var dHeight = PageHeight.AsPixels() + dMargin;
 
 
-        if ( !major) {            
+        if (!major)
+        {
             await ctx.SetLineWidthAsync(1);
             await ctx.SetLineDashAsync(new float[] { 5, 1 });
             await ctx.SetStrokeStyleAsync("White");
-        } else {
+        }
+        else
+        {
             await ctx.SetLineDashAsync(Array.Empty<float>());
             await ctx.SetStrokeStyleAsync("Black");
         }
@@ -428,7 +431,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetFillStyleAsync("Black");
         await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
 
-        await ctx.SetFillStyleAsync("Grey");
+        $"RenderNoItems Color={Color}".WriteInfo();
+        await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(0.75F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
@@ -460,7 +464,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetFillStyleAsync("Black");
         await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
 
-        await ctx.SetFillStyleAsync("Blue");
+        $"RenderConcise Color={Color}".WriteInfo();
+        await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(0.80F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
@@ -510,13 +515,13 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await UpdateContext(ctx, tick);
 
-  
+
         var margin = PageMargin.AsPixels();
-        Width = (PageWidth + 2.0 * margin).AsPixels();
-        Height = (PageHeight + 2.0 * margin).AsPixels();
+        var width = PageWidth.AsPixels() + 2.0 * margin;
+        var height = PageHeight.AsPixels() + 2.0 * margin;
 
         await ctx.SetFillStyleAsync("White");
-        await ctx.FillRectAsync(0, 0, Width, Height);
+        await ctx.FillRectAsync(0, 0, width, height);
 
         await DrawPageName(ctx);
 
