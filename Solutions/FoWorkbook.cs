@@ -46,7 +46,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         PubSub = foundry.PubSub();
     }  
 
-    public FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory")
+    public FoPage2D EstablishCurrentPage(string pagename, string color = "Yellow")
     {
         var drawing = Workspace.GetDrawing()!;
         var manager = drawing.Pages();
@@ -54,7 +54,6 @@ public class FoWorkbook: FoComponent, IWorkbook
         if (WorkPage == null)
         {
             WorkPage = new FoPage2D(pagename, color);
-            WorkPage.SetPageSize(60, 40, "cm");
             manager.AddPage(WorkPage);
         }
         manager.SetCurrentPage(WorkPage);

@@ -139,7 +139,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
-        GetMembers<FoWorkbook>()?.ForEach(item => 
+        AllWorkbooks()?.ForEach(item => 
         {
             if (item.IsActive)
                 item.PreRender(tick);
@@ -148,7 +148,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PostRender(int tick)
     {
-        GetMembers<FoWorkbook>()?.ForEach(item =>
+        AllWorkbooks()?.ForEach(item =>
         {
             if (item.IsActive)
                 item.PostRender(tick);
@@ -199,7 +199,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
-        GetMembers<FoWorkbook>()?.ForEach(async item =>
+        AllWorkbooks()?.ForEach(async item =>
         {
             if (item.IsActive)
                 await item.RenderWatermark(ctx, tick);
@@ -299,9 +299,9 @@ public class FoWorkspace : FoComponent, IWorkspace
         "ClearAllWorkbook".WriteWarning();
     }
 
-    public List<FoWorkbook> AddWorkbook(FoWorkbook piece)
+    public List<FoWorkbook> AddWorkbook(FoWorkbook book)
     {
-        Add<FoWorkbook>(piece);
+        Add<FoWorkbook>(book);
         FoWorkspace.RefreshCommands = true;
         FoWorkspace.RefreshMenus = true;
         return Members<FoWorkbook>();
@@ -413,7 +413,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        space.EstablishMenu2D<FoMenu2D,FoButton2D>("Main", new Dictionary<string, Action>()
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
          {
              { "New Window", () => OpenNew()},
              { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
@@ -424,7 +424,8 @@ public class FoWorkspace : FoComponent, IWorkspace
              { "Restore Drawing", () => Command.Restore()},
          }, true);
 
-        GetMembers<FoWorkbook>()?.ForEach(item => item.CreateMenus(space, js, nav));
+        ActiveWorkbook?.CreateMenus(space, js, nav);
+
 
         GetDrawing()?.CreateMenus(space,js, nav);
         GetArena()?.CreateMenus(space,js, nav);
@@ -491,7 +492,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
-        GetMembers<FoWorkbook>()?.ForEach(item => item.CreateCommands(space,js, nav, serverUrl));
+        ActiveWorkbook?.CreateCommands(space,js, nav, serverUrl);
 
         FoWorkspace.RefreshCommands = true;
     }
@@ -556,7 +557,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public bool SetSignalRHub(HubConnection hub, string panid)
     {
-        Members<FoWorkbook>().ForEach(item => item.SetSignalRHub(hub, panid));
+        ActiveWorkbook.SetSignalRHub(hub, panid);
 
         hub.Closed += async (error) =>
        {
@@ -583,7 +584,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
         GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));
-        Members<FoWorkbook>().ForEach(item => item.CollectCommands(list));
+        ActiveWorkbook?.CollectCommands(list);
         return list;
     }
 

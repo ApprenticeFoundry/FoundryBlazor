@@ -446,12 +446,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         }, true)
         .ToggleLayout().MoveTo(0, 80);
 
-
-        //A0 841 x 1189 mm 33.1 x 46.8 in
-        //PageManager.SetPageSizeMM(840,1120);
-        PageManager.SetPageSize(200, 300, "mm");
-        // PageManager.SetPageLandscape(); 
-        // ResetPanZoom();
     }
 
 
