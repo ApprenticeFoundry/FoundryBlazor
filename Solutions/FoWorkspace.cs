@@ -5,6 +5,7 @@ using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
+using System.Linq;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -249,9 +250,14 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public T EstablishWorkbook<T>() where T : FoWorkbook
     {
-        var book = Activator.CreateInstance(typeof(T), this, Foundry) as T;
-        AddWorkbook(book!);
-        return book!;
+
+        var found = Members<FoWorkbook>().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
+        if ( found == null )
+        {
+            found = Activator.CreateInstance(typeof(T), this, Foundry) as T;
+            AddWorkbook(found!);
+        }
+        return found!;
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
