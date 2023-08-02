@@ -13,6 +13,7 @@ public interface IHitTestService
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
+    void SetRectangle(Rectangle rect);
 }
 
 public class HitTestService : IHitTestService
@@ -22,26 +23,36 @@ public class HitTestService : IHitTestService
 
     private readonly List<Rectangle> PreviousSearches = new();
     private readonly IPanZoomService _panzoom;
+    private Rectangle Rect = new(0, 0, 100, 100);
 
     public HitTestService(IPanZoomService panzoom)
     {
         _panzoom = panzoom;
         Page = new FoPage2D("dummy", "White");
-        var rect = Page.Rect();
-        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
-        Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
     }
 
+    public void SetRectangle(Rectangle rect)
+    {
+        Rect.X = rect.X;
+        Rect.Y = rect.Y;
+        Rect.Width = rect.Width;
+        Rect.Height = rect.Height;
+
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
+
+    }
 
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
         Page = page;
-        var rect = Page.Rect();
 
-        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(rect);
-        Tree.Reset(rect.X, rect.Y, rect.Width, rect.Height);
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
 
-        Page.InsertShapesToQuadTree(Tree,_panzoom);
+        Page.InsertShapesToQuadTree(Tree, _panzoom);
 
         return AllShapesEverywhere();
     }
