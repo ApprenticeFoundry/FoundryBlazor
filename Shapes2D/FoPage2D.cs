@@ -485,7 +485,6 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         //var win = CurrentScale.UserWindow();
         //await ctx.StrokeRectAsync(win.X, win.Y, win.Width, win.Height);
 
-
         await ctx.RestoreAsync();
         return true;
     }
@@ -520,8 +519,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var width = PageWidth.AsPixels() + 2.0 * margin;
         var height = PageHeight.AsPixels() + 2.0 * margin;
 
+        Width = (int)width;
+        Height = (int)height;
+
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, width, height);
+
 
         await DrawPageName(ctx);
 

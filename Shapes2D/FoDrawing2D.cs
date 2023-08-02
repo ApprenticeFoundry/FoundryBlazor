@@ -49,9 +49,9 @@ public interface IDrawing : IRender
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
     void SetUserID(string panID);
     void ClearAll();
-
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
+    Rectangle Rect();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -95,6 +95,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
 
+
+    public override Rectangle Rect()
+    {
+        var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+        return result;
+    }
 
     public bool SetCurrentlyRendering(bool isRendering, int tick)
     {
@@ -153,6 +159,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         )
     {
         HitTestService = hittest;
+        HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
@@ -265,6 +272,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
+        HitTestService.SetRectangle(Rect());
     }
     public Size TrueCanvasSize()
     {
@@ -428,11 +436,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             // { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
             // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
             // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
-            { "A0", () => PageManager.SetPageSize(840,1120, "mm")}, 
-            { "A1", () => PageManager.SetPageSize(600, 840, "mm")}, 
+            { "A0", () => PageManager.SetPageSize(840,1120, "mm")},
+            { "A1", () => PageManager.SetPageSize(600, 840, "mm")},
             { "A2", () => PageManager.SetPageSize(420, 600, "mm")},
-            { "A3", () => PageManager.SetPageSize(300, 420, "mm")}, 
-            { "A4", () => PageManager.SetPageSize(200, 300, "mm")}, 
+            { "A3", () => PageManager.SetPageSize(300, 420, "mm")},
+            { "A4", () => PageManager.SetPageSize(200, 300, "mm")},
             { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom(); } },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
@@ -482,7 +490,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var page = PageManager.CurrentPage();
 
-//        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
+        //        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
 
         await ClearCanvas(ctx);
 
