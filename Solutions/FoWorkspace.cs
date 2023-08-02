@@ -36,7 +36,6 @@ public interface IWorkspace : IWorkbook
     void SetViewStyle(ViewStyle style);
     bool IsViewStyle2D();
     bool IsViewStyle3D();
-    public List<T> Members<T>() where T : FoBase;
 
     U EstablishCommand<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoCommand2D;
     U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
@@ -44,6 +43,7 @@ public interface IWorkspace : IWorkbook
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkbook();
+    List<FoWorkbook> AllWorkbooks();
     List<FoWorkbook> AddWorkbook(FoWorkbook book);
     T EstablishWorkbook<T>() where T : FoWorkbook;
 
@@ -261,6 +261,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return found!;
     }
 
+
+    public List<FoWorkbook> AllWorkbooks() 
+    {
+        return Members<FoWorkbook>();
+    }
 
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
