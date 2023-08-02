@@ -47,6 +47,9 @@ public interface IWorkspace : IWorkbook
     List<FoWorkbook> AddWorkbook(FoWorkbook book);
     T EstablishWorkbook<T>() where T : FoWorkbook;
 
+    FoWorkbook CurrentWorkbook();
+    FoWorkbook SetCurrentWorkbook(FoWorkbook book);
+    
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
     ComponentBus GetPubSub();

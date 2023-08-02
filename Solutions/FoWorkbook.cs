@@ -30,6 +30,9 @@ public class FoWorkbook: FoComponent, IWorkbook
     
     protected ComponentBus PubSub { get; set; }
 
+    public bool IsActive { get; set; } = false;
+    public bool IsDirty { get; set; } = false;
+
     public FoWorkbook(IWorkspace space, IFoundryService foundry)
     {
         Workspace = space;
