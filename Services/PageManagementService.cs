@@ -228,7 +228,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
-        //if (ActivePage == page) return ActivePage;
+        if (ActivePage == page) return ActivePage;
 
         ActivePage = page;
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
