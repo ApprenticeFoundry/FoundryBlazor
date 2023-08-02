@@ -60,10 +60,9 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     protected string UserID { get; set; } = "";
     protected string CurrentUrl { get; set; } = "";
-    protected ViewStyle viewStyle = ViewStyle.View2D;
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
-
-
+    
+    protected ViewStyle viewStyle = ViewStyle.View2D;
 
     protected IDrawing ActiveDrawing { get; init; }
     protected IArena ActiveArena { get; init; }
