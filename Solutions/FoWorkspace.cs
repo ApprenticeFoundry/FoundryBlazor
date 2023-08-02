@@ -52,6 +52,7 @@ public interface IWorkspace : IWorkbook
     FoWorkbook CurrentWorkbook();
     FoWorkbook SetCurrentWorkbook(FoWorkbook book);
     
+
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
     ComponentBus GetPubSub();
@@ -65,6 +66,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     protected string UserID { get; set; } = "";
     protected string CurrentUrl { get; set; } = "";
+    
     public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
     
     protected ViewStyle viewStyle = ViewStyle.View2D;
@@ -188,6 +190,11 @@ public class FoWorkspace : FoComponent, IWorkspace
     public FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory")
     {
         return CurrentWorkbook().EstablishCurrentPage(pagename, color);
+    }
+
+    public FoPage2D CurrentPage()
+    {
+        return CurrentWorkbook().CurrentPage();
     }
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
