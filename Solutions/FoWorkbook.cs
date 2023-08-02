@@ -10,7 +10,7 @@ namespace FoundryBlazor.Solutions;
 
 public interface IWorkbook
 {
-    FoPage2D EstablisCurrentPage(string pagename, string color = "Ivory");
+    FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory");
     void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
@@ -45,7 +45,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         PubSub = foundry.PubSub();
     }  
 
-    public FoPage2D EstablisCurrentPage(string pagename, string color = "Ivory")
+    public FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory")
     {
         var drawing = Workspace.GetDrawing()!;
         var manager = drawing.Pages();

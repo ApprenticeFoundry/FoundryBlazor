@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
+using IoBTMessage.Extensions;
 
 namespace FoundryBlazor.Solutions;
 
@@ -184,6 +185,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return ActiveWorkbook;
     }
 
+    public FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory")
+    {
+        return CurrentWorkbook().EstablishCurrentPage(pagename, color);
+    }
+
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
         GetMembers<FoWorkbook>()?.ForEach(async item =>
@@ -297,7 +303,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     public T EstablishWorkbook<T>() where T : FoWorkbook
     {
 
-        var found = Members<FoWorkbook>().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
+        var found = AllWorkbooks().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
         if ( found == null )
         {
             found = Activator.CreateInstance(typeof(T), this, Foundry) as T;
@@ -306,6 +312,11 @@ public class FoWorkspace : FoComponent, IWorkspace
         return found!;
     }
 
+    public FoWorkbook? FindWorkbook(string name)
+    {
+
+        return AllWorkbooks().Where(item => item.Name.Matches(name)).FirstOrDefault();
+    }
 
     public List<FoWorkbook> AllWorkbooks() 
     {
