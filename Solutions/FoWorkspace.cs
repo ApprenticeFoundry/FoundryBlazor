@@ -47,6 +47,7 @@ public interface IWorkspace : IWorkbook
     List<FoWorkbook> AddWorkbook(FoWorkbook book);
     T EstablishWorkbook<T>() where T : FoWorkbook;
 
+    FoWorkbook? FindWorkbook(string name);
     FoWorkbook CurrentWorkbook();
     FoWorkbook SetCurrentWorkbook(FoWorkbook book);
     
@@ -67,6 +68,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     
     protected ViewStyle viewStyle = ViewStyle.View2D;
 
+    private FoWorkbook ActiveWorkbook { get; set; }
     protected IDrawing ActiveDrawing { get; init; }
     protected IArena ActiveArena { get; init; }
     public ICommand Command { get; set; }
@@ -100,6 +102,8 @@ public class FoWorkspace : FoComponent, IWorkspace
         Dialog = foundry.Dialog();
         JsRuntime = foundry.JS();
 
+        ActiveWorkbook = CurrentWorkbook();
+
         SetDrawingStyle = async () =>
         {
             try
@@ -132,24 +136,62 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void PreRender(int tick)
     {
-        GetMembers<FoWorkbook>()?.ForEach(item => item.PreRender(tick));
+        GetMembers<FoWorkbook>()?.ForEach(item => 
+        {
+            if (item.IsActive)
+                item.PreRender(tick);
+        });
     }
 
     public virtual void PostRender(int tick)
     {
-        GetMembers<FoWorkbook>()?.ForEach(item => item.PostRender(tick));
+        GetMembers<FoWorkbook>()?.ForEach(item =>
+        {
+            if (item.IsActive)
+                item.PostRender(tick);
+        });
     }
 
 
+    public FoWorkbook CurrentWorkbook()
+    {
+        if (ActiveWorkbook == null)
+        {
+            var found = AllWorkbooks().Where(book => book.IsActive).FirstOrDefault();
+            if (found == null)
+            {
+                found = new FoWorkbook(this, Foundry)
+                {
+                    Name = "Book-1"
+                };
+                AddWorkbook(found);
+            }
+            ActiveWorkbook = found;
+            ActiveWorkbook.IsActive = true;
+        }
+
+        return ActiveWorkbook;
+    }
+
+    public FoWorkbook SetCurrentWorkbook(FoWorkbook book)
+    {
+        if (ActiveWorkbook == book) return ActiveWorkbook;
+
+        ActiveWorkbook = book;
+        AllWorkbooks().ForEach(item => item.IsActive = false);
+        ActiveWorkbook.IsActive = true;
+
+        return ActiveWorkbook;
+    }
 
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
-        var list = GetMembers<FoWorkbook>();
-        if ( list != null)
-            foreach (var item in list)
-            {
+        GetMembers<FoWorkbook>()?.ForEach(async item =>
+        {
+            if (item.IsActive)
                 await item.RenderWatermark(ctx, tick);
-            }
+        });
+        await Task.CompletedTask;
      }
 
     public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
