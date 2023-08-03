@@ -296,8 +296,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PageManager.SetCurrentPage(page);
         PanZoomService.ReadFromPage(page);
-
+        return page;
     }
+    
     public void ClearAll()
     {
         CurrentPage().ClearAll();

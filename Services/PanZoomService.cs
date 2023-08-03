@@ -92,6 +92,8 @@ public class PanZoomService : IPanZoomService
     public PanZoomState ReadFromPage(FoPage2D page)
     {
         State.SetState(page.PanZoom);
+        Smash(true);
+        OnComplete?.Invoke();
         return State;
     }
     public PanZoomState WriteToPage(FoPage2D page)
