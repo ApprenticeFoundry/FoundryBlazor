@@ -6,8 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <AssemblyVersion>9.2.0.0</AssemblyVersion>
-    <Version>9.2.0</Version>
+    <AssemblyVersion>9.4.0.0</AssemblyVersion>
+    <Version>9.4.0</Version>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
