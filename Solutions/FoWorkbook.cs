@@ -56,7 +56,7 @@ public class FoWorkbook: FoComponent, IWorkbook
             WorkPage = new FoPage2D(pagename, color);
             manager.AddPage(WorkPage);
         }
-        manager.SetCurrentPage(WorkPage);
+        drawing.SetCurrentPage(WorkPage);
         return WorkPage;
     }
 
@@ -65,8 +65,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         if ( WorkPage != null)
         {
             var drawing = Workspace.GetDrawing()!;
-            var manager = drawing.Pages();
-            manager.SetCurrentPage(WorkPage);
+            drawing.SetCurrentPage(WorkPage);
             return WorkPage;
         }
         return EstablishCurrentPage(Name);

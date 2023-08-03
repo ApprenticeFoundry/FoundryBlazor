@@ -30,6 +30,7 @@ public interface IDrawing : IRender
     List<FoImage2D> GetAllImages();
     List<FoVideo2D> GetAllVideos();
 
+    FoPage2D SetCurrentPage(FoPage2D page);
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
@@ -56,8 +57,11 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-    public int TrueCanvasWidth = 0;
-    public int TrueCanvasHeight = 0;
+    
+    public bool ShowStats { get; set; } = false;
+    private int TrueCanvasWidth = 0;
+    private int TrueCanvasHeight = 0;
+
     private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
 
     private string UserID = "";
@@ -79,7 +83,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public List<FoImage2D> AllImages = new();
     public List<FoVideo2D> AllVideos = new();
     private ComponentBus PubSub { get; set; }
-
 
     protected readonly List<BaseInteraction> interactionRules;
     protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
@@ -289,9 +292,14 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
     }
 
+    public FoPage2D SetCurrentPage(FoPage2D page)
+    {
+        PageManager.SetCurrentPage(page);
+        PanZoomService.ReadFromPage(page);
+
+    }
     public void ClearAll()
     {
-
         CurrentPage().ClearAll();
     }
     public IPageManagement Pages()
@@ -484,8 +492,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var page = PageManager.CurrentPage();
 
-        //        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
-
         await ClearCanvas(ctx);
 
         await ctx.SaveAsync();
@@ -507,6 +513,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
         await GetInteraction().RenderDrawing(ctx, tick);
+
+        if ( !ShowStats ) return;
 
 
         var offsetY = 60;
@@ -723,6 +731,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool WheelChange(CanvasWheelChangeArgs args)
     {
         PanZoomService.ZoomWheel(args.DeltaY);
+        PanZoomService.WriteToPage(PageManager.CurrentPage());
         //$"Wheel change: {args.DeltaX}, {args.DeltaY}, {args.DeltaZ}".WriteLine(ConsoleColor.Yellow);
         return true;
     }
@@ -731,6 +740,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PanZoomService.PanBy(dx, dy);
         UserWindowMovedTo(PanZoomService.Pan());
+
+        PanZoomService.WriteToPage(PageManager.CurrentPage());
 
         PanZoomShape?.Smash(false);  //Anit scale and move
         return true;
