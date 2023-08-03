@@ -59,6 +59,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     public int index = 0;
     public string path = "";
 
+    public bool IsExpanded = true;
     private Size _branchSize = new(10, 10);
     private Point _branchULPoint = new(100, 100);
     private BoxLayoutStyle _layoutStyle = BoxLayoutStyle.None;
@@ -97,8 +98,6 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
         await ctx.SaveAsync();
 
-
-        
         await ctx.SetLineWidthAsync(4);
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
         await ctx.SetStrokeStyleAsync(Colors[level]);
