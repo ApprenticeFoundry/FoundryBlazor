@@ -51,8 +51,10 @@ public interface IWorkspace : IWorkbook
     FoWorkbook? FindWorkbook(string name);
     FoWorkbook CurrentWorkbook();
     FoWorkbook SetCurrentWorkbook(FoWorkbook book);
-    
 
+
+    Task LocalFileSave(string filename, byte[] data);
+    Task<string> FileLoad(string filename);
     Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
 
     ComponentBus GetPubSub();
@@ -130,6 +132,19 @@ public class FoWorkspace : FoComponent, IWorkspace
             }
             catch { }
         };
+    }
+
+
+//https://stackoverflow.com/questions/52683706/how-can-one-generate-and-save-a-file-client-side-using-blazor
+    public async Task LocalFileSave(string filename, byte[] data)
+    {
+        if (JsRuntime != null) 
+            await JsRuntime.InvokeAsync<object>("window.saveAsFile",filename,Convert.ToBase64String(data));
+    }
+    public async Task<string> FileLoad(string filename)
+    {
+        await Task.CompletedTask;
+        return "";
     }
 
     public IFoundryService GetFoundryService()
@@ -481,6 +496,7 @@ public class FoWorkspace : FoComponent, IWorkspace
                         { "Clear", () => DoClear()},
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
+               { "Save", () => DoSave()},
             // { "1:1", () => PanZoom.Reset()},
             // { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
             // { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
@@ -495,6 +511,14 @@ public class FoWorkspace : FoComponent, IWorkspace
         ActiveWorkbook?.CreateCommands(space,js, nav, serverUrl);
 
         FoWorkspace.RefreshCommands = true;
+    }
+
+    private void DoSave()
+    {
+        var text = "Hello, Saved world!";
+        var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+
+        LocalFileSave("HelloWorld.txt", bytes);
     }
 
     public void DoPing()

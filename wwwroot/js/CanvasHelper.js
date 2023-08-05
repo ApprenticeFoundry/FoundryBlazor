@@ -298,6 +298,15 @@ function hideFileInput() {
     }
 }
 
+function saveAsFile(filename, bytesBase64) {
+  var link = document.createElement("a");
+  link.download = filename;
+  link.href = "data:application/octet-stream;base64," + bytesBase64;
+  document.body.appendChild(link); // Needed for Firefox
+  link.click();
+  document.body.removeChild(link);
+}
+
 function canvasPNGBase64() {
     return getCanvasNode().toDataURL();
 }
@@ -321,5 +330,6 @@ window.CanvasFileInput = {
 
 window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventListeners };
 window.canvasPNGBase64 = canvasPNGBase64;
+window.saveAsFile = saveAsFile;
 
 window.initRenderJS = initRenderJS;

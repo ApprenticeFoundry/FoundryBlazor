@@ -196,7 +196,8 @@ public class FoVideo2D : FoGlyph2D, IImage2D
 
     private async void RunJavascript(string action)
     {
-        if (JsRuntime != null) await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
+        if (JsRuntime != null) 
+            await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
     }
 
     public FoVideo2D() : base()
