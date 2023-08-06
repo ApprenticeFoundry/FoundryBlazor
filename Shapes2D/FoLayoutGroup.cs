@@ -7,7 +7,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
+public class FoLayoutGroup<V> : IHasRectangle where V : FoGlyph2D
 {
 
     public double X { get; set; } = 110.0;
@@ -18,11 +18,67 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
     public double Dy { get; set; } = 0.0;
 
     private V _item;
+    private List<FoLayoutNode<V>> _members;
 
-    public FoLayoutNode(V node, int x, int y)
+    public FoLayoutGroup(V node, int x, int y)
     {
         _item = node;
+        _members = new();
         MoveTo(x, y);
+    }
+
+    public FoLayoutGroup<V> PurgeMembers()
+    {
+        _members = new();
+        return this;
+    }
+
+    public string GroupName()
+    {
+        return _item.Name;
+    }
+    
+    public string SetGroupName(string name)
+    {
+        _item.Name = name;
+        return _item.Name;
+    }
+
+    public List<FoLayoutNode<V>> GetMembers()
+    {
+        _members ??= new List<FoLayoutNode<V>>();
+        var list = _members.ToList();
+        return list;
+    }
+
+    public FoLayoutNode<V>? AddMemberNode(FoLayoutNode<V>? member)
+    {
+
+        if ( member != null)
+        {
+            this._members ??= new List<FoLayoutNode<V>>();
+            this._members.Add(member);
+           //var shape = child.GetShape();
+            //var tag = shape.Tag;
+            // $"Adding Shape {tag} {shape.Name}".WriteLine(ConsoleColor.Green);
+        } else 
+        {
+            $"Member is empty {member}".WriteSuccess();
+        }
+        return member;
+    }
+    public void HorizontalLayout(int PinX, int PinY, Point margin)
+    {
+        var point = new Point(PinX, PinY);
+        //this.ComputeNodeBranchSize(margin, TreeLayoutRules.HorizontalLayout);
+        //this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.HorizontalLayout);
+    }
+
+    public void VerticalLayout(int PinX, int PinY, Point margin)
+    {
+        var point = new Point(PinX, PinY);
+        //this.ComputeNodeBranchSize(margin, TreeLayoutRules.VerticalLayout);
+        //this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.VerticalLayout);
     }
 
     public double CalculateLength(FoLayoutNode<V> b)

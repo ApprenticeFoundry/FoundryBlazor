@@ -1,16 +1,12 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
 using System.Drawing;
-using System;
 
 namespace FoundryBlazor.Shape;
 
 
 public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
 {
-
 
     private U _item;
     private FoLayoutNode<V>? _source;
@@ -79,14 +75,10 @@ public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
     }
     public async Task RenderLayoutNetwork(Canvas2DContext ctx, int tick)
     {
-
-
         await ctx.SaveAsync();
 
         await ctx.SetLineWidthAsync(4);
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
-        //await ctx.SetStrokeStyleAsync(Colors[level]);
-
 
         await ctx.RestoreAsync();
     }

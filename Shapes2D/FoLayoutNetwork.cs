@@ -143,7 +143,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private void ApplyCenterForces()
     {
-        "ApplyCenterForces".WriteInfo();
+        //"ApplyCenterForces".WriteInfo();
         // Calculate center of mass
         var sx = 0.0;
         var sy = 0.0;
@@ -169,7 +169,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     public void ApplyBoundaryForces()
     {
-        "ApplyBoundaryForces".WriteInfo();
+        //"ApplyBoundaryForces".WriteInfo();
         foreach(var node in _nodes)
         {
             // Check if node is outside x bounds
@@ -180,7 +180,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
      public void ApplyRandomForces()
     {
-        "ApplyRandomForces".WriteInfo();
+        //"ApplyRandomForces".WriteInfo();
         var rand = new Random();
         foreach(var node in _nodes)
         {
@@ -230,7 +230,7 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
 
     private void Reset()
     {
-        "Reset".WriteInfo();
+       // "Reset".WriteInfo();
         alpha = 1.0;
         alphaDamping = 0.94;
         ResetNodes();
@@ -246,14 +246,14 @@ public class FoLayoutNetwork<U,V> where V : FoShape2D where U : FoShape1D
     }
     private void UpdatePositions(double alpha)
     {
-        "UpdatePositions".WriteInfo();
+        //"UpdatePositions".WriteInfo();
         foreach (var node in _nodes)
             node.UpdatePositionUsingForceValues(alpha);
     }
 
     private void ApplyRepellingForces()
     {
-        //"ApplyRepellingForces".WriteInfo();
+       // //"ApplyRepellingForces".WriteInfo();
         for (int i = 0; i < _nodes.Count; i++)
         {
             for (int j = 0; j < _nodes.Count; j++)
