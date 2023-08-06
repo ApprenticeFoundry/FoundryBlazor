@@ -25,7 +25,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public Euler? Rotation { get; set; }
     public Vector3? BoundingBox { get; set; }
     public List<Vector3>? Path { get; set; }
-    private Guid? LoadingGUID { get; set; }
     public string? LoadingURL { get; set; }
 
     private Mesh? ShapeMesh { get; set; }

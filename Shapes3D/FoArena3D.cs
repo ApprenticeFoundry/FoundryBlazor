@@ -191,6 +191,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 PlatformName = item.platformName,
                 GlyphId = item.uniqueGuid,
                 Name = item.name,
+                Address = item.address,
                 Symbol = item.symbol,
                 Type = item.type,
                 Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
@@ -212,6 +213,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 PlatformName = item.platformName,
                 GlyphId = item.uniqueGuid,
                 Name = item.name,
+                Address = item.address,
                 Position = pos?.LocAsVector3(),
                 Text = item.text,
                 Details = item.details

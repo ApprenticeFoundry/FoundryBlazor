@@ -41,86 +41,19 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoRelationship3D>();
     }
 
-    // public T Find<T>(string name) where T : FoGlyph3D
-    // {
-    // 	if (typeof(T).Name.Matches(nameof(FoShape3D)))
-    // 		return bodies?.FirstOrDefault(item => item.name.Matches(name)) as T;
 
-    // 	if (typeof(T).Name.Matches(nameof(FoText3D)))
-    // 		return labels?.FirstOrDefault(item => item.name.Matches(name)) as T;
 
-    // 	if (typeof(T).Name.Matches(nameof(FoGroup3D)))
-    // 		return platforms?.FirstOrDefault(item => item.name.Matches(name)) as T;
 
-    // 	return null;
-    // }
 
-    // public T FindReferenceDesignation<T>(string name) where T : FoGlyph3D
-    // {
-    // 	if (typeof(T).Name.Matches(nameof(FoShape3D)))
-    // 		return bodies?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
 
-    // 	if (typeof(T).Name.Matches(nameof(FoText3D)))
-    // 		return labels?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
 
-    // 	if (typeof(T).Name.Matches(nameof(FoGroup3D)))
-    // 		return platforms?.FirstOrDefault(item => item.referenceDesignation.Matches(name)) as T;
 
-    // 	return null;
-    // }
 
-    public FoWorld3D FlushPlatformsObsolite()
-    {
-        Platforms()?.ForEach(platform => platform.Flush());
-        return this;
-    }
 
-    public List<FoGroup3D>? FillPlatformsObsolite()
-    {
-        var platforms = Platforms();
-        platforms?.ForEach(platform =>
-        {
-            platform.Flush();
-
-            //TODO: Why are TextLabels being added to Bodies?  If we can prevent that then we don't need to check obj.Type != null
-            var bodies = Bodies();
-            bodies?.Where(obj => obj.IsSamePlatform(platform) && obj.Type != null)
-                    .Select(obj => platform.Add<FoShape3D>(obj)).ToList();
-
-            Labels()?.Where(obj => obj.IsSamePlatform(platform))
-                    .Select(obj => platform.Add<FoText3D>(obj)).ToList();
-
-            Datums()?.Where(obj => obj.IsSamePlatform(platform))
-                    .Select(obj => platform.Add<FoDatum3D>(obj)).ToList();
-        });
-        return platforms;
-    }
-
-    //public FoWorld3D FillWorldFromPlatform(FoGroup3D platform)
-    //{
-    //    platforms.Add(platform);
-    //    bodies.AddRange(platform.bodies);
-    //    labels.AddRange(platform.labels);
-    //    relationships.AddRange(platform.relationships);
-    //    return RemoveDuplicates();
-    //}
-
-    //public FoWorld3D FillWorldFromWorld(FoWorld3D world)
-    //{
-    //    platforms.AddRange(world.platforms);
-    //    bodies.AddRange(world.bodies);
-    //    labels.AddRange(world.labels);
-    //    relationships.AddRange(world.relationships);
-    //    return RemoveDuplicates();
-    //}
 
     public FoWorld3D RemoveDuplicates()
     {
-        //platforms = platforms.DistinctBy(i => i.uniqueGuid).ToList();
-        //bodies = bodies.DistinctBy(i => i.uniqueGuid).ToList();
-        //labels = labels.DistinctBy(i => i.uniqueGuid).ToList();
-        //relationships = relationships.DistinctBy(i => i.uniqueGuid).ToList();
-
+ 
         var platforms = Platforms()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
         if (platforms != null)
             GetSlot<FoGroup3D>()?.Flush().AddRange(platforms);

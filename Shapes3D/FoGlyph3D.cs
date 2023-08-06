@@ -14,6 +14,7 @@ public class FoGlyph3D : FoComponent
     public string PlatformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
+    public string Address { get; set; } = "";
 
     protected double width = 0;
     public double Width { get { return this.width; } set { this.width = AssignDouble(value, width); } }
