@@ -81,18 +81,22 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public bool Menu3D(Scene ctx)
     {
-        var buttons = new List<Button>() {
-            new Button("BTN1", "Button 1") {
-                OnClick = (Button btn)=>Console.WriteLine("Clicked Button1")
-            },
-            new Button("BTN2","Button 2"){
-                OnClick = (Button btn)=>Console.WriteLine("Clicked Button2")
-            },
-            new Button("BTN3","Button 3")
-        };
-        var menu = new Menu
+        var buttons = new List<Button>();
+        GetSlot<FoButton3D>()?.ForEach((item) =>
         {
-            Buttons = buttons
+            var button = new Button(item.Name, item.Name)
+            {
+                OnClick = (Button btn) => Console.WriteLine("Clicked Button1")
+            };
+            buttons.Add(button);
+        });
+
+        var height = buttons.Count * 0.22;
+        var menu = new PanelMenu
+        {
+            Buttons = buttons,
+            Height = height,
+            Width = 1
         };
 
         ctx.Add(menu);

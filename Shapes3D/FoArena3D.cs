@@ -29,13 +29,14 @@ public interface IArena
     bool PreRender(FoGlyph3D glyph);
 
     FoWorld3D MapToWorld3D(UDTO_World world);
-    
+
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
     FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
+    void AddMenu3D(FoMenu3D menu3D);
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
@@ -46,8 +47,7 @@ public class FoArena3D : FoGlyph3D, IArena
     public ComponentBus PubSub { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
-
-
+    public FoMenu3D? TestMenu { get; set; }
 
     public FoArena3D(
         IStageManagement manager,
@@ -295,6 +295,8 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(Scene, 0, 0);
         });
 
+        TestMenu?.Render(Scene, 4, 3);
+
         //RefreshUI();
         //PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
         return true;
@@ -337,4 +339,8 @@ public class FoArena3D : FoGlyph3D, IArena
 
     }
 
+    public void AddMenu3D(FoMenu3D menu3D)
+    {
+        TestMenu = menu3D;
+    }
 }
