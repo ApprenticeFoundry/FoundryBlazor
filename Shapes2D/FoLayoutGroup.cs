@@ -7,7 +7,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutGroup<V> : IHasRectangle where V : FoGlyph2D
+public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : FoGlyph2D
 {
 
     public double X { get; set; } = 110.0;
@@ -18,7 +18,7 @@ public class FoLayoutGroup<V> : IHasRectangle where V : FoGlyph2D
     public double Dy { get; set; } = 0.0;
 
     private V _item;
-    private List<FoLayoutNode<V>> _members;
+    private List<FoLayoutNode<U>> _members;
 
     public FoLayoutGroup(V node, int x, int y)
     {
@@ -27,10 +27,9 @@ public class FoLayoutGroup<V> : IHasRectangle where V : FoGlyph2D
         MoveTo(x, y);
     }
 
-    public FoLayoutGroup<V> PurgeMembers()
+    public void PurgeMembers()
     {
         _members = new();
-        return this;
     }
 
     public string GroupName()
@@ -44,19 +43,19 @@ public class FoLayoutGroup<V> : IHasRectangle where V : FoGlyph2D
         return _item.Name;
     }
 
-    public List<FoLayoutNode<V>> GetMembers()
+    public List<FoLayoutNode<U>> GetMembers()
     {
-        _members ??= new List<FoLayoutNode<V>>();
+        _members ??= new List<FoLayoutNode<U>>();
         var list = _members.ToList();
         return list;
     }
 
-    public FoLayoutNode<V>? AddMemberNode(FoLayoutNode<V>? member)
+    public FoLayoutNode<U>? AddMemberNode(FoLayoutNode<U> member)
     {
 
         if ( member != null)
         {
-            this._members ??= new List<FoLayoutNode<V>>();
+            this._members ??= new List<FoLayoutNode<U>>();
             this._members.Add(member);
            //var shape = child.GetShape();
             //var tag = shape.Tag;
