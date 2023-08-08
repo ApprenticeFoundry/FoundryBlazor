@@ -107,10 +107,17 @@ public class FoWorld3D : FoGlyph3D
                 var textLines = item.subSystem.Targets().Select((item) => $"Address: {item.address}").ToList();
                 shape3D.TextPanel.TextLines = textLines;
 
-                item.subSystem.Targets().ForEach(target =>
+                var i = 1;
+                item.subSystem.Targets().ForEach((target) =>
                 {
                     var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
                     shape3D.NavMenu.Add(button);
+
+                    var subPanel = shape3D.TextPanel.Establish<FoPanel3D>(target.address);
+                    subPanel.TextLines.Add(target.address);
+                    subPanel.Color = "green";
+                    subPanel.Position = pos?.LocAsVector3().Add(i * 1.5 - 3, 2, -6);
+                    i++;
                 });
             }
 

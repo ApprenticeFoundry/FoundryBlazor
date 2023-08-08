@@ -22,12 +22,18 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Name;
     }
 
+    public FoPanel3D() : base() { }
+
     public FoPanel3D(string name) : base(name, "Grey")
     {
         //ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
 
+    public List<FoPanel3D> Panels()
+    {
+        return Members<FoPanel3D>().ToList();
+    }
 
     public virtual FoPanel3D Clear()
     {
@@ -53,7 +59,10 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-
+        foreach (var panel in Panels())
+        {
+            panel.Render(ctx, tick, fps, true);
+        }
         var result = TextPanel(ctx);
         return result;
     }
