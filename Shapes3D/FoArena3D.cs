@@ -202,6 +202,17 @@ public class FoArena3D : FoGlyph3D, IArena
             newWorld.Slot<FoShape3D>().Add(shape3D);
             $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
 
+            //add the nav menu
+            if ( item.subSystem != null)
+            {
+                shape3D.NavMenu = new FoMenu3D("NavMenu");
+                item.subSystem.Targets().ForEach(target =>
+                {
+                    var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
+                    shape3D.NavMenu.Add(button);
+                });
+            }
+
         });
 
         world.labels.ForEach(item =>
@@ -280,6 +291,10 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
+            var pos = body.Position;
+            var x = (int)(pos?.X ?? 0) + 3; 
+            var y = (int)(pos?.Y ?? 0) + 2; 
+            body.NavMenu?.Render(Scene, x, y);
         });
 
         world.Labels()?.ForEach(label =>
@@ -294,7 +309,7 @@ public class FoArena3D : FoGlyph3D, IArena
             datum.Render(Scene, 0, 0);
         });
 
-        TestMenu?.Render(Scene, 4, 3);
+
 
         //RefreshUI();
         //PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
