@@ -27,6 +27,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public List<Vector3>? Path { get; set; }
     public string? LoadingURL { get; set; }
     public FoMenu3D? NavMenu { get; set; }
+    public FoPanel3D? TextPanel { get; set; }
     private Mesh? ShapeMesh { get; set; }
     private Object3D? ShapeObject3D { get; set; }
     public FoShape3D() : base()
