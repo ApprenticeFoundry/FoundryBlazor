@@ -51,31 +51,11 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public FoMenu3D LayoutHorizontal(int width = 95, int height = 40)
     {
-        // var x = 0;
-        // var y = 18;
-        // Members<FoButton3D>().ForEach(item =>
-        // {
-        //     item.MoveTo(x, y);
-        //     item.ResizeTo(width, height);
-        //     x += width+5;
-        // });
-        // _layout = "H";
-        // ResizeTo(x, height+20);
         return this;
     }
 
     public FoMenu3D LayoutVertical(int width = 95, int height = 40)
     {
-        // var x = 3;
-        // var y = 18;
-        // Members<FoButton3D>().ForEach(item =>
-        // {
-        //     //item.MoveTo(x, y);
-        //     //item.ResizeTo(width, height);
-        //     y += height + 10;
-        // });
-        // _layout = "V";
-        // //ResizeTo(width+5, y);
         return this;
     }
 

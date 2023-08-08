@@ -32,6 +32,11 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoShape3D>();
     }
 
+    public List<FoMenu3D>? Menus()
+    {
+        return GetMembers<FoMenu3D>();
+    }
+
     public List<FoText3D>? Labels()
     {
         return GetMembers<FoText3D>();

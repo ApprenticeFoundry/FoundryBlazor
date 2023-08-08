@@ -17,7 +17,7 @@ namespace FoundryBlazor.Shape;
 public interface IArena
 {
 
-    //void RefreshUI();
+
     void SetViewer(Viewer viewer, Scene scene);
     Task RenderArena(Scene scene, int tick, double fps);
     Task ClearArena();
@@ -36,7 +36,7 @@ public interface IArena
     FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
-    void AddMenu3D(FoMenu3D menu3D);
+
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
@@ -47,7 +47,6 @@ public class FoArena3D : FoGlyph3D, IArena
     public ComponentBus PubSub { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
-    public FoMenu3D? TestMenu { get; set; }
 
     public FoArena3D(
         IStageManagement manager,
@@ -339,8 +338,4 @@ public class FoArena3D : FoGlyph3D, IArena
 
     }
 
-    public void AddMenu3D(FoMenu3D menu3D)
-    {
-        TestMenu = menu3D;
-    }
 }
