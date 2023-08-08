@@ -54,7 +54,7 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoRelationship3D>();
     }
 
-   public FoWorld3D FillFromUDTOWorld(UDTO_World world)
+    public FoWorld3D FillFromUDTOWorld(UDTO_World world)
     {
         world.platforms.ForEach(item =>
         {
@@ -89,12 +89,23 @@ public class FoWorld3D : FoGlyph3D
             $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
 
             //add the nav menu
-            if ( item.subSystem != null)
+            if (item.subSystem != null)
             {
                 shape3D.NavMenu = new FoMenu3D("NavMenu")
                 {
                     Position = pos?.LocAsVector3().Add(1, 2, 0)
                 };
+
+                shape3D.TextPanel = new FoPanel3D("TextPanel")
+                {
+                    Width = 2,
+                    Height = 1.5,
+                    Color = "purple",
+                    Position = pos?.LocAsVector3().Add(1, 2, -3)
+                };
+
+                var textLines = item.subSystem.Targets().Select((item) => $"Address: {item.address}").ToList();
+                shape3D.TextPanel.TextLines = textLines;
 
                 item.subSystem.Targets().ForEach(target =>
                 {
@@ -118,7 +129,7 @@ public class FoWorld3D : FoGlyph3D
                 Text = item.text,
                 Details = item.details
             };
-           Slot<FoText3D>().Add(text3D);
+            Slot<FoText3D>().Add(text3D);
         });
 
         return this;
@@ -127,7 +138,7 @@ public class FoWorld3D : FoGlyph3D
 
     public FoWorld3D RemoveDuplicates()
     {
- 
+
         var platforms = Platforms()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
         if (platforms != null)
             GetSlot<FoGroup3D>()?.Flush().AddRange(platforms);

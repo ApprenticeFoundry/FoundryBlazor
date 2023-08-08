@@ -12,29 +12,23 @@ using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;
 
-public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
+public class FoMenu3D : FoPanel3D, IFoMenu
 {
     private string _layout = "H";
-    public Vector3? Position { get; set; }
-
-    public string DisplayText()
-    {
-        return Name;
-    }
 
     public List<IFoButton> Buttons()
     {
         return GetMembers<FoButton3D>()?.Select(item => item as IFoButton).ToList() ?? new List<IFoButton>();
     }
 
-    public FoMenu3D(string name) : base(name, "Grey")
+    public FoMenu3D(string name) : base(name)
     {
         //ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
 
 
-    public FoMenu3D Clear()
+    public override FoMenu3D Clear()
     {
         GetMembers<FoButton3D>()?.Clear();
         return this;
