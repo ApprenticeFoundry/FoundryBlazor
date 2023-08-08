@@ -28,7 +28,7 @@ public interface IArena
     bool RenderWorld3D(FoWorld3D? world);
     bool PreRender(FoGlyph3D glyph);
 
-    FoWorld3D MapToWorld3D(UDTO_World world);
+    //FoWorld3D MapToWorld3D(UDTO_World world);
 
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
@@ -159,7 +159,8 @@ public class FoArena3D : FoGlyph3D, IArena
             shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
         };
 
-        var world = MapToWorld3D(world3D);
+
+        var world = new FoWorld3D(world3D);
         RenderWorld3D(world);
 
         //PostRenderplatform
@@ -167,72 +168,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public FoWorld3D MapToWorld3D(UDTO_World world)
-    {
-        var newWorld = new FoWorld3D();
-        world.platforms.ForEach(item =>
-        {
-            var group = new FoGroup3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-            };
-            newWorld.Slot<FoGroup3D>().Add(group);
-        });
-
-        world.bodies.ForEach(item =>
-        {
-            var pos = item.position;
-            var box = item.boundingBox;
-            var shape3D = new FoShape3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Symbol = item.symbol,
-                Type = item.type,
-                Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
-                Position = pos?.LocAsVector3(),
-                Rotation = pos?.AngAsVector3(),
-                BoundingBox = box?.BoxAsVector3(),
-                Pivot = box?.PinAsVector3(),
-            };
-            newWorld.Slot<FoShape3D>().Add(shape3D);
-            $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
-
-            //add the nav menu
-            if ( item.subSystem != null)
-            {
-                shape3D.NavMenu = new FoMenu3D("NavMenu");
-                item.subSystem.Targets().ForEach(target =>
-                {
-                    var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
-                    shape3D.NavMenu.Add(button);
-                });
-            }
-
-        });
-
-        world.labels.ForEach(item =>
-        {
-            var pos = item.position;
-            var text3D = new FoText3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Position = pos?.LocAsVector3(),
-                Text = item.text,
-                Details = item.details
-            };
-            newWorld.Slot<FoText3D>().Add(text3D);
-        });
-
-        return newWorld;
-    }
+ 
 
     public FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL)
     {
@@ -255,7 +191,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-        var world = MapToWorld3D(world3D);
+        var world = new FoWorld3D(world3D);
         RenderWorld3D(world);
 
 
@@ -273,7 +209,19 @@ public class FoArena3D : FoGlyph3D, IArena
     }
 
 
+    public void PreRenderWorld3D(FoWorld3D? world)
+    {
+        $"PreRenderWorld world={world}".WriteInfo();
+        if (world == null)
+        {
+            $"world is empty or viewer is not preent".WriteError();
+            return;
+        }
 
+        var bodies = world.Bodies();
+        if (bodies != null)
+            PreRenderShape3D(bodies);
+    }
 
 
     public bool RenderWorld3DToScene(FoWorld3D? world)
@@ -316,19 +264,6 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
-    public void PreRenderWorld3D(FoWorld3D? world)
-    {
-        $"PreRenderWorld world={world}".WriteInfo();
-        if (world == null)
-        {
-            $"world is empty or viewer is not preent".WriteError();
-            return;
-        }
-
-        var bodies = world.Bodies();
-        if (bodies != null)
-            PreRenderShape3D(bodies);
-    }
 
     public void PreRenderShape3D(List<FoShape3D> shapes)
     {
