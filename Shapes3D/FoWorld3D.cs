@@ -93,8 +93,9 @@ public class FoWorld3D : FoGlyph3D
             {
                 shape3D.NavMenu = new FoMenu3D("NavMenu")
                 {
-                    Position = pos?.LocAsVector3(),
+                    Position = pos?.LocAsVector3().Add(1, 2, 0)
                 };
+
                 item.subSystem.Targets().ForEach(target =>
                 {
                     var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
