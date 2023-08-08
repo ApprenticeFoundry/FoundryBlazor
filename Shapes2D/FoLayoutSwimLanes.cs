@@ -8,7 +8,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutSwamLanes<U,V> where V : FoShape2D where U : FoShape1D
+public class FoLayoutSwimLanes<U,V> where V : FoShape2D where U : FoShape1D
 {
 
     public Rectangle Boundary = new (100, 100, 700, 700);
@@ -21,7 +21,7 @@ public class FoLayoutSwamLanes<U,V> where V : FoShape2D where U : FoShape1D
     private readonly List<FoLayoutNode<V>> _nodes = new();
 
 
-    public FoLayoutSwamLanes()
+    public FoLayoutSwimLanes()
     {
     }
 
@@ -93,10 +93,7 @@ public class FoLayoutSwamLanes<U,V> where V : FoShape2D where U : FoShape1D
         //"ApplyLocationToShape".WriteInfo();
         foreach (var node in _nodes)
         {
-            var shape = node.GetShape();
-           // $"{tick} Node {shape.Name} - X: {node.X}, Y: {node.Y}   {shape.PinX}  {shape.PinY}".WriteWarning();
             node.MoveTo((int)node.X, (int)node.Y);
-            //$"{tick} {shape.PinX}  {shape.PinY}".WriteSuccess();
         }
     }
 
