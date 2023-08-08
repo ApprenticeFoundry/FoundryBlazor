@@ -15,6 +15,7 @@ namespace FoundryBlazor.Shape;
 public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 {
     private string _layout = "H";
+    public Vector3? Position { get; set; }
 
     public string DisplayText()
     {
@@ -61,9 +62,9 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public bool Menu3D(Scene ctx)
     {
-        var buttons = Members<FoButton3D>().Select((item) =>
+        var buttons = Buttons().Select((item) =>
         {
-            var button = new Button(item.Name, item.Name)
+            var button = new Button(item.DisplayText(), item.DisplayText())
             {
                 OnClick = (Button btn) => Console.WriteLine("Clicked Button1")
             };
@@ -77,7 +78,7 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
             Buttons = buttons,
             Height = Height,
             Width = Width,
-            Position = new Vector3(0, 0, 0)
+            Position = Position ?? new Vector3(0, 0, 0),
         };
 
         ctx.Add(menu);
