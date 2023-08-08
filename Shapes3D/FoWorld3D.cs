@@ -116,8 +116,8 @@ public class FoWorld3D : FoGlyph3D
 
                     var subPanel = shape3D.TextPanel.Establish<FoPanel3D>(target.address);
                     subPanel.TextLines.Add(target.address);
-                    subPanel.Color = "green";
-                    subPanel.Position = new Vector3(target.x, target.y, target.z);
+                    subPanel.Color = GetColor(target);
+                    subPanel.Position = new Vector3(target.x, target.y, -target.z);
                 });
             }
 
@@ -140,6 +140,21 @@ public class FoWorld3D : FoGlyph3D
         });
 
         return this;
+    }
+
+    public static string GetColor(DT_Target model)
+    {
+        var Color = model.domain switch
+        {
+            "PIN" => "Pink",
+            "PROC" => "Wisteria",
+            "DOC" => "Gray",
+            "ASST" => "Aqua",
+            "CAD" => "Orange",
+            "WRLD" => "Green",
+            _ => "Yellow",
+        };
+        return Color;
     }
 
 
