@@ -1,5 +1,5 @@
 
-
+using System.Linq;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
@@ -61,22 +61,23 @@ public class FoMenu3D : FoGlyph3D, IFoMenu, IShape3D
 
     public bool Menu3D(Scene ctx)
     {
-        var buttons = new List<Button>();
-        GetSlot<FoButton3D>()?.ForEach((item) =>
+        var buttons = Members<FoButton3D>().Select((item) =>
         {
             var button = new Button(item.Name, item.Name)
             {
                 OnClick = (Button btn) => Console.WriteLine("Clicked Button1")
             };
-            buttons.Add(button);
-        });
+            return button;
+        }).ToList();
 
-        var height = buttons.Count * 0.22;
+        Width = 1;
+        Height = buttons.Count * 0.22;
         var menu = new PanelMenu
         {
             Buttons = buttons,
-            Height = height,
-            Width = 1
+            Height = Height,
+            Width = Width,
+            Position = new Vector3(0, 0, 0)
         };
 
         ctx.Add(menu);

@@ -91,7 +91,10 @@ public class FoWorld3D : FoGlyph3D
             //add the nav menu
             if ( item.subSystem != null)
             {
-                shape3D.NavMenu = new FoMenu3D("NavMenu");
+                shape3D.NavMenu = new FoMenu3D("NavMenu")
+                {
+                    Position = pos?.LocAsVector3().add(0, 0, 0.5),
+                };
                 item.subSystem.Targets().ForEach(target =>
                 {
                     var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
