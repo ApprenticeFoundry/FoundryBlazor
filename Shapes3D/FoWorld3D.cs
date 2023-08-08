@@ -143,6 +143,7 @@ public class FoWorld3D : FoGlyph3D
     }
 
 
+    //assume the units are in meters
     public static void LayoutSystemInSwinlanes(DT_System system, int dx = 0, int dy = 0, int dz = 0)
     {
         if (system == null) return;
@@ -154,22 +155,22 @@ public class FoWorld3D : FoGlyph3D
         var order = new List<string>() { "WRLD", "PIN", "DOC", "PROC", "CAD", "ASST" };
 
         //set the target locations here 
-        var x = 200;
-        var y = 200;
+        var x = 0;
+        var y = 0;
         var z = 0;
         foreach (var item in order)
         {
             if (dict.ContainsKey(item))
             {
-                y = 200;
+                y = 2;
                 foreach (var target in dict[item])
                 {
                     target.x = x + dx;
                     target.y = y + dy;
                     target.z = z + dz;
-                    y += 200;
+                    y += 2;
                 }
-                x += 250;
+                x += 3;
             }
         }
     }
