@@ -175,6 +175,13 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         ZeroPointY.Assign(loc, units);
     }
 
+    public List<FoGlyph2D> AllShapes()
+    {
+        var result = Shapes2D.Values().ToList();
+        return result;
+    }
+
+
     public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
     {
         Shapes2D.ForEach(item => item.CollectImages(list, deep));

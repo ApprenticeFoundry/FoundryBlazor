@@ -215,7 +215,7 @@ public class FoArena3D : FoGlyph3D, IArena
             };
             loc += 3;
             
-            page.GetMembers<FoShape2D>()?.ForEach(shape =>
+            page.AllShapes()?.ForEach(shape =>
             {
                 var panel = new FoPanel3D(shape.Name)
                 {
