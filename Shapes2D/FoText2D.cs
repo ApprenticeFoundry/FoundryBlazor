@@ -38,6 +38,10 @@ public class FoText2D : FoGlyph2D, IShape2D
         return newValue;
     }
 
+    public override string GetText()
+    {
+        return Text;
+    }
     public string FontSizeAndName()
     {
         //styles -   normal | italic | oblique | inherit
