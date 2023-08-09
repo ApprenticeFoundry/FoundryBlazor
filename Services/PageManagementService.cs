@@ -30,6 +30,8 @@ public interface IPageManagement : IRender
 
     int PageCount();
 
+    List<FoPage2D> GetAllPages();
+
     FoPage2D SetPageSize(double width, double height, string units);
 
     FoPage2D SetPageLandscape();
@@ -74,6 +76,11 @@ public class PageManagementService : FoComponent, IPageManagement
     public int PageCount()
     {
         return Members<FoPage2D>().Count;
+    }
+
+    public List<FoPage2D> GetAllPages()
+    {
+        return Members<FoPage2D>();
     }
 
 

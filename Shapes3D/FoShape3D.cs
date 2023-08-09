@@ -358,14 +358,14 @@ public class FoShape3D : FoGlyph3D, IShape3D
         });
     }
 
-    private bool PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
+    private async Task<bool> PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
         var settings = AsImportSettings(format);
 
         if (string.IsNullOrEmpty(LoadingURL)) return false;
         $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
 
-        viewer.Request3DModel(settings);
+        await viewer.Request3DModel(settings);
         arena.Add<FoShape3D>(settings.Uuid.ToString(), this);
         return true;
     }
@@ -384,7 +384,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Pivot = GetPivot(),
             OnComplete = (Scene scene, Object3D object3D) =>
             {
-                //$"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
+                $"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
                 if (object3D != null)
                     ShapeObject3D = object3D;
                 else
@@ -395,7 +395,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return setting;
     }
 
-    public static bool PreRenderClones(List<FoShape3D> bodies, FoArena3D arena, Viewer viewer, Import3DFormats format)
+    public static async Task<bool> PreRenderClones(List<FoShape3D> bodies, FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
         var settings = new List<ImportSettings>();
 
@@ -404,6 +404,9 @@ public class FoShape3D : FoGlyph3D, IShape3D
             var setting = body.AsImportSettings(format);
             arena.Add<FoShape3D>(body.GetGlyphId(), body);
             settings.Add(setting);
+
+            $"AsImportSettings body.Symbol {body.Symbol} X = {setting.FileURL}".WriteSuccess();
+
         }
 
         var source = settings.ElementAt(0);
@@ -424,7 +427,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
                 "Unexpected empty object3D".WriteError(1);
         };
 
-        viewer.Request3DModel(source);
+        await viewer.Request3DModel(source);
         return true;
     }
 
@@ -497,18 +500,20 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return Rotation;
     }
 
-    public override bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
+    public override async Task<bool> PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
         //is symbol ends with ....
         //LoadingURL = Symbol.Replace("http:", "https:");
+        //await Task.CompletedTask;
+
         LoadingURL = Symbol;
         var result = Type switch
         {
-            "Collada" => PreRenderImport(arena, viewer, Import3DFormats.Collada),
-            "Fbx" => PreRenderImport(arena, viewer, Import3DFormats.Fbx),
-            "Obj" => PreRenderImport(arena, viewer, Import3DFormats.Obj),
-            "Stl" => PreRenderImport(arena, viewer, Import3DFormats.Stl),
-            "Glb" => PreRenderImport(arena, viewer, Import3DFormats.Gltf),
+            "Collada" => await PreRenderImport(arena, viewer, Import3DFormats.Collada),
+            "Fbx" => await PreRenderImport(arena, viewer, Import3DFormats.Fbx),
+            "Obj" => await PreRenderImport(arena, viewer, Import3DFormats.Obj),
+            "Stl" => await PreRenderImport(arena, viewer, Import3DFormats.Stl),
+            "Glb" => await PreRenderImport(arena, viewer, Import3DFormats.Gltf),
             _ => false
         };
         return result;

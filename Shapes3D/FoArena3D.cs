@@ -24,9 +24,10 @@ public interface IArena
     Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    bool RenderWorld3DToScene(FoWorld3D? world);
-    bool RenderWorld3D(FoWorld3D? world);
-    bool PreRender(FoGlyph3D glyph);
+    bool RenderPagesOnWorld3DWall(IDrawing drawing);
+    bool RenderWorld3DToScene(FoWorld3D world);
+    bool RenderWorld3D(FoWorld3D world);
+    Task<bool> PreRender(FoGlyph3D glyph);
 
     //FoWorld3D MapToWorld3D(UDTO_World world);
 
@@ -106,10 +107,9 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         return Scene!;
     }
-    public bool PreRender(FoGlyph3D glyph)
+    public async Task<bool> PreRender(FoGlyph3D glyph)
     {
-
-        return glyph.PreRender(this, Viewer3D!);
+        return await glyph.PreRender(this, Viewer3D!);
     }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
@@ -198,7 +198,15 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public bool RenderWorld3D(FoWorld3D? world)
+    public bool RenderPagesOnWorld3DWall(IDrawing drawing)
+    {
+        foreach (var page in drawing.GetAllPages())
+        {
+            
+        }
+        return true;
+    }
+    public bool RenderWorld3D(FoWorld3D world)
     {
         if (world == null) return false;
 

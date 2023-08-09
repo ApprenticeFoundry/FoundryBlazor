@@ -27,6 +27,8 @@ public interface IDrawing : IRender
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 
+
+    List<FoPage2D> GetAllPages();
     List<FoImage2D> GetAllImages();
     List<FoVideo2D> GetAllVideos();
 
@@ -252,6 +254,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return PageManager.ExtractShapes(GlyphId);
     }
 
+    public List<FoPage2D> GetAllPages()
+    {
+        return PageManager.GetAllPages();
+    }
     public List<FoGlyph2D> DeleteSelections()
     {
         return PageManager.DeleteSelections();

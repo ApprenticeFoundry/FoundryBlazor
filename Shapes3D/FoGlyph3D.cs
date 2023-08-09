@@ -122,8 +122,9 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual bool PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
+    public virtual async Task<bool> PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
     {
+        await Task.CompletedTask;
         return false;
     }
 
