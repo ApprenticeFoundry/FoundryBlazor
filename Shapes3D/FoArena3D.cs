@@ -204,7 +204,7 @@ public class FoArena3D : FoGlyph3D, IArena
         var north = new FoPanel3D("-Z Wall")
         {
             Position = new Vector3(0, 7, -14.8),
-             Rotation = new Euler(0, Math.PI * 0 / 180, 0),
+            Rotation = new Euler(0, Math.PI * 0 / 180, 0),
         };
         var south = new FoPanel3D("+Z Wall")
         {
@@ -213,7 +213,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         var east = new FoPanel3D("-X Wall")
         {
-            Position = new Vector3(-14.8,7, 0),
+            Position = new Vector3(-14.8, 7, 0),
             Rotation = new Euler(0, Math.PI * 90 / 180, 0),
         };
         var west = new FoPanel3D("+X Wall")
@@ -229,12 +229,13 @@ public class FoArena3D : FoGlyph3D, IArena
         queue.Enqueue(east);
         queue.Enqueue(west);
         queue.Enqueue(south);
- 
+
 
         int loc = 0;
         int pixels = 100;
         foreach (var page in drawing.GetAllPages())
         {
+
             var shapes = page.AllShapes2D();
             if (shapes.Count == 0)
                 continue;
@@ -243,7 +244,7 @@ public class FoArena3D : FoGlyph3D, IArena
             wall.Width = 16;
             wall.Height = 16;
             wall.Color = page.Color;
-            
+
 
             shapes?.ForEach(shape =>
             {
@@ -256,13 +257,20 @@ public class FoArena3D : FoGlyph3D, IArena
                     Width = w,
                     Height = h,
                     Color = shape.Color,
-                    Position = new Vector3(x - wall.Width / 2, wall.Height / 2 - y, loc + .1),
+                    Position = new Vector3(x, y, loc + .1),
                 };
-                var lines = shape.GetText().Split('_').ToList();
-                panel.TextLines.AddRange(lines);
+                var textLines = shape.GetText().Split('_').ToList();
+                panel.TextLines.AddRange(textLines);
 
                 wall.Add<FoPanel3D>(panel);
             });
+
+            var lineShapes = page.AllShapes1D();
+            foreach (var lineShape in lineShapes)
+            {
+                wall.Add(lineShape);
+            }
+
             wall.Render(Scene, 0, 0);
         }
         return true;

@@ -27,7 +27,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
-    public PanZoomState PanZoom  { get; set; } = new();
+    public PanZoomState PanZoom { get; set; } = new();
 
     public Length PageMargin { get; set; } = new Length(1, "cm");  //inches
     public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
@@ -173,6 +173,19 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         //set the zero point to the bottom left
         ScaleAxisY = scale;
         ZeroPointY.Assign(loc, units);
+    }
+
+    public List<FoShape1D> AllShapes1D()
+    {
+        var result = new List<FoShape1D>();
+        foreach (var value in Shapes1D.Values())
+        {
+            if (value is FoShape1D shape)
+            {
+                result.Add(shape);
+            }
+        }
+        return result;
     }
 
     public List<FoGlyph2D> AllShapes2D()
