@@ -8,6 +8,8 @@ namespace FoundryBlazor.Shape;
 public class FoPanel3D : FoGlyph3D, IShape3D
 {
     public Vector3? Position { get; set; }
+    public Vector3? Pivot { get; set; }
+    public Euler? Rotation { get; set; }
     public List<string> TextLines { get; set; } = new();
 
     public string DisplayText()
@@ -44,6 +46,8 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             Width = Width,
             Color = Color,
             Position = Position ?? new Vector3(0, 0, 0),
+            Pivot = Pivot ?? new Vector3(0, 0, 0),
+            Rotation = Rotation ?? new Euler(0, 0, 0),
         };
 
         ctx.Add(panel);

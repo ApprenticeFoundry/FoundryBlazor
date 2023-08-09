@@ -201,8 +201,35 @@ public class FoArena3D : FoGlyph3D, IArena
         if (Scene == null)
             return false;
 
+        var north = new FoPanel3D("-Z Wall")
+        {
+            Position = new Vector3(0, 7, -14.8),
+             Rotation = new Euler(0, Math.PI * 0 / 180, 0),
+        };
+        var south = new FoPanel3D("+Z Wall")
+        {
+            Position = new Vector3(0, 7, 14.8),
+            Rotation = new Euler(0, Math.PI * 180 / 180, 0),
+        };
+        var east = new FoPanel3D("-X Wall")
+        {
+            Position = new Vector3(-14.8,7, 0),
+            Rotation = new Euler(0, Math.PI * 90 / 180, 0),
+        };
+        var west = new FoPanel3D("+X Wall")
+        {
+            Position = new Vector3(14.8, 7, 0),
+            Rotation = new Euler(0, Math.PI * 270 / 180, 0),
+        };
         //need to convert pixels to meters
         //Conversion(5000, "px", 1, "m");
+
+        var queue = new Queue<FoPanel3D>();
+        queue.Enqueue(north);
+        queue.Enqueue(east);
+        queue.Enqueue(west);
+        queue.Enqueue(south);
+ 
 
         int loc = 0;
         int pixels = 100;
@@ -212,13 +239,11 @@ public class FoArena3D : FoGlyph3D, IArena
             if (shapes.Count == 0)
                 continue;
 
-            var wall = new FoPanel3D(page.Name)
-            {
-                Width = 16,
-                Height = 16,
-                Position = new Vector3(loc, 0, loc),
-                Color = page.Color
-            };
+            var wall = queue.Dequeue();
+            wall.Width = 16;
+            wall.Height = 16;
+            wall.Color = page.Color;
+            
 
             shapes?.ForEach(shape =>
             {
