@@ -2,6 +2,9 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Menus;
 using FoundryBlazor.Extensions;
+using BlazorThreeJS.Geometires;
+using BlazorThreeJS.Objects;
+using BlazorThreeJS.Materials;
 
 namespace FoundryBlazor.Shape;
 
@@ -30,6 +33,11 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Members<FoPanel3D>().ToList();
     }
 
+    public List<FoShape1D> Connections()
+    {
+        return Members<FoShape1D>().ToList();
+    }
+
     public virtual FoPanel3D Clear()
     {
         TextLines.Clear();
@@ -54,6 +62,40 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return true;
     }
 
+    public bool Draw3DConnections(Scene ctx)
+    {
+        var radius = 0.15f;
+        int pixels = 100;
+
+        var z = -3;
+        foreach (var connection in Connections())
+        {
+
+            var X1 = connection.StartX / pixels;
+            var Y1 = connection.StartY / pixels;
+            var X2 = connection.FinishX / pixels;
+            var Y2 = connection.FinishY / pixels;
+
+            var positions = new List<Vector3>() {
+                new Vector3(X1, Y1, z),
+                new Vector3(X2, Y2, z)
+            };
+
+            var tube = new Mesh
+            {
+                Geometry = new TubeGeometry(tubularSegments: 10, radialSegments: 8, radius: radius, path: positions),
+                Position = new Vector3(0, 0, 0),
+                Material = new MeshStandardMaterial()
+                {
+                    Color = "yellow"
+                }
+            };
+            ctx.Add(tube);
+        }
+
+        return true;
+    }
+
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
@@ -61,6 +103,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         {
             panel.Render(ctx, tick, fps, true);
         }
+        Draw3DConnections(ctx);
         var result = DrawPanel3D(ctx);
         return result;
     }
