@@ -175,9 +175,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         ZeroPointY.Assign(loc, units);
     }
 
-    public List<FoGlyph2D> AllShapes()
+    public List<FoGlyph2D> AllShapes2D()
     {
-        var result = Shapes2D.Values().ToList();
+        var result = Shapes2D.Values();
         return result;
     }
 

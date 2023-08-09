@@ -22,7 +22,7 @@ public interface IArena
     Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    bool RenderPages(IDrawing drawing);
+    bool RenderDrawingToScene(IDrawing drawing);
     bool RenderWorld3DToScene(FoWorld3D world);
     bool RenderWorld3D(FoWorld3D world);
     Task<bool> PreRender(FoGlyph3D glyph);
@@ -196,7 +196,7 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public bool RenderPages(IDrawing drawing)
+    public bool RenderDrawingToScene(IDrawing drawing)
     {
         if ( Scene == null) 
             return false;
@@ -208,7 +208,7 @@ public class FoArena3D : FoGlyph3D, IArena
         int dx = 500;
         foreach (var page in drawing.GetAllPages())
         {
-            var shapes = page.AllShapes();
+            var shapes = page.AllShapes2D();
             if ( shapes.Count == 0 ) 
                 continue;
 
