@@ -16,15 +16,13 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-
-
     void SetViewer(Viewer viewer, Scene scene);
     Task RenderArena(Scene scene, int tick, double fps);
     Task ClearArena();
     Task UpdateArena();
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    bool RenderPagesOnWorld3DWall(IDrawing drawing);
+    bool RenderPages(IDrawing drawing);
     bool RenderWorld3DToScene(FoWorld3D world);
     bool RenderWorld3D(FoWorld3D world);
     Task<bool> PreRender(FoGlyph3D glyph);
@@ -198,14 +196,41 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public bool RenderPagesOnWorld3DWall(IDrawing drawing)
+    public bool RenderPages(IDrawing drawing)
     {
+        if ( Scene == null) 
+            return false;
+
+        //need to convert pixels to meters
+        //Conversion(5000, "px", 1, "m");
+
+        int loc = 0;
         foreach (var page in drawing.GetAllPages())
         {
+            var wall = new FoPanel3D(page.Name)
+            {
+                Width = 10,
+                Height = 10,
+                Position = new Vector3(loc, 0, loc),
+            };
+            loc += 3;
             
+            page.GetMembers<FoShape2D>()?.ForEach(shape =>
+            {
+                var panel = new FoPanel3D(shape.Name)
+                {
+                    Width = shape.Width / 5000,
+                    Height = shape.Height / 5000,
+                    Color = shape.Color,
+                    Position = new Vector3(shape.PinX/5000, shape.PinY/5000, 0),
+                };
+                wall.Add<FoPanel3D>(panel);
+            });
+            wall.Render(Scene, 0, 0);
         }
         return true;
     }
+
     public bool RenderWorld3D(FoWorld3D world)
     {
         if (world == null) return false;
