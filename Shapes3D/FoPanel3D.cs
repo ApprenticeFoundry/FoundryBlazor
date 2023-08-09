@@ -1,6 +1,7 @@
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Menus;
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -51,6 +52,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
+        $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
         foreach (var panel in Panels())
         {
             panel.Render(ctx, tick, fps, true);
