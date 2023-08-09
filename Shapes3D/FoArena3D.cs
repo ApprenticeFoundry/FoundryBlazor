@@ -205,8 +205,13 @@ public class FoArena3D : FoGlyph3D, IArena
         //Conversion(5000, "px", 1, "m");
 
         int loc = 0;
+        int dx = 500;
         foreach (var page in drawing.GetAllPages())
         {
+            var shapes = page.AllShapes();
+            if ( shapes.Count == 0 ) 
+                continue;
+
             var wall = new FoPanel3D(page.Name)
             {
                 Width = 10,
@@ -215,14 +220,14 @@ public class FoArena3D : FoGlyph3D, IArena
             };
             loc += 3;
             
-            page.AllShapes()?.ForEach(shape =>
+            shapes?.ForEach(shape =>
             {
                 var panel = new FoPanel3D(shape.Name)
                 {
-                    Width = shape.Width / 5000,
-                    Height = shape.Height / 5000,
+                    Width = shape.Width / dx,
+                    Height = shape.Height / dx,
                     Color = shape.Color,
-                    Position = new Vector3(shape.PinX/5000, shape.PinY/5000, 0),
+                    Position = new Vector3(shape.PinX/dx, shape.PinY/dx, 0),
                 };
                 wall.Add<FoPanel3D>(panel);
             });
@@ -251,7 +256,7 @@ public class FoArena3D : FoGlyph3D, IArena
             return;
         }
 
-        var bodies = world.Bodies();
+        var bodies = world.ShapeBodies();
         if (bodies != null)
             PreRenderShape3D(bodies);
     }
@@ -268,7 +273,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         //$"RenderPlatformToScene Bodies() {platform.Bodies()?.Count}  Labels() {platform.Labels()?.Count}  ".WriteSuccess();
 
-        world.Bodies()?.ForEach(body =>
+        world.ShapeBodies()?.ForEach(body =>
         {
             // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);

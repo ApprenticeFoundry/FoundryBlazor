@@ -14,7 +14,7 @@ namespace FoundryBlazor.Shape;
 
 public class FoMenu3D : FoPanel3D, IFoMenu
 {
-    private string _layout = "H";
+
 
     public List<IFoButton> Buttons()
     {
@@ -34,15 +34,6 @@ public class FoMenu3D : FoPanel3D, IFoMenu
         return this;
     }
 
-    public FoMenu3D ToggleLayout()
-    {
-        if (_layout.Matches("V"))
-            LayoutHorizontal();
-        else
-            LayoutVertical();
-
-        return this;
-    }
 
     public FoMenu3D LayoutHorizontal(int width = 95, int height = 40)
     {
@@ -54,11 +45,12 @@ public class FoMenu3D : FoPanel3D, IFoMenu
         return this;
     }
 
-    public bool Menu3D(Scene ctx)
+    public bool DrawMenu3D(Scene ctx)
     {
         var buttons = Buttons().Select((item) =>
         {
-            var button = new Button(item.DisplayText(), item.DisplayText())
+            var text = item.DisplayText();
+            var button = new Button(text, text)
             {
                 OnClick = (Button btn) => Console.WriteLine("Clicked Button1")
             };
@@ -67,7 +59,7 @@ public class FoMenu3D : FoPanel3D, IFoMenu
 
         Width = 1;
         Height = buttons.Count * 0.22;
-        var menu = new PanelMenu
+        var menu = new PanelMenu()
         {
             Buttons = buttons,
             Height = Height,
@@ -81,8 +73,7 @@ public class FoMenu3D : FoPanel3D, IFoMenu
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-
-        var result = Menu3D(ctx);
+        var result = DrawMenu3D(ctx);
         return result;
     }
 

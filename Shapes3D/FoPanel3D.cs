@@ -1,13 +1,5 @@
-
-using System.Linq;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
-using BlazorThreeJS.Viewers;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
 using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;
@@ -22,7 +14,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Name;
     }
 
-    public FoPanel3D() : base() { }
+    //public FoPanel3D() : base() { }
 
     public FoPanel3D(string name) : base(name, "Grey")
     {
@@ -41,10 +33,10 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return this;
     }
 
-    public bool TextPanel(Scene ctx)
+    public bool DrawPanel3D(Scene ctx)
     {
 
-        var panel = new TextPanel
+        var panel = new TextPanel()
         {
             TextLines = TextLines,
             Height = Height,
@@ -63,7 +55,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         {
             panel.Render(ctx, tick, fps, true);
         }
-        var result = TextPanel(ctx);
+        var result = DrawPanel3D(ctx);
         return result;
     }
 

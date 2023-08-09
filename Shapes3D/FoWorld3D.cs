@@ -18,6 +18,7 @@ public class FoWorld3D : FoGlyph3D
         GetSlot<FoText3D>();
         GetSlot<FoDatum3D>();
         GetSlot<FoMenu3D>();
+        GetSlot<FoPanel3D>();
         GetSlot<FoPathway3D>();
         GetSlot<FoRelationship3D>();
     }
@@ -27,7 +28,7 @@ public class FoWorld3D : FoGlyph3D
         FillFromUDTOWorld(source);
     }
 
-    public List<FoGroup3D>? Platforms()
+    public List<FoGroup3D>? ShapeGroups()
     {
         return GetMembers<FoGroup3D>();
     }
@@ -36,7 +37,7 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoDatum3D>();
     }
 
-    public List<FoShape3D>? Bodies()
+    public List<FoShape3D>? ShapeBodies()
     {
         return GetMembers<FoShape3D>();
     }
@@ -44,6 +45,10 @@ public class FoWorld3D : FoGlyph3D
     public List<FoMenu3D>? Menus()
     {
         return GetMembers<FoMenu3D>();
+    }
+    public List<FoPanel3D>? Panels()
+    {
+        return GetMembers<FoPanel3D>();
     }
 
     public List<FoText3D>? Labels()
@@ -92,7 +97,7 @@ public class FoWorld3D : FoGlyph3D
             //add the nav menu
             if (item.subSystem != null)
             {
-                LayoutSystemInSwinlanes(item.subSystem, 0, 0, 14);
+                LayoutSystemInSwinlanes(item.subSystem, 0, 0, -14);
                 shape3D.NavMenu = new FoMenu3D("NavMenu")
                 {
                     Position = pos?.LocAsVector3().Add(1, 2, 0)
@@ -117,7 +122,7 @@ public class FoWorld3D : FoGlyph3D
                     var subPanel = shape3D.TextPanel.Establish<FoPanel3D>(target.address);
                     subPanel.TextLines.Add(target.address);
                     subPanel.Color = GetColor(target);
-                    subPanel.Position = new Vector3(target.x, target.y, -target.z);
+                    subPanel.Position = new Vector3(target.x, target.y, target.z);
                 });
             }
 
@@ -193,11 +198,11 @@ public class FoWorld3D : FoGlyph3D
     public FoWorld3D RemoveDuplicates()
     {
 
-        var platforms = Platforms()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
+        var platforms = ShapeGroups()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
         if (platforms != null)
             GetSlot<FoGroup3D>()?.Flush().AddRange(platforms);
 
-        var bodies = Bodies()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
+        var bodies = ShapeBodies()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();
         if (bodies != null)
             GetSlot<FoShape3D>()?.Flush().AddRange(bodies);
 
