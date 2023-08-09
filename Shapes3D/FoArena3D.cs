@@ -198,28 +198,28 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public bool RenderDrawingToScene(IDrawing drawing)
     {
-        if ( Scene == null) 
+        if (Scene == null)
             return false;
 
         //need to convert pixels to meters
         //Conversion(5000, "px", 1, "m");
 
         int loc = 0;
-        int pixels = 300;
+        int pixels = 100;
         foreach (var page in drawing.GetAllPages())
         {
             var shapes = page.AllShapes2D();
-            if ( shapes.Count == 0 ) 
+            if (shapes.Count == 0)
                 continue;
 
             var wall = new FoPanel3D(page.Name)
             {
-                Width = 10,
-                Height = 10,
+                Width = 16,
+                Height = 16,
                 Position = new Vector3(loc, 0, loc),
+                Color = page.Color
             };
-            loc += 3;
-            
+
             shapes?.ForEach(shape =>
             {
                 var w = (double)shape.Width / pixels;
@@ -231,9 +231,10 @@ public class FoArena3D : FoGlyph3D, IArena
                     Width = w,
                     Height = h,
                     Color = shape.Color,
-                    Position = new Vector3(x, 3 - y, loc - 0.1),
+                    Position = new Vector3(x - wall.Width / 2, wall.Height / 2 - y, loc + .1),
                 };
-                panel.TextLines.Add(shape.GetText());
+                var lines = shape.GetText().Split('_').ToList();
+                panel.TextLines.AddRange(lines);
 
                 wall.Add<FoPanel3D>(panel);
             });
