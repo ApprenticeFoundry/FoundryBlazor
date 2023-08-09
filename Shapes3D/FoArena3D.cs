@@ -222,12 +222,16 @@ public class FoArena3D : FoGlyph3D, IArena
             
             shapes?.ForEach(shape =>
             {
+                var w = (double)shape.Width / dx;
+                var h = (double)shape.Height / dx;
+                var x = (double)shape.PinX / dx;
+                var y = (double)shape.PinY / dx;
                 var panel = new FoPanel3D(shape.Name)
                 {
-                    Width = shape.Width / dx,
-                    Height = shape.Height / dx,
+                    Width = w,
+                    Height = h,
                     Color = shape.Color,
-                    Position = new Vector3(shape.PinX/dx, shape.PinY/dx, loc - 0.1),
+                    Position = new Vector3(x, y, loc - 0.1),
                 };
                 wall.Add<FoPanel3D>(panel);
             });
