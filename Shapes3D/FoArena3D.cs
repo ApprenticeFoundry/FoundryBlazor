@@ -205,7 +205,7 @@ public class FoArena3D : FoGlyph3D, IArena
         //Conversion(5000, "px", 1, "m");
 
         int loc = 0;
-        int dx = 1000;
+        int pixels = 1000;
         foreach (var page in drawing.GetAllPages())
         {
             var shapes = page.AllShapes2D();
@@ -222,17 +222,19 @@ public class FoArena3D : FoGlyph3D, IArena
             
             shapes?.ForEach(shape =>
             {
-                var w = (double)shape.Width / dx;
-                var h = (double)shape.Height / dx;
-                var x = (double)shape.PinX / dx;
-                var y = (double)shape.PinY / dx;
+                var w = (double)shape.Width / pixels;
+                var h = (double)shape.Height / pixels;
+                var x = (double)shape.PinX / pixels;
+                var y = (double)shape.PinY / pixels;
                 var panel = new FoPanel3D(shape.Name)
                 {
                     Width = w,
                     Height = h,
                     Color = shape.Color,
-                    Position = new Vector3(x, y, loc - 0.1),
+                    Position = new Vector3(x, 15 - y, loc - 0.1),
                 };
+                panel.TextLines.Add(shape.GetText());
+                
                 wall.Add<FoPanel3D>(panel);
             });
             wall.Render(Scene, 0, 0);

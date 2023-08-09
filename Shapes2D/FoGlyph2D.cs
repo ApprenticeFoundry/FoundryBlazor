@@ -158,6 +158,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         return Name;
     }
+    public virtual string GetText()
+    {
+        return Tag;
+    }
     public string GetGlyphId()
     {
         if (string.IsNullOrEmpty(GlyphId))
