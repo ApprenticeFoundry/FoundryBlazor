@@ -268,6 +268,7 @@ public class FoArena3D : FoGlyph3D, IArena
             });
 
             var lineShapes = page.AllShapes1D();
+            var pathZ = z - 0.25;
 
             foreach (var lineShape in lineShapes)
             {
@@ -276,8 +277,8 @@ public class FoArena3D : FoGlyph3D, IArena
                 var X2 = lineShape.FinishX / pixels;
                 var Y2 = lineShape.FinishY / pixels;
                 var path = new List<Vector3>() {
-                    new Vector3(X1, Y1, z + 1),
-                    new Vector3(X2, Y2, z + 1)
+                    new Vector3(X1 - halfW, halfH - Y1, pathZ),
+                    new Vector3(X2 - halfW, halfH - Y2, pathZ)
                 };
                 var pathway = new FoPathway3D(lineShape.GetName())
                 {

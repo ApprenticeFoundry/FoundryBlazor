@@ -15,7 +15,7 @@ public class FoPathway3D : FoGlyph3D, IPipe3D
     public Vector3? Position { get; set; }
     public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
-    public double Radius { get; set; } = 0.25;
+    public double Radius { get; set; } = 0.1;
     private Mesh? Tube { get; set; }
 
     public FoPathway3D(string name) : base(name, "Grey")
@@ -30,7 +30,6 @@ public class FoPathway3D : FoGlyph3D, IPipe3D
         Tube = new Mesh
         {
             Geometry = new TubeGeometry(tubularSegments: 10, radialSegments: 8, radius: Radius, path: Path),
-            // Position = new Vector3(0, 0, 0),
             Material = new MeshStandardMaterial()
             {
                 Color = Color
