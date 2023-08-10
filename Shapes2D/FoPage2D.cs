@@ -188,9 +188,16 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return result;
     }
 
-    public List<FoGlyph2D> AllShapes2D()
+    public List<FoShape2D> AllShapes2D()
     {
-        var result = Shapes2D.Values();
+        var result = new List<FoShape2D>();
+        foreach (var value in Shapes2D.Values())
+        {
+            if (value is FoShape2D shape)
+            {
+                result.Add(shape);
+            }
+        }
         return result;
     }
 
