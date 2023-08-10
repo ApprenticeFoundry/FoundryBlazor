@@ -21,6 +21,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Name;
     }
 
+    public FoPanel3D() { }
     public FoPanel3D(string name) : base(name, "Grey")
     {
     }
