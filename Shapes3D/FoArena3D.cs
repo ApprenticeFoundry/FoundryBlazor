@@ -33,7 +33,7 @@ public interface IArena
 
     FoStage3D CurrentStage();
     FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
-    FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL);
+    FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 }
@@ -168,7 +168,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-    public FoWorld3D Load3DModelFromFile(FoShape3D spec, string folder, string filename, string baseURL)
+    public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
 
@@ -177,16 +177,14 @@ public class FoArena3D : FoGlyph3D, IArena
         var root = new DT_Hero
         {
             name = name,
-            guid = spec.GetGlyphId(),
+            guid = spec.uniqueGuid,
         };
 
-        var box = spec.BoundingBox ?? new FoBoundingBox3D();
+
         var world3D = new UDTO_World();
-        var shape = world3D.CreateGlb(root, url, 1, 2, 3);
-
-        if ( spec.Position != null)
-            shape.position = spec.Position;
-
+        var body = world3D.CreateGlb(root, url);
+        body.boundingBox = spec.boundingBox;
+        body.position = spec.position;
 
         var world = new FoWorld3D(world3D);
         RenderWorld3D(world);
