@@ -199,14 +199,14 @@ public class FoArena3D : FoGlyph3D, IArena
     public Vector3 Placement(string name, Vector3 pos, double x, double y)
     {
         var source = new Vector3(pos.X, pos.Y, pos.Z);
-        var result = name switch 
+        var result = name switch
         {
-            "+X Wall" => source.Add(x,y,0),
-            "-X Wall" => source.Add(x,y,0),
-            "+Z Wall" => source.Add(x,y,-.5),
-            "-Z Wall" => source.Add(x,y,.5),
-            _ => source;
-        }
+            "+X Wall" => source.Add(x, y, 0),
+            "-X Wall" => source.Add(x, y, 0),
+            "+Z Wall" => source.Add(x, y, -.5),
+            "-Z Wall" => source.Add(x, y, .5),
+            _ => source,
+        };
         return source;
     }
 
