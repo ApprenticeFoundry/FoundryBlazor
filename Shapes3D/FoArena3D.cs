@@ -266,7 +266,7 @@ public class FoArena3D : FoGlyph3D, IArena
             });
 
             var lineShapes = page.AllShapes1D();
-            var pathZ = z - 0.25;
+            var pathZ = z - 0.1;
 
             foreach (var lineShape in lineShapes)
             {
@@ -281,7 +281,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 var pathway = new FoPathway3D(lineShape.GetName())
                 {
                     Path = path,
-                    Color = "yellow"
+                    Color = "black"
                 };
 
                 wall.Add(pathway);
