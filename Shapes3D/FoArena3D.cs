@@ -168,33 +168,33 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-    public FoWorld3D Load3DModelFromFile(string folder, string filename, string baseURL)
+    public FoWorld3D Load3DModelFromFile(FoShape3D spec, string folder, string filename, string baseURL)
     {
         var name = Path.GetFileNameWithoutExtension(filename);
 
         var url = Path.Join(baseURL, folder, filename);
-        // var url = $"{baseURL}/{folder}/{filename}";
 
         var root = new DT_Hero
         {
-            name = name
+            name = name,
+            guid = spec.GetGlyphId(),
         };
 
+        var box = spec.BoundingBox ?? new FoBoundingBox3D();
         var world3D = new UDTO_World();
-        world3D.CreateGlb(root, url, 1, 2, 3);
+        var shape = world3D.CreateGlb(root, url, 1, 2, 3);
 
-
-        var text = name.Replace("_", " ");
-        world3D.CreateLabel(root, text, 0.0, 5.0, 0.0);
-
+        if ( spec.Position != null)
+            shape.position = spec.Position;
 
 
         var world = new FoWorld3D(world3D);
         RenderWorld3D(world);
 
-
         return world;
     }
+
+
 
     public bool RenderDrawingToScene(IDrawing drawing)
     {
@@ -276,9 +276,9 @@ public class FoArena3D : FoGlyph3D, IArena
                 var X2 = lineShape.FinishX / pixels;
                 var Y2 = lineShape.FinishY / pixels;
                 var path = new List<Vector3>() {
-                            new Vector3(X1, Y1, z + 1),
-                            new Vector3(X2, Y2, z + 1)
-                            };
+                    new Vector3(X1, Y1, z + 1),
+                    new Vector3(X2, Y2, z + 1)
+                };
                 var pathway = new FoPathway3D(lineShape.GetName())
                 {
                     Path = path,
