@@ -5,7 +5,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
+public class FoLayoutLink<U, V> where V : FoGlyph2D where U : FoShape1D
 {
 
     private U _item;
@@ -43,7 +43,7 @@ public class FoLayoutLink<U, V> where V : FoShape2D where U : FoShape1D
         var dx = _source.X - _sink.X;
         var dy = _source.Y - _sink.Y;
         var distance = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
-        return (dx/distance, dy/distance, distance);
+        return (dx / distance, dy / distance, distance);
     }
 
     public void ClearAll()
