@@ -8,7 +8,7 @@ using System.Drawing;
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutSwimLanes<U,V> where V : FoShape2D where U : FoShape1D
+public class FoLayoutSwimLanes<U,V> where V : FoText2D where U : FoShape1D
 {
 
     public Rectangle Boundary = new (100, 100, 700, 700);
