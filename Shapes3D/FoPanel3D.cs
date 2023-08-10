@@ -14,6 +14,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
     public List<string> TextLines { get; set; } = new();
+    private TextPanel? Panel { get; set; }
 
     public string DisplayText()
     {
@@ -44,10 +45,11 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return this;
     }
 
-    public bool DrawPanel3D(Scene ctx)
+    public TextPanel EstablishPanel3D()
     {
+        if (Panel != null) return Panel;
 
-        var panel = new TextPanel()
+        Panel = new TextPanel()
         {
             TextLines = TextLines,
             Height = Height,
@@ -56,6 +58,28 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             Position = Position ?? new Vector3(0, 0, 0),
             Pivot = Pivot ?? new Vector3(0, 0, 0),
             Rotation = Rotation ?? new Euler(0, 0, 0),
+        };
+        return Panel;
+    }
+
+
+    private List<TextPanel> ChildPanels()
+    {
+        return Panels().Select((panel) => panel.EstablishPanel3D()).ToList();
+    }
+
+    public bool PanelGroup3D(Scene ctx)
+    {
+        var panel = new PanelGroup()
+        {
+            TextLines = TextLines,
+            Height = Height,
+            Width = Width,
+            Color = Color,
+            Position = Position ?? new Vector3(0, 0, 0),
+            Pivot = Pivot ?? new Vector3(0, 0, 0),
+            Rotation = Rotation ?? new Euler(0, 0, 0),
+            TextPanels = ChildPanels()
         };
 
         ctx.Add(panel);
@@ -99,12 +123,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
-        foreach (var panel in Panels())
-        {
-            panel.Render(ctx, tick, fps, true);
-        }
-        Draw3DConnections(ctx);
-        var result = DrawPanel3D(ctx);
+        var result = PanelGroup3D(ctx);
         return result;
     }
 

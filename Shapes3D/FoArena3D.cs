@@ -196,20 +196,6 @@ public class FoArena3D : FoGlyph3D, IArena
         return world;
     }
 
-    public Vector3 Placement(string name, Vector3 pos, double x, double y)
-    {
-        var source = new Vector3(pos.X, pos.Y, pos.Z);
-        var result = name switch
-        {
-            "+X Wall" => source.Add(x, y, 0),
-            "-X Wall" => source.Add(x, y, 0),
-            "+Z Wall" => source.Add(x, y, -.5),
-            "-Z Wall" => source.Add(x, y, .5),
-            _ => source,
-        };
-        return source;
-    }
-
     public bool RenderDrawingToScene(IDrawing drawing)
     {
         if (Scene == null)
@@ -257,8 +243,8 @@ public class FoArena3D : FoGlyph3D, IArena
             wall.Width = 16;
             wall.Height = 16;
             wall.Color = page.Color;
-            var tag = page.Name.Split('_').FirstOrDefault();
-
+            var halfW = wall.Width / 2;
+            var halfH = wall.Height / 2;
 
             shapes?.ForEach(shape =>
             {
@@ -271,8 +257,8 @@ public class FoArena3D : FoGlyph3D, IArena
                     Width = w,
                     Height = h,
                     Color = shape.Color,
-                    Position = Placement(page.Name, wall.Position!, x, y),
-                    Rotation = wall.Rotation,
+                    // Position = Placement(page.Name, wall.Position!, x, y),
+                    Position = new Vector3(x - halfW, halfH - y, 0.1),
                 };
                 var textLines = shape.GetText().Split('_').ToList();
                 panel.TextLines.AddRange(textLines);
