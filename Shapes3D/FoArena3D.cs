@@ -276,8 +276,8 @@ public class FoArena3D : FoGlyph3D, IArena
                 var X2 = lineShape.FinishX / pixels;
                 var Y2 = lineShape.FinishY / pixels;
                 var path = new List<Vector3>() {
-                            new Vector3(X1, Y1, z + 1),
-                            new Vector3(X2, Y2, z + 1)
+                            new Vector3(X1, Y1, z),
+                            new Vector3(X2, Y2, z)
                             };
                 var pathway = new FoPathway3D(lineShape.GetName())
                 {

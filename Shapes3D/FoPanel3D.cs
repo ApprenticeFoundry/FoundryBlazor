@@ -61,7 +61,12 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     private List<TextPanel> ChildPanels()
     {
-        return Panels().Select((panel) => panel.EstablishPanel3D()).ToList();
+        return Panels().Select((item) => item.EstablishPanel3D()).ToList();
+    }
+
+    private List<Mesh> ChildMeshes()
+    {
+        return Connections().Select((item) => item.EstablishPathway3D()).ToList();
     }
 
     public bool PanelGroup3D(Scene ctx)
@@ -75,7 +80,8 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             Position = Position ?? new Vector3(0, 0, 0),
             Pivot = Pivot ?? new Vector3(0, 0, 0),
             Rotation = Rotation ?? new Euler(0, 0, 0),
-            TextPanels = ChildPanels()
+            TextPanels = ChildPanels(),
+            Meshes = ChildMeshes()
         };
 
         ctx.Add(panel);
@@ -85,10 +91,10 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
-        foreach (var connection in Connections())
-        {
-            connection.Render(ctx, tick, fps, deep);
-        }
+        // foreach (var connection in Connections())
+        // {
+        //     connection.Render(ctx, tick, fps, deep);
+        // }
         var result = PanelGroup3D(ctx);
         return result;
     }
