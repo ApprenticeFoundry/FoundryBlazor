@@ -21,22 +21,18 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Name;
     }
 
-    //public FoPanel3D() : base() { }
-
     public FoPanel3D(string name) : base(name, "Grey")
     {
-        //ResetLocalPin((obj) => 0, (obj) => 0);
     }
-
 
     public List<FoPanel3D> Panels()
     {
         return Members<FoPanel3D>().ToList();
     }
 
-    public List<FoShape1D> Connections()
+    public List<FoPathway3D> Connections()
     {
-        return Members<FoShape1D>().ToList();
+        return Members<FoPathway3D>().ToList();
     }
 
     public virtual FoPanel3D Clear()
@@ -86,43 +82,13 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return true;
     }
 
-    public bool Draw3DConnections(Scene ctx)
-    {
-        var radius = 0.15f;
-        int pixels = 100;
-
-        var z = -3;
-        foreach (var connection in Connections())
-        {
-
-            var X1 = connection.StartX / pixels;
-            var Y1 = connection.StartY / pixels;
-            var X2 = connection.FinishX / pixels;
-            var Y2 = connection.FinishY / pixels;
-
-            var positions = new List<Vector3>() {
-                new Vector3(X1, Y1, z),
-                new Vector3(X2, Y2, z)
-            };
-
-            var tube = new Mesh
-            {
-                Geometry = new TubeGeometry(tubularSegments: 10, radialSegments: 8, radius: radius, path: positions),
-                Position = new Vector3(0, 0, 0),
-                Material = new MeshStandardMaterial()
-                {
-                    Color = "yellow"
-                }
-            };
-            ctx.Add(tube);
-        }
-
-        return true;
-    }
-
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
+        foreach (var connection in Connections())
+        {
+            connection.Render(ctx, tick, fps, deep);
+        }
         var result = PanelGroup3D(ctx);
         return result;
     }

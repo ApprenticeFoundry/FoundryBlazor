@@ -231,7 +231,8 @@ public class FoArena3D : FoGlyph3D, IArena
         queue.Enqueue(south);
 
 
-        int pixels = 100;
+        var pixels = 100;
+        var z = 0.1;
         foreach (var page in drawing.GetAllPages())
         {
 
@@ -258,7 +259,7 @@ public class FoArena3D : FoGlyph3D, IArena
                     Height = h,
                     Color = shape.Color,
                     // Position = Placement(page.Name, wall.Position!, x, y),
-                    Position = new Vector3(x - halfW, halfH - y, 0.1),
+                    Position = new Vector3(x - halfW, halfH - y, z),
                 };
                 var textLines = shape.GetText().Split('_').ToList();
                 panel.TextLines.AddRange(textLines);
@@ -267,9 +268,24 @@ public class FoArena3D : FoGlyph3D, IArena
             });
 
             var lineShapes = page.AllShapes1D();
+
             foreach (var lineShape in lineShapes)
             {
-                wall.Add(lineShape);
+                var X1 = lineShape.StartX / pixels;
+                var Y1 = lineShape.StartY / pixels;
+                var X2 = lineShape.FinishX / pixels;
+                var Y2 = lineShape.FinishY / pixels;
+                var path = new List<Vector3>() {
+                            new Vector3(X1, Y1, z + 1),
+                            new Vector3(X2, Y2, z + 1)
+                            };
+                var pathway = new FoPathway3D(lineShape.GetName())
+                {
+                    Path = path,
+                    Color = "yellow"
+                };
+
+                wall.Add(pathway);
             }
 
             wall.Render(Scene, 0, 0);
