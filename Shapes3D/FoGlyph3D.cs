@@ -116,6 +116,12 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
+    public virtual Vector3 GetScale(double x = 1, double y = 1, double z = 1)
+    {
+        var result = new Vector3(x, y, z);
+        return result;
+    }
+
     public virtual Euler GetRotation(int x = 0, int y = 0, int z = 0)
     {
         var result = new Euler(x, y, z);

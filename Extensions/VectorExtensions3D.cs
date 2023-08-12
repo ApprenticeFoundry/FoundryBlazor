@@ -20,6 +20,11 @@ public static class Vector3Extensions
         return new Vector3(box.pinX.Value(), box.pinY.Value(), box.pinZ.Value());
     }
 
+    public static Vector3 ScaleAsVector3(this BoundingBox box)
+    {
+        return new Vector3(box.scaleX, box.scaleY, box.scaleZ);
+    }
+
     //HighResPosition 
 
     public static Vector3 LocAsVector3(this HighResPosition pos)

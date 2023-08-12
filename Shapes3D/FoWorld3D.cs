@@ -89,6 +89,7 @@ public class FoWorld3D : FoGlyph3D
                 Position = pos?.LocAsVector3(),
                 Rotation = pos?.AngAsVector3(),
                 BoundingBox = box?.BoxAsVector3(),
+                Scale = box?.ScaleAsVector3(),
                 Pivot = box?.PinAsVector3(),
             };
             Slot<FoShape3D>().Add(shape3D);
