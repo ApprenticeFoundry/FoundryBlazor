@@ -3,14 +3,14 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoText2D : FoGlyph2D, IShape2D
+public class FoText2D : FoShape2D, IShape2D
 {
     public bool ComputeResize { get; set; } = false;
 
     private string text = "";
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
 
-    private string fontsize = "30";
+    private string fontsize = "20";
     public string FontSize { get { return this.fontsize; } set { this.fontsize = AssignText(value, fontsize); } }
 
     private string font = "Segoe UI";
@@ -21,6 +21,7 @@ public class FoText2D : FoGlyph2D, IShape2D
 
     public int Margin { get; set; } = 2;
     public List<string>? Details { get; set; }
+    private bool AllowResize { get; set; } = false;
 
     protected string CreateDetails(string text)
     {
@@ -93,8 +94,9 @@ public class FoText2D : FoGlyph2D, IShape2D
         await ctx.SaveAsync();
         await ctx.SetFontAsync(FontSizeAndName());
 
-        if (IsEditing || ComputeResize)
-            await ComputeSize(ctx, Text);
+        if (AllowResize)
+            if (IsEditing || ComputeResize)
+                await ComputeSize(ctx, Text);
 
         await UpdateContext(ctx, tick);
 

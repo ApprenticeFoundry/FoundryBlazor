@@ -15,7 +15,7 @@ public class FoPathway3D : FoGlyph3D, IPipe3D
     public Vector3? Position { get; set; }
     public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
-    public double Radius { get; set; } = 0.1;
+    public double Radius { get; set; } = 0.025;
     private Mesh? Tube { get; set; }
 
     public FoPathway3D(string name) : base(name, "Grey")
