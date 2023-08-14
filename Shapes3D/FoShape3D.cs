@@ -422,7 +422,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
             settings.Add(setting);
 
             $"AsImportSettings body.Symbol {body.Symbol} X = {setting.FileURL}".WriteSuccess();
-
         }
 
         var source = settings.ElementAt(0);
