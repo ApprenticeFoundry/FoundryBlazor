@@ -1,8 +1,6 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Enums;
-using BlazorThreeJS.Events;
 using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Labels;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
@@ -10,8 +8,6 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-
-
 
 namespace FoundryBlazor.Shape;
 
@@ -27,10 +23,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public Vector3? Scale { get; set; }
     public List<Vector3>? Path { get; set; }
     public string? LoadingURL { get; set; }
-    public FoMenu3D? NavMenu { get; set; }
+    // public FoMenu3D? NavMenu { get; set; }
     public FoPanel3D? TextPanel { get; set; }
+    public Action<ImportSettings> UserHit { get; set; } = (ImportSettings model3D) => { };
+
     private Mesh? ShapeMesh { get; set; }
     private Object3D? ShapeObject3D { get; set; }
+
     public FoShape3D() : base()
     {
     }
@@ -375,7 +374,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private async Task<bool> PreRenderImport(FoArena3D arena, Viewer viewer, Import3DFormats format)
     {
-        var settings = AsImportSettings(format);
+        var settings = AsImportSettings(arena, format);
 
         if (string.IsNullOrEmpty(LoadingURL)) return false;
         $"PreRenderImport symbol [{LoadingURL}] ".WriteInfo(1);
@@ -385,7 +384,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return true;
     }
 
-    public ImportSettings AsImportSettings(Import3DFormats format)
+    public ImportSettings AsImportSettings(FoArena3D arena, Import3DFormats format)
     {
         LoadingURL = Symbol;
 
@@ -398,6 +397,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = GetRotation(),
             Pivot = GetPivot(),
             Scale = GetScale(),
+            OnClick = (ImportSettings self) =>
+            {
+                self.Increment();
+                $"FoundryBlazor OnClick handler for self.Uuid={self.Uuid}, self.IsShow={self.IsShow()}".WriteInfo();
+                UserHit?.Invoke(self);
+                arena.UpdateArena();
+            },
             OnComplete = (Scene scene, Object3D object3D) =>
             {
                 $"OnComplete for object3D.Uuid={object3D.Uuid}, body.LoadingURL={LoadingURL}, position.x={Position?.X}".WriteInfo();
@@ -417,7 +423,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         foreach (var body in bodies)
         {
-            var setting = body.AsImportSettings(format);
+            var setting = body.AsImportSettings(arena, format);
             arena.Add<FoShape3D>(body.GetGlyphId(), body);
             settings.Add(setting);
 
@@ -557,6 +563,30 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Tube" => Tube(ctx),
             _ => NotImplemented(ctx)
         };
+
+        UserHit = (ImportSettings model3D) =>
+        {
+
+
+            $"In UserHit".WriteInfo();
+
+            TextPanel ??= new FoPanel3D("TextPanel")
+            {
+                Width = 2,
+                Height = 1.5,
+                Color = "purple",
+                Position = model3D.Position.Add(0, 1, 0),
+                TextLines = new()
+                    {
+                        $"{tick} Lorem ipsum dolor sit amet.", "Lorem ipsum dolor sit amet.", "Lorem ipsum dolor sit amet."
+                    }
+            };
+
+            TextPanel.IsVisible = model3D.IsShow();
+            TextPanel.Render(ctx, tick, fps, deep);
+        };
+
+
         return result;
     }
 }

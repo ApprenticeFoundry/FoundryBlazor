@@ -1,6 +1,7 @@
 // this is a tool to load/unload knowledge modules that define projects
 
 using BlazorThreeJS.Maths;
+using BlazorThreeJS.Settings;
 using FoundryBlazor.Extensions;
 using IoBTMessage.Models;
 
@@ -94,37 +95,36 @@ public class FoWorld3D : FoGlyph3D
             };
             Slot<FoShape3D>().Add(shape3D);
             $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
-
             //add the nav menu
             if (item.subSystem != null)
             {
-                LayoutSystemInSwinlanes(item.subSystem, 0, 0, -14);
-                shape3D.NavMenu = new FoMenu3D("NavMenu")
-                {
-                    Position = pos?.LocAsVector3().Add(1, 2, 0)
-                };
+                // LayoutSystemInSwinlanes(item.subSystem, 0, 0, -14);
+                // shape3D.NavMenu = new FoMenu3D("NavMenu")
+                // {
+                //     Position = pos?.LocAsVector3().Add(1, 2, 0)
+                // };
 
-                shape3D.TextPanel = new FoPanel3D("TextPanel")
-                {
-                    Width = 2,
-                    Height = 1.5,
-                    Color = "purple",
-                    Position = pos?.LocAsVector3().Add(1, 2, -3)
-                };
+                // shape3D.TextPanel = new FoPanel3D("TextPanel")
+                // {
+                //     Width = 2,
+                //     Height = 1.5,
+                //     Color = "purple",
+                //     Position = pos?.LocAsVector3().Add(1, 2, -3)
+                // };
 
-                var textLines = item.subSystem.Targets().Select((item) => $"Address: {item.address}").ToList();
-                shape3D.TextPanel.TextLines = textLines;
+                // var textLines = item.subSystem.Targets().Select((item) => $"Address: {item.address}").ToList();
+                // shape3D.TextPanel.TextLines = textLines;
 
-                item.subSystem.Targets().ForEach((target) =>
-                {
-                    var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
-                    shape3D.NavMenu.Add(button);
+                // item.subSystem.Targets().ForEach((target) =>
+                // {
+                //     var button = new FoButton3D(target.address, () => $"Clicked {target.address}".WriteSuccess());
+                //     shape3D.NavMenu.Add(button);
 
-                    var subPanel = shape3D.TextPanel.Establish<FoPanel3D>(target.address);
-                    subPanel.TextLines.Add(target.address);
-                    subPanel.Color = GetColor(target);
-                    subPanel.Position = new Vector3(target.x, target.y, target.z);
-                });
+                //     var subPanel = shape3D.TextPanel.Establish<FoPanel3D>(target.address);
+                //     subPanel.TextLines.Add(target.address);
+                //     subPanel.Color = GetColor(target);
+                //     subPanel.Position = new Vector3(target.x, target.y, target.z);
+                // });
             }
 
         });

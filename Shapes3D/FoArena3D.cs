@@ -333,11 +333,11 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
             body.Render(Scene, 0, 0);
-            var pos = body.Position;
-            var x = (int)(pos?.X ?? 0) + 3;
-            var y = (int)(pos?.Y ?? 0) + 2;
-            body.NavMenu?.Render(Scene, x, y);
-            body.TextPanel?.Render(Scene, x, y);
+            // var pos = body.Position;
+            // var x = (int)(pos?.X ?? 0) + 3;
+            // var y = (int)(pos?.Y ?? 0) + 2;
+            // body.NavMenu?.Render(Scene, x, y);
+            // body.TextPanel?.Render(Scene, x, y);
         });
 
         world.Labels()?.ForEach(label =>
