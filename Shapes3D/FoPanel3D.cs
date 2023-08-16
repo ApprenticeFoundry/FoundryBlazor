@@ -14,7 +14,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public Vector3? Pivot { get; set; }
     public Euler? Rotation { get; set; }
     public List<string> TextLines { get; set; } = new();
-    private TextPanel? Panel { get; set; }
+    private TextPanel? TextPanel { get; set; }
 
     public string DisplayText()
     {
@@ -44,9 +44,9 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     public TextPanel EstablishPanel3D()
     {
-        if (Panel != null) return Panel;
+        if (TextPanel != null) return TextPanel;
 
-        Panel = new TextPanel()
+        TextPanel = new TextPanel()
         {
             TextLines = TextLines,
             Height = Height,
@@ -56,7 +56,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             Pivot = Pivot ?? new Vector3(0, 0, 0),
             Rotation = Rotation ?? new Euler(0, 0, 0),
         };
-        return Panel;
+        return TextPanel;
     }
 
 
@@ -92,12 +92,19 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
-        // foreach (var connection in Connections())
-        // {
-        //     connection.Render(ctx, tick, fps, deep);
-        // }
-        var result = PanelGroup3D(ctx);
-        return result;
+
+        if (IsVisible)
+        {
+            // var result = PanelGroup3D(ctx);
+            TextPanel = EstablishPanel3D();
+            ctx.Add(TextPanel);
+        }
+        else
+        {
+            if (TextPanel != null)
+                ctx.Remove(TextPanel);
+        }
+        return true;
     }
 
 }
