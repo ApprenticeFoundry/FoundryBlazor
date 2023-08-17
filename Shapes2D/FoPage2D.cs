@@ -461,7 +461,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         $"RenderNoItems Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
-        await ctx.SetGlobalAlphaAsync(0.75F);
+        await ctx.SetGlobalAlphaAsync(1.0F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
@@ -494,7 +494,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         $"RenderConcise Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
-        await ctx.SetGlobalAlphaAsync(0.80F);
+        await ctx.SetGlobalAlphaAsync(1.0F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
@@ -557,7 +557,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await DrawPageName(ctx);
 
         await ctx.SetFillStyleAsync(Color);
-        await ctx.SetGlobalAlphaAsync(0.75F);
+        await ctx.SetGlobalAlphaAsync(1.0F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
