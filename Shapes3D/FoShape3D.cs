@@ -10,6 +10,7 @@ using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 using IoBTMessage.Models;
+using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shape;
 
@@ -373,12 +374,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Rotation = GetRotation(),
             Pivot = GetPivot(),
             Scale = GetScale(),
-            OnClick = (ImportSettings self) =>
+            OnClick = async (ImportSettings self) =>
             {
                 self.Increment();
                 $"FoundryBlazor OnClick handler for self.Uuid={self.Uuid}, self.IsShow={self.IsShow()}".WriteInfo();
                 UserHit?.Invoke(self);
-                _ = arena.UpdateArena();
+                await arena.UpdateArena();
+                $"FoundryBlazor OnClick handler UpdateArena called".WriteInfo(); 
             },
             OnComplete = (Scene scene, Object3D object3D) =>
             {
@@ -500,6 +502,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
             "Glb" => await PreRenderImport(arena, viewer, Import3DFormats.Gltf),
             _ => false
         };
+
+        if ( arena.Scene != null)
+            SetupHitTest(arena.Scene);
+            
         return result;
     }
     public void RenderPrimitives(Scene ctx)
@@ -531,6 +537,31 @@ public class FoShape3D : FoGlyph3D, IShape3D
          }
     }
 
+    public bool SetupHitTest(Scene ctx, int tick = 0, double fps = 0, bool deep = true)
+    {
+        $"SetupHitTest for {Name}".WriteInfo();
+        UserHit = (ImportSettings model3D) =>
+        {
+            $"In UserHit".WriteInfo();
+
+            TextPanel ??= new FoPanel3D("TextPanel")
+            {
+                Width = 2,
+                Height = 1.5,
+                Color = "purple",
+                TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
+            };
+
+            TextPanel.Position = model3D.Position.Add(0, 1, 0);
+
+            TextPanel.IsVisible = model3D.IsShow();
+            $"TextPanel.IsVisible = {TextPanel.IsVisible}".WriteInfo(1);
+            TextPanel.Render(ctx, tick, fps, deep);
+            $"TextPanel.Render complete".WriteInfo(1);
+        };
+        return true;
+    }
+
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
         // if ( ShapeObject3D != null && IsVisible)
@@ -547,23 +578,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         RenderPrimitives(ctx);
 
-        UserHit = (ImportSettings model3D) =>
-        {
-            $"In UserHit".WriteInfo();
-
-            TextPanel ??= new FoPanel3D("TextPanel")
-            {
-                Width = 2,
-                Height = 1.5,
-                Color = "purple",
-                TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
-            };
-
-            TextPanel.Position = model3D.Position.Add(0, 1, 0);
-
-            TextPanel.IsVisible = model3D.IsShow();
-            TextPanel.Render(ctx, tick, fps, deep);
-        };
+        SetupHitTest(ctx, tick, fps, deep);
 
 
         return true;

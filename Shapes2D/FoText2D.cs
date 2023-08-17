@@ -23,10 +23,11 @@ public class FoText2D : FoShape2D, IShape2D
     public List<string>? Details { get; set; }
     private bool AllowResize { get; set; } = false;
 
-    protected string CreateDetails(string text)
+    protected string CreateDetails(string details="")
     {
-        Details = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-        return text;
+
+        Details = details.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+        return details;
     }
 
     protected string AssignText(string newValue, string oldValue)
