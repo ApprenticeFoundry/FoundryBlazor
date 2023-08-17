@@ -28,8 +28,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
     public Vector3? BoundingBox { get; set; }
     public Vector3? Scale { get; set; }
     public string? LoadingURL { get; set; }
-    // public FoMenu3D? NavMenu { get; set; }
-    public FoPanel3D? TextPanel { get; set; }
+
+    public List<FoPanel3D>? TextPanels { get; set; }
     public Action<ImportSettings> UserHit { get; set; } = (ImportSettings model3D) => { };
 
     private Mesh? ShapeMesh { get; set; }
@@ -537,6 +537,55 @@ public class FoShape3D : FoGlyph3D, IShape3D
         }
     }
 
+            // "PIN" => "Pink",
+            // "PROC" => "Wisteria",
+            // "DOC" => "Gray",
+            // "ASST" => "Aqua",
+            // "CAD" => "Orange",
+            // "WRLD" => "Green",
+
+    public List<FoPanel3D> EstablishTextPanels(ImportSettings model3D)
+    {
+        if ( TextPanels != null && TextPanels.Count > 0)
+            return TextPanels;
+
+
+        var leftPos = model3D.Position.CreatePlus(-3, 1, 0);
+        var centerPos = model3D.Position.CreatePlus(0, 1, 0);  
+        var rightPos = model3D.Position.CreatePlus(3, 1, 0);
+
+        var center = new FoPanel3D("Threads")
+        {
+            Width = 2.5,
+            Height = 1.5,
+            Color = "Gray",
+            TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
+            Position = centerPos
+        };
+
+        var left = new FoPanel3D("Process")
+        {
+            Width = 2.5,
+            Height = 1.5,
+            Color = "Wisteria",
+            TextLines = new() { "Process Steps" },
+            Position = leftPos
+        };
+
+        var right = new FoPanel3D("BOM")
+        {
+            Width = 2.5,
+            Height = 1.5,
+            Color = "Pink",
+            TextLines = new() { "BOM Structure" },
+            Position = rightPos
+        };
+
+        TextPanels = new List<FoPanel3D>() { left, center, right };
+
+        return TextPanels;
+    }
+
     public bool SetupHitTest(Scene ctx, int tick = 0, double fps = 0, bool deep = true)
     {
         $"SetupHitTest for {Name}".WriteInfo();
@@ -544,19 +593,15 @@ public class FoShape3D : FoGlyph3D, IShape3D
         {
             $"In UserHit".WriteInfo();
 
-            TextPanel ??= new FoPanel3D("TextPanel")
+            var list = EstablishTextPanels(model3D);
+            foreach (var item in list)
             {
-                Width = 2,
-                Height = 1.5,
-                Color = "purple",
-                TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
-                Position = model3D.Position.Add(0, 1, 0)
-            };
+                item.IsVisible = model3D.IsShow();
+                $"TextPanel.IsVisible = {item.IsVisible}".WriteInfo(1);
+                item.Render(ctx, tick, fps, deep);
+                $"TextPanel.Render complete".WriteInfo(1);     
+            }
 
-            TextPanel.IsVisible = model3D.IsShow();
-            $"TextPanel.IsVisible = {TextPanel.IsVisible}".WriteInfo(1);
-            TextPanel.Render(ctx, tick, fps, deep);
-            $"TextPanel.Render complete".WriteInfo(1);
         };
         return true;
     }
