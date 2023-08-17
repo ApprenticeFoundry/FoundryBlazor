@@ -19,7 +19,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public string Symbol { get; set; } = "";
     public string Type { get; set; } = "";
-     public List<DT_Target>? Targets { get; set; }
+    public List<DT_Target>? Targets { get; set; }
 
     public Vector3? Position { get; set; }
     public List<Vector3>? Path { get; set; }
@@ -109,7 +109,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public Mesh Box()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
@@ -126,7 +126,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public Mesh Boundary()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
@@ -143,7 +143,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Cylinder()
     {
-                if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
         ShapeMesh = new Mesh
@@ -160,7 +160,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Sphere()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
@@ -178,7 +178,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Tube()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
 
@@ -195,7 +195,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
     private Mesh Circle()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -212,7 +212,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Capsule()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -229,7 +229,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Cone()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -246,7 +246,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Dodecahedron()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -263,7 +263,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Icosahedron()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -280,7 +280,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Octahedron()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
@@ -297,7 +297,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
     private Mesh Tetrahedron()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
@@ -314,7 +314,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     }
     private Mesh Plane()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
 
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
@@ -332,7 +332,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     private Mesh Ring()
     {
-        if ( ShapeMesh != null) return ShapeMesh;
+        if (ShapeMesh != null) return ShapeMesh;
         var box = BoundingBox ?? new Vector3(1, 1, 1);
 
         ShapeMesh = new Mesh
@@ -380,7 +380,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
                 $"FoundryBlazor OnClick handler for self.Uuid={self.Uuid}, self.IsShow={self.IsShow()}".WriteInfo();
                 UserHit?.Invoke(self);
                 await arena.UpdateArena();
-                $"FoundryBlazor OnClick handler UpdateArena called".WriteInfo(); 
+                $"FoundryBlazor OnClick handler UpdateArena called".WriteInfo();
             },
             OnComplete = (Scene scene, Object3D object3D) =>
             {
@@ -503,14 +503,14 @@ public class FoShape3D : FoGlyph3D, IShape3D
             _ => false
         };
 
-        if ( arena.Scene != null)
+        if (arena.Scene != null)
             SetupHitTest(arena.Scene);
-            
+
         return result;
     }
     public void RenderPrimitives(Scene ctx)
     {
-        if ( ShapeMesh == null && IsVisible)
+        if (ShapeMesh == null && IsVisible)
         {
             ShapeMesh = Type switch
             {
@@ -530,11 +530,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
                 ctx.Add(ShapeMesh);
         };
 
-         if ( ShapeMesh != null && !IsVisible)
-         {
-                ctx.Remove(ShapeMesh);
-                ShapeMesh = null;
-         }
+        if (ShapeMesh != null && !IsVisible)
+        {
+            ctx.Remove(ShapeMesh);
+            ShapeMesh = null;
+        }
     }
 
     public bool SetupHitTest(Scene ctx, int tick = 0, double fps = 0, bool deep = true)
@@ -550,9 +550,8 @@ public class FoShape3D : FoGlyph3D, IShape3D
                 Height = 1.5,
                 Color = "purple",
                 TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
+                Position = model3D.Position.Add(0, 1, 0)
             };
-
-            TextPanel.Position = model3D.Position.Add(0, 1, 0);
 
             TextPanel.IsVisible = model3D.IsShow();
             $"TextPanel.IsVisible = {TextPanel.IsVisible}".WriteInfo(1);
