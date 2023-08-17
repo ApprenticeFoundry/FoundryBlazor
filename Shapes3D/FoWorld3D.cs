@@ -98,6 +98,7 @@ public class FoWorld3D : FoGlyph3D
             //add the nav menu
             if (item.subSystem != null)
             {
+                shape3D.Targets = item.subSystem.Targets();
                 // LayoutSystemInSwinlanes(item.subSystem, 0, 0, -14);
                 // shape3D.NavMenu = new FoMenu3D("NavMenu")
                 // {

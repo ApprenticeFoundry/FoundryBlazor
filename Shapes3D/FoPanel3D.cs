@@ -15,6 +15,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public Euler? Rotation { get; set; }
     public List<string> TextLines { get; set; } = new();
     private TextPanel? TextPanel { get; set; }
+    private PanelGroup? PanelGroup { get; set; }
 
     public string DisplayText()
     {
@@ -24,6 +25,11 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public FoPanel3D() { }
     public FoPanel3D(string name) : base(name, "Grey")
     {
+    }
+
+    public bool HasPanels()
+    {
+        return GetMembers<FoPanel3D>()?.Count > 0;
     }
 
     public List<FoPanel3D> Panels()
@@ -39,6 +45,8 @@ public class FoPanel3D : FoGlyph3D, IShape3D
     public virtual FoPanel3D Clear()
     {
         TextLines.Clear();
+        Members<FoPanel3D>().Clear();
+        Members<FoPathway3D>().Clear();
         return this;
     }
 
@@ -59,20 +67,11 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return TextPanel;
     }
 
-
-    private List<TextPanel> ChildPanels()
+    public PanelGroup EstablishGroup3D()
     {
-        return Panels().Select((item) => item.EstablishPanel3D()).ToList();
-    }
+        if (PanelGroup != null) return PanelGroup;
 
-    private List<Mesh> ChildMeshes()
-    {
-        return Connections().Select((item) => item.EstablishPathway3D()).ToList();
-    }
-
-    public bool PanelGroup3D(Scene ctx)
-    {
-        var panel = new PanelGroup()
+        PanelGroup = new PanelGroup()
         {
             TextLines = TextLines,
             Height = Height,
@@ -82,12 +81,23 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             Pivot = Pivot ?? new Vector3(0, 0, 0),
             Rotation = Rotation ?? new Euler(0, 0, 0),
             TextPanels = ChildPanels(),
-            Meshes = ChildMeshes()
+            Meshes = ChildConnections()
         };
-
-        ctx.Add(panel);
-        return true;
+        return PanelGroup;
     }
+
+
+    private List<TextPanel> ChildPanels()
+    {
+        return Panels().Select((item) => item.EstablishPanel3D()).ToList();
+    }
+
+    private List<Mesh> ChildConnections()
+    {
+        return Connections().Select((item) => item.EstablishPathway3D()).ToList();
+    }
+
+
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
@@ -103,6 +113,19 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         {
             if (TextPanel != null)
                 ctx.Remove(TextPanel);
+            TextPanel = null;
+        }
+
+        if ( HasPanels())
+        {
+            PanelGroup = EstablishGroup3D();
+            ctx.Add(PanelGroup);
+        }
+        else
+        {
+            if (PanelGroup != null)
+                ctx.Remove(PanelGroup);
+            PanelGroup = null;
         }
         return true;
     }
