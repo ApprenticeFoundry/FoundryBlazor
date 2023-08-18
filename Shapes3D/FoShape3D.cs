@@ -551,7 +551,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         var root = model3D.Position.CreatePlus(0, 1, 0);
         if (Position != null && BoundingBox != null)
-            root = Position.CreatePlus(BoundingBox.X, BoundingBox.Y, BoundingBox.Z);
+            root = Position.CreatePlus(0, BoundingBox.Y, 0);
 
         var leftPos = root.CreatePlus(-3, 1, 0);
         var centerPos = root.CreatePlus(0, 1, 0);  
