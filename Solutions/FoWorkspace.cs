@@ -348,11 +348,11 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
-    public  void ResolveTargets(DT_System system)
+    public  void ResolveTargets(List<DT_Target> targets)
     {
         AllWorkbooks()?.ForEach(item =>
         {
-            item.ResolveTargets(system);
+            item.ResolveTargets(targets);
         });
     }
 
