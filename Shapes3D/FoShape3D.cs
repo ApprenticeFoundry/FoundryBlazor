@@ -549,10 +549,13 @@ public class FoShape3D : FoGlyph3D, IShape3D
         if ( TextPanels != null && TextPanels.Count > 0)
             return TextPanels;
 
+        var root = model3D.Position.CreatePlus(0, 1, 0);
+        if (Position != null && BoundingBox != null)
+            root = Position.CreatePlus(BoundingBox.X, BoundingBox.Y, BoundingBox.Z);
 
-        var leftPos = model3D.Position.CreatePlus(-3, 1, 0);
-        var centerPos = model3D.Position.CreatePlus(0, 1, 0);  
-        var rightPos = model3D.Position.CreatePlus(3, 1, 0);
+        var leftPos = root.CreatePlus(-3, 1, 0);
+        var centerPos = root.CreatePlus(0, 1, 0);  
+        var rightPos = root.CreatePlus(3, 1, 0);
 
         var center = new FoPanel3D("Threads")
         {
