@@ -233,8 +233,6 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
             var shape1D = Activator.CreateInstance<U>();
             shape1D.Layout = style;
-            shape1D.Thickness = 5;
-            shape1D.Color = "Green";
 
             pageManager.AddShape<U>(shape1D);
 

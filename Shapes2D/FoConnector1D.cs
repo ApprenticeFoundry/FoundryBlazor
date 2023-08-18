@@ -8,10 +8,7 @@ public class FoConnector1D : FoShape1D, IShape1D
 {
 
 
-
     public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
-
-
 
 
 
@@ -70,15 +67,6 @@ public class FoConnector1D : FoShape1D, IShape1D
     {
         this.Thickness = 5;
     }
-
-
-
-
-
-
-
-
-
 
 
     //PageManager.Add(new FoConnector1D(300,300, 500, 500, 10, "Red"));
