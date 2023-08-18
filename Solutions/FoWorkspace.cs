@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
 using IoBTMessage.Extensions;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Solutions;
 
@@ -41,6 +42,7 @@ public interface IWorkspace : IWorkbook
     U EstablishCommand<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoCommand2D;
     U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
+
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkbook();
@@ -346,11 +348,18 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
+    public  void ResolveTargets(DT_System system)
+    {
+        AllWorkbooks()?.ForEach(item =>
+        {
+            item.ResolveTargets(system);
+        });
+    }
+
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
         GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
-
         return list;
     }
 
