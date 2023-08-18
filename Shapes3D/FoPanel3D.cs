@@ -101,11 +101,10 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-        $"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
+        //$"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
 
         if (IsVisible)
         {
-            // var result = PanelGroup3D(ctx);
             TextPanel = EstablishPanel3D();
             ctx.Add(TextPanel);
         }

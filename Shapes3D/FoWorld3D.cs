@@ -94,7 +94,7 @@ public class FoWorld3D : FoGlyph3D
                 Pivot = box?.PinAsVector3(),
             };
             Slot<FoShape3D>().Add(shape3D);
-            $"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
+            //$"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
             if (item.subSystem != null)
             {
                 shape3D.Targets = item.subSystem.Targets();

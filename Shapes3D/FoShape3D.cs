@@ -562,7 +562,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Width = 2.5,
             Height = 1.5,
             Color = "Gray",
-            TextLines = Targets?.Select((item) => $"Address: {item.address}").ToList() ?? new List<string>(),
+            TextLines = Targets?.Select((item) => $"{item.domain}: {item.address}").ToList() ?? new List<string>(),
             Position = centerPos
         };
 
@@ -600,9 +600,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             foreach (var item in list)
             {
                 item.IsVisible = model3D.IsShow();
-                $"TextPanel.IsVisible = {item.IsVisible}".WriteInfo(1);
-                item.Render(ctx, tick, fps, deep);
-                $"TextPanel.Render complete".WriteInfo(1);     
+                item.Render(ctx, tick, fps, deep);  
             }
 
         };
