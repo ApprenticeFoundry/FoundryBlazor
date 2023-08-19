@@ -21,7 +21,21 @@ public class FoText2D : FoShape2D, IShape2D
 
     public int Margin { get; set; } = 2;
     public List<string>? Details { get; set; }
-    private bool AllowResize { get; set; } = false;
+    public bool AllowResize { get; set; } = false;
+
+
+    public FoText2D() : base()
+    {
+    }
+    public FoText2D(string name) : base(name, "Orange")
+    {
+        Text = name;
+    }
+
+    public FoText2D(int width, int height, string color) : base("", width, height, color)
+    {
+        Text = "Hello Everyone";
+    }
 
     protected string CreateDetails(string details="")
     {
@@ -68,9 +82,13 @@ public class FoText2D : FoShape2D, IShape2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync(TextColor);
-        await ctx.FillTextAsync(Text, LeftX() + 1, TopY() + 1);
+        await ctx.FillTextAsync(Text, LeftX() + 5, TopY() + 5);
 
     }
+
+
+
+
 
     // https://jenkov.com/tutorials/html5-canvas/text.html
 
@@ -116,18 +134,6 @@ public class FoText2D : FoShape2D, IShape2D
 
 
 
-    public FoText2D() : base()
-    {
-    }
-    public FoText2D(string name) : base(name, "Orange")
-    {
-        Text = name;
-    }
-
-    public FoText2D(int width, int height, string color) : base("", width, height, color)
-    {
-        Text = "Hello Everyone";
-    }
 
 
 
