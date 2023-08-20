@@ -569,6 +569,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             Position = centerPos
         };
 
+        //if this is Mk48 then add a panel for the process steps
         var left = new FoPanel3D("Process")
         {
             Width = 2.5,
@@ -577,7 +578,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             TextLines = new() { "Process Steps" },
             Position = leftPos
         };
-
+        //if this is Mk48 then add a panel for the BOM
         var right = new FoPanel3D("BOM")
         {
             Width = 2.5,
