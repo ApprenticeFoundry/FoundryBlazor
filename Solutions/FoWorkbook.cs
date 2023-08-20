@@ -22,7 +22,7 @@ public interface IWorkbook
     void PostRender(int tick);
     Task RenderWatermark(Canvas2DContext ctx, int tick);
 
-    void ResolveTargets(List<DT_Target> targets);
+    void ResolveTargets(List<DT_Target>? targets);
 }
 
 public class FoWorkbook: FoComponent, IWorkbook
@@ -49,7 +49,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         PubSub = foundry.PubSub();
     }  
 
-    public virtual void ResolveTargets(List<DT_Target> targets)
+    public virtual void ResolveTargets(List<DT_Target>? targets)
     {
     }
 

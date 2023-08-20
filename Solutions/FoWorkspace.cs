@@ -348,7 +348,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
-    public  void ResolveTargets(List<DT_Target> targets)
+    public void ResolveTargets(List<DT_Target>? targets)
     {
         AllWorkbooks()?.ForEach(item =>
         {
