@@ -53,7 +53,7 @@ public class FoWorkbook: FoComponent, IWorkbook
     {
     }
 
-    public FoPage2D EstablishCurrentPage(string pagename, string color = "Yellow")
+    public FoPage2D EstablishCurrentPage(string pagename, string color)
     {
         var drawing = Workspace.GetDrawing()!;
         var manager = drawing.Pages();
@@ -75,7 +75,7 @@ public class FoWorkbook: FoComponent, IWorkbook
             drawing.SetCurrentPage(WorkPage);
             return WorkPage;
         }
-        return EstablishCurrentPage(Name);
+        return EstablishCurrentPage(Name, "Black");
     }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
