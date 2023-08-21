@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
+    <!-- <PackageReference Include="Foundry.Extensions.Canvas" Version="1.1.6" /> -->
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
@@ -28,5 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
     <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
+    <ProjectReference Include="..\BlazorExtensionsCanvas\src\Blazor.Extensions.Canvas\Blazor.Extensions.Canvas.csproj" />
   </ItemGroup>
 </Project>
