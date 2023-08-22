@@ -101,6 +101,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         set
         {
             this.color = value;
+            if (value.Matches("yellow"))
+                return;
         }
     }
 

@@ -46,7 +46,7 @@ public class FoImage2D : FoGlyph2D, IImage2D
         set { this.imageRef = value; } 
     }
 
-    private int waitcount = 0;
+    protected int waitcount = 0;
 
     public FoImage2D() : base()
     {
