@@ -20,6 +20,7 @@ public interface IFoPage2D
     int MapToPageYLoc(Length value);
     double MapToModelXLoc(int value);
     double MapToModelYLoc(int value);
+    string CalculateTitle(string title);
 }
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
@@ -43,6 +44,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
     public int ScaleAxisY { get; set; } = 1;
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
+    public string Title { get; set; } = string.Empty;
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
@@ -517,12 +519,22 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return true;
     }
 
+    public string CalculateTitle(string title = "")
+    {
+        if (!string.IsNullOrEmpty(title))
+            Title = title;
+        else if (string.IsNullOrEmpty(Title))
+        {
+            var text = $"Page: {Name} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
+            text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
+            Title = text;
+        }
+        return Title;
+    }
+
     public async Task DrawPageName(Canvas2DContext ctx)
     {
         await ctx.SaveAsync();
-        var text = $"Page: {Name} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
-        text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
-
 
         //Draw the page name at the top
         await ctx.SetFontAsync("16px Segoe UI");
@@ -530,7 +542,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync(text, PinX + 5, PinY + 5);
+        await ctx.FillTextAsync(Title, PinX + 5, PinY + 5);
         await ctx.RestoreAsync();
     }
 
