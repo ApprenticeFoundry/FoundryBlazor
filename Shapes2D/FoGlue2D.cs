@@ -39,7 +39,6 @@ public class FoGlue2D : FoBase
     public bool MarkSelected(bool value)
     {
         return (Source?.MarkSelected(value)) != null;
-
     }
 
     public FoGlue2D GlueTo(IGlueOwner source, FoGlyph2D target, FoGlyph2D body) 

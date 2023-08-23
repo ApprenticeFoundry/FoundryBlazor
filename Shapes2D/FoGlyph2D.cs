@@ -260,6 +260,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     {
         if (Selectable)
             this.IsSelected = value;
+        else
+            $"Shape {Name} is not selectable".WriteNote();
         return this;
     }
 
