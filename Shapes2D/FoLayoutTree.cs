@@ -106,9 +106,14 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         rect.Inflate(5 * level, 5 * level);
         await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
 
-        _children?.ForEach(async item => await item.RenderLayoutTree(ctx,tick));
+        _children?.ForEach(async item => await item.RenderLayoutTree(ctx, tick));
 
         await ctx.RestoreAsync();
+    }
+
+    public FoLayoutTree<V>? GetParent()
+    {
+        return _parent;
     }
 
     public void SetParent(FoLayoutTree<V> node)
@@ -149,13 +154,13 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     {
         if (string.IsNullOrEmpty(name)) return null;
 
-        if ( _item.Name == name) return this;
-        
-        if ( _children != null) 
+        if (_item.Name == name) return this;
+
+        if (_children != null)
             foreach (var child in _children)
             {
                 var found = child.FindNodeWithName(name);
-                if ( found != null) return found;
+                if (found != null) return found;
             }
 
         return null;
@@ -163,16 +168,27 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     public FoLayoutTree<V>? FindNodeWithGuid(string guid)
     {
-        if ( GetGlyphId() == guid) return this;
-        
-        if ( _children != null) 
+        if (GetGlyphId() == guid) return this;
+
+        if (_children != null)
             foreach (var child in _children)
             {
                 var found = child.FindNodeWithGuid(guid);
-                if ( found != null) return found;
+                if (found != null) return found;
             }
 
         return null;
+    }
+
+    public void RemoveChild(FoLayoutTree<V> target)
+    {
+        if (_children == null) return;
+        var found = _children.Find((item) => item == target);
+        if (found != null)
+        {
+            found._parent = null;
+            _children.Remove(found);
+        }
     }
 
     public FoLayoutTree<V>? PurgeChildren()
@@ -189,7 +205,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     public FoLayoutTree<V> FindRoot(FoLayoutTree<V> node)
     {
         var found = node;
-        while ( found._parent != null)
+        while (found._parent != null)
             found = found._parent;
 
         return found;
@@ -240,30 +256,30 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             if (glueStart.Matches("TOP") || glueStart.Matches("BOTTOM"))
             {
                 if (FoShape1D.HasNoGlue(shape, "TOP"))
-                {                    
+                {
                     shape1D.GlueStartTo(parent, "BOTTOM");
                     shape1D.GlueFinishTo(shape, "TOP");
                 }
             }
-            else if ( glueStart.Matches("LEFT") || glueStart.Matches("RIGHT"))
+            else if (glueStart.Matches("LEFT") || glueStart.Matches("RIGHT"))
             {
                 if (FoShape1D.HasNoGlue(shape, "LEFT"))
                 {
                     shape1D.GlueStartTo(parent, "RIGHT");
                     shape1D.GlueFinishTo(shape, "LEFT");
                 }
-            } 
-            else  
+            }
+            else
             {
                 shape1D.GlueStartTo(parent);
-                shape1D.GlueFinishTo(shape);              
+                shape1D.GlueFinishTo(shape);
             }
 
             child.ConnectParentChildShapeTree<U>(pageManager, glueStart, styleList);
         });
 
     }
-    public void LayoutConnections<U>(IPageManagement pageManager,string glueStart, List<LineLayoutStyle> rules) where U : FoConnector1D
+    public void LayoutConnections<U>(IPageManagement pageManager, string glueStart, List<LineLayoutStyle> rules) where U : FoConnector1D
     {
         this.ConnectParentChildShapeTree<U>(pageManager, glueStart, rules);
     }
@@ -292,14 +308,14 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.VerticalLayout);
     }
 
-    public void Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules=null)
+    public void Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules = null)
     {
         var point = new Point(PinX, PinY);
-        this.ComputeNodeBranchSize(margin,rules);
-        this.ComputeNodeBranchLocation(point, margin,rules);
+        this.ComputeNodeBranchSize(margin, rules);
+        this.ComputeNodeBranchLocation(point, margin, rules);
     }
 
-    public void ComputeNodeBranchSize(Point margin, List<BoxLayoutStyle>? styleList=null)
+    public void ComputeNodeBranchSize(Point margin, List<BoxLayoutStyle>? styleList = null)
     {
         if (!_item.IsVisible)
         {
@@ -307,7 +323,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             return;
         }
 
-        if ( styleList != null ) 
+        if (styleList != null)
         {
             if (this.level >= styleList.Count) return;
             _layoutStyle = styleList[this.level];
@@ -364,7 +380,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     private static Point Relocate(Point pt, V shape)
     {
-                //return new Point(pt.X, pt.Y);
+        //return new Point(pt.X, pt.Y);
         //return new Point(pt.X , pt.Y + shape.LocPinY(shape));
         return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
     }
@@ -373,7 +389,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     {
         if (!_item.IsVisible) return;
 
-        if ( styleList != null ) 
+        if (styleList != null)
         {
             if (this.level >= styleList.Count) return;
             _layoutStyle = styleList[this.level];
@@ -414,7 +430,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             halfHeight = _branchSize.Height / 2;
             stepY = pt.Y - halfHeight;
             _branchULPoint = new Point(pt.X, stepY);
-            shape.MoveTo(loc.X, loc.Y- shape.LocPinY(shape));
+            shape.MoveTo(loc.X, loc.Y - shape.LocPinY(shape));
         }
         else if (_layoutStyle == BoxLayoutStyle.HorizontalStacked)
         {
@@ -436,11 +452,11 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             stepX = pt.X + margin.X;
             stepY = pt.Y - halfHeight;
             _branchULPoint = new Point(pt.X, stepY);
-            shape.MoveTo(loc.X, loc.Y- shape.LocPinY(shape));
+            shape.MoveTo(loc.X, loc.Y - shape.LocPinY(shape));
         }
 
         // shape.AnimatedMoveTo(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape), 2.0F, delay);
-       
+
 
         _children?.ForEach(child =>
         {
@@ -481,17 +497,18 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     public FoLayoutTree<V>? AddChildNode(FoLayoutTree<V>? child)
     {
 
-        if ( child != null)
+        if (child != null)
         {
             this._children ??= new List<FoLayoutTree<V>>();
             this._children.Add(child);
             child._parent = this;
             child.level = level + 1;
             child.index = this._children.Count;
-           //var shape = child.GetShape();
+            //var shape = child.GetShape();
             //var tag = shape.Tag;
             // $"Adding Shape {tag} {shape.Name}".WriteLine(ConsoleColor.Green);
-        } else 
+        }
+        else
         {
             $"Child is empty {child}".WriteSuccess();
         }

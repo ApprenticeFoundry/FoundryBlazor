@@ -8,6 +8,7 @@ public enum SelectionState
     Dropped,
     FirstSelected,
     Reselected,
+    PreDelete
 }
 
 public class SelectionChanged
@@ -66,6 +67,19 @@ public class SelectionChanged
         var result = new SelectionChanged()
         {
             State = SelectionState.Reselected,
+            Selections = list
+        };
+        return result;
+    }
+
+    public static SelectionChanged PreDelete(List<FoGlyph2D> selections)
+    {
+        Console.WriteLine("SelectionChanged PreDelete");
+        var list = new List<FoGlyph2D>();
+        list.AddRange(selections);
+        var result = new SelectionChanged()
+        {
+            State = SelectionState.PreDelete,
             Selections = list
         };
         return result;
