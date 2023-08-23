@@ -12,6 +12,7 @@ public interface ISelectionService
     void MouseDropped();
     void MouseFirstSelected();
     void MouseStartDrag();
+    void MousePreDelete();
     void MouseReselect();
     ISelectionService MoveTo(int x, int y);
     ISelectionService MoveBy(int dx, int dy);
@@ -82,6 +83,12 @@ public class SelectionService : ISelectionService
     {
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.StartDrag(Members));
+    }
+    public void MousePreDelete()
+    {
+        Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
+        if (Members.Count > 0)
+            PubSub.Publish<SelectionChanged>(SelectionChanged.PreDelete(Members));
     }
     public void MouseReselect()
     {
