@@ -45,11 +45,10 @@ public class SelectionService : ISelectionService
     public ISelectionService ClearAll()
     {
         //"ClearAll".WriteLine(ConsoleColor.Green);
-        // PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
-        PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(new List<FoGlyph2D>()));
+        PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
 
-        // Members.ForEach(item => item.MarkSelected(false));
-        // Members.Clear();
+        Members.ForEach(item => item.MarkSelected(false));
+        Members.Clear();
         return this;
     }
 
