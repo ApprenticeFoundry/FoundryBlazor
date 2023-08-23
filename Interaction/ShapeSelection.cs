@@ -22,16 +22,16 @@ public class ShapeSelection : ShapeHovering
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
         return true;
-    }  
+    }
 
     public override void Abort()
-    {     
+    {
         isFenceSelecting = false;
     }
 
@@ -56,17 +56,17 @@ public class ShapeSelection : ShapeHovering
         isFenceSelecting = false;
         var mustClear = args.ShiftKey == false;
 
-        
+
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
 
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
-        
-        selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); 
-        if ( hitShape != null) 
+
+        selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault();
+        if (hitShape != null)
         {
-            if ( !hitShape.IsSelected )
+            if (!hitShape.IsSelected)
             {
                 selectionService?.ClearAllWhen(mustClear);
                 selectionService?.AddItem(hitShape);
@@ -75,10 +75,15 @@ public class ShapeSelection : ShapeHovering
                 drawing.SetInteraction(InteractionStyle.ShapeDragging);
                 var interact = drawing.GetInteraction();
                 interact.MouseDown(args);
-            } else  {
+                selectionService?.MouseFirstSelected();
+            }
+            else
+            {
                 selectionService?.MouseReselect();
             }
-        } else {
+        }
+        else
+        {
 
             isFenceSelecting = true;
             selectionService?.ClearAllWhen(mustClear);
@@ -102,12 +107,12 @@ public class ShapeSelection : ShapeHovering
             {
                 //anything that intersects
                 //selectionService?.AddRange(findings);
-                
+
                 //only findings that are totally inside the fence
                 foreach (var item in findings)
                 {
-                    if ( dragArea.Contains(item.Rect()) )
-                        selectionService?.AddItem(item);  
+                    if (dragArea.Contains(item.Rect()))
+                        selectionService?.AddItem(item);
                 }
             }
         }
@@ -124,7 +129,7 @@ public class ShapeSelection : ShapeHovering
         {
             dragArea = panZoomService.HitRectContinue(args, dragArea);
         }
-        else if ( selectionService.Selections().Count > 0 )
+        else if (selectionService.Selections().Count > 0)
         {
             dragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.Movement();

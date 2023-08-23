@@ -6,6 +6,7 @@ public enum SelectionState
     Cleared,
     Changed,
     Dropped,
+    FirstSelected,
     Reselected,
 }
 
@@ -46,6 +47,18 @@ public class SelectionChanged
         };
         return result;
     }
+    public static SelectionChanged FirstSelected(List<FoGlyph2D> selections)
+    {
+        var list = new List<FoGlyph2D>();
+        list.AddRange(selections);
+        var result = new SelectionChanged()
+        {
+            State = SelectionState.FirstSelected,
+            Selections = list
+        };
+        return result;
+    }
+
     public static SelectionChanged Reselected(List<FoGlyph2D> selections)
     {
         var list = new List<FoGlyph2D>();

@@ -10,6 +10,7 @@ public interface ISelectionService
     FoGlyph2D AddItem(FoGlyph2D item);
     List<FoGlyph2D> AddRange(List<FoGlyph2D> list);
     void MouseDropped();
+    void MouseFirstSelected();
     void MouseReselect();
     ISelectionService MoveTo(int x, int y);
     ISelectionService MoveBy(int dx, int dy);
@@ -36,7 +37,7 @@ public class SelectionService : ISelectionService
     public ISelectionService ClearAllWhen(bool apply)
     {
         //"ClearAllWhen".WriteLine(ConsoleColor.Green);   
-        if ( apply ) ClearAll();
+        if (apply) ClearAll();
         return this;
     }
 
@@ -52,7 +53,8 @@ public class SelectionService : ISelectionService
 
     public List<FoGlyph2D> AddRange(List<FoGlyph2D> list)
     {
-        list.ForEach(item => {
+        list.ForEach(item =>
+        {
             item.MarkSelected(true);
             if (Members.IndexOf(item) == -1)
                 Members.Add(item);
@@ -70,14 +72,19 @@ public class SelectionService : ISelectionService
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
+    public void MouseFirstSelected()
+    {
+        if (Members.Count > 0)
+            PubSub.Publish<SelectionChanged>(SelectionChanged.FirstSelected(Members));
+    }
     public void MouseReselect()
     {
-        if ( Members.Count > 0)
+        if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Reselected(Members));
     }
     public void MouseDropped()
     {
-        if ( Members.Count > 0)
+        if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
     }
 
