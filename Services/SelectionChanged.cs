@@ -8,6 +8,7 @@ public enum SelectionState
     Dropped,
     FirstSelected,
     Reselected,
+    StartDrag,
 }
 
 public class SelectionChanged
@@ -54,6 +55,18 @@ public class SelectionChanged
         var result = new SelectionChanged()
         {
             State = SelectionState.FirstSelected,
+            Selections = list
+        };
+        return result;
+    }
+
+    public static SelectionChanged StartDrag(List<FoGlyph2D> selections)
+    {
+        var list = new List<FoGlyph2D>();
+        list.AddRange(selections);
+        var result = new SelectionChanged()
+        {
+            State = SelectionState.StartDrag,
             Selections = list
         };
         return result;

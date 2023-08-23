@@ -46,7 +46,7 @@ public class ShapeDragging : ShapeHovering
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
         if ( selectedShape != null ) 
         {
-            selectionService.MouseReselect();
+            selectionService.MouseStartDrag();
         }       
 
         if (selectedShape != null)
@@ -56,7 +56,7 @@ public class ShapeDragging : ShapeHovering
         else if ( hitShape != null && !hitShape.IsSelected )
         {
             selectionService.ClearAll();
-            selectionService?.AddItem(hitShape);
+            selectionService.AddItem(hitShape);
             isDraggingShapes = true;
         } 
         else {

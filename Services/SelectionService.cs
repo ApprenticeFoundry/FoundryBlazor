@@ -11,6 +11,7 @@ public interface ISelectionService
     List<FoGlyph2D> AddRange(List<FoGlyph2D> list);
     void MouseDropped();
     void MouseFirstSelected();
+    void MouseStartDrag();
     void MouseReselect();
     ISelectionService MoveTo(int x, int y);
     ISelectionService MoveBy(int dx, int dy);
@@ -76,6 +77,11 @@ public class SelectionService : ISelectionService
     {
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.FirstSelected(Members));
+    }
+    public void MouseStartDrag()
+    {
+        if (Members.Count > 0)
+            PubSub.Publish<SelectionChanged>(SelectionChanged.StartDrag(Members));
     }
     public void MouseReselect()
     {

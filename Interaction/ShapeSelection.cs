@@ -2,7 +2,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
-
+using FoundryBlazor.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -51,7 +51,7 @@ public class ShapeSelection : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
+        $"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
 
         isFenceSelecting = false;
         var mustClear = args.ShiftKey == false;
@@ -70,12 +70,12 @@ public class ShapeSelection : ShapeHovering
             {
                 selectionService?.ClearAllWhen(mustClear);
                 selectionService?.AddItem(hitShape);
+                selectionService?.MouseFirstSelected();
 
                 //Restart this interaction in Drag Shape mode
                 drawing.SetInteraction(InteractionStyle.ShapeDragging);
                 var interact = drawing.GetInteraction();
                 interact.MouseDown(args);
-                selectionService?.MouseFirstSelected();
             }
             else
             {
