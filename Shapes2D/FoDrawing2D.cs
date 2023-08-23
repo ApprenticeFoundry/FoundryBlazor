@@ -59,7 +59,7 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-    
+
     public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
@@ -260,10 +260,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
     public List<FoGlyph2D> DeleteSelections()
     {
+        SelectionService?.MousePreDelete();
         return PageManager.DeleteSelections();
     }
     public List<FoGlyph2D> DeleteSelectionsWithAnimations()
     {
+        SelectionService?.MousePreDelete();
         return PageManager.DeleteSelectionsWithAnimations();
     }
     public List<FoGlyph2D> Selections()
@@ -304,7 +306,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PanZoomService.ReadFromPage(page);
         return page;
     }
-    
+
     public void ClearAll()
     {
         CurrentPage().ClearAll();
@@ -521,7 +523,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
-        if ( !ShowStats ) return;
+        if (!ShowStats) return;
 
 
         var offsetY = 60;
