@@ -1,11 +1,11 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
+
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using System.Linq;
+
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -273,7 +273,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         if (string.IsNullOrEmpty(UserID))
         {
-            var data = new MockDataMaker();
+            var data = new MockDataGenerator();
             UserID = data.GenerateName();
         }
         return UserID;
@@ -523,12 +523,12 @@ public class FoWorkspace : FoComponent, IWorkspace
         FoWorkspace.RefreshCommands = true;
     }
 
-    private void DoSave()
+    private async void DoSave()
     {
         var text = "Hello, Saved world!";
         var bytes = System.Text.Encoding.UTF8.GetBytes(text);
 
-        LocalFileSave("HelloWorld.txt", bytes);
+        await LocalFileSave("HelloWorld.txt", bytes);
     }
 
     public void DoPing()

@@ -1,13 +1,11 @@
 using Blazor.Extensions;
-using Blazor.Extensions.Canvas;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
-
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;

@@ -355,7 +355,7 @@ public class FoArena3D : FoGlyph3D, IArena
     }
 
 
-    public void PreRenderShape3D(List<FoShape3D> shapes)
+    public async void PreRenderShape3D(List<FoShape3D> shapes)
     {
 
         var glbBodies = shapes.Where((body) => body.Type.Matches("Glb")).ToList();
@@ -367,13 +367,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
         foreach (var keyValuePair in bodyDict)
         {
-            FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
+            await FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
         }
 
         foreach (var body in otherBodies)
         {
             $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            body.PreRender(this, Viewer3D!);
+            await body.PreRender(this, Viewer3D!);
         };
 
     }
