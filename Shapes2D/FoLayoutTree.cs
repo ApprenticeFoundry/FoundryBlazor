@@ -43,13 +43,23 @@ public static class TreeLayoutRules
         BoxLayoutStyle.Vertical,
     };
 
+    public static List<LineLayoutStyle> VerticalLineLayout { get; set; } = new()
+    {
+        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.VerticalFirst,
+    };
     public static List<LineLayoutStyle> LineLayout { get; set; } = new()
     {
-        LineLayoutStyle.Straight,
-        LineLayoutStyle.Straight,
-        LineLayoutStyle.Straight,
-        LineLayoutStyle.Straight,
-        LineLayoutStyle.VerticalFirst,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
+        LineLayoutStyle.None,
     };
 };
 
@@ -237,6 +247,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         var parent = this.GetShape();
         parent.GetConnectionPoints();
 
+
         if (this.level >= styleList.Count) return;
         var style = styleList[this.level];
         // $"{style} for level {level} ConnectParentChild".WriteLine(ConsoleColor.DarkBlue);
@@ -248,7 +259,8 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             //shape.Tag = $"Node: {child.ComputeName()}";
 
             var shape1D = Activator.CreateInstance<U>();
-            shape1D.Layout = style;
+            if ( shape1D.Layout == LineLayoutStyle.None)
+                shape1D.Layout = style;
 
             pageManager.AddShape<U>(shape1D);
 
