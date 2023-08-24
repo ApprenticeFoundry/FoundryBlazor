@@ -212,6 +212,13 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         return this;
     }
 
+    public FoLayoutTree<V>? FindRoot()
+    {
+        if (_parent == null) return this;
+        _parent?.FindRoot();
+        return null;
+    }
+
     public FoLayoutTree<V> FindRoot(FoLayoutTree<V> node)
     {
         var found = node;
@@ -259,7 +266,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
             //shape.Tag = $"Node: {child.ComputeName()}";
 
             var shape1D = Activator.CreateInstance<U>();
-            if ( shape1D.Layout == LineLayoutStyle.None)
+            if (shape1D.Layout == LineLayoutStyle.None)
                 shape1D.Layout = style;
 
             pageManager.AddShape<U>(shape1D);
