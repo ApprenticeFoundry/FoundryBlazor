@@ -6,10 +6,7 @@ namespace FoundryBlazor.Shape;
 
 public class FoConnector1D : FoShape1D, IShape1D
 {
-
-
     public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
-
 
     public Action<Canvas2DContext, FoConnector1D> DrawHorizontalFirst = async (ctx, obj) =>
     {
@@ -57,6 +54,7 @@ public class FoConnector1D : FoShape1D, IShape1D
         {
             var color = this.Color;
             var thick = this.Thickness;
+
            // this.Color = "Yellow";
             this.Thickness = 10;
             await ctx.SetLineDashAsync(new float[] { 10, 10 });
@@ -98,10 +96,6 @@ public class FoConnector1D : FoShape1D, IShape1D
             DrawVerticalFirst.Invoke(ctx, this);
         else if (Layout == LineLayoutStyle.Straight)
             await DrawStraight(ctx, Color, tick);
-
-        // await ctx.SetStrokeStyleAsync("Yellow");
-        // await ctx.SetLineWidthAsync(1);
-        // await ctx.StrokeRectAsync(0, 0, Width, Height);
 
         //await DrawTruePin(ctx);
         await ctx.RestoreAsync();
