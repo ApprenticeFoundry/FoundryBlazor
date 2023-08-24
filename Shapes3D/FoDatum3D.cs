@@ -1,5 +1,5 @@
 using BlazorThreeJS.Maths;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Shape;
 public class FoDatum3D : FoGlyph3D

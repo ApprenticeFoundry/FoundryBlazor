@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
-    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
+    <ProjectReference Include="..\FoundryRulesAndUnits\FoundryRulesAndUnits.csproj" />
     <!-- <ProjectReference Include="..\BlazorExtensionsCanvas\src\Blazor.Extensions.Canvas\Blazor.Extensions.Canvas.csproj" /> -->
   </ItemGroup>
 </Project>

@@ -7,8 +7,8 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -138,33 +138,33 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-    public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
-    {
-        var name = Path.GetFileNameWithoutExtension(filename);
+    //public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    //{
+    //    var name = Path.GetFileNameWithoutExtension(filename);
 
 
-        var world3D = new UDTO_World();
-        var data = new MockDataMaker();
-        var url = Path.Join(baseURL, folder, filename);
+    //    var world3D = new UDTO_World();
+    //    var data = new MockDataMaker();
+    //    var url = Path.Join(baseURL, folder, filename);
 
-        var root = new DT_Hero();
+    //    var root = new DT_Hero();
 
-        for (int i = 0; i < count; i++)
-        {
-            root.name = $"{name}-{i}";
-            var shape = world3D.CreateGlb(root, url, 1, 2, 3);
-            shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
-            shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
-        };
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        root.name = $"{name}-{i}";
+    //        var shape = world3D.CreateGlb(root, url, 1, 2, 3);
+    //        shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
+    //        shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
+    //    };
 
 
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
+    //    var world = new FoWorld3D(world3D);
+    //    RenderWorld3D(world);
 
-        //PostRenderplatform
+    //    //PostRenderplatform
 
-        return world;
-    }
+    //    return world;
+    //}
 
 
 

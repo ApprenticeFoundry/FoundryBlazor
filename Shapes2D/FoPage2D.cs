@@ -4,7 +4,8 @@ using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Units;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Units;
 using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shape;

@@ -1,10 +1,10 @@
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
+
 using FoundryBlazor.Message;
 using FoundryBlazor.Persistence;
 using FoundryBlazor.Shared;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 

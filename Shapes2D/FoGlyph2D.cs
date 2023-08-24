@@ -1,7 +1,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using Unglide;

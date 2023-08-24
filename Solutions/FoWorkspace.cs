@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Solutions;
 

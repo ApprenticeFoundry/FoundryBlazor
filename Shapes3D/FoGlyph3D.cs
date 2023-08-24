@@ -3,7 +3,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 
 
 namespace FoundryBlazor.Shape;

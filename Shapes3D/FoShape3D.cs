@@ -9,8 +9,7 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
-using Radzen.Blazor.Rendering;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 

@@ -1,7 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 

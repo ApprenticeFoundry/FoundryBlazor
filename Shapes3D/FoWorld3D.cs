@@ -1,9 +1,6 @@
 // this is a tool to load/unload knowledge modules that define projects
 
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Settings;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -24,10 +21,71 @@ public class FoWorld3D : FoGlyph3D
         GetSlot<FoRelationship3D>();
     }
 
-    public FoWorld3D(UDTO_World source) : this()
-    {
-        FillFromUDTOWorld(source);
-    }
+    //public FoWorld3D(UDTO_World source) : this()
+    //{
+    //    FillFromUDTOWorld(source);
+    //}
+
+    //public FoWorld3D FillFromUDTOWorld(UDTO_World world)
+    //{
+    //    world.platforms.ForEach(item =>
+    //    {
+    //        var group = new FoGroup3D()
+    //        {
+    //            PlatformName = item.platformName,
+    //            GlyphId = item.uniqueGuid,
+    //            Name = item.name,
+    //        };
+    //        Slot<FoGroup3D>().Add(group);
+    //    });
+
+    //    world.bodies.ForEach(item =>
+    //    {
+    //        var pos = item.position;
+    //        var box = item.boundingBox;
+    //        var shape3D = new FoShape3D()
+    //        {
+    //            PlatformName = item.platformName,
+    //            GlyphId = item.uniqueGuid,
+    //            Name = item.name,
+    //            Address = item.address,
+    //            Symbol = item.symbol,
+    //            Type = item.type,
+    //            Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
+    //            Position = pos?.LocAsVector3(),
+    //            Rotation = pos?.AngAsVector3(),
+    //            BoundingBox = box?.BoxAsVector3(),
+    //            Scale = box?.ScaleAsVector3(),
+    //            Pivot = box?.PinAsVector3(),
+    //        };
+    //        Slot<FoShape3D>().Add(shape3D);
+    //        //$"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
+    //        if (item.subSystem != null)
+    //        {
+    //            shape3D.Targets = item.subSystem.Targets();
+    //        }
+
+    //    });
+
+    //    world.labels.ForEach(item =>
+    //    {
+    //        var pos = item.position;
+    //        var text3D = new FoText3D()
+    //        {
+    //            PlatformName = item.platformName,
+    //            GlyphId = item.uniqueGuid,
+    //            Name = item.name,
+    //            Address = item.address,
+    //            Position = pos?.LocAsVector3(),
+    //            Text = item.text,
+    //            Details = item.details
+    //        };
+    //        Slot<FoText3D>().Add(text3D);
+    //    });
+
+    //    return this;
+    //}
+
 
     public List<FoGroup3D>? ShapeGroups()
     {
@@ -61,65 +119,6 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoRelationship3D>();
     }
 
-    public FoWorld3D FillFromUDTOWorld(UDTO_World world)
-    {
-        world.platforms.ForEach(item =>
-        {
-            var group = new FoGroup3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-            };
-            Slot<FoGroup3D>().Add(group);
-        });
-
-        world.bodies.ForEach(item =>
-        {
-            var pos = item.position;
-            var box = item.boundingBox;
-            var shape3D = new FoShape3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Symbol = item.symbol,
-                Type = item.type,
-                Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
-                Position = pos?.LocAsVector3(),
-                Rotation = pos?.AngAsVector3(),
-                BoundingBox = box?.BoxAsVector3(),
-                Scale = box?.ScaleAsVector3(),
-                Pivot = box?.PinAsVector3(),
-            };
-            Slot<FoShape3D>().Add(shape3D);
-            //$"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
-            if (item.subSystem != null)
-            {
-                shape3D.Targets = item.subSystem.Targets();
-            }
-
-        });
-
-        world.labels.ForEach(item =>
-        {
-            var pos = item.position;
-            var text3D = new FoText3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Position = pos?.LocAsVector3(),
-                Text = item.text,
-                Details = item.details
-            };
-            Slot<FoText3D>().Add(text3D);
-        });
-
-        return this;
-    }
 
     //public static string GetColor(DT_Target model)
     //{
@@ -137,37 +136,6 @@ public class FoWorld3D : FoGlyph3D
     //}
 
 
-    //assume the units are in meters
-    public static void LayoutSystemInSwinlanes(DT_System system, int dx = 0, int dy = 0, int dz = 0)
-    {
-        if (system == null) return;
-
-
-        var targets = system.Targets().OrderBy(item => item.linkCount).ToList();
-        var dict = targets.GroupBy(item => item.domain).ToDictionary(item => item.Key, item => item.ToList());
-
-        var order = new List<string>() { "WRLD", "PIN", "DOC", "PROC", "CAD", "ASST" };
-
-        //set the target locations here 
-        var x = 0;
-        var y = 0;
-        var z = 0;
-        foreach (var item in order)
-        {
-            if (dict.ContainsKey(item))
-            {
-                y = 2;
-                foreach (var target in dict[item])
-                {
-                    target.x = x + dx;
-                    target.y = y + dy;
-                    target.z = z + dz;
-                    y += 2;
-                }
-                x += 3;
-            }
-        }
-    }
 
     public FoWorld3D RemoveDuplicates()
     {
