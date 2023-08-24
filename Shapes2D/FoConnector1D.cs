@@ -106,21 +106,18 @@ public class FoConnector1D : FoShape1D, IShape1D
         if (_matrix == null)
         {
             RecomputeGlue();
-            // var dx = (double)(x2 - x1);
-            // var dy = (double)(y2 - y1);
+
             x = (x2 + x1) / 2;  //compute PinX in center
             y = (y2 + y1) / 2; //compute PinY in center
-            // width = (int)Math.Sqrt(dx * dx + dy * dy); //compute the length
-            // rotation = 0;
 
-            //$"Shape1D GetMatrix {PinX} {PinY} {angle}".WriteError();
+            //$"FoConnector1D GetMatrix {PinX} {PinY} {angle}".WriteError();
             _matrix = Matrix2D.NewMatrix();
             if (_matrix != null)
             {
                 _matrix.AppendTransform(x1, y1, 1.0, 1.0, 0, LocPinX(this), LocPinY(this));
             }
             else
-                "GetMatrix Shape1D here is IMPOSSABLE".WriteError();
+                "GetMatrix FoConnector1D here is IMPOSSABLE".WriteError();
 
             //FoGlyph2D.ResetHitTesting = true;
             //$"GetMatrix  {Name}".WriteLine(ConsoleColor.DarkBlue);

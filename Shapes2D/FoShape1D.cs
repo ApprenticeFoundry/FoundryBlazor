@@ -383,10 +383,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
-        await Draw(ctx, tick);
-
         if (!IsSelected)
+        {
+            await Draw(ctx, tick);
             HoverDraw?.Invoke(ctx, this);
+        }
 
         await DrawTag(ctx);
 
