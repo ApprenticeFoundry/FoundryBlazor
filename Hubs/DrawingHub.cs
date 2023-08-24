@@ -1,5 +1,6 @@
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FoundryBlazor.Solutions;

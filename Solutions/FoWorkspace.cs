@@ -14,6 +14,7 @@ using Microsoft.JSInterop;
 using Radzen;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Solutions;
 

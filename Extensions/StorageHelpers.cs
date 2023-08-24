@@ -46,7 +46,7 @@ public static class StorageHelpers
     public static string GetMIMEType(this string fileName)
     {
         var provider = StorageHelpers.MIMETypeProvider();
-        if (!provider.TryGetContentType(fileName, out string contentType))
+        if (!provider.TryGetContentType(fileName, out string? contentType))
         {
             contentType = "application/octet-stream";
         }

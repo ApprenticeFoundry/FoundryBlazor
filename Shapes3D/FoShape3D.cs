@@ -10,6 +10,7 @@ using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Shape;
 

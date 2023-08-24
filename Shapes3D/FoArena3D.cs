@@ -9,6 +9,7 @@ using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
+using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -32,7 +33,7 @@ public interface IArena
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
-    FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
+    //FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
