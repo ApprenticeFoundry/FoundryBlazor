@@ -1,7 +1,7 @@
 
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using IoBTMessage.Models;
+using System.Drawing;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -12,76 +12,69 @@ public interface IHitTestService
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
-    Task RenderTree(Canvas2DContext ctx);
+    Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
+    void SetRectangle(Rectangle rect);
 }
 
 public class HitTestService : IHitTestService
 {
-    private FoPage2D Page { get; set; } 
+    private FoPage2D Page { get; set; }
     private QuadTree<FoGlyph2D> Tree { get; set; }
 
     private readonly List<Rectangle> PreviousSearches = new();
-    private readonly IScaledDrawingHelpers _helper;
     private readonly IPanZoomService _panzoom;
-    public HitTestService(IScaledDrawingHelpers helper, IPanZoomService panzoom)
-    {
-        _helper = helper;
-        _panzoom = panzoom;
-        Page = new FoPage2D("dummy","White");
-        Tree = new QuadTree<FoGlyph2D>(Rect());
-    }  
+    private Rectangle Rect = new(0, 0, 100, 100);
 
-    public Rectangle Rect()
+    public HitTestService(IPanZoomService panzoom)
     {
-        //make sure any shape on the canvas is in the hittest
-        var canvas = _helper.Rect();
-        canvas = _panzoom.AntiScaleRect(canvas);
-        return canvas;
+        _panzoom = panzoom;
+        Page = new FoPage2D("dummy", "White");
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
     }
+
+    public void SetRectangle(Rectangle rect)
+    {
+        Rect.X = rect.X;
+        Rect.Y = rect.Y;
+        Rect.Width = rect.Width;
+        Rect.Height = rect.Height;
+
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
+
+    }
+
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
         Page = page;
-        Tree = new QuadTree<FoGlyph2D>(Rect());
 
-        //Page.GetMembers<FoShape1D>()?.ForEach(child => Tree.Insert(child));
-        //Page.GetMembers<FoConnector1D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoGroup2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoShape2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoHero2D>()?.ForEach(child => Tree.Insert(child));
+        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
 
-        Page.GetMembers<FoText2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoImage2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoVideo2D>()?.ForEach(child => Tree.Insert(child));
+        Page.InsertShapesToQuadTree(Tree, _panzoom);
 
-        Page.GetMembers<FoCompound2D>()?.ForEach(child => Tree.Insert(child));
-        Page.GetMembers<FoDragTarget2D>()?.ForEach(child => Tree.Insert(child));
-
-        // Page.Members<FoButton2D>().ForEach(child => Tree.Insert(child));
-        //Page.Members<FoMenu2D>().ForEach(child => Tree.Insert(child));
-
-        //$"Refresh Tree {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
         return AllShapesEverywhere();
     }
 
     public bool InsertRange(List<FoGlyph2D> list)
     {
-        if ( Tree != null)
-            list.ForEach(child => Tree.Insert(child));
+        if (Tree != null)
+            list.ForEach(child => Tree.Insert(child, child.Rect()));
         return Tree != null;
     }
 
     public bool Insert(FoGlyph2D glyph)
     {
-        Tree?.Insert(glyph);
+        Tree?.Insert(glyph, glyph.Rect());
         return Tree != null;
     }
 
     public List<FoGlyph2D> FindGlyph(Rectangle rect)
     {
-        if ( PreviousSearches.Count > 10)
-        {
+        if (PreviousSearches.Count > 10)
             PreviousSearches.RemoveRange(0, 6);
-        }
+
         PreviousSearches.Add(rect);
         //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 
@@ -103,25 +96,29 @@ public class HitTestService : IHitTestService
         return list;
     }
 
-    public async Task RenderTree(Canvas2DContext ctx)
+    public async Task RenderQuadTree(Canvas2DContext ctx, bool showTracks)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
         await ctx.SaveAsync();
 
-        await ctx.SetLineWidthAsync(4);
+        await ctx.SetLineWidthAsync(2);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
-        await ctx.SetStrokeStyleAsync("Cyan");
-        await Tree.Render(ctx, true);
 
-        await ctx.SetLineWidthAsync(1);
-        await ctx.SetLineDashAsync(Array.Empty<float>());
-        await ctx.SetStrokeStyleAsync("Blue");
-        PreviousSearches.ForEach(async rect =>
+        await Tree.DrawQuadTree(ctx, false);
+
+        if (showTracks)
         {
-            //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
-            await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
-        });
+            await ctx.SetLineWidthAsync(1);
+            await ctx.SetLineDashAsync(Array.Empty<float>());
+            await ctx.SetStrokeStyleAsync("Blue");
+
+            PreviousSearches.ForEach(async rect =>
+            {
+                //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+                await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+            });
+        }
 
         await ctx.RestoreAsync();
     }

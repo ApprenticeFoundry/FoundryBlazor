@@ -1,29 +1,66 @@
-
-using System.Collections.Generic;
-using System.Linq;
-using IoBTMessage.Models;
+using FoundryBlazor.Extensions;
+using Newtonsoft.Json.Linq;
 
 namespace FoundryBlazor;
 
+public interface IFoCollection
+{
+    int Count();
+    string GetName();
+    string NextItemName();
+    List<string> Keys();
+    List<U> ValuesOfType<U>();
+    bool AddObject(string key, object value);
+}
+
 [System.Serializable]
-public class FoCollection<T> where T : FoBase
+public class FoCollection<T>: IFoCollection where T : FoBase
 {
     public string Key { get; set; }
+
     private readonly Dictionary<string, T> members = new();
+
+    public string GetName()
+    {
+        return Key;
+    }
+
+    public string NextItemName()
+    {
+        return  $"{Key}-{members.Count}";
+    }
+
+
+    public bool AddObject(string key, object value)
+    {
+
+        if (!TryGetValue(key, out T? found) || found == null)
+        {
+            this.members.Add(key, (T)value);
+            return true;
+        }
+        return false;
+    }
 
     public FoCollection()
     {
         Key = typeof(T).Name;
     }
-
+    public int Count()
+    {
+        return this.members.Keys.Count;
+    }
     public List<string> Keys()
     {
         return this.members.Keys.ToList();
     }
-
     public List<T> Values()
     {
         return this.members.Values.ToList<T>();
+    }
+    public List<U> ValuesOfType<U>()
+    {
+        return this.members.Values.Where(item => item is U || item.GetType().IsSubclassOf(typeof(U)) ).Cast<U>().ToList();
     }
     public T? GetValue(string key)
     {
@@ -31,7 +68,6 @@ public class FoCollection<T> where T : FoBase
             return value;
         return null;
     }
-
     public bool TryGetValue(string key, out T? found)
     {
         found = null;
@@ -43,16 +79,14 @@ public class FoCollection<T> where T : FoBase
     {
         list.ForEach(item => Add(item));
         return list;
-    }
-    
+    } 
     public T Add(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = $"{typeof(T).Name}-{this.members.Count}";
+            value.Name = NextItemName();
         }
         return this.Add(value.Name, value);
     }
-
     public T Add(string key, T value)
     {
         if (!TryGetValue(key, out T? found) || found == null)
@@ -61,11 +95,10 @@ public class FoCollection<T> where T : FoBase
         }
         return value;
     }
-
     public T Remove(T value)
     {
         if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = $"{typeof(T).Name}-{this.members.Count}";
+            value.Name = NextItemName();
         }
         return this.Remove(value.Name, value);
     }
@@ -78,7 +111,6 @@ public class FoCollection<T> where T : FoBase
         }
         return false;
     }
-
     public T Remove(string key, T value)
     {
         if (TryGetValue(key, out T? found) && found != null)
@@ -87,22 +119,38 @@ public class FoCollection<T> where T : FoBase
         }
         return value;
     }
-
+    public List<T> ForEach(Action<T> applyClause)
+    {
+        var list = Values();
+        list.ForEach(applyClause);
+        return list;
+    }
     public List<T> ExtractWhere(Func<T,bool> whereClause)
     {
         var extraction = FindWhere(whereClause);
         extraction.ForEach(item => this.members.Remove(item.Name));
         return extraction;
     }
-
     public List<T> FindWhere(Func<T,bool> whereClause)
     {
-        var extraction = Values().Where(item => whereClause(item)).ToList();
+        var list = Values();
+        var extraction = list.Where(item => whereClause(item)).ToList();
+        // foreach (var item in list)
+        // {
+        //     $"FindWhere {item.Name} whereClause = {whereClause(item)}".WriteInfo();
+        // }
         return extraction;
     }
-
-    public void Flush()
+    public void Clear()
     {
         members.Clear();
     }
+    public FoCollection<T> Flush()
+    {
+        Clear();
+        return this;
+    }
+
+
+
 }

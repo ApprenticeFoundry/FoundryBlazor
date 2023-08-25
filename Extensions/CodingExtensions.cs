@@ -1,19 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using IoBTMessage.Extensions;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Web;
 
 
 namespace FoundryBlazor.Extensions
 {
 
-	public static class CodingExtensions
+    public static class CodingHelpers
 	{
 
 		public static String RemoveExtension(this String str)
@@ -48,11 +44,11 @@ namespace FoundryBlazor.Extensions
 			return HttpUtility.UrlEncode(str, e);
 		}
 
-		public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
-		{
-			foreach (T element in source)
-				action(element);
-		}
+		//public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+		//{
+		//	foreach (T element in source)
+		//		action(element);
+		//}
 
 		public static async Task ForEachAsync<T>(this List<T> list, Func<T, Task> func)
 		{
@@ -62,30 +58,6 @@ namespace FoundryBlazor.Extensions
 			}
 		}
 
-		public static string Dehydrate<T>(T target, bool includeFields) where T : class
-		{
-			var options = new JsonSerializerOptions()
-			{
-				IncludeFields = includeFields,
-				IgnoreReadOnlyFields = true,
-				DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-			};
-
-			var result = JsonSerializer.Serialize(target, typeof(T), options);
-			return result;
-		}
-
-		public static string Dehydrate(object target, Type type, bool includeFields) 
-		{	
-			var options = new JsonSerializerOptions()
-			{
-				IncludeFields = includeFields,
-				IgnoreReadOnlyFields = true,
-				DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-			};
-			var result = JsonSerializer.Serialize(target, type, options);
-			return result;
-		}
 
 		public static string EncodeFieldNamesAsCSV(this object source, char d = '\u002C')
 		{

@@ -4,7 +4,7 @@ namespace FoundryBlazor.Shape;
 
 public class FoCommand2D : FoGlyph2D, IFoCommand
 {
-    public FoCommand2D(string name) : base(name,10,10,"Grey")
+    public FoCommand2D(string name) : base(name,10,10,"Red")
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
     }

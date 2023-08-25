@@ -13,6 +13,13 @@ public class FoConnectionPoint2D : FoHandle2D
     {
     }
 
+    public override FoGlyph2D MarkSelected(bool value)
+    {
+        var glue = GetMembers<FoGlue2D>();
+            glue?.ForEach(item => item.MarkSelected(value));
+            
+        return base.MarkSelected(value);
+    }
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {

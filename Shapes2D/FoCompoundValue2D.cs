@@ -3,7 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoCompoundValue2D : FoGlyph2D
+public class FoCompoundValue2D : FoGlyph2D, IShape2D
 {
     private readonly PropertyInfo propInfo;
     public string Text { get; set; } = "";
@@ -71,11 +71,7 @@ public class FoCompoundValue2D : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            GetHandles()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));    
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
 
         await ctx.RestoreAsync();

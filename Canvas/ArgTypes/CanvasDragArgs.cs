@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-
-namespace FoundryBlazor.Canvas
+﻿namespace FoundryBlazor.Canvas
 {
     /// <summary>
     /// Mouse information passed from JavaScript
@@ -9,13 +7,13 @@ namespace FoundryBlazor.Canvas
     //https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer
     //https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types
     //event.dataTransfer.setData("text/plain", "This is text to drag");
-    
-    public class FileTransfer
-    {
-        public string name { get; set; }
-        public long size { get; set; }
-    }
-    
+
+    //public class FileTransfer
+    //{
+    //    public string name { get; set; }
+    //    public long size { get; set; }
+    //}
+
     // public class DataTransfer
     // {
     //     public string dropEffect { get; set; } = "";

@@ -1,14 +1,16 @@
 using Blazor.Extensions.Canvas.Canvas2D;
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
-public class FoText2D : FoGlyph2D
+public class FoText2D : FoShape2D, IShape2D
 {
+    public bool ComputeResize { get; set; } = false;
+
     private string text = "";
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
 
-    private string fontsize = "30";
+    private string fontsize = "20";
     public string FontSize { get { return this.fontsize; } set { this.fontsize = AssignText(value, fontsize); } }
 
     private string font = "Segoe UI";
@@ -16,27 +18,46 @@ public class FoText2D : FoGlyph2D
 
     public string TextColor { get; set; } = "White";
     public bool IsEditing { get; set; } = false;
-    public bool ComputeResize { get; set; } = false;
 
     public int Margin { get; set; } = 2;
     public List<string>? Details { get; set; }
+    public bool AllowResize { get; set; } = false;
 
-    protected string CreateDetails(string text)
+
+    public FoText2D() : base()
     {
-        Details = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-        return text;
+    }
+    public FoText2D(string name) : base(name, "Orange")
+    {
+        Text = name;
+    }
+
+    public FoText2D(int width, int height, string color) : base("", width, height, color)
+    {
+        Text = "Hello Everyone";
+    }
+
+    protected string CreateDetails(string details="")
+    {
+
+        Details = details.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+        return details;
     }
 
     protected string AssignText(string newValue, string oldValue)
     {
         if (newValue != oldValue)
         {
-            //ComputeResize = true;
+            ComputeResize = true;
         }
 
         return newValue;
     }
 
+    public override string GetText()
+    {
+        return Text;
+    }
     public string FontSizeAndName()
     {
         //styles -   normal | italic | oblique | inherit
@@ -61,9 +82,13 @@ public class FoText2D : FoGlyph2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync(TextColor);
-        await ctx.FillTextAsync(Text, LeftX() + 1, TopY() + 1);
+        await ctx.FillTextAsync(Text, LeftX() + 5, TopY() + 5);
 
     }
+
+
+
+
 
     // https://jenkov.com/tutorials/html5-canvas/text.html
 
@@ -88,8 +113,9 @@ public class FoText2D : FoGlyph2D
         await ctx.SaveAsync();
         await ctx.SetFontAsync(FontSizeAndName());
 
-        if (IsEditing || ComputeResize)
-            await ComputeSize(ctx, Text);
+        if (AllowResize)
+            if (IsEditing || ComputeResize)
+                await ComputeSize(ctx, Text);
 
         await UpdateContext(ctx, tick);
 
@@ -99,11 +125,7 @@ public class FoText2D : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            //GetHandles()?.ForEach(async child => await child.Render(ctx, tick, deep));
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
 
         await ctx.RestoreAsync();
@@ -112,18 +134,6 @@ public class FoText2D : FoGlyph2D
 
 
 
-    public FoText2D() : base()
-    {
-    }
-    public FoText2D(string name) : base(name, "Orange")
-    {
-        Text = name;
-    }
-
-    public FoText2D(int width, int height, string color) : base("", width, height, color)
-    {
-        Text = "Hello Everyone";
-    }
 
 
 

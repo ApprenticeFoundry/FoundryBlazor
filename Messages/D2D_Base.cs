@@ -1,14 +1,22 @@
-using System;
-
 namespace FoundryBlazor.Message;
 
 public class D2D_Base
 {
+    public string Topic() 
+    {
+        return D2D_Base.AsTopic(GetType().Name);
+    }
+
+    public static string AsTopic(string name)
+    {
+        return name.Replace("D2D_", "");
+    }
+    
     public string MsgId { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = "";
     public string Type { get; set; } = "";
     public string TimeStamp { get; set; } = "";
-    public string PanID { get; set; } = "";
+    public string UserID { get; set; } = "";
 
     private ControlParameters? _metaData;
 
@@ -26,19 +34,11 @@ public class D2D_Base
         return this.TimeStamp;
     }
 
-    public static string AsTopic(string name)
-    {
-        return name.Replace("D2D_", "");
-    }
+
 
     public static string AsTopic<T>() where T : D2D_Base
     {
         return D2D_Base.AsTopic(typeof(T).Name);
-    }
-
-    public string Topic() 
-    {
-        return D2D_Base.AsTopic(GetType().Name);
     }
 
 

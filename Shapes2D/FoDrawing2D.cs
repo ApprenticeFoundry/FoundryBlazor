@@ -1,18 +1,16 @@
 
-using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using BlazorBoids;
-
 using BlazorComponentBus;
-using FoundryBlazor.Message;
-
-using FoundryBlazor.Solutions;
-using IoBTMessage.Models;
+using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Message;
+using FoundryBlazor.Shared;
+using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Radzen;
-using FoundryBlazor.Canvas;
+using IoBTMessage.Extensions;
+using System.Drawing;
+using IoBTMessage.Units;
 
 namespace FoundryBlazor.Shape;
 
@@ -20,26 +18,30 @@ namespace FoundryBlazor.Shape;
 
 public interface IDrawing : IRender
 {
+    bool SetCurrentlyRendering(bool value, int tick);
+    bool SetCurrentlyProcessing(bool value);
+    void SetCanvasPixelSize(int width, int height);
 
-    void SetCanvasSize(int width, int height);
-    Point InchesToPixelsInset(double width, double height);
+    Size TrueCanvasSize();
+    Rectangle TransformRect(Rectangle rect);
+    void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
-    void CreateMenus(IJSRuntime js, NavigationManager nav);
 
 
+    List<FoPage2D> GetAllPages();
     List<FoImage2D> GetAllImages();
     List<FoVideo2D> GetAllVideos();
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
 
-    FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
+    FoPage2D SetCurrentPage(FoPage2D page);
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
-
+    void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
+    void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
     V AddShape<V>(V shape) where V : FoGlyph2D;
-    FoRealPage2D CurrentPage();
+    FoPage2D CurrentPage();
     IPageManagement Pages();
     List<FoGlyph2D> ExtractShapes(string glyphId);
 
@@ -47,24 +49,35 @@ public interface IDrawing : IRender
     void ToggleHitTestDisplay();
     bool MovePanBy(int dx, int dy);
 
-
+    D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
+    void SetUserID(string panID);
+    void ClearAll();
+    List<FoGlyph2D> Selections();
+    List<FoGlyph2D> DeleteSelections();
+    Rectangle Rect();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
+
+    public bool ShowStats { get; set; } = false;
+    private int TrueCanvasWidth = 0;
+    private int TrueCanvasHeight = 0;
+
+    private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
+
+    private string UserID = "";
     private InputStyle InputStyle = InputStyle.None;
-    public D2D_UserMove? UserLocation { get; set; }
-    public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
+    private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
-    public BoidField? BoidSimulation { get; set; }
-    //public MoSimulation? EdgeSimulation { get; set; }
 
-    private FoPanZoomWindow? _panZoomWindow { get; set; }
-
+    public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
+    public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
-    private IScaledDrawingHelpers ScaleDrawing { get; set; }
+
     private IHitTestService HitTestService { get; set; }
+    private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
     private ISelectionService SelectionService { get; set; }
 
@@ -73,44 +86,109 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public List<FoVideo2D> AllVideos = new();
     private ComponentBus PubSub { get; set; }
 
-
-
-    private readonly Dictionary<InteractionStyle, IBaseInteraction> interactionLookup;
-    private InteractionStyle interactionStyle = InteractionStyle.None;
+    protected readonly List<BaseInteraction> interactionRules;
+    protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
+    protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
     private IBaseInteraction? lastInteraction;
 
 
-    public FoDrawing2D (
+
+
+    //private readonly Stopwatch stopwatch = new();
+    //private int lastTick = 0;
+    private bool IsCurrentlyRendering = false;
+    private bool IsCurrentlyProcessing = false;
+    private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
+
+
+    public override Rectangle Rect()
+    {
+        var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+        return result;
+    }
+
+    public bool SetCurrentlyRendering(bool isRendering, int tick)
+    {
+        var oldValue = IsCurrentlyRendering;
+        // if (isRendering)
+        // {
+        //     stopwatch.Restart();
+        //     lastTick = tick;
+        // }
+
+        if (!isRendering)
+        {
+            // if ( tick == lastTick)
+            // {
+            //     stopwatch.Stop();
+            //     var fps = 1000.0 / stopwatch.ElapsedMilliseconds;
+            //     $"time to render is {stopwatch.ElapsedMilliseconds} ms  FPS: {fps}".WriteInfo();
+            // } else {
+            //     $"skipped a tick {lastTick} {tick}".WriteInfo();
+            // }
+
+            while (MouseArgQueue.Count > 0)
+            {
+                var args = MouseArgQueue.Dequeue();
+                // $"SetCurrentlyRendering is Dequeueing {args.Topic} ".WriteSuccess(2);
+                ApplyMouseArgs(args);
+            }
+        }
+
+        IsCurrentlyRendering = isRendering;
+        return oldValue;
+    }
+
+    public bool SetCurrentlyProcessing(bool isProcessing)
+    {
+        var oldValue = IsCurrentlyProcessing;
+        if (!isProcessing)
+        {
+            while (MouseArgQueue.Count > 0)
+            {
+                var args = MouseArgQueue.Dequeue();
+                //$"SetCurrentlyProcessing Dequeueing {args.Topic} ".WriteSuccess(2);
+                ApplyMouseArgs(args);
+            }
+        }
+        IsCurrentlyProcessing = isProcessing;
+        return oldValue;
+    }
+
+    public FoDrawing2D(
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
-        IScaledDrawingHelpers scaled,
         IHitTestService hittest,
         ComponentBus pubSub
         )
     {
-        ScaleDrawing = scaled;
         HitTestService = hittest;
+        HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
-
         PubSub = pubSub;
 
 
-
-        interactionLookup = new()
+        interactionRules = new()
         {
-            {InteractionStyle.None, new BaseInteraction(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.PagePanAndZoom, new PagePanAndZoom(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeHovering, new ShapeHovering(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeSelection, new ShapeSelection(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeDragging, new ShapeDragging(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeResizing, new ShapeResizing(this, pubSub, panzoom, select, manager, hittest)},
-            {InteractionStyle.ShapeConnecting, new ShapeConnecting(this, pubSub, panzoom, select, manager, hittest)},
-           //{InteractionStyle.AllEvents, new AllEvents(this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 11, this, pubSub, panzoom, select, manager, hittest)},
+            {new MoShapeLinking(InteractionStyle.ModelLinking, 10, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeMenu(InteractionStyle.ShapeMenu, 9, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeResizing(InteractionStyle.ShapeResizing, 7, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(InteractionStyle.ShapeDragging, 5, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(InteractionStyle.ShapeSelection, 4, this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(InteractionStyle.ShapeHovering, 3, this, pubSub, panzoom, select, manager, hittest)},
+            {new BaseInteraction(InteractionStyle.ReadOnly, 0, this, pubSub, panzoom, select, manager, hittest)},
         };
 
+        interactionLookup = new();
+        interactionRules.ForEach(x =>
+        {
+            interactionLookup.Add(x.Style, x);
+        });
 
         InitSubscriptions();
         PanZoomService.SetOnComplete(() =>
@@ -118,16 +196,32 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             //SRS refresh zoom if changed
             ResetPanZoom();
         });
+
+        SetInteraction(InteractionStyle.ShapeHovering);
     }
 
+    public void SetPreRenderAction(Func<Canvas2DContext, int, Task> action)
+    {
+        PreRender = action;
+    }
+    public void SetPostRenderAction(Func<Canvas2DContext, int, Task> action)
+    {
+        PostRender = action;
+    }
+    public void AddInteraction(InteractionStyle style, BaseInteraction interaction)
+    {
+        interactionLookup.Add(style, interaction);
+
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
+    }
     public void SetInteraction(InteractionStyle style)
     {
-        if ( interactionStyle == style) return;
+        if (interactionStyle == style) return;
         lastInteraction?.Abort();
         interactionStyle = style;
         lastInteraction = null;
 
-        $"SetInteraction {interactionStyle}".WriteLine(ConsoleColor.Green);
+        //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
 
     public IBaseInteraction GetInteraction()
@@ -136,34 +230,100 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return lastInteraction;
     }
 
+    public Rectangle UserWindow()
+    {
+        return UserWindowRect;
+    }
+
+    public Rectangle SetUserWindow(Size size)
+    {
+        UserWindowRect = new Rectangle(UserWindowRect.Location, size);
+        return UserWindowRect;
+    }
+    public Rectangle SetUserWindow(Point loc)
+    {
+        UserWindowRect = new Rectangle(-loc.X, -loc.Y, UserWindowRect.Width, UserWindowRect.Height);
+        return UserWindowRect;
+    }
+    public void SetUserID(string panID)
+    {
+        UserID = panID;
+    }
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         return PageManager.ExtractShapes(GlyphId);
     }
 
-    public Point InchesToPixelsInset(double width, double height)
+    public List<FoPage2D> GetAllPages()
     {
-        return ScaleDrawing.InchesToPixelInset(width, height);
+        return PageManager.GetAllPages();
+    }
+    public List<FoGlyph2D> DeleteSelections()
+    {
+        SelectionService?.MousePreDelete();
+        return PageManager.DeleteSelections();
+    }
+    public List<FoGlyph2D> DeleteSelectionsWithAnimations()
+    {
+        SelectionService?.MousePreDelete();
+        return PageManager.DeleteSelectionsWithAnimations();
+    }
+    public List<FoGlyph2D> Selections()
+    {
+        return PageManager.Selections();
     }
 
-    public void SetCanvasSize(int width, int height)
+
+    public Rectangle TransformRect(Rectangle rect)
     {
-        ScaleDrawing.SetCanvasSize(width, height);
+        return PanZoomService.TransformRect(rect);
     }
 
+    public void SetCanvasPixelSize(int width, int height)
+    {
+        TrueCanvasWidth = width;
+        TrueCanvasHeight = height;
+        HitTestService.SetRectangle(Rect());
+    }
+    public Size TrueCanvasSize()
+    {
+        return new Size(TrueCanvasWidth, TrueCanvasHeight);
+    }
+
+    public async Task ClearCanvas(Canvas2DContext ctx)
+    {
+        await ctx.ClearRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+        await ctx.SetFillStyleAsync("#98AFC7");
+        await ctx.FillRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+
+        await ctx.SetStrokeStyleAsync("Black");
+        await ctx.StrokeRectAsync(0, 0, TrueCanvasWidth, TrueCanvasHeight);
+    }
+
+    public FoPage2D SetCurrentPage(FoPage2D page)
+    {
+        PageManager.SetCurrentPage(page);
+        PanZoomService.ReadFromPage(page);
+        return page;
+    }
+
+    public void ClearAll()
+    {
+        CurrentPage().ClearAll();
+    }
     public IPageManagement Pages()
     {
         return PageManager;
     }
 
-    public FoRealPage2D CurrentPage()
+    public FoPage2D CurrentPage()
     {
-         var page = PageManager.CurrentPage();
-         return page;
+        var page = PageManager.CurrentPage();
+        return page;
     }
     public V AddShape<V>(V shape) where V : FoGlyph2D
     {
-        return PageManager.Add<V>(shape);
+        return PageManager.AddShape<V>(shape);
     }
 
     public void SetDoCreate(Action<CanvasMouseArgs> action)
@@ -176,16 +336,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             var page = PageManager.CurrentPage();
             DoCreate?.Invoke(new CanvasMouseArgs()
             {
-                OffsetX = page.FractionX(0.15) + 20 * page.Members<FoShape2D>().Count,
-                OffsetY = page.FractionY(0.15) + 20 * page.Members<FoShape2D>().Count
+                OffsetX = page.FractionX(0.15) + 20,
+                OffsetY = page.FractionY(0.15) + 20
             });
 
-            var region = ScaleDrawing.UserWindow();
+            var region = UserWindow();
             page.ComputeShouldRender(region);
         }
         catch (System.Exception ex)
         {
-            $" DoCreate {action.Method.Name} {ex.Message}".WriteLine();
+            $" DoCreate {action.Method.Name} {ex.Message}".WriteNote();
         }
     }
 
@@ -201,7 +361,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllImages.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                var data = item.ImageUrl;
+                // $"{data}".WriteLine();
             });
             FoImage2D.RefreshImages = false;
         }
@@ -209,10 +370,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return AllImages;
     }
 
-    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        return PageManager.CollectMenus(list);
-    }
+
     public List<FoVideo2D> GetAllVideos()
     {
         if (FoVideo2D.RefreshVideos)
@@ -222,17 +380,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             AllVideos.ForEach(item =>
             {
-                item.ImageUrl.WriteLine();
+                var data = item.ImageUrl;
+                $"{data}".WriteNote();
             });
             FoVideo2D.RefreshVideos = false;
         }
 
         return AllVideos;
-    }
-
-    public new T Add<T>(T value) where T : FoGlyph2D
-    {
-        return PageManager.Add(value);
     }
 
 
@@ -243,43 +397,30 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public FoPanZoomWindow PanZoomWindow()
     {
-        if (_panZoomWindow == null)
+        if (PanZoomShape == null)
         {
-            _panZoomWindow = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, ScaleDrawing, "Silver");
-            _panZoomWindow.SizeToFit();
+            PanZoomShape = new FoPanZoomWindow(PageManager, PanZoomService, HitTestService, this, "Silver");
+            PanZoomShape.SizeToFit();
+            PanZoomShape.IsVisible = false;
 
             var page = PageManager.CurrentPage();
-            var pt = InchesToPixelsInset(page.PageWidth / 2, 3.0);
-            _panZoomWindow.MoveTo(pt.X, pt.Y);
+            var pt = new Point(page.PageWidth.AsPixels() / 2, new Length(3.0, "in").AsPixels());
+            PanZoomShape.MoveTo(pt.X, pt.Y);
         }
-        return _panZoomWindow;
+        return PanZoomShape;
     }
 
     public void TogglePanZoomWindow()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PanZoomWindow().IsVisible = !PanZoomWindow().IsVisible;
     }
 
     public void ToggleHitTestDisplay()
     {
-        FoGlyph2D.ResetHitTesting = true;
         PageManager.ToggleHitTestRender();
     }
 
 
-
-
-
-
-
-
-
-    public FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
-    {
-        var result = PageManager.EstablishMenu2D<T, FoButton2D>(name, menu, clear);
-        return result;
-    }
 
 
     public void RefreshHitTest_IfDirty()
@@ -291,74 +432,36 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
-        EstablishMenu<FoMenu2D>("Main", new Dictionary<string, Action>()
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
         {
-            { "Clear", () => PageManager?.ClearAll()},
+
+            { "Clear", () => ClearAll()},
+
             { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-            //{ "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-            //{ "Save", () => Command?.Save()},
-            //{ "Restore", () => Command?.Restore()},
-            { "Pan Zoom", () => TogglePanZoomWindow()},
+            // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
+
         }, true);
 
 
-
-
         // https://coastalcreative.com/standard-paper-sizes/
-        EstablishMenu<FoMenu2D>("Page Size", new Dictionary<string, Action>()
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Page Size", new Dictionary<string, Action>()
         {
-            { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
-            { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
-            { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
-            { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
-            { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
-            { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom();} },
+            // { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
+            // { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
+            // { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
+            // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
+            // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
+            { "A0", () => PageManager.SetPageSize(840,1120, "mm")},
+            { "A1", () => PageManager.SetPageSize(600, 840, "mm")},
+            { "A2", () => PageManager.SetPageSize(420, 600, "mm")},
+            { "A3", () => PageManager.SetPageSize(300, 420, "mm")},
+            { "A4", () => PageManager.SetPageSize(200, 300, "mm")},
+            { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom(); } },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
         }, true)
         .ToggleLayout().MoveTo(0, 80);
-
-        //EdgeSimulation = new MoSimulation("TVA Edge", PageManager, this, DialogService!);
-        //EstablishMenu<FoMenu2D>("Simulation", EdgeSimulation.MenuItems(js), true);
-
-        PageManager.SetPageSizeInches(34, 44);
-        //PanZoomService.SetZoom(0.5);
-        //PanZoomService.SetPan(75, 25);
-        //PageManager.SetPageLandscape();
-        //ResetPanZoom();
-        //PanZoomWindow().IsVisible = false;
-
-        // var plan = "ProcessPlan";
-        // ProcessPlan = new DTARSolution(DTARRestService, this, null);
-        // EstablishMenu<FoMenu2D>(plan, ProcessPlan.ProcessMenuItems(plan, js), true);
-
-        // var treeName = "Documents";
-        // DocumentTree = new DTARSolution(DTARRestService, this, null);
-        // EstablishMenu<FoMenu2D>(treeName, DocumentTree.DocumentMenuItems(treeName, js), true);
-
-        // var RefreshMenus = (string url) =>
-        // {
-        //     DTARRestService.SetServerUrl(url);
-        //     EstablishMenu<FoMenu2D>(plan, DocumentTree.DocumentMenuItems(treeName, js), true);
-        //     EstablishMenu<FoMenu2D>(treeName, DocumentTree.DocumentMenuItems(treeName, js), true);
-        //     CreateCommands(js, nav);
-        // };
-
-        // EstablishMenu<FoMenu2D>("DTAR Server", new Dictionary<string, Action>()
-        // {
-        //     { "localhost:5001", () => RefreshMenus("https://localhost:5001")},
-        //     { "rondtar", () => RefreshMenus("https://rondtar.azurewebsites.net/")},
-        //     { "dtarwebdev", () => RefreshMenus("https://dtarwebdev.azurewebsites.net/")},
-        // }, true);
-
-
-        // var BoidCount = 10;
-        // BoidSimulation = new BoidField(Command, PageManager);
-        // BoidSimulation.CreateBoids(BoidCount, BoidField.RandomColor());
-        // EstablishMenu<FoMenu2D>("Boid", BoidSimulation.MenuItems(),true)
-        //     .LayoutVertical(100, 40).MoveTo(120, 80);
-
 
     }
 
@@ -367,7 +470,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public bool UserWindowMovedTo(Point loc)
     {
-        var region = ScaleDrawing.SetUserWindow(loc);
+        var region = SetUserWindow(loc);
         var page = PageManager.CurrentPage();
         page.ComputeShouldRender(region);
 
@@ -376,8 +479,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
     public bool UserWindowResized(Size size)
     {
-        var region = ScaleDrawing.SetUserWindow(size);
+        var region = SetUserWindow(size);
         var page = PageManager.CurrentPage();
+
         page.ComputeShouldRender(region);
 
         //  $"UserWindowResized {rect.X} {rect.Y} {rect.Width} {rect.Height} ---".WriteLine(ConsoleColor.Blue);
@@ -386,43 +490,65 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public async Task RenderDrawing(Canvas2DContext ctx, int tick, double fps)
     {
-        //BoidSimulation?.Advance();
 
-        //Animations.Update((float)0.033);
+        //skip this frame is still working 
+        if (IsCurrentlyProcessing) return;
+
+        FoGlyph2D.Animations.Update((float)0.033);
 
         var wasDirty = FoGlyph2D.ResetHitTesting;
         RefreshHitTest_IfDirty();
 
         var page = PageManager.CurrentPage();
 
-        page.Color = InputStyle == InputStyle.FileDrop ? "Yellow" : "Grey";
-
-
-        await ScaleDrawing.ClearCanvas(ctx);
+        await ClearCanvas(ctx);
 
         await ctx.SaveAsync();
+
         var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
 
+        if (PreRender != null)
+            await PreRender.Invoke(ctx, tick);
+
         await PageManager.RenderDetailed(ctx, tick, true);
+
+        if (PostRender != null)
+            await PostRender.Invoke(ctx, tick);
+
         await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
 
-
-        // if ( ProcessPlan != null)
-        //     await ProcessPlan.RenderTree(ctx);
-
-        //RenderDetailed(ctx, tick, true);
         await ctx.RestoreAsync();
-        tick++;
 
-        //await DrawUserWindow(ctx);
+
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
+        if (!ShowStats) return;
 
-        //this is the mouse 
+
+        var offsetY = 60;
+        var offsetX = 1400;
+
+        await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
+        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+
+        await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
+        await ctx.SetFontAsync("26px Segoe UI");
+        await ctx.FillTextAsync($"Foundry Canvas {UserID} {InputStyle}", offsetX, offsetY);
+
+        await ctx.SetFontAsync("18px consolas");
+        //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
+        await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
+        //await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
+
+        int loc = 130;
+
+        await ctx.SetTextBaselineAsync(TextBaseline.Top);
         OtherUserLocations.Values.ForEach(async user =>
         {
-            await ctx.SetStrokeStyleAsync("#FFFFFF");
+            loc += 15;
+            await ctx.FillTextAsync($"{user.UserID} is helping", 20 + offsetX, loc);
+
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(user.X, user.Y);
             await ctx.LineToAsync(user.X + 20, user.Y + 15);
@@ -431,38 +557,36 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.ClosePathAsync();
             await ctx.FillAsync();
 
-            await ctx.SetStrokeStyleAsync("#000000");
-            await ctx.SetFontAsync("16px Segoe UI");
-            await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
-            await ctx.SetTextBaselineAsync(TextBaseline.Top);
-            await ctx.FillTextAsync(user.PanID, user.X + 5, user.Y + 20);
+            await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
+    }
 
-        var offsetY = 60;
-        var offsetX = 1400;
+    public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
+    {
+        var key = usermove.UserID;
 
-        await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
-        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
-
-        var PanID = "NO PANID";
-        await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
-        await ctx.SetFontAsync("26px Segoe UI");
-        await ctx.FillTextAsync($"Foundry Canvas {PanID} {InputStyle}", offsetX, offsetY);
-
-        await ctx.SetFontAsync("18px consolas");
-        //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
-        await ctx.FillTextAsync($"fps: {fps:0.00}", offsetX, offsetY + 25);
-        await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
-
-        int loc = 50;
-        OtherUserLocations.Values.ForEach(async user =>
+        if (IsCurrentlyRendering)
         {
-            loc += 15;
-            await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
-            await ctx.SetTextBaselineAsync(TextBaseline.Top);
-            await ctx.FillTextAsync($"{user.PanID} is helping", 20 + offsetX, loc);
-        });
+            if (!OtherUserLocations.ContainsKey(key)) return usermove;
 
+            var found = OtherUserLocations[key];
+            found.Active = usermove.Active;
+            found.X = usermove.X;
+            found.Y = usermove.Y;
+            return found;
+        }
+
+        if (!OtherUserLocations.Remove(key))
+            if (usermove.Active)
+                toast?.Success($"{key} has joined");
+
+
+        if (usermove.Active)
+            OtherUserLocations.Add(key, usermove);
+        else
+            toast?.Info($"{key} has left");
+
+        return usermove;
     }
 
     private async Task DrawUserWindow(Canvas2DContext ctx)
@@ -470,90 +594,116 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // draw the current window
         await ctx.SetStrokeStyleAsync("Black");
         await ctx.SetLineWidthAsync(10.0F);
-        var win = ScaleDrawing.UserWindow();
+        var win = UserWindow();
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 
-    private bool TestRule(InteractionStyle style, CanvasMouseArgs args) 
+    protected bool TestRule(BaseInteraction interact, CanvasMouseArgs args)
     {
-        var interact = interactionLookup[style];
         if (interact.IsDefaultTool(args) == false)
         {
-            $"{style} No Match".WriteLine(ConsoleColor.Red);
+            //$"{style} No Match".WriteError();
             return false;
         }
 
-        $"{style} Match".WriteLine(ConsoleColor.Green);
+        var style = interact.Style;
+        //$"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
     }
 
-    private void SelectInteractionByRuleFor(CanvasMouseArgs args) 
+    protected virtual IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
-        if ( TestRule(InteractionStyle.PagePanAndZoom,args) ) return;
-
-        if ( TestRule(InteractionStyle.ShapeConnecting,args) ) return;
-
-        if ( TestRule(InteractionStyle.ShapeDragging,args) ) return;
-
-        TestRule(InteractionStyle.ShapeSelection,args);
+        foreach (var rule in interactionRules)
+        {
+            if (TestRule(rule, args))
+                return GetInteraction();
+        }
+        SetInteraction(InteractionStyle.ReadOnly);
+        return GetInteraction();
     }
 
+    private void ApplyMouseArgs(CanvasMouseArgs args)
+    {
+        if (args == null) return;
+
+        try
+        {
+            SetCurrentlyProcessing(true);
+            // call IsDefaultTool method on each interaction to
+            // determine what is the right interaction for this case?
+
+            var isEventHandled = (args.Topic) switch
+            {
+                ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
+                ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
+                ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
+                ("ON_MOUSE_IN") => GetInteraction().MouseIn(args),
+                ("ON_MOUSE_OUT") => GetInteraction().MouseOut(args),
+                _ => false
+            };
+        }
+        catch (Exception ex)
+        {
+            $" {args.Topic} {ex.Message}".WriteNote();
+        }
+        finally
+        {
+            SetCurrentlyProcessing(false);
+        }
+    }
 
 
     private void InitSubscriptions()
     {
-        PubSub!.SubscribeTo<InputStyle>(style => {
+        PubSub!.SubscribeTo<InputStyle>(style =>
+        {
             InputStyle = style;
         });
 
-        PubSub!.SubscribeTo<CanvasMouseArgs>( args =>
+        PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
         {
             try
             {
-                // call IsDefaultTool method on each interaction to
-                // determine what is the right interaction for this case?
-                if ( args.Topic.Matches("ON_MOUSE_DOWN"))
-                    SelectInteractionByRuleFor(args);
-
-                var interact = GetInteraction();
-                
-                var isEventHandled = (args.Topic) switch
+                if (IsCurrentlyRendering || IsCurrentlyProcessing)
                 {
-                    ("ON_MOUSE_DOWN") => interact.MouseDown(args),
-                    ("ON_MOUSE_MOVE") => interact.MouseMove(args),
-                    ("ON_MOUSE_UP") => interact.MouseUp(args),
-                    ("ON_MOUSE_IN") => interact.MouseIn(args),
-                    ("ON_MOUSE_OUT") => interact.MouseOut(args),
-                    _ => false
-                };
+                    //you should cashe the args to replayed latter
+                    //when the UI is not rendering..
+                    MouseArgQueue.Enqueue(args);
+                }
+                else
+                {
+                    //"is rendering ".WriteSuccess(2);
+                    ApplyMouseArgs(args);
+                }
+
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
 
-       PubSub!.SubscribeTo<CanvasKeyboardEventArgs>( args =>
-        {
-            try
-            {
-                var isEventHandled = (args.Topic) switch
-                {
+        PubSub!.SubscribeTo<CanvasKeyboardEventArgs>(args =>
+         {
+             try
+             {
+                 var isEventHandled = (args.Topic) switch
+                 {
 
-                    ("ON_KEY_DOWN") => KeyDown(args),
-                    ("ON_KEY_UP") => KeyUp(args),
-                    ("ON_KEY_PRESS") => KeyPress(args),
-                    _ => false
-                };
-            }
-            catch (Exception ex)
-            {
-                $" {args.Topic} {ex.Message}".WriteLine();
-            }
-        });
+                     ("ON_KEY_DOWN") => KeyDown(args),
+                     ("ON_KEY_UP") => KeyUp(args),
+                     ("ON_KEY_PRESS") => KeyPress(args),
+                     _ => false
+                 };
+             }
+             catch (Exception ex)
+             {
+                 $" {args.Topic} {ex.Message}".WriteNote();
+             }
+         });
 
-        PubSub!.SubscribeTo<CanvasWheelChangeArgs>( args =>
+        PubSub!.SubscribeTo<CanvasWheelChangeArgs>(args =>
         {
             try
             {
@@ -565,11 +715,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
 
-        PubSub!.SubscribeTo<CanvasResizeArgs>( args =>
+        PubSub!.SubscribeTo<CanvasResizeArgs>(args =>
         {
             try
             {
@@ -581,7 +731,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteLine();
+                $" {args.Topic} {ex.Message}".WriteNote();
             }
         });
     }
@@ -590,6 +740,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool WheelChange(CanvasWheelChangeArgs args)
     {
         PanZoomService.ZoomWheel(args.DeltaY);
+        PanZoomService.WriteToPage(PageManager.CurrentPage());
         //$"Wheel change: {args.DeltaX}, {args.DeltaY}, {args.DeltaZ}".WriteLine(ConsoleColor.Yellow);
         return true;
     }
@@ -599,20 +750,22 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PanZoomService.PanBy(dx, dy);
         UserWindowMovedTo(PanZoomService.Pan());
 
-        _panZoomWindow?.Smash();  //Anit scale and move
+        PanZoomService.WriteToPage(PageManager.CurrentPage());
+
+        PanZoomShape?.Smash(false);  //Anit scale and move
         return true;
     }
 
     public bool MoveSelectionsBy(int dx, int dy)
     {
         PageManager.SelectionsMoveBy(dx, dy);
-        //PageManager.Selections().ForEach(shape => SendShapeMoved(shape));
+        PageManager.Selections().ForEach(shape => PubSub.Publish<FoGlyph2D>(shape));
         return true;
     }
     public bool RotateSelectionsBy(int angle)
     {
         PageManager.SelectionsRotateBy(angle);
-        //PageManager.Selections().ForEach(shape => SendShapeMoved(shape));
+        PageManager.Selections().ForEach(shape => PubSub.Publish<FoGlyph2D>(shape));
         return true;
     }
 
@@ -645,20 +798,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return item?.OpenCreate() ?? false;
     }
 
-    public bool DeleteSelections()
-    {
-        PageManager.Selections().ForEach(shape =>
-        {
-            shape.IsSelected = false;
-            shape.AnimatedResizeTo(0, 0).OnComplete(() =>
-            {
-                PageManager.ExtractShapes(shape.GlyphId);
-                shape.UnglueAll();
-                //SendShapeDestroy(shape);
-            });
-        });
-        return true;
-    }
+
+
     public bool DuplicateSelections()
     {
         var Duplicates = new List<FoGlyph2D>();
@@ -687,32 +828,34 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //$"Key Down ShiftKey?: {args.ShiftKey}, AltKey?: {args.AltKey}, CtrlKey?: {args.CtrlKey}, Key={args.Key} Code={args.Code}".WriteLine(ConsoleColor.Yellow);
 
         var move = args.ShiftKey ? 1 : 5;
-        var success = (args.Code, args.AltKey, args.ShiftKey) switch
+        object success = (args.Code, args.AltKey, args.CtrlKey, args.ShiftKey) switch
         {
-            ("ArrowUp", false, true) => MovePanBy(0, -move * 10),
-            ("ArrowDown", false, true) => MovePanBy(0, move * 10),
-            ("ArrowLeft", false, true) => MovePanBy(-move * 10, 0),
-            ("ArrowRight", false, true) => MovePanBy(move * 10, 0),
+            ("ArrowUp", false, true, true) => MovePanBy(0, -move * 10),
+            ("ArrowDown", false, true, true) => MovePanBy(0, move * 10),
+            ("ArrowLeft", false, true, true) => MovePanBy(-move * 10, 0),
+            ("ArrowRight", false, true, true) => MovePanBy(move * 10, 0),
 
-            ("ArrowUp", false, false) => MoveSelectionsBy(0, -move),
-            ("ArrowDown", false, false) => MoveSelectionsBy(0, move),
-            ("ArrowLeft", false, false) => MoveSelectionsBy(-move, 0),
-            ("ArrowRight", false, false) => MoveSelectionsBy(move, 0),
-            ("ArrowUp", true, false) => ZoomSelectionBy(1.25),
-            ("ArrowDown", true, false) => ZoomSelectionBy(0.75),
+            ("ArrowUp", false, false, _) => MoveSelectionsBy(0, -move),
+            ("ArrowDown", false, false, _) => MoveSelectionsBy(0, move),
+            ("ArrowLeft", false, false, _) => MoveSelectionsBy(-move, 0),
+            ("ArrowRight", false, false, _) => MoveSelectionsBy(move, 0),
 
-            ("KeyG", true, false) => PageManager?.GroupSelected<FoGroup2D>() != null,
-            ("KeyR", true, false) => RotateSelectionsBy(30),
-            ("KeyL", true, false) => LayoutSelections(),
-            ("KeyO", true, false) => OpenEdit(),
-            ("KeyC", true, false) => OpenCreate(),
+            ("ArrowUp", true, false, false) => ZoomSelectionBy(1.25),
+            ("ArrowDown", true, false, false) => ZoomSelectionBy(0.75),
 
-            ("Insert", false, false) => DuplicateSelections(),
-            ("Delete", false, false) => DeleteSelections(),
+            ("KeyG", true, false, false) => PageManager?.GroupSelected<FoGroup2D>() != null,
+            ("KeyR", true, false, false) => RotateSelectionsBy(30),
+            ("KeyL", true, false, false) => LayoutSelections(),
+            ("KeyO", true, false, false) => OpenEdit(),
+            ("KeyC", true, false, false) => OpenCreate(),
+
+            ("KeyD", false, true, false) => DuplicateSelections(),
+            ("Insert", false, false, false) => DuplicateSelections(),
+            ("Delete", false, false, false) => DeleteSelections(),
+            ("Delete", false, true, false) => DeleteSelectionsWithAnimations(),
             _ => false
         };
-        //$"result {success}".WriteLine(ConsoleColor.Red);
-        return success;
+        return success != null;
     }
 
     public bool KeyUp(CanvasKeyboardEventArgs args)

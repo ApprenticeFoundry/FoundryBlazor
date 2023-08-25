@@ -8,7 +8,7 @@ using Microsoft.JSInterop;
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoVideo2D : FoGlyph2D
+public class FoVideo2D : FoGlyph2D, IImage2D
 {
     // TODO: can we figure out how to inject JsRuntime?
     public IJSRuntime? JsRuntime { get; set; }
@@ -72,7 +72,11 @@ public class FoVideo2D : FoGlyph2D
         return this;
     }
 
-
+    public override List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true)
+    {
+        list.Add(this);
+        return list;
+    }
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -121,11 +125,7 @@ public class FoVideo2D : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            //GetHandles()?.ForEach(async child => await child.Render(ctx, tick, deep));
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if (HoverDraw != null)
         {
@@ -196,7 +196,8 @@ public class FoVideo2D : FoGlyph2D
 
     private async void RunJavascript(string action)
     {
-        if (JsRuntime != null) await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
+        if (JsRuntime != null) 
+            await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
     }
 
     public FoVideo2D() : base()

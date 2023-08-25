@@ -9,13 +9,15 @@ namespace FoundryBlazor.Shape;
 public class ShapeHovering : BaseInteraction
 {
     public ShapeHovering(
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pubsub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
     {
     }
 
@@ -23,13 +25,13 @@ public class ShapeHovering : BaseInteraction
     {
 
         lastHover?.ForEach(child => child.HoverDraw = null);
-        //lastHover?.ForEach(child => child.LocalMouseHover(args, null));
+        lastHover?.ForEach(child => child.LocalMouseHover(args, null));
 
         var loc = panZoomService.HitRectStart(args);
         lastHover = pageManager!.FindGlyph(loc);
 
         lastHover.ForEach(child => child.HoverDraw = OnHover);
-        //lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
+        lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
         return true;
     }
 

@@ -1,22 +1,22 @@
 @inherits MenuManager
 @using FoundryBlazor.Shape
 
-<div class="position-fixed mw-25 w-100 d-flex justify-content-between"
+<div class="position-fixed mw-25 w-100 d-flex"
     style="background-color: var(--rz-card-background-color); z-index:30">
     <RadzenCard Class="rz-border-radius-0">
         <RadzenMenu>
-            @foreach (var menu in GetAllMenus())
+        @foreach (var menu in GetAllMenus())
+        {
+            <RadzenMenuItem Text="@menu.DisplayText()">
+            @foreach (var button in menu.Buttons())
             {
-                <RadzenMenuItem Text="@menu.DisplayText()">
-
-                    @foreach (var button in menu.Buttons())
-                    {
-                        <RadzenMenuItem Text="@button.DisplayText()" Click="@button.ClickAction()"></RadzenMenuItem>
-                    }
-                </RadzenMenuItem>
+                <RadzenMenuItem Text="@button.DisplayText()" Click="@button.ClickAction()"></RadzenMenuItem>
             }
+            </RadzenMenuItem>
+        }
         </RadzenMenu>
     </RadzenCard>
+    
     <div>
         <Command />
     </div>

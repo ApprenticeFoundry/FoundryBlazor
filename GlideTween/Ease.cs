@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Unglide
+﻿namespace Unglide
 {
     /// <summary>
     /// Static class with useful easer functions that can be used by Tweens.
@@ -158,7 +156,7 @@ namespace Unglide
         /// <returns>Eased timescale.</returns>
         public static float QuintOut(float t)
         {
-            return (t = t - 1) * t * t * t * t + 1;
+            return (--t) * t * t * t * t + 1;
         }
 
         /// <summary>

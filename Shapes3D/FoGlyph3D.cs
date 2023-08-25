@@ -1,19 +1,28 @@
-using BlazorThreeJS.Core;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Lights;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
-using BlazorThreeJS.Settings;
+using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
+
 
 namespace FoundryBlazor.Shape;
 
 public class FoGlyph3D : FoComponent
 {
+    public string GlyphId { get; set; } = "";
+    public string PlatformName { get; set; } = "";
     public float Opacity { get; set; } = 1.0F;
     public string Color { get; set; } = "Green";
+    public string Address { get; set; } = "";
+
+    protected double width = 0;
+    public double Width { get { return this.width; } set { this.width = AssignDouble(value, width); } }
+    protected double height = 0;
+    public double Height { get { return this.height; } set { this.height = AssignDouble(value, height); } }
+    protected double depth = 0;
+    public double Depth { get { return this.depth; } set { this.depth = AssignDouble(value, depth); } }
+    public bool IsVisible { get; set; } = true;
 
     public FoGlyph3D() : base("")
     {
@@ -26,12 +35,56 @@ public class FoGlyph3D : FoComponent
         Color = color;
     }
 
-    public virtual void Render(Viewer viewer, Scene ctx, int tick, double fps, bool deep = true)
+    public string GetGlyphId()
     {
-        var mesh = GetMesh(viewer);
-        ctx.Add(mesh);
+        if (string.IsNullOrEmpty(GlyphId))
+            GlyphId = Guid.NewGuid().ToString();
+
+        return GlyphId;
     }
 
+    public bool GlyphIdCompare(string other)
+    {
+        var id = GetGlyphId();
+        var result = id == other;
+        // $"GlyphIdCompare {result}  {id} {other}".WriteNote();
+        return result;
+    }
+
+    public FoGlyph3D SetBoundry(int width, int height, int depth)
+    {
+        (Width, Height, Depth) = (width, height, depth);
+        return this;
+    }
+
+    protected double AssignDouble(double newValue, double oldValue)
+    {
+        if (Math.Abs(newValue - oldValue) > 0)
+            Smash(true);
+
+        return newValue;
+    }
+
+
+
+    public virtual bool Smash(bool force)
+    {
+        //if ( _matrix == null && !force) return false;
+        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
+
+        // ResetHitTesting = true;
+        // this._matrix = null;
+        // this._invMatrix = null;
+
+        return true;
+    }
+
+    public Action<FoGlyph3D, int>? ContextLink;
+
+    public bool IsSamePlatform(FoGlyph3D obj)
+    {
+        return PlatformName.Matches(obj.PlatformName);
+    }
 
     public virtual MeshStandardMaterial GetMaterial()
     {
@@ -42,26 +95,65 @@ public class FoGlyph3D : FoComponent
         return result;
     }
 
-    public virtual BufferGeometry GetGeometry(Viewer viewer)
+    public virtual bool UpdateMeshPosition(double xLoc, double yLoc, double zLoc)
     {
-        var result = new BoxGeometry(1F, 2F, 3F);
+        return false;
+    }
+
+    public FoGlyph3D MoveTo(int x, int y, int z)
+    {
+        var pos = GetPosition(x, y, z);
+        return this;
+    }
+    public virtual Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
+    {
+        var result = new Vector3(x, y, z);
         return result;
     }
 
-    public virtual Vector3 GetPosition()
+    public virtual Vector3 GetPivot(int x = 0, int y = 0, int z = 0)
     {
-        var result = new Vector3(0F, 0F, 0F);
+        var result = new Vector3(x, y, z);
         return result;
     }
 
-    public virtual Mesh GetMesh(Viewer viewer)
+    public virtual Vector3 GetScale(double x = 1, double y = 1, double z = 1)
     {
-        var result = new Mesh
-        {
-            Geometry = GetGeometry(viewer),
-            Position = GetPosition(),
-            Material = GetMaterial()
-        };
+        var result = new Vector3(x, y, z);
         return result;
     }
+
+    public virtual Euler GetRotation(int x = 0, int y = 0, int z = 0)
+    {
+        var result = new Euler(x, y, z);
+        return result;
+    }
+
+    public virtual async Task<bool> PreRender(FoArena3D arena, Viewer viewer, bool deep = true)
+    {
+        await Task.CompletedTask;
+        return false;
+    }
+
+    public virtual bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+        return false;
+    }
+    public virtual bool OnModelLoadComplete(Guid PromiseGuid)
+    {
+        return false;
+    }
+
+    public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.ExtractWhere(whereClause);
+    }
+
+    public virtual List<T>? FindWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.FindWhere(whereClause);
+    }
+
 }

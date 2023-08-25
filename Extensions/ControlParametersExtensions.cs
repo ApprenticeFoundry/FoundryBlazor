@@ -1,5 +1,5 @@
+using IoBTMessage.Extensions;
 using System.Reflection;
-using FoundryBlazor;
 
 namespace FoundryBlazor.Extensions;
 
@@ -31,7 +31,7 @@ public static class ControlParametersExtension
 
     public static T SetObject<T>(this ControlParameters cn, string field, T value) where T: class
     {
-        var result = StorageHelpers.Dehydrate<T>(value, true);
+        var result = CodingExtensions.Dehydrate<T>(value, true);
         cn.Establish(field, result);
         return value;
     }
@@ -39,7 +39,7 @@ public static class ControlParametersExtension
     public static T? GetObject<T>(this ControlParameters cn, string field) where T: class
     {
         var value = cn.Find(field);
-        var result = value == null ? default : StorageHelpers.Hydrate<T>(value.ToString()!, true);
+        var result = value == null ? default : CodingExtensions.Hydrate<T>(value.ToString()!, true);
         return result;
     }
 

@@ -4,9 +4,9 @@
  * https://swharden.com/blog/2021-01-07-blazor-canvas-animated-graphics/
  */
 
-const fileInputContainer = getFileInputContainer();
 /*This is called from the Blazor component's Initialize method*/
-export function initRenderJS(instance) {
+const fileInputId = 'fileInputHolder';
+function initRenderJS(instance) {
     // instance is the Blazor component dotnet reference
     window.theInstance = instance;
 
@@ -61,14 +61,14 @@ function getCanvasNode() {
 // }
 
 function getFileInputContainer() {
-    var node = document.getElementById('fileInputHolder');
+    var node = document.getElementById(fileInputId);
     return node;
 }
 
 /*This is called whenever we have requested an animation frame*/
 function renderJS(timeStamp) {
     // Call the blazor component's [JSInvokable] RenderInBlazor method
-    theInstance.invokeMethodAsync('RenderInBlazor', timeStamp);
+    theInstance.invokeMethodAsync('RenderInBlazor');
     // request another animation frame
     window.requestAnimationFrame(renderJS);
 }
@@ -275,20 +275,61 @@ function canvasWheelChangeArgs(e) {
     };
 }
 
+function showFileInputNodeNotFound() {
+    window.alert(
+        `No file input node with id='${fileInputId}' was found in CanvasComponent.  You will not be able to drop files.`
+    );
+}
+
 function showFileInput() {
+    const fileInputContainer = getFileInputContainer();
     if (fileInputContainer) {
         fileInputContainer.style.zIndex = 20;
+    } else {
+        showFileInputNodeNotFound();
     }
 }
 
 function hideFileInput() {
     // We *must* hide file input after file is dropped over chrome
+    const fileInputContainer = getFileInputContainer();
     if (fileInputContainer) {
         fileInputContainer.style.zIndex = 0;
     }
+}
+
+function saveAsFile(filename, bytesBase64) {
+  var link = document.createElement("a");
+  link.download = filename;
+  link.href = "data:application/octet-stream;base64," + bytesBase64;
+  document.body.appendChild(link); // Needed for Firefox
+  link.click();
+  document.body.removeChild(link);
+}
+
+function canvasPNGBase64() {
+    return getCanvasNode().toDataURL();
+}
+
+function removeKeyEventListeners() {
+    window.removeEventListener('keydown', keyDown);
+    window.removeEventListener('keyup', keyUp);
+    window.removeEventListener('keypress', keyPress);
+}
+
+function addKeyEventListeners() {
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
+    window.addEventListener('keypress', keyPress);
 }
 
 window.CanvasFileInput = {
     ShowFileInput: showFileInput,
     HideFileInput: hideFileInput,
 };
+
+window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventListeners };
+window.canvasPNGBase64 = canvasPNGBase64;
+window.saveAsFile = saveAsFile;
+
+window.initRenderJS = initRenderJS;

@@ -1,10 +1,10 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using BlazorComponentBus;
 
-using IoBTMessage.Models;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -13,15 +13,19 @@ public class ShapeConnecting :  ShapeHovering
 {
     private bool isConnecting = false;
 
+    public Type SourceType { get; set; } = typeof(FoGlyph2D);
+    public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
-    public ShapeConnecting(
+    public ShapeConnecting (
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pub,panzoom,select,manager,hitTest)
     {
     }
     public override void Abort()
@@ -73,16 +77,15 @@ public class ShapeConnecting :  ShapeHovering
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
-        var heros = findings!.Where(item => item is FoHero2D);
-        var targets = heros.Where(item => item.Tag.Matches(nameof(DT_AssetFile)));
-        return targets.ToList(); 
+        var heros = findings!.Where(item => item.GetType() == SourceType);
+        return heros.ToList(); 
     }
 
-    private List<FoGlyph2D> ValidDropTargets(Rectangle rect)
+    private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
         var findings = pageManager?.FindGlyph(rect);
-        var heros = findings!.Where(item => item is FoHero2D);
-        var targets = heros.Where(item => !item.Tag.Matches(nameof(DT_AssetFile)));
+        var targets = findings!.Where(item => item.GetType() == TargetType);
+        //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 
     }
 
@@ -92,7 +95,7 @@ public class ShapeConnecting :  ShapeHovering
         {
             isConnecting = false;
             var over = panZoomService.HitRectStart(args);
-            var findings = ValidDropTargets(over);
+            var findings = ValidDropTarget(over);
             var found = findings!.Where(item => item != selectedShape).FirstOrDefault();
 
             if ( found != null)
@@ -100,13 +103,16 @@ public class ShapeConnecting :  ShapeHovering
                 //link this in the model and force a new layout
                 var msg = new AttachAssetFileEvent()
                 {
-                    AssetFile = (FoHero2D)selectedShape,
-                    Target = (FoHero2D)found
+                    AssetGuid = selectedShape.GetGlyphId(),
+                    TargetGuid = found.GetGlyphId(),
+                    AssetShape = selectedShape,
+                    TargetShape = found
                 };
                 pubsub?.Publish<AttachAssetFileEvent>(msg);
                 return true;
             }
         }
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return false;
     }
     public override bool MouseMove(CanvasMouseArgs args)
@@ -120,7 +126,7 @@ public class ShapeConnecting :  ShapeHovering
         }
 
         var over = panZoomService.HitRectStart(args);
-        var found = ValidDropTargets(over);
+        var found = ValidDropTarget(over);
 
         lastHover?.ForEach(child => child.HoverDraw = null);
 
@@ -128,9 +134,8 @@ public class ShapeConnecting :  ShapeHovering
         {
             lastHover = found;
             lastHover.ForEach(child => child.HoverDraw = OnHoverTarget);
-         }
+        }
         
-
         return true;
     }
 

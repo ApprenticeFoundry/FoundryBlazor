@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoImage2D : FoGlyph2D
+public class FoImage2D : FoGlyph2D, IImage2D
 {
     public static bool RefreshImages { get; set; } = true;
 
@@ -32,7 +32,11 @@ public class FoImage2D : FoGlyph2D
     public string ImageUrl 
     { 
         get { return this.imageUrl; } 
-        set { this.imageUrl = value; waitcount = 0; FoImage2D.RefreshImages = true; } 
+        set { 
+            this.imageUrl = value; 
+            waitcount = 0; 
+            FoImage2D.RefreshImages = true; 
+        } 
     }
 
     private ElementReference imageRef;
@@ -42,8 +46,18 @@ public class FoImage2D : FoGlyph2D
         set { this.imageRef = value; } 
     }
 
-    private int waitcount = 0;
+    protected int waitcount = 0;
 
+    public FoImage2D() : base()
+    {
+    }
+    public FoImage2D(int width, int height, string color) : base("", width, height, color)
+    {
+    }
+    public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
+    {
+    }
+    
     public override FoImage2D ZoomBy(double factor) 
     { 
         ShrinkBy(factor); return this; 
@@ -68,7 +82,11 @@ public class FoImage2D : FoGlyph2D
         return this;
     }
 
-
+    public override List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true)
+    {
+        list.Add(this);
+        return list;
+    }
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -117,23 +135,12 @@ public class FoImage2D : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            //GetHandles()?.ForEach(async child => await child.Render(ctx, tick, deep));
-            //await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
 
         await ctx.RestoreAsync();
         return true;
     }
-    public FoImage2D() : base()
-    {
-    }
-    public FoImage2D(int width, int height, string color) : base("", width, height, color)
-    {
-        // ResetLocalPin((obj) => 0, (obj) => 0);
 
-    }
 
 }

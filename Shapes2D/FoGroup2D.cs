@@ -2,40 +2,45 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace FoundryBlazor.Shape;
 
-public class FoGroup2D : FoGlyph2D
+public class FoGroup2D : FoGlyph2D, IShape2D
 {
 
     public FoGroup2D() : base()
     {
-        ShapeDraw = DrawRect;
+        ShapeDraw = DrawBox;
     }
 
+    public FoGroup2D(int width, int height, string color) : base("", width, height, color)
+    {
+        PinX = PinY = 0;
+        ShapeDraw = DrawBox;
+    }
     public FoGroup2D(string name, int width, int height, string color) : base(name, width, height, color)
     {
-        ShapeDraw = DrawRect;
-    }
-    public override List<FoHandle2D> GetHandles() 
-    {
-        if ( !this.HasSlot<FoHandle2D>()) 
-        {
-            Add<FoHandle2D>(new FoHandle2D("UL", LeftX(), TopY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("UR", RightX(), TopY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("LL", LeftX(), BottomY(), "Green"));
-            Add<FoHandle2D>(new FoHandle2D("LR", RightX(), BottomY(), "Green"));
-        }
-        var result = this.Members<FoHandle2D>();
-        return result;
+        ShapeDraw = DrawBox;
     }
 
+    public T AddShape<T>(T value) where T : FoGlyph2D
+    {
+        var dx = -LeftEdge();
+        var dy = -TopEdge();
+        value.MoveBy(dx, dy);
+        Slot<T>().Add(value);   
+        return value;
+    }
 
 
     public List<T>? CaptureSelectedShapes<T>(FoGlyph2D source) where T: FoGlyph2D
     {
-        var members = source.ExtractSelected<T>();
         var dx = -LeftEdge();
         var dy = -TopEdge();       
-        members?.ForEach(shape => shape.MoveBy(dx,dy));
-        if (members != null) Slot<T>().AddRange(members);
+
+        var members = source.ExtractSelectedShapes<T>(new List<T>());
+        if ( members != null)
+        {
+            members.ForEach(shape => shape.MoveBy(dx,dy));
+            Slot<T>().AddRange(members);
+        }
  
         return members;
     }
@@ -48,21 +53,20 @@ public class FoGroup2D : FoGlyph2D
         await UpdateContext(ctx, tick);
 
         PreDraw?.Invoke(ctx, this);
-        //await Draw(ctx, tick);
+        await Draw(ctx, tick);
         HoverDraw?.Invoke(ctx, this);
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if ( deep) 
         {
             Members<FoShape1D>().ForEach(async child => await child.RenderDetailed(ctx, tick, deep));    
             Members<FoShape2D>().ForEach(async child => await child.RenderDetailed(ctx, tick, deep));       
-        }
+            Members<FoImage2D>().ForEach(async child => await child.RenderDetailed(ctx, tick, deep));       
+            Members<FoText2D>().ForEach(async child => await child.RenderDetailed(ctx, tick, deep));       
+       }
         await ctx.RestoreAsync();
         return true;
     }

@@ -1,15 +1,15 @@
-using Blazor.Extensions.Canvas.Canvas2D;
-using IoBTMessage.Models;
-
 namespace FoundryBlazor.Shape;
 
-public class FoButton3D : FoText3D, IFoButton
+public class FoButton3D : FoGlyph3D, IFoButton
 {
     public Action? OnClick;
 
+    private int countdown = 0;
+    public bool ComputeResize { get; set; } = false;
+
     private string text = "";
-    public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
-    public List<string>? Details { get; set; }
+    public string Text { get { return this.text; } set { this.text = AssignText(value, text); } }
+
 
     public Action ClickAction()
     {
@@ -19,12 +19,6 @@ public class FoButton3D : FoText3D, IFoButton
     public string DisplayText()
     {
         return Text;
-    }
-
-    protected string CreateDetails(string text)
-    {
-        Details = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-        return text;
     }
 
     protected string AssignText(string newValue, string oldValue)

@@ -30,15 +30,43 @@ public interface IPanZoomService
 
     public void SetOnComplete(Action action);
 
+    public PanZoomState ReadFromPage(FoPage2D page);
+    public PanZoomState WriteToPage(FoPage2D page);
+}
+
+public class PanZoomState
+{
+    public double Zoom = 1.0;
+    public double LastZoom = 1.0;
+    public Point Pan = new(0, 0);
+    public Point Delta = new(0, 0);
+    public Point LastLocation = new(0, 0);
+
+    public void SetState(PanZoomState state)
+    {
+        Zoom = state.Zoom;
+        LastZoom = state.LastZoom;
+        Pan = state.Pan;
+        Delta = state.Delta;
+        LastLocation = state.LastLocation;
+    }
+    public void Reset()
+    {
+        LastZoom = Zoom;
+        Zoom = 1.0;
+        Pan = new(0, 0);
+    }
+    public Point ComputeDelta(int x, int y)
+    {
+        Delta = new Point(x - LastLocation.X, y - LastLocation.Y);
+        LastLocation = new(x,y);
+        return Delta;
+    }
 }
 
 public class PanZoomService : IPanZoomService
 {
-    private double _zoom = 1.0;
-    private double _lastZoom = 1.0;
-    private Point _pan = new(0, 0);
-    private Point _Delta = new(0, 0);
-    private Point _LastLocation = new(0, 0);
+    private readonly PanZoomState State = new();
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
@@ -56,11 +84,22 @@ public class PanZoomService : IPanZoomService
 
     public void Reset()
     {
-        _lastZoom = _zoom;
-        _zoom = 1.0;
-        _pan = new(0, 0);
-        Smash();
+        State.Reset();
+        Smash(true);
         OnComplete?.Invoke();
+    }
+
+    public PanZoomState ReadFromPage(FoPage2D page)
+    {
+        State.SetState(page.PanZoom);
+        Smash(true);
+        OnComplete?.Invoke();
+        return State;
+    }
+    public PanZoomState WriteToPage(FoPage2D page)
+    {
+        page.PanZoom.SetState(State);
+        return State;
     }
 
     public Rectangle Normalize(Rectangle dragArea)
@@ -82,23 +121,28 @@ public class PanZoomService : IPanZoomService
     }
     private Point ComputeDelta(int x, int y)
     {
-        _Delta = new Point(x - _LastLocation.X, y - _LastLocation.Y);
-        _LastLocation = new(x,y);
-        return _Delta;
+        return State.ComputeDelta(x, y);
     }
 
-    public virtual void Smash()
+    public virtual bool Smash(bool force)
     {
-        this._matrix = null;
-        this._invMatrix = null;
+        if (_matrix == null && !force) return false;
+
+        //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
+        FoGlyph2D.ResetHitTesting = true;
+
+        this._matrix = Matrix2D.SmashMatrix(this._matrix);
+        this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
+
+        return true;
     }
 
     public virtual Matrix2D GetMatrix()
     {
         if (_matrix == null)
         {
-            _matrix = new Matrix2D();
-            _matrix.AppendTransform(_pan.X, _pan.Y, _zoom, _zoom, 0.0, 0.0, 0.0, 0.0, 0.0);
+            _matrix = Matrix2D.NewMatrix();
+            _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
             //"PanZoomService GetMatrix recalculate".WriteLine(ConsoleColor.Yellow);
         }
@@ -141,15 +185,16 @@ public class PanZoomService : IPanZoomService
         var x2 = pt.X;
         var y2 = pt.Y;
         var hit = new Rectangle(x1,y1, x2-x1, y2-y1);
-        _LastLocation = new Point(0, 0);
+        State.LastLocation = new Point(0, 0);
         ComputeDelta(hit.Left, hit.Top);
         return hit;
     }
 
     public Rectangle TransformRect(Rectangle rect)
     {
-        var pt1 = GetMatrix().TransformPoint(rect.Left, rect.Top);
-        var pt2 = GetMatrix().TransformPoint(rect.Right, rect.Bottom);
+        var matrix = GetMatrix();
+        var pt1 = matrix.TransformPoint(rect.Left, rect.Top);
+        var pt2 = matrix.TransformPoint(rect.Right, rect.Bottom);
 
         var newRect = new Rectangle(pt1.X, pt1.Y, pt2.X-pt1.X, pt2.Y-pt1.Y);
 
@@ -158,11 +203,12 @@ public class PanZoomService : IPanZoomService
 
     public Rectangle AntiScaleRect(Rectangle rect)
     {
-               //anti scale this window
-        var x = (rect.X-_pan.X) / _zoom;
-        var y = (rect.Y-_pan.Y) / _zoom;
-        var width = rect.Width / _zoom;
-        var height = rect.Height / _zoom;  
+        //anti scale this window
+        var zoom = State.Zoom;
+        var x = (rect.X-State.Pan.X) / zoom;
+        var y = (rect.Y-State.Pan.Y) / zoom;
+        var width = rect.Width / zoom;
+        var height = rect.Height / zoom;  
 
         var newRect = new Rectangle((int)x, (int)y, (int)width, (int)height);
         //$"AntiScaleRect {x} {y} {width} {height}".WriteLine(ConsoleColor.Yellow);
@@ -172,24 +218,24 @@ public class PanZoomService : IPanZoomService
 
     public double ZoomWheel(double delta)
     {
-        _lastZoom = _zoom;
-        _zoom *= delta < 0 ? 1.1 : 0.9;
-        Smash();
+        State.LastZoom = State.Zoom;
+        State.Zoom *= delta < 0 ? 1.1 : 0.9;
+        Smash(true);
         OnComplete?.Invoke();
-        return _zoom;
+        return State.Zoom;
     }
 
     public Point Movement()
     {
-        return _Delta;
+        return State.Delta;
 
     }
 
     public void Deconstruct(out double zoom, out int panx, out int pany)
     {
-        zoom = _zoom;
-        panx = _pan.X;
-        pany = _pan.Y;
+        zoom = State.Zoom;
+        panx = State.Pan.X;
+        pany = State.Pan.Y;
     }
 
     public async Task<PanZoomService> TranslateAndScale(Canvas2DContext ctx, FoGlyph2D shape)
@@ -214,41 +260,41 @@ public class PanZoomService : IPanZoomService
 
     public double SetZoom(double zoom)
     {
-        _lastZoom = _zoom;
-        _zoom = zoom;
-         Smash();
+        State.LastZoom = State.Zoom;
+        State.Zoom = zoom;
+        Smash(true);
         OnComplete?.Invoke();
-        return _zoom;
+        return State.Zoom;
     }
 
     public double Zoom()
     {
-        return _zoom;
+        return State.Zoom;
     }
     public double LastZoom()
     {
-        return _lastZoom;
+        return State.LastZoom;
     }
     public Point Pan()
     {
-        return _pan;
+        return State.Pan;
     }
 
     public Point PanBy(int dx, int dy)
     {
-        _pan.X += dx;
-        _pan.Y += dy;
-         Smash();
+        State.Pan.X += dx;
+        State.Pan.Y += dy;
+        Smash(true);
         OnComplete?.Invoke();
-        return _pan;
+        return State.Pan;
     }
 
 
     public Point SetPan(int x, int y)
     {
-        _pan = new(x, y);
-         Smash();
+        State.Pan = new(x, y);
+        Smash(true);
         OnComplete?.Invoke();
-        return _pan;
+        return State.Pan;
     }
 }

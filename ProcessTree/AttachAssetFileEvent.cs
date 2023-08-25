@@ -1,8 +1,11 @@
 
 
 namespace FoundryBlazor.Shape;
-public class AttachAssetFileEvent
+public class AttachAssetFileEvent 
 {
-    public  FoHero2D AssetFile { get; set; }
-    public  FoHero2D Target { get; set; }
+    public  string? AssetGuid { get; set; }
+    public  string? TargetGuid { get; set; }
+
+    public  FoGlyph2D? AssetShape { get; set; }
+    public  FoGlyph2D? TargetShape { get; set; }
 }

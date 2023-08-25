@@ -4,7 +4,7 @@ using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
-public class FoCompound2D : FoGlyph2D
+public class FoCompound2D : FoGlyph2D, IShape2D
 {
     public bool ApplyLayout = false;
 
@@ -130,6 +130,7 @@ public class FoCompound2D : FoGlyph2D
 
         if (DrawModelText == null )
         {
+            await ctx.SaveAsync();
             await ctx.SetTextAlignAsync(TextAlign.Left);
             await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
@@ -139,6 +140,7 @@ public class FoCompound2D : FoGlyph2D
 
             await ctx.SetFillStyleAsync("White");
             await ctx.FillTextAsync(Name,LeftX()+1,TopY()+1);
+            await ctx.RestoreAsync();
         }
     }
 
@@ -159,10 +161,7 @@ public class FoCompound2D : FoGlyph2D
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if ( deep ) 
         {

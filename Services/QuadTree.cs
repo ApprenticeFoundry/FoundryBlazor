@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Extensions;
+using Radzen.Blazor.Rendering;
+using System.Drawing;
 
 // https://happycoding.io/tutorials/processing/collision-detection
 //  https://bytes.com/topic/c-sharp/insights/880968-generic-quadtree-implementation
@@ -13,6 +11,8 @@ namespace FoundryBlazor.Shape;
 /// <summary>
 /// Interface to define Rect, so that QuadTree knows how to store the object.
 /// </summary>
+/// 
+
 
 
 /// <summary>
@@ -21,6 +21,31 @@ namespace FoundryBlazor.Shape;
 /// <typeparam name="T">Any object iheriting from IHasRect.</typeparam>
 public class QuadTree<T> where T : IHasRectangle
 {
+    private static readonly Queue<QuadTree<T>> cashe = new();
+    public static QuadTree<T> NewQuadTree(int x, int y, int width, int height)
+    {
+        if (cashe.Count == 0)
+        {
+            //$"New QuadTree {cashe.Count}".WriteInfo();
+            return new QuadTree<T>(x, y, width, height);
+        }
+
+        //$"Recycle QuadTree {cashe.Count}".WriteInfo();
+        var result = cashe.Dequeue();
+        result.Reset(x, y, width, height);
+        return result;
+    }
+
+    public static QuadTree<T>? SmashQuadTree(QuadTree<T>? source)
+    {
+        if (source == null) return null;
+
+        source.Clear(true);
+        cashe.Enqueue(source);
+       // $"Smash QuadTree {cashe.Count}".WriteNote();
+        return null;
+    }
+
     #region Constants
     // How many objects can exist in a QuadTree before it sub divides itself
     private const int MAX_OBJECTS_PER_NODE = 2;
@@ -84,23 +109,48 @@ public class QuadTree<T> where T : IHasRectangle
     {
         m_rect = new Rectangle(x, y, width, height);
     }
+    public QuadTree<T> Reset(int x, int y, int width, int height)
+    {
+        m_rect.Width = width;
+        m_rect.Height = height;
+        m_rect.Y = y;
+        m_rect.X = x;   
+        return this;
+    }
+
+    public bool IsSmashed()
+    {
+        var count = m_objects?.Count(item => item.IsSmashed());
+        var smashed = count > 0;
+        if ( !HasSubTrees() ) return smashed;
+
+        if ( m_childTL!.IsSmashed() || m_childTR!.IsSmashed() || m_childBL!.IsSmashed() || m_childBR!.IsSmashed() )
+            smashed = true;
+
+        return smashed;
+    }
+
     #endregion
 
-    public async Task Render(Canvas2DContext ctx, bool members = false)
+    public async Task DrawQuadTree(Canvas2DContext ctx, bool members = false)
     {
-        await ctx.StrokeRectAsync(m_rect.X-3, m_rect.Y-3, m_rect.Width+6, m_rect.Height+6);
+        var color = IsSmashed()? "Red" : "Cyan";
+
+        await ctx.SetStrokeStyleAsync(color);
+
+        await ctx.StrokeRectAsync(m_rect.X+1, m_rect.Y+1, m_rect.Width-2, m_rect.Height-2);
 
         if ( members )
             m_objects?.ForEach(async item =>
             {
                 var rect = item.Rect();
-                await ctx.StrokeRectAsync(rect.X-3, rect.Y-3, rect.Width+6, rect.Height+6);
+                await ctx.StrokeRectAsync(rect.X+1, rect.Y+1, rect.Width-2, rect.Height-2);
             });
 
-        if (TopLeftChild != null) await TopLeftChild.Render(ctx);
-        if (TopRightChild != null) await TopRightChild.Render(ctx);
-        if (BottomLeftChild != null) await BottomLeftChild.Render(ctx);
-        if (BottomRightChild != null) await BottomRightChild.Render(ctx);
+        if (TopLeftChild != null) await TopLeftChild.DrawQuadTree(ctx,members);
+        if (TopRightChild != null) await TopRightChild.DrawQuadTree(ctx,members);
+        if (BottomLeftChild != null) await BottomLeftChild.DrawQuadTree(ctx,members);
+        if (BottomRightChild != null) await BottomRightChild.DrawQuadTree(ctx,members);
     }
 
     #region Private Members
@@ -146,30 +196,31 @@ public class QuadTree<T> where T : IHasRectangle
         return count;
     }
 
-    /// <summary>
+
     /// Subdivide this QuadTree and move it's children into the appropriate Quads where applicable.
-    /// </summary>
+
     private void Subdivide()
     {
         // We've reached capacity, subdivide...
         Point size = new(m_rect.Width / 2, m_rect.Height / 2);
         Point mid = new(m_rect.X + size.X, m_rect.Y + size.Y);
 
-        m_childTL = new QuadTree<T>(new Rectangle(m_rect.Left, m_rect.Top, size.X, size.Y));
-        m_childTR = new QuadTree<T>(new Rectangle(mid.X, m_rect.Top, size.X, size.Y));
-        m_childBL = new QuadTree<T>(new Rectangle(m_rect.Left, mid.Y, size.X, size.Y));
-        m_childBR = new QuadTree<T>(new Rectangle(mid.X, mid.Y, size.X, size.Y));
+        m_childTL = NewQuadTree(m_rect.Left, m_rect.Top, size.X, size.Y);
+        m_childTR = NewQuadTree(mid.X, m_rect.Top, size.X, size.Y);
+        m_childBL = NewQuadTree(m_rect.Left, mid.Y, size.X, size.Y);
+        m_childBR = NewQuadTree(mid.X, mid.Y, size.X, size.Y);
 
         // If they're completely contained by the quad, bump objects down
         for (int i = 0; i < m_objects?.Count; i++)
         {
-            QuadTree<T> destTree = GetDestinationTree(m_objects[i]);
+            var item = m_objects[i];
+            QuadTree<T> destTree = GetDestinationTree(item);
 
             if (destTree != this)
             {
                 // Insert to the appropriate tree, remove the object, and back up one in the loop
-                destTree.Insert(m_objects[i]);
-                Remove(m_objects[i]);
+                destTree.Insert(item, item.Rect());
+                Remove(item);
                 i--;
             }
         }
@@ -185,19 +236,21 @@ public class QuadTree<T> where T : IHasRectangle
         // If a child can't contain an object, it will live in this Quad
         QuadTree<T> destTree = this;
 
-        if (m_childTL!.QuadRect.Contains(item.Rect()))
+        var rect = item.Rect();
+
+        if (m_childTL!.QuadRect.Contains(rect))
         {
             destTree = m_childTL;
         }
-        else if (m_childTR!.QuadRect.Contains(item.Rect()))
+        else if (m_childTR!.QuadRect.Contains(rect))
         {
             destTree = m_childTR;
         }
-        else if (m_childBL!.QuadRect.Contains(item.Rect()))
+        else if (m_childBL!.QuadRect.Contains(rect))
         {
             destTree = m_childBL;
         }
-        else if (m_childBR!.QuadRect.Contains(item.Rect()))
+        else if (m_childBR!.QuadRect.Contains(rect))
         {
             destTree = m_childBR;
         }
@@ -210,28 +263,34 @@ public class QuadTree<T> where T : IHasRectangle
     /// <summary>
     /// Clears the QuadTree of all objects, including any objects living in its children.
     /// </summary>
-    public void Clear()
+    public QuadTree<T> Clear(bool force)
     {
-        // Clear out the children, if we have any
+        // the question is:  do we want to clear the tree if it has no smashed objects?
 
-        m_childTL?.Clear();
-        m_childTR?.Clear();
-        m_childBL?.Clear();
-        m_childBR?.Clear();
-
+        var smashed = IsSmashed();
+        //no smashed objects, no need to clear
+        if ( smashed && !force && !HasSubTrees()) 
+            return this;
 
         // Clear any objects at this level
-        if (m_objects != null)
-        {
-            m_objects.Clear();
-            m_objects = null;
-        }
+        if ( smashed || force)
+            m_objects?.Clear();
+
+        m_childTL?.Clear(force);
+        m_childTR?.Clear(force);
+        m_childBL?.Clear(force);
+        m_childBR?.Clear(force);
 
         // Set the children to null
-        m_childTL = null;
-        m_childTR = null;
-        m_childBL = null;
-        m_childBR = null;
+        if ( force )
+        {
+            m_childTL = SmashQuadTree(m_childTL);
+            m_childTR = SmashQuadTree(m_childTR);
+            m_childBL = SmashQuadTree(m_childBL);
+            m_childBR = SmashQuadTree(m_childBR);
+        }
+
+        return this;
     }
 
     /// <summary>
@@ -257,7 +316,7 @@ public class QuadTree<T> where T : IHasRectangle
             m_childBR?.Delete(item);
         }
 
-        if (m_childTL != null)
+        if (HasSubTrees())
         {
             // If all the children are empty, delete all the children
             if (m_childTL!.Count == 0 &&
@@ -265,48 +324,45 @@ public class QuadTree<T> where T : IHasRectangle
                 m_childBL!.Count == 0 &&
                 m_childBR!.Count == 0)
             {
-                m_childTL = null;
-                m_childTR = null;
-                m_childBL = null;
-                m_childBR = null;
+                m_childTL = SmashQuadTree(m_childTL);
+                m_childTR = SmashQuadTree(m_childTR);
+                m_childBL = SmashQuadTree(m_childBL);
+                m_childBR = SmashQuadTree(m_childBR);
             }
         }
     }
 
-    /// <summary>
-    /// Insert an item into this QuadTree object.
-    /// </summary>
-    /// <param name="item">The item to insert.</param>
-    public void Insert(T item)
+
+    public bool HasSubTrees()
     {
+        return m_childTL != null;
+    }
+    /// Insert an item into this QuadTree object.
+
+    public void Insert(T item, Rectangle itemRect)
+    {
+        //var itemRect = item.Rect();
         // If this quad doesn't intersect the items rectangle, do nothing
-        if (!m_rect.IntersectsWith(item.Rect()))
+        if (!m_rect.IntersectsWith(itemRect))
             return;
 
-        if (m_objects == null ||
-            (m_childTL == null && m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE))
-        {
-            // If there's room to add the object, just add it
-            Add(item);
-        }
+        if (m_objects == null )
+            Add(item); // If there's room to add the object, just add it       
+        else if ( m_objects.Count + 1 <= MAX_OBJECTS_PER_NODE && HasSubTrees() == false)
+            Add(item); // If there's room to add the object, just add it
         else
         {
             // No quads, create them and bump objects down where appropriate
-            if (m_childTL == null)
-            {
+            if ( !HasSubTrees() )
                 Subdivide();
-            }
+            
 
             // Find out which tree this object should go in and add it there
-            QuadTree<T> destTree = GetDestinationTree(item);
+            var destTree = GetDestinationTree(item);
             if (destTree == this)
-            {
                 Add(item);
-            }
             else
-            {
-                destTree.Insert(item);
-            }
+                destTree.Insert(item,itemRect);
         }
     }
 
@@ -318,36 +374,29 @@ public class QuadTree<T> where T : IHasRectangle
     public void GetObjects(Rectangle rect, ref List<T> results)
     {
         // We can't do anything if the results list doesn't exist
-        if (results != null)
+        if (results == null) return;
+        
+        if (rect.Contains(m_rect))
         {
-            if (rect.Contains(m_rect))
-            {
-                // If the search area completely contains this quad, just get every object this quad and all it's children have
-                GetAllObjects(ref results);
-            }
-            else if (rect.IntersectsWith(m_rect))
-            {
-                // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
-                if (m_objects != null)
-                {
-                    for (int i = 0; i < m_objects.Count; i++)
-                    {
-                        if (rect.IntersectsWith(m_objects[i].Rect()))
-                        {
-                            results.Add(m_objects[i]);
-                        }
-                    }
-                }
-
-                // Get the objects for the search rectangle from the children
-
-                m_childTL?.GetObjects(rect, ref results);
-                m_childTR?.GetObjects(rect, ref results);
-                m_childBL?.GetObjects(rect, ref results);
-                m_childBR?.GetObjects(rect, ref results);
-
-            }
+            // If the search area completely contains this quad, just get every object this quad and all it's children have
+            GetAllObjects(ref results);
         }
+        else if (rect.IntersectsWith(m_rect))
+        {
+            // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
+            if (m_objects != null)
+                for (int i = 0; i < m_objects.Count; i++)
+                    if (rect.IntersectsWith(m_objects[i].Rect()))
+                        results.Add(m_objects[i]);
+
+            // Get the objects for the search rectangle from the children
+
+            m_childTL?.GetObjects(rect, ref results);
+            m_childTR?.GetObjects(rect, ref results);
+            m_childBL?.GetObjects(rect, ref results);
+            m_childBR?.GetObjects(rect, ref results);
+        }
+        
     }
 
     /// <summary>

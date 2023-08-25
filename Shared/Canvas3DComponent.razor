@@ -1,0 +1,13 @@
+﻿@using FoundryBlazor.Shared
+@using BlazorThreeJS.Viewers
+@inherits Canvas3DComponentBase
+
+<div style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight >
+  <AnimationHelper @ref="AnimationHelperReference" RenderFrame="RenderFrame"  >
+        <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene()  />
+   </AnimationHelper>
+</div>
+
+
+
+

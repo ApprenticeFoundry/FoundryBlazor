@@ -10,13 +10,17 @@ namespace FoundryBlazor.Shape;
 public enum InteractionStyle
 {
     None,
+    ReadOnly,
     PagePanAndZoom,
     ShapeSelection,
     ShapeHovering,
     ShapeDragging,
+    ShapeMenu,
     ShapeResizing,
     ShapeCreating,
     ShapeConnecting,
+    ModelLinking,
+    UserExtension,
 }
 
 public interface IBaseInteraction
@@ -33,6 +37,8 @@ public interface IBaseInteraction
 }
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
+    public int Priority { get; set; } = 0;
+    public InteractionStyle Style { get; set; } = InteractionStyle.None;
     protected Rectangle dragArea;
     protected FoGlyph2D? selectedShape;
     
@@ -46,6 +52,8 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     protected ISelectionService selectionService;
 
     public BaseInteraction(
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pub,
             IPanZoomService panzoom,
@@ -54,6 +62,8 @@ public class BaseInteraction : FoComponent, IBaseInteraction
             IHitTestService hitTest
         ): base()
         {
+            Style = style;
+            Priority = priority;
             drawing = draw;
             pubsub = pub;
             hitTestService = hitTest;
@@ -106,6 +116,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     }
     public virtual bool MouseUp(CanvasMouseArgs args)
     {
+        selectionService.MouseDropped();
         return false;
     }
     public virtual bool MouseMove(CanvasMouseArgs args)

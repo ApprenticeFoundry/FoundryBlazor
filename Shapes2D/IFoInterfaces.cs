@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace FoundryBlazor.Shape;
 
 
@@ -20,4 +15,29 @@ public interface IFoMenu
 public interface IFoCommand
 {
     List<IFoButton> Buttons();
+}
+
+
+public interface IShape1D
+{
+
+}
+
+public interface IShape2D
+{
+    
+}
+public interface IImage2D: IShape2D
+{
+    
+}
+
+public interface IShape3D
+{
+
+}
+
+public interface IPipe3D
+{
+    
 }

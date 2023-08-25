@@ -1,81 +1,233 @@
-using FoundryBlazor.Canvas;
+using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
+using FoundryBlazor.Canvas;
+using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+using System.Linq;
+
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using Radzen;
+using IoBTMessage.Extensions;
+using IoBTMessage.Models;
 
 namespace FoundryBlazor.Solutions;
 
 public enum ViewStyle { None, View2D, View3D }
 public enum InputStyle { None, Drawing, FileDrop }
-public interface IWorkspace
+
+
+
+public interface IWorkspace : IWorkbook
 {
+    string GetBaseUrl();
+    string SetBaseUrl(string url);
+    
     Task InitializedAsync(string defaultHubURI);
-    IDrawing? GetDrawing();
-    IArena? GetArena();
-    string GetPanID();
+    IDrawing GetDrawing();
+    IArena GetArena();
+    ISelectionService GetSelectionService();
+    IFoundryService GetFoundryService();
+
+    string GetUserID();
     ViewStyle GetViewStyle();
     void SetViewStyle(ViewStyle style);
     bool IsViewStyle2D();
     bool IsViewStyle3D();
 
-    List<FoCommand2D> GetAllCommands();
-    void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl);
-    FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D;
-    void CreateMenus(IJSRuntime js, NavigationManager nav);
-    FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D;
+    U EstablishCommand<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoCommand2D;
+    U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D;
+    U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
+
 
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
+    void ClearAllWorkbook();
+    List<FoWorkbook> AllWorkbooks();
+    List<FoWorkbook> AddWorkbook(FoWorkbook book);
+    T EstablishWorkbook<T>() where T : FoWorkbook;
+
+    FoWorkbook? FindWorkbook(string name);
+    FoWorkbook CurrentWorkbook();
+    FoWorkbook SetCurrentWorkbook(FoWorkbook book);
+
+
+    Task LocalFileSave(string filename, byte[] data);
+    Task<string> FileLoad(string filename);
+    Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args);
+
+    ComponentBus GetPubSub();
+    void OnDispose();
 }
 
 public class FoWorkspace : FoComponent, IWorkspace
 {
     public static bool RefreshCommands { get; set; } = true;
+    public static bool RefreshMenus { get; set; } = true;
 
-    public D2D_UserToast UserToast = new();
-    public D2D_UserMove? UserLocation { get; set; }
-    public Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
+    protected string UserID { get; set; } = "";
+    protected string CurrentUrl { get; set; } = "";
+    
+    public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
+    
+    protected ViewStyle viewStyle = ViewStyle.View2D;
 
-    private IDrawing? ActiveDrawing { get; init; }
-    private IArena? ActiveArena { get; init; }
+    private FoWorkbook ActiveWorkbook { get; set; }
+    protected IDrawing ActiveDrawing { get; init; }
+    protected IArena ActiveArena { get; init; }
     public ICommand Command { get; set; }
     public IPanZoomService PanZoom { get; set; }
-    private ViewStyle viewStyle = ViewStyle.View2D;
-    public InputStyle InputStyle { get; set; } = InputStyle.Drawing;
-    private readonly string panID;
-    private IToast Toast { get; set; }
-    private ComponentBus PubSub { get; set; }
 
 
+    public IFoundryService Foundry { get; set; }
+    protected IToast Toast { get; set; }
+    protected ComponentBus PubSub { get; set; }
+    protected DialogService Dialog { get; set; }
+    protected IJSRuntime JsRuntime { get; set; }
+    protected ISelectionService SelectionService { get; set; }
+   
 
-    public FoWorkspace(
-        IToast toast,
-        ICommand command,
-        IPanZoomService panzoom,
-        IDrawing drawing,
-        IArena arena,
-        ComponentBus pubSub
-        )
+    public Func<IBrowserFile, CanvasMouseArgs, Task> OnFileDrop { get; set; } = async (IBrowserFile file, CanvasMouseArgs args) => { await Task.CompletedTask; };
+
+
+    protected Action SetDrawingStyle { get; set; }
+    protected Action SetFileDropStyle { get; set; }
+
+    public FoWorkspace(IFoundryService foundry)
     {
+        Foundry = foundry;
+        Toast = foundry.Toast();
+        Command = foundry.Command();
+        SelectionService = foundry.Selection();
+        ActiveDrawing = foundry.Drawing();
+        ActiveArena = foundry.Arena();
+        PubSub = foundry.PubSub();
+        PanZoom = foundry.PanZoom();
+        Dialog = foundry.Dialog();
+        JsRuntime = foundry.JS();
 
-        Toast = toast;
-        Command = command;
-        ActiveDrawing = drawing;
-        ActiveArena = arena;
-        PubSub = pubSub;
-        PanZoom = panzoom;
+        ActiveWorkbook = CurrentWorkbook();
 
-        var names = new MockDataGenerator();
-        panID = names.GenerateName();
+        SetDrawingStyle = async () =>
+        {
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("CanvasFileInput.HideFileInput");
+                InputStyle = InputStyle.Drawing;
+                await PubSub!.Publish<InputStyle>(InputStyle);
+                "SetDrawingStyle".WriteWarning();
+            }
+            catch { }
+        };
 
-        $"Instance of FoWorkspace created using {panID}".WriteLine(ConsoleColor.Green);
+        SetFileDropStyle = async () =>
+        {
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
+                InputStyle = InputStyle.FileDrop;
+                await PubSub!.Publish<InputStyle>(InputStyle);
+                "SetFileDropStyle".WriteWarning();
+            }
+            catch { }
+        };
     }
 
+
+//https://stackoverflow.com/questions/52683706/how-can-one-generate-and-save-a-file-client-side-using-blazor
+    public async Task LocalFileSave(string filename, byte[] data)
+    {
+        if (JsRuntime != null) 
+            await JsRuntime.InvokeAsync<object>("window.saveAsFile",filename,Convert.ToBase64String(data));
+    }
+    public async Task<string> FileLoad(string filename)
+    {
+        await Task.CompletedTask;
+        return "";
+    }
+
+    public IFoundryService GetFoundryService()
+    {
+        return Foundry;
+    }
+
+    public virtual void PreRender(int tick)
+    {
+        AllWorkbooks()?.ForEach(item => 
+        {
+            if (item.IsActive)
+                item.PreRender(tick);
+        });
+    }
+
+    public virtual void PostRender(int tick)
+    {
+        AllWorkbooks()?.ForEach(item =>
+        {
+            if (item.IsActive)
+                item.PostRender(tick);
+        });
+    }
+
+
+    public FoWorkbook CurrentWorkbook()
+    {
+        if (ActiveWorkbook == null)
+        {
+            var found = AllWorkbooks().Where(book => book.IsActive).FirstOrDefault();
+            if (found == null)
+            {
+                found = new FoWorkbook(this, Foundry)
+                {
+                    Name = "Book-1"
+                };
+                AddWorkbook(found);
+            }
+            ActiveWorkbook = found;
+            ActiveWorkbook.IsActive = true;
+        }
+
+        return ActiveWorkbook;
+    }
+
+    public FoWorkbook SetCurrentWorkbook(FoWorkbook book)
+    {
+        if (ActiveWorkbook == book) return ActiveWorkbook;
+
+        ActiveWorkbook = book;
+        AllWorkbooks().ForEach(item => item.IsActive = false);
+        ActiveWorkbook.IsActive = true;
+
+        return ActiveWorkbook;
+    }
+
+    public FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory")
+    {
+        return CurrentWorkbook().EstablishCurrentPage(pagename, color);
+    }
+
+    public FoPage2D CurrentPage()
+    {
+        return CurrentWorkbook().CurrentPage();
+    }
+
+    public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
+    {
+        AllWorkbooks()?.ForEach(async item =>
+        {
+            if (item.IsActive)
+                await item.RenderWatermark(ctx, tick);
+        });
+        await Task.CompletedTask;
+     }
+
+    public virtual async Task DropFileCreateShape(IBrowserFile file, CanvasMouseArgs args)
+    {
+        await OnFileDrop.Invoke(file, args);
+    }
 
     public async Task InitializedAsync(string defaultHubURI)
     {
@@ -88,70 +240,240 @@ public class FoWorkspace : FoComponent, IWorkspace
         await PubSub!.Publish<InputStyle>(InputStyle);
     }
 
+    public void StartHub()
+    {
+        Command.StartHub();
+        var defaultHubURI = Command.GetServerUri()?.ToString() ?? "GetServerUri Error";
+        var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+        Command.SendToast(ToastType.Info, note);
+    }
+
+    public void StopHub()
+    {
+        Command.StopHub();
+        var defaultHubURI = Command.GetServerUri()?.ToString() ?? "GetServerUri Error";
+        var note = $"Starting SignalR Hub:{defaultHubURI}".WriteNote();
+        Command.SendToast(ToastType.Info, note);
+    }
+    public void OnDispose()
+    {
+        if (Command.HasHub())
+        {
+            DisconnectDrawingSyncHub();
+        }
+    }
+
     private void OnWorkspaceViewStyleChanged(ViewStyle e)
     {
         viewStyle = e;
     }
 
-    public string GetPanID()
+    public string GetUserID()
     {
-        return panID;
+        if (string.IsNullOrEmpty(UserID))
+        {
+            var data = new MockDataMaker();
+            UserID = data.GenerateName();
+        }
+        return UserID;
     }
 
-    public IDrawing? GetDrawing()
+    
+    public string GetBaseUrl()
+    {
+        return CurrentUrl;
+    }
+
+    public string SetBaseUrl(string url)
+    {
+        CurrentUrl = url;
+        $"CurrentUrl: {CurrentUrl}".WriteSuccess();
+        return CurrentUrl;
+    }
+
+    public IDrawing GetDrawing()
     {
         return ActiveDrawing;
     }
 
-    public IArena? GetArena()
+    public IArena GetArena()
     {
         return ActiveArena;
+    }
+
+    public ISelectionService GetSelectionService()
+    {
+        return SelectionService;
+    }
+    
+    public void ClearAllWorkbook()
+    {
+        GetSlot<FoWorkbook>()?.Clear();
+        GetSlot<FoMenu2D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
+        FoWorkspace.RefreshCommands = true;
+        FoWorkspace.RefreshMenus = true;
+        "ClearAllWorkbook".WriteWarning();
+    }
+
+    public List<FoWorkbook> AddWorkbook(FoWorkbook book)
+    {
+        Add<FoWorkbook>(book);
+        FoWorkspace.RefreshCommands = true;
+        FoWorkspace.RefreshMenus = true;
+        return Members<FoWorkbook>();
+    }
+
+    public T EstablishWorkbook<T>() where T : FoWorkbook
+    {
+
+        var found = AllWorkbooks().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
+        if ( found == null )
+        {
+            found = Activator.CreateInstance(typeof(T), this, Foundry) as T;
+            AddWorkbook(found!);
+        }
+        return found!;
+    }
+
+    public FoWorkbook? FindWorkbook(string name)
+    {
+
+        return AllWorkbooks().Where(item => item.Name.Matches(name)).FirstOrDefault();
+    }
+
+    public List<FoWorkbook> AllWorkbooks() 
+    {
+        return Members<FoWorkbook>();
+    }
+
+
+    public void ResolveTargets(List<DT_Target>? targets)
+    {
+        AllWorkbooks()?.ForEach(item =>
+        {
+            item.ResolveTargets(targets);
+        });
     }
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
         GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
-
-        if ( !IsViewStyle3D())
-            GetDrawing()?.CollectMenus(list);
-
-        if ( !IsViewStyle2D())
-            GetArena()?.CollectMenus(list);
-
+        GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
         return list;
     }
 
-    public FoMenu2D EstablishMenu<T>(string name, Dictionary<string, Action> menu, bool clear) where T : FoMenu2D
+   public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
     {
-        var result = ActiveDrawing?.EstablishMenu<T>(name, menu, clear);
-        return result!;
-    }
-
-    public void CreateMenus(IJSRuntime js, NavigationManager nav)
-    {
-        EstablishMenu<FoMenu2D>("View", new Dictionary<string, Action>()
+        var menu = Find<U>(name);
+        if (menu == null)
         {
-            { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
-            { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
-            { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-        }, true);
-    }
-
-    public List<FoCommand2D> GetAllCommands()
-    {
-        var list = this.Members<FoCommand2D>();
-        return list;
-    }
-    public FoCommand2D EstablishCommand<T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D
-    {
-        var commandBar = Find<FoCommand2D>(name);
-        if (commandBar == null)
-        {
-            commandBar = Activator.CreateInstance(typeof(FoCommand2D), name) as FoCommand2D;
-            this.Add<FoCommand2D>(commandBar!);
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
         }
         if (clear)
-            commandBar?.Clear();
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishMenu2D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U : FoMenu2D
+    {
+        var menu = EstablishMenu2D<U>(name,clear);
+
+        foreach (KeyValuePair<string, Action> item in actions)
+        {
+            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+                menu.Add<T>(shape);
+        }
+
+        return menu;
+    }
+
+    public U EstablishMenu3D<U>(string name, bool clear) where U : FoMenu3D
+    {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshMenus = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D
+    {
+        var menu = EstablishMenu3D<U>(name,clear);
+
+        foreach (KeyValuePair<string, Action> item in actions)
+        {
+            if (Activator.CreateInstance(typeof(T), item.Key, item.Value) is T shape)
+                menu.Add<T>(shape);
+        }
+
+        //menu.LayoutHorizontal();
+
+        return menu;
+    }
+
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
+    {
+        GetSlot<FoMenu2D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
+
+        "FoWorkspace CreateMenus".WriteWarning();
+        var OpenNew = async () =>
+        {
+            var target = nav!.ToAbsoluteUri("/");
+            try
+            {
+                await js.InvokeAsync<object>("open", target); //, "_blank", "height=600,width=1200");
+            }
+            catch { }
+        };
+
+        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
+         {
+             { "New Window", () => OpenNew()},
+             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
+             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
+             { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
+           //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
+             { "Save Drawing", () => Command.Save()},
+             { "Restore Drawing", () => Command.Restore()},
+         }, true);
+
+        ActiveWorkbook?.CreateMenus(space, js, nav);
+
+
+        GetDrawing()?.CreateMenus(space,js, nav);
+        GetArena()?.CreateMenus(space,js, nav);
+    }
+
+
+    public U EstablishCommand<U>(string name, bool clear) where U : FoCommand2D
+    {
+        var menu = Find<U>(name);
+        if (menu == null)
+        {
+            RefreshCommands = true;
+            menu = Activator.CreateInstance(typeof(U), name) as U;
+            Add<U>(menu!);
+        }
+        if (clear)
+            menu?.Clear();
+
+        return menu!;
+    }
+
+    public U EstablishCommand<U,T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton2D where U: FoCommand2D
+    {
+        var commandBar = EstablishCommand<U>(name,clear);
 
         foreach (KeyValuePair<string, Action> item in actions)
         {
@@ -162,8 +484,9 @@ public class FoWorkspace : FoComponent, IWorkspace
         return commandBar!;
     }
 
-    public void CreateCommands(IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IWorkspace space,  IJSRuntime js, NavigationManager nav, string serverUrl)
     {
+        GetSlot<FoCommand2D>()?.Clear();
 
         var OpenDTAR = async () =>
         {
@@ -175,47 +498,46 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        var SetDrawingStyle = async () =>
-        {
-            try
-            {
-                await js!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
-                InputStyle = InputStyle.Drawing;
-                await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetDrawingStyle".WriteLine(ConsoleColor.DarkYellow);
-            }
-            catch { }
-        };
 
-        var SetFileDropStyle = async () =>
+        space.EstablishCommand<FoCommand2D,FoButton2D>("CMD", new Dictionary<string, Action>()
         {
-            try
-            {
-                await js!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
-                InputStyle = InputStyle.FileDrop;
-                await PubSub!.Publish<InputStyle>(InputStyle);
-                "SetFileDropStyle".WriteLine(ConsoleColor.DarkYellow);
-            }
-            catch { }
-        };
-        EstablishCommand<FoButton2D>("CMD", new Dictionary<string, Action>()
-        {
-            { serverUrl, () => OpenDTAR() },
+            { "Ping", () => DoPing()},
+                        { "Clear", () => DoClear()},
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
-            { "1:1", () => PanZoom.Reset()},
-            { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
-            { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
-            { "Down", () => ActiveDrawing?.MovePanBy(0,50)},
-            { "Right", () => ActiveDrawing?.MovePanBy(50,0)},
-            { "Up", () => ActiveDrawing?.MovePanBy(0,-50)},
-            { "Left", () => ActiveDrawing?.MovePanBy(-50,0)},
+               { "Save", () => DoSave()},
+            // { "1:1", () => PanZoom.Reset()},
+            // { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
+            // { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
+            // { "Down", () => ActiveDrawing?.MovePanBy(0,50)},
+            // { "Right", () => ActiveDrawing?.MovePanBy(50,0)},
+            // { "Up", () => ActiveDrawing?.MovePanBy(0,-50)},
+            // { "Left", () => ActiveDrawing?.MovePanBy(-50,0)},
             { "Window", () => ActiveDrawing?.TogglePanZoomWindow()},
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
+        ActiveWorkbook?.CreateCommands(space,js, nav, serverUrl);
 
         FoWorkspace.RefreshCommands = true;
+    }
+
+    private void DoSave()
+    {
+        var text = "Hello, Saved world!";
+        var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+
+        LocalFileSave("HelloWorld.txt", bytes);
+    }
+
+    public void DoPing()
+    {
+        Command.SendToast(ToastType.Info, "Ping");
+    }
+
+    public void DoClear()
+    {
+        GetDrawing()?.ClearAll();
     }
 
     public ViewStyle GetViewStyle()
@@ -228,28 +550,47 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
     public bool IsViewStyle2D()
     {
-        FoPage2D.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View2D;
     }
     public bool IsViewStyle3D()
     {
-        FoPage2D.RefreshMenus = true;
         return GetViewStyle() == ViewStyle.View3D;
     }
 
     public HubConnection EstablishDrawingSyncHub(string defaultHubURI)
     {
-        if (Command.HasHub()) return Command.GetHub()!;
+        if (Command.HasHub()) 
+            return Command.GetSignalRHub()!;
 
-        var secureHub = defaultHubURI.Replace("http://", "https://");
-        var secureHubURI = new Uri(secureHub);
+        //var secureHub = defaultHubURI.Replace("http://", "https://");
+        var secureHubURI = new Uri(defaultHubURI);
 
 
         var hub = new HubConnectionBuilder()
             .WithUrl(secureHubURI)
             .Build();
 
-        Command.SetHub(hub, panID);
+        Command.SetSignalRHub(hub, secureHubURI, GetUserID(), Toast);
+        SetSignalRHub(hub, GetUserID());
+
+        //Toast?.Success($"HubConnection {secureHubURI} ");
+
+        return hub;
+    }
+
+    public void DisconnectDrawingSyncHub()
+    {
+        if (Command.HasHub()) 
+            Command.StopHub();
+
+        // Command.SetSignalRHub(hub, GetUserID(), Toast);
+        // SetSignalRHub(hub, GetUserID());
+
+    }
+
+    public bool SetSignalRHub(HubConnection hub, string panid)
+    {
+        ActiveWorkbook.SetSignalRHub(hub, panid);
 
         hub.Closed += async (error) =>
        {
@@ -269,117 +610,19 @@ public class FoWorkspace : FoComponent, IWorkspace
             var rand = new Random();
             await Task.Delay(rand.Next(0, 5) * 1000);
         };
-
-
-
-        hub.On<D2D_Move>("Move", (move) =>
-        {
-            if (move.PayloadType.Matches("Boid"))
-            {
-                // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-                //BoidSimulation?.DoMovement(move);
-                return;
-            }
-            Command?.Move(move);
-        });
-
-        hub.On<D2D_Destroy>("Destroy", (destroy) =>
-        {
-
-            if (destroy.PayloadType.Matches("Boid"))
-            {
-                // $"Receive D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message Receive on {PanID}".WriteLine(ConsoleColor.Yellow);
-                // BoidSimulation?.DoDestroy(destroy);
-                return;
-            }
-
-            Command?.Destroy(destroy);
-
-        });
-
-        hub.On<D2D_UserMove>("UserMove", (usermove) =>
-        {
-            var key = usermove.PanID;
-            if (!OtherUserLocations.Remove(key))
-                if (usermove.Active)
-                    Toast?.Success($"{key} has joined");
-
-
-            if (usermove.Active)
-                OtherUserLocations.Add(key, usermove);
-            else
-                Toast?.Info($"{key} has left");
-        });
-
-        hub.On<D2D_UserToast>("UserToast", (usertoast) =>
-        {
-            Toast?.RenderToast(usertoast);
-        });
-
-        return hub;
+        return true;
     }
 
 
-    protected D2D_UserToast SendToast(D2D_UserToast toast)
+    public List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
-        Toast?.RenderToast(toast);
-        SendSyncMessage(toast);
-        return toast;
+        GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));
+        ActiveWorkbook?.CollectCommands(list);
+        return list;
     }
 
-    protected void SendShapeDestroy<T>(T shape) where T : FoGlyph2D
+    public ComponentBus GetPubSub()
     {
-        var destroy = new D2D_Destroy()
-        {
-            PanID = panID,
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name
-        };
-        // $"Send___ D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(destroy);
+        return PubSub;
     }
-
-
-    protected D2D_Move SendShapeMoved<T>(T shape) where T : FoGlyph2D
-    {
-        var move = new D2D_Move()
-        {
-            PanID = panID,
-            TargetId = shape.GlyphId,
-            PayloadType = shape.GetType().Name,
-            PinX = shape.PinX,
-            PinY = shape.PinY,
-            Angle = shape.Angle
-        };
-        // $"Send___ D2D_Move {move.TargetId} {move.PayloadType} {move.PanID} Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(move);
-        return move;
-    }
-
-    protected D2D_UserMove SendUserMove(CanvasMouseArgs args, bool isActive)
-    {
-        UserLocation ??= new D2D_UserMove();
-        UserLocation.Active = isActive;
-        UserLocation.X = args.OffsetX;
-        UserLocation.Y = args.OffsetY;
-
-        //$"Send___ D2D_UserMove  Message".WriteLine(ConsoleColor.Yellow);
-
-        SendSyncMessage(UserLocation);
-        return UserLocation;
-    }
-
-    protected D2D_Base SendSyncMessage(D2D_Base msg)
-    {
-        Task.Run(async () =>
-        {
-            msg.PanID = this.panID;
-            await Command.Send(msg);
-        });
-        return msg;
-    }
-
-
 }

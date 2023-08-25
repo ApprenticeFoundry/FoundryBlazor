@@ -1,7 +1,5 @@
-using System.Drawing;
-using FoundryBlazor.Canvas;
 using BlazorComponentBus;
-using FoundryBlazor;
+using FoundryBlazor.Canvas;
 
 namespace FoundryBlazor.Shape;
 
@@ -12,19 +10,25 @@ public class ShapeDragging : ShapeHovering
 
 
     public ShapeDragging(
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pubsub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
     {
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        return selectionService.Selections().Count > 0;
+        dragArea = panZoomService.HitRectStart(args);
+        var findings = pageManager?.FindGlyph(dragArea);
+        var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
+        return selected != null;
+        //return selectionService.Selections().Count > 0;
     }
 
     public override bool MouseDown(CanvasMouseArgs args)
@@ -36,7 +40,14 @@ public class ShapeDragging : ShapeHovering
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
         var hitShape = findings?.LastOrDefault(); 
+        hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
+
+
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
+        if ( selectedShape != null ) 
+        {
+            selectionService.MouseStartDrag();
+        }       
 
         if (selectedShape != null)
         {
@@ -45,7 +56,7 @@ public class ShapeDragging : ShapeHovering
         else if ( hitShape != null && !hitShape.IsSelected )
         {
             selectionService.ClearAll();
-            selectionService?.AddItem(hitShape);
+            selectionService.AddItem(hitShape);
             isDraggingShapes = true;
         } 
         else {
@@ -57,7 +68,10 @@ public class ShapeDragging : ShapeHovering
     }
     public override bool MouseUp(CanvasMouseArgs args)
     {
+        selectedShape?.OnShapeClick(ClickStyle.MouseUp, args);
         isDraggingShapes = false;
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        selectionService?.MouseDropped();
         return true;
     }
 

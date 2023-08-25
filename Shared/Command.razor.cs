@@ -1,37 +1,42 @@
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
-using FoundryBlazor.Model;
-using IoBTMessage.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class CommandManager : ComponentBase
+public class CommandManager : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
     [Inject] public IWorkspace? Workspace { get; init; }
-    [Inject] public IDTARSolution? DTARSolution { get; set; }
 
-    public List<FoCommand2D> AllCommands = new();
+    public List<IFoCommand> AllCommands = new();
 
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var url = DTARSolution?.GetServerUrl() ?? "";
-    //     Workspace?.CreateCommands(JsRuntime!, Navigation!, url);
-    //     await base.OnInitializedAsync();
-    // }
-
-    public List<FoCommand2D> GetAllCommands()
+    protected override void OnInitialized()
     {
-        if (FoWorkspace.RefreshCommands)
+        if ( Navigation != null)
+            Navigation.LocationChanged += LocationChanged;
+    }
+
+    void IDisposable.Dispose()
+    {
+        if ( Navigation != null)
+            Navigation.LocationChanged -= LocationChanged;
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    public List<IFoCommand> GetAllCommands()
+    {
+        if (FoWorkspace.RefreshCommands && Workspace != null)
         {
             AllCommands.Clear();
-            var commands = Workspace?.GetAllCommands();
-
-            Workspace?.GetAllCommands().ForEach(item => AllCommands.Add(item) );
-
+            AllCommands = Workspace.CollectCommands(AllCommands);
+            FoWorkspace.RefreshCommands = false;
 
             // AllCommands.ForEach(obj =>
             // {
@@ -41,8 +46,6 @@ public class CommandManager : ComponentBase
             //         $"AllCommands the but {but.DisplayText()}".WriteLine();
             //     });
             // });
-
-            FoWorkspace.RefreshCommands = false;
         }
 
         return AllCommands;

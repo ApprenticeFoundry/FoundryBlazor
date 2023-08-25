@@ -1,40 +1,32 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace FoundryBlazor;
 
 
 public class FoBase
 {
     public string Name { get; set; }
-    private ControlParameters? _metaData { get; set; }
+    private ControlParameters? metaData { get; set; }
 
     public FoBase(string name)
     {
-        //if ( !string.IsNullOrEmpty(name))
         Name = name;
-        //else
-        //    Name = Guid.NewGuid().ToString();
     }
     public ControlParameters MetaData()
     {
-        _metaData ??= new ControlParameters();
-        return _metaData;
+        metaData ??= new ControlParameters();
+        return metaData;
     }
 
 
     public bool HasMetaData()
     {
-        return _metaData != null;
+        return metaData != null;
     }
 
     public bool HasMetaDataKey(string key)
     {
-        if (_metaData != null)
+        if (metaData != null)
         {
-            return _metaData.Find(key) != null;
+            return metaData.Find(key) != null;
         }
         return false;
     }
@@ -42,6 +34,6 @@ public class FoBase
     public ControlParameters AddMetaData(string key, string value)
     {
         MetaData().Establish(key, value);
-        return _metaData!;
+        return metaData!;
     }
 }

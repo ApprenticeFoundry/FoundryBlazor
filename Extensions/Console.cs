@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace FoundryBlazor.Extensions;
@@ -27,20 +25,36 @@ public static class ConsoleHelpers
         Console.ResetColor();
     }
 
+    public static string Padding(int pad = 0)
+    {
+        var index = pad * 3;
+        var padded = "                                                                       "[..index];
+        return padded;
+    }
+    public static string WriteInfo(this string message, int pad = 0)
+    {
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Cyan);
+    }
+    public static string WriteNote(this string message, int pad = 0)
+    {
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.DarkMagenta);
+    }
 
+    public static string WriteWarning(this string message, int pad = 0)
+    {
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Yellow);
+    }
 
-    public static string WriteSuccess(this string message)
+    public static string WriteError(this string message, int pad = 0)
     {
-        return message.WriteLine(ConsoleColor.Green);
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Red);
     }
-    public static string WriteError(this string message)
+
+    public static string WriteSuccess(this string message, int pad = 0)
     {
-        return message.WriteLine(ConsoleColor.Red);
+        return $"{Padding(pad)}{message}".WriteLine(ConsoleColor.Green);
     }
-	public static string WriteInfo(this string message)
-    {
-        return message.WriteLine(ConsoleColor.Cyan);
-    }
+    
 
     public static string WriteLine(this string message, ConsoleColor? color = null)
     {

@@ -1,77 +1,80 @@
 
-using IoBTMessage.Models;
+using System.Linq;
+using BlazorThreeJS.Geometires;
+using BlazorThreeJS.Materials;
+using BlazorThreeJS.Maths;
+using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
+using IoBTMessage.Extensions;
+using IoBTMessage.Models;
+using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;
 
-public class FoMenu3D : FoGlyph3D, IFoMenu
+public class FoMenu3D : FoPanel3D, IFoMenu
 {
-    private string _layout = "H";
 
-    public string DisplayText()
-    {
-        return Name;
-    }
 
     public List<IFoButton> Buttons()
     {
         return GetMembers<FoButton3D>()?.Select(item => item as IFoButton).ToList() ?? new List<IFoButton>();
     }
 
-    public FoMenu3D(string name) : base(name,"Grey")
+    public FoMenu3D(string name) : base(name)
     {
         //ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
 
 
-    public FoMenu3D Clear()
+    public override FoMenu3D Clear()
     {
         GetMembers<FoButton3D>()?.Clear();
         return this;
     }
 
-    public FoMenu3D ToggleLayout()
+
+    public FoMenu3D LayoutHorizontal(int width = 95, int height = 40)
     {
-        if ( _layout.Matches("V"))
-            LayoutHorizontal();
-        else
-            LayoutVertical();
-            
         return this;
     }
 
-    public FoMenu3D LayoutHorizontal(int width=95, int height=40)
+    public FoMenu3D LayoutVertical(int width = 95, int height = 40)
     {
-        // var x = 0;
-        // var y = 18;
-        // Members<FoButton3D>().ForEach(item =>
-        // {
-        //     item.MoveTo(x, y);
-        //     item.ResizeTo(width, height);
-        //     x += width+5;
-        // });
-        // _layout = "H";
-        // ResizeTo(x, height+20);
         return this;
     }
 
-    public FoMenu3D LayoutVertical(int width=95, int height=40)
+    public bool DrawMenu3D(Scene ctx)
     {
-        // var x = 3;
-        // var y = 18;
-        // Members<FoButton3D>().ForEach(item =>
-        // {
-        //     //item.MoveTo(x, y);
-        //     //item.ResizeTo(width, height);
-        //     y += height + 10;
-        // });
-        // _layout = "V";
-        // //ResizeTo(width+5, y);
-        return this;
+        var buttons = Buttons().Select((item) =>
+        {
+            var text = item.DisplayText();
+            var button = new Button(text, text)
+            {
+                OnClick = (Button btn) => Console.WriteLine("Clicked Button1")
+            };
+            return button;
+        }).ToList();
+
+        Width = 1;
+        Height = buttons.Count * 0.22;
+        var menu = new PanelMenu()
+        {
+            Buttons = buttons,
+            Height = Height,
+            Width = Width,
+            Position = Position ?? new Vector3(0, 0, 0),
+        };
+
+        ctx.Add(menu);
+        return true;
     }
 
-
-
+    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+    {
+        var result = DrawMenu3D(ctx);
+        return result;
+    }
 
 }

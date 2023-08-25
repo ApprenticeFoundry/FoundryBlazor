@@ -2,21 +2,24 @@ using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-
-using IoBTMessage.Models;
+using IoBTMessage.Extensions;
 
 namespace FoundryBlazor.Shape;
 
 
 
-public class FoMenu2D : FoGlyph2D, IFoMenu
+public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 {
     private string _layout = "H";
 
-    public string DisplayText()
+
+
+    public FoMenu2D(string name) : base(name,100,50,"Purple")
     {
-        return Name;
+        ShapeDraw = DrawRect;
+        ResetLocalPin((obj) => 0, (obj) => 0);
     }
+
 
     public List<IFoButton> Buttons()
     {
@@ -24,19 +27,17 @@ public class FoMenu2D : FoGlyph2D, IFoMenu
     }
 
 
-    public FoMenu2D(string name) : base(name,100,50,"Grey")
-    {
-        ShapeDraw = DrawRect;
-        ResetLocalPin((obj) => 0, (obj) => 0);
-    }
-
-
-
     public FoMenu2D Clear()
     {
         GetMembers<FoButton2D>()?.Clear();
         return this;
     }
+
+    public string DisplayText()
+    {
+        return Name;
+    }
+
 
     public FoMenu2D ToggleLayout()
     {
@@ -118,10 +119,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu
         PostDraw?.Invoke(ctx, this);
 
         if (IsSelected)
-        {
-            DrawSelected?.Invoke(ctx, this);
-            await DrawPin(ctx);
-        }
+            await DrawWhenSelected(ctx, tick, deep);
 
         if ( deep )
         {

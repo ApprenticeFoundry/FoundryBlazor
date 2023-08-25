@@ -1,8 +1,7 @@
+using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using IoBTMessage.Models;
+
+using IoBTMessage.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -12,6 +11,7 @@ namespace FoundryBlazor.Extensions;
 
 public static class StorageHelpers
 {
+    private static readonly Dictionary<string, Type> typeLookup = new();
     private static FileExtensionContentTypeProvider? _provider;
     public static FileExtensionContentTypeProvider MIMETypeProvider()
     {
@@ -65,97 +65,31 @@ public static class StorageHelpers
         return result.ToString();
     }
 
-    public static T Hydrate<T>(this string target, bool includeFields) where T : class
+
+
+
+    public static void RegisterLookupType<T>() where T: class
     {
-        using var stream = new MemoryStream();
-        using var writer = new Utf8JsonWriter(stream);
-        var node = JsonNode.Parse(target);
-        node?.WriteTo(writer);
-        writer.Flush();
-
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Deserialize<T>(stream.ToArray(), options) as T;
-
-        return result!;
+        var type = typeof(T);
+        var name = type.Name;
+        if ( typeLookup.ContainsKey(name) == false ) {
+            typeLookup.Add(name, type);
+        }
     }
 
-    public static List<T> HydrateList<T>(string target, bool includeFields) where T : class
+    public static Type? LookupType(string payloadType, Assembly? assembly=null)
     {
-        using var stream = new MemoryStream();
-        using var writer = new Utf8JsonWriter(stream);
-        var node = JsonNode.Parse(target);
-        node?.WriteTo(writer);
-        writer.Flush();
-
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Deserialize<List<T>>(stream.ToArray(), options) as List<T>;
-
-        return result!;
+        
+        if ( typeLookup.TryGetValue(payloadType, out Type? type) == false ) {
+            var source = assembly ?? typeof(StorageHelpers).Assembly;
+            type = source.DefinedTypes.FirstOrDefault(item => item.Name == payloadType);
+            if ( type != null)
+                typeLookup.Add(payloadType, type);
+        }
+        return type;
     }
 
-    public static ContextWrapper<T> HydrateWrapper<T>(string target, bool includeFields) where T : class
-    {
-        using var stream = new MemoryStream();
-        using var writer = new Utf8JsonWriter(stream);
-        var node = JsonNode.Parse(target);
-        node?.WriteTo(writer);
-        writer.Flush();
-
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Deserialize<ContextWrapper<T>>(stream.ToArray(), options) as ContextWrapper<T>;
-
-        return result!;
-    }
-
-
-
-    public static string Dehydrate<T>(T target, bool includeFields) where T : class
-    {
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            WriteIndented = true,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Serialize(target, options);
-        return result;
-    }
-
-    public static string DehydrateList<T>(List<T> target, bool includeFields) where T : class
-    {
-        var options = new JsonSerializerOptions()
-        {
-            IncludeFields = includeFields,
-            WriteIndented = true,
-            IgnoreReadOnlyFields = includeFields,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var result = JsonSerializer.Serialize(target, options);
-        return result;
-    }
-
-
+  
 
     public static Stream GenerateStream(this string s)
     {
@@ -167,22 +101,20 @@ public static class StorageHelpers
         return stream;
     }
 
-    public static bool FileExist(string path)
-    {
-        var found = File.Exists(path);
+	public static void EstablishDirectory(string folder)
+	{
+		if (!Directory.Exists(folder))
+			Directory.CreateDirectory(folder);
+	}
+    public static bool PathExist(string filePath)
+	{
+		return Directory.Exists(filePath);
+	}
 
-        if (found)
-        {
-            $"exist {path}".WriteTrace();
-        }
-        else
-        {
-
-            $"DOES NOT exist {path}".WriteTrace();
-        }
-
-        return found;
-    }
+	public static bool FileExist(string filePath)
+	{
+		return File.Exists(filePath);
+	}
 
     public static string LocalPath(string directory, string filename)
     {
@@ -194,6 +126,7 @@ public static class StorageHelpers
     {
         string path = Directory.GetCurrentDirectory();
         string filePath = Path.Combine(path, directory, filename);
+   
         return filePath;
     }
 
@@ -202,7 +135,7 @@ public static class StorageHelpers
         try
         {
             $"WriteData local {folder.ToUpper()}: {filename}".WriteTrace();
-
+            EstablishDirectory(folder);
             string filePath = FullPath(folder, filename);
             File.WriteAllText(filePath, data);
             return data;
@@ -218,7 +151,7 @@ public static class StorageHelpers
         try
         {
             $"ReadData local {folder.ToUpper()}: {filename}".WriteTrace();
-
+            EstablishDirectory(folder);
             string filePath = FullPath(folder, filename);
             string data = File.ReadAllText(filePath);
             return data;
@@ -237,7 +170,7 @@ public static class StorageHelpers
             string filePath = FullPath(directory, filename);
 
             string text = File.ReadAllText(filePath);
-            var result = HydrateList<T>(text, true);
+            var result = CodingExtensions.HydrateList<T>(text, true);
 
             return result;
         }
@@ -254,7 +187,7 @@ public static class StorageHelpers
         {
             string filePath = FullPath(directory, filename);
 
-            var result = DehydrateList<T>(data, true);
+            var result = CodingExtensions.DehydrateList<T>(data, true);
             File.WriteAllText(filePath, result);
 
             return data;
@@ -273,7 +206,7 @@ public static class StorageHelpers
             string filePath = FullPath(directory, filename);
 
             string text = File.ReadAllText(filePath);
-            var result = Hydrate<T>(text, true);
+            var result = CodingExtensions.Hydrate<T>(text, true);
 
             return result;
         }
@@ -293,7 +226,7 @@ public static class StorageHelpers
         {
             string filePath = FullPath("config", filename);
 
-            var result = Dehydrate<T>(value, false);
+            var result = CodingExtensions.Dehydrate<T>(value, false);
             File.WriteAllText(filePath, result);
         }
         catch (Exception ex)

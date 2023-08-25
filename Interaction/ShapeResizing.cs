@@ -12,16 +12,29 @@ public class ShapeResizing : ShapeHovering
 
 
     public ShapeResizing(
+            InteractionStyle style,
+            int priority,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(draw,pubsub,panzoom,select,manager,hitTest)
+        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
     {
     }
     
+     public override bool IsDefaultTool(CanvasMouseArgs args)
+    {
+        dragArea = panZoomService.HitRectStart(args);
+        var findings = pageManager?.FindGlyph(dragArea);
+        selectedShape = findings?.LastOrDefault(); // get one on top
+        if (args.CtrlKey && selectedShape is IImage2D)
+            return true;
+
+        return false;
+    }
+
     public override bool MouseDown(CanvasMouseArgs args)
     {
 
@@ -29,10 +42,10 @@ public class ShapeResizing : ShapeHovering
 
         dragArea = panZoomService.HitRectStart(args);
         var findings = pageManager?.FindGlyph(dragArea);
-        selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
+        selectedShape = findings?.LastOrDefault(); // get one on top
 
 
-        if (args.AltKey && findings?.Count == 1 && selectedShape != null)
+        if (args.CtrlKey && selectedShape is IImage2D)
         {
             //adjust the drag ares to upper left corner of the box 
             isResizingShape = true;
@@ -54,7 +67,7 @@ public class ShapeResizing : ShapeHovering
         }
 
         isResizingShape = false;
-
+        drawing.SetInteraction(InteractionStyle.ShapeHovering);
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

@@ -5,38 +5,30 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <IsPackable>true</IsPackable>
+    <AssemblyVersion>9.6.6.0</AssemblyVersion>
+    <Version>9.6.6</Version>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
-
-
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <None  Include="wwwroot\js\CanvasHelper.js" />
-  </ItemGroup>
-
-
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
+    <!-- <PackageReference Include="Foundry.Extensions.Canvas" Version="1.1.6" /> -->
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
-    <PackageReference Include="BlazorThreeJS" Version="0.0.0.21" />
+
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Radzen.Blazor" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="IoBTMessageLibrary">
-      <HintPath>otherdlls\IoBTMessageLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="IoBTModuleLibrary">
-      <HintPath>otherdlls\IoBTModuleLibrary.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
+    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
+    <!-- <ProjectReference Include="..\BlazorExtensionsCanvas\src\Blazor.Extensions.Canvas\Blazor.Extensions.Canvas.csproj" /> -->
   </ItemGroup>
-
-
-
 </Project>
