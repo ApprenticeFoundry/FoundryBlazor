@@ -28,6 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
     <ProjectReference Include="..\FoundryRulesAndUnits\FoundryRulesAndUnits.csproj" />
-    <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" />
+    <!-- <ProjectReference Include="..\IoBTMessageLibrary\IoBTMessageLibrary.csproj" /> -->
    </ItemGroup>
 </Project>
