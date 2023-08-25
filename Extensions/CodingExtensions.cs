@@ -141,16 +141,16 @@ namespace FoundryBlazor.Extensions
 			}
 		}
 
-		public static void CopyFields<T>(this T source, T dest)
-		{
-			var plist = typeof(T).GetFields();
+		// public static void CopyFields<T>(this T source, T dest)
+		// {
+		// 	var plist = typeof(T).GetFields();
 
-			foreach (FieldInfo prop in plist)
-			{
-				var value = prop.GetValue(source);
-				prop.SetValue(dest, value);
-			}
-		}
+		// 	foreach (FieldInfo prop in plist)
+		// 	{
+		// 		var value = prop.GetValue(source);
+		// 		prop.SetValue(dest, value);
+		// 	}
+		// }
 
 		public static void CopyFieldsTo<T,U>(this T source, U dest)
 		{
@@ -213,24 +213,24 @@ namespace FoundryBlazor.Extensions
 		}
 
 
-		public static S CreateSPECfromUDTO<U, S>(this U source)
-		{
-			var result = Activator.CreateInstance<S>();
+		// public static S CreateSPECfromUDTO<U, S>(this U source)
+		// {
+		// 	var result = Activator.CreateInstance<S>();
 
-			var flistsource = from field1 in typeof(U).GetFields() where field1.IsPublic select field1;
-			var plistdest = from prop1 in typeof(S).GetProperties() where prop1.CanRead select prop1;
+		// 	var flistsource = from field1 in typeof(U).GetFields() where field1.IsPublic select field1;
+		// 	var plistdest = from prop1 in typeof(S).GetProperties() where prop1.CanRead select prop1;
 
-			foreach (PropertyInfo destProp in plistdest)
-			{
-				var sourceField = flistsource.Where((f) => f.Name == destProp.Name).FirstOrDefault();
-				if (sourceField != null)
-				{
-					var value = sourceField.GetValue(source);
-					destProp.SetValue(result, value);
-				}
-			}
-			return result;
-		}
+		// 	foreach (PropertyInfo destProp in plistdest)
+		// 	{
+		// 		var sourceField = flistsource.Where((f) => f.Name == destProp.Name).FirstOrDefault();
+		// 		if (sourceField != null)
+		// 		{
+		// 			var value = sourceField.GetValue(source);
+		// 			destProp.SetValue(result, value);
+		// 		}
+		// 	}
+		// 	return result;
+		// }
 
 	}
 }
