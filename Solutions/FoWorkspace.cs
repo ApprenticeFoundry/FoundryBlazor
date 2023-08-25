@@ -349,13 +349,13 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
-    public void ResolveTargets(List<DT_Target>? targets)
-    {
-        AllWorkbooks()?.ForEach(item =>
-        {
-            item.ResolveTargets(targets);
-        });
-    }
+    //public void ResolveTargets(List<DT_Target>? targets)
+    //{
+    //    AllWorkbooks()?.ForEach(item =>
+    //    {
+    //        item.ResolveTargets(targets);
+    //    });
+    //}
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {

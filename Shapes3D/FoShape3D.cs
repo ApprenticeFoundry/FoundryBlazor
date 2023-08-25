@@ -19,7 +19,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public string Symbol { get; set; } = "";
     public string Type { get; set; } = "";
-    public List<DT_Target>? Targets { get; set; }
+    //public List<DT_Target>? Targets { get; set; }
 
     public Vector3? Position { get; set; }
     public List<Vector3>? Path { get; set; }
@@ -557,15 +557,15 @@ public class FoShape3D : FoGlyph3D, IShape3D
         var centerPos = root.CreatePlus(0, 1, 0);  
         var rightPos = root.CreatePlus(3, 1, 0);
 
-        var lines = Targets?.Where(item => item.address.Length < 20 )
-                    .Select((item) => $"{item.domain}: {item.address}").ToList() ?? new List<string>();
+        //var lines = Targets?.Where(item => item.address.Length < 20 )
+        //            .Select((item) => $"{item.domain}: {item.address}").ToList() ?? new List<string>();
 
         var center = new FoPanel3D("Threads")
         {
             Width = 2.5,
             Height = 1.5,
             Color = "Gray",
-            TextLines = lines,
+            TextLines = new() { "Thread Links" },
             Position = centerPos
         };
 

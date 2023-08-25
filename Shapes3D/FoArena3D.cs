@@ -33,8 +33,9 @@ public interface IArena
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
+
     //FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
-    FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
+    //FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 }
@@ -169,29 +170,29 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-    public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
-    {
-        var name = Path.GetFileNameWithoutExtension(filename);
+    //public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
+    //{
+    //    var name = Path.GetFileNameWithoutExtension(filename);
 
-        var url = Path.Join(baseURL, folder, filename);
+    //    var url = Path.Join(baseURL, folder, filename);
 
-        var root = new DT_Hero
-        {
-            name = name,
-            guid = spec.uniqueGuid,
-        };
+    //    var root = new DT_Hero
+    //    {
+    //        name = name,
+    //        guid = spec.uniqueGuid,
+    //    };
 
 
-        var world3D = new UDTO_World();
-        var body = world3D.CreateGlb(root, url);
-        body.boundingBox = spec.boundingBox;
-        body.position = spec.position;
+    //    var world3D = new UDTO_World();
+    //    var body = world3D.CreateGlb(root, url);
+    //    body.boundingBox = spec.boundingBox;
+    //    body.position = spec.position;
 
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
+    //    var world = new FoWorld3D(world3D);
+    //    RenderWorld3D(world);
 
-        return world;
-    }
+    //    return world;
+    //}
 
 
 
