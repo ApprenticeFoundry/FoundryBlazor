@@ -4,13 +4,13 @@ namespace FoundryBlazor.Persistence;
 
 public class ModelPersist
 {
-    public VersionInfo? Version { get; set; }
+    public VersionPersistence? Version { get; set; }
     public PageSetPersist<PagePersist>? Pages { get; set; }
 
     public ModelPersist()
     {
     }
-    public ModelPersist(VersionInfo version)
+    public ModelPersist(VersionPersistence version)
     {
         Version = version;
     }

@@ -16,12 +16,27 @@ public static class Vector3Extensions
         return new Vector3(box.width.Value(), box.height.Value(), box.depth.Value());
     }
 
+    public static Vector3 BoxAsVector3(this UDTO_BoundingBox box)
+    {
+        return new Vector3(box.width, box.height, box.depth);
+    }
+
     public static Vector3 PinAsVector3(this BoundingBox box)
     {
         return new Vector3(box.pinX.Value(), box.pinY.Value(), box.pinZ.Value());
     }
 
+    public static Vector3 PinAsVector3(this UDTO_BoundingBox box)
+    {
+        return new Vector3(box.pinX, box.pinY, box.pinZ);
+    }
+
     public static Vector3 ScaleAsVector3(this BoundingBox box)
+    {
+        return new Vector3(box.scaleX, box.scaleY, box.scaleZ);
+    }
+
+    public static Vector3 ScaleAsVector3(this UDTO_BoundingBox box)
     {
         return new Vector3(box.scaleX, box.scaleY, box.scaleZ);
     }
@@ -31,6 +46,11 @@ public static class Vector3Extensions
     public static Vector3 LocAsVector3(this HighResPosition pos)
     {
         return new Vector3(pos.xLoc.Value(), pos.yLoc.Value(), pos.zLoc.Value());
+    }
+
+    public static Vector3 LocAsVector3(this UDTO_HighResPosition pos)
+    {
+        return new Vector3(pos.xLoc, pos.yLoc, pos.zLoc);
     }
 
     public static Euler AngAsVector3(this HighResPosition pos)
@@ -43,6 +63,16 @@ public static class Vector3Extensions
         };
     }
 
+    public static Euler AngAsVector3(this UDTO_HighResPosition pos)
+    {
+        return new Euler()
+        {
+            X = pos.xAng,
+            Y = pos.yAng,
+            Z = pos.zAng,
+            Order = "XYZ"
+        };
+    }
     //public static Vector3 AsVector3(this FoVector3D obj)
     //{
     //    return new Vector3(obj.X, obj.Y, obj.Z);

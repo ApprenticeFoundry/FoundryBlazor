@@ -224,7 +224,8 @@ public class PageManagementService : FoComponent, IPageManagement
             var found = Members<FoPage2D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
+                found = new FoPage2D("Page-1", 300, 200, "RED");
+                $"CurrentPage CREATING new page {found.Name}".WriteLine(ConsoleColor.White);
                 AddPage(found);
             }
             ActivePage = found;
@@ -251,7 +252,10 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
         if (found == null)
+        {
             Slot<FoPage2D>().Add(page);
+            $"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
+        }
         return page;
     }
 

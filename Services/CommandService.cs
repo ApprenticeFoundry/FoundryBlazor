@@ -432,7 +432,7 @@ public class CommandService : ICommand
         var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
         $"lastVersion {lastVersion}".WriteNote();
 
-        var version = VersionInfo.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
+        var version = VersionPersistence.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());
