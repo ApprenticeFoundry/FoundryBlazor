@@ -6,6 +6,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shape;
@@ -81,6 +82,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         ResetLocalPin((obj) => 0, (obj) => 0);
         HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
         VRuler2D = new FoVerticalRuler2D(Scale2D, this);
+        CalculateTitle();
     }
 
 
@@ -163,6 +165,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         SetPageAxisX(1, 0, units);
         SetPageAxisY(-1, height, units);
+        CalculateTitle();
     }
     public void SetPageAxisX(int scale, double loc, string units)
     {
@@ -233,7 +236,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public override bool Smash(bool force)
     {
         if (_matrix == null && !force) return false;
-        $"Smashing Page {Name} {GetType().Name}".WriteInfo(2);
+        $"Smashing Page {Name} {GetType().Name} force {force}".WriteInfo(2);
 
         return base.Smash(force);
     }
@@ -306,8 +309,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public FoPage2D ClearAll()
     {
         FoGlyph2D.ResetHitTesting = true;
-        Shapes1D.Clear();
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
+
+        Shapes1D.Clear();
         Shapes2D.Clear();
 
         foreach (var item in menus)
@@ -526,7 +530,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             Title = title;
         else if (string.IsNullOrEmpty(Title))
         {
-            var text = $"Page: {Name} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
+            var text = $"Page: {Name} {Color} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
             text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
             Title = text;
         }

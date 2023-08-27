@@ -57,9 +57,25 @@ public class PageManagementService : FoComponent, IPageManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
+
+    private FoPage2D? _page;
+    private FoPage2D ActivePage { 
+        get 
+        {
+            if ( _page?.IsActive != true)
+                $"Get Active Page {_page?.Name} is broken".WriteInfo();
+
+            return _page!; 
+        }
+        set
+        {
+            _page = value;
+            _page.IsActive = true;
+            $"Set Active Page {_page?.Name}".WriteInfo();
+        }
+    }
 
     public PageManagementService(
         IHitTestService hit,
@@ -228,8 +244,7 @@ public class PageManagementService : FoComponent, IPageManagement
                 $"CurrentPage CREATING new page {found.Name}".WriteLine(ConsoleColor.White);
                 AddPage(found);
             }
-            ActivePage = found;
-            ActivePage.IsActive = true;
+            ActivePage = SetCurrentPage(found);
         }
 
         return ActivePage;
@@ -239,9 +254,8 @@ public class PageManagementService : FoComponent, IPageManagement
         if (ActivePage == page) 
             return ActivePage;
 
-        ActivePage = page;
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
-        ActivePage.IsActive = true;
+        ActivePage = page;
 
         //force refresh of hit testing
         RefreshHitTesting(null);
