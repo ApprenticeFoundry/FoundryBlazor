@@ -4,7 +4,6 @@ public class FoButton3D : FoGlyph3D, IFoButton
 {
     public Action? OnClick;
 
-    private int countdown = 0;
     public bool ComputeResize { get; set; } = false;
 
     private string text = "";

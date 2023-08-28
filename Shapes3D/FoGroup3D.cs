@@ -1,5 +1,5 @@
 using BlazorThreeJS.Maths;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Shape;
 

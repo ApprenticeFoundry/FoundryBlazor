@@ -12,6 +12,7 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 

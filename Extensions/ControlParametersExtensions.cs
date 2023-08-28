@@ -1,4 +1,4 @@
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Reflection;
 
 namespace FoundryBlazor.Extensions;

@@ -7,8 +7,9 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -32,8 +33,9 @@ public interface IArena
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
-    FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
-    FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
+
+    //FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
+    //FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 }
@@ -138,59 +140,59 @@ public class FoArena3D : FoGlyph3D, IArena
 
 
 
-    public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
-    {
-        var name = Path.GetFileNameWithoutExtension(filename);
+    //public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    //{
+    //    var name = Path.GetFileNameWithoutExtension(filename);
 
 
-        var world3D = new UDTO_World();
-        var data = new MockDataMaker();
-        var url = Path.Join(baseURL, folder, filename);
+    //    var world3D = new UDTO_World();
+    //    var data = new MockDataMaker();
+    //    var url = Path.Join(baseURL, folder, filename);
 
-        var root = new DT_Hero();
+    //    var root = new DT_Hero();
 
-        for (int i = 0; i < count; i++)
-        {
-            root.name = $"{name}-{i}";
-            var shape = world3D.CreateGlb(root, url, 1, 2, 3);
-            shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
-            shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
-        };
-
-
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
-
-        //PostRenderplatform
-
-        return world;
-    }
+    //    for (int i = 0; i < count; i++)
+    //    {
+    //        root.name = $"{name}-{i}";
+    //        var shape = world3D.CreateGlb(root, url, 1, 2, 3);
+    //        shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
+    //        shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
+    //    };
 
 
+    //    var world = new FoWorld3D(world3D);
+    //    RenderWorld3D(world);
 
-    public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
-    {
-        var name = Path.GetFileNameWithoutExtension(filename);
+    //    //PostRenderplatform
 
-        var url = Path.Join(baseURL, folder, filename);
-
-        var root = new DT_Hero
-        {
-            name = name,
-            guid = spec.uniqueGuid,
-        };
+    //    return world;
+    //}
 
 
-        var world3D = new UDTO_World();
-        var body = world3D.CreateGlb(root, url);
-        body.boundingBox = spec.boundingBox;
-        body.position = spec.position;
 
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
+    //public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
+    //{
+    //    var name = Path.GetFileNameWithoutExtension(filename);
 
-        return world;
-    }
+    //    var url = Path.Join(baseURL, folder, filename);
+
+    //    var root = new DT_Hero
+    //    {
+    //        name = name,
+    //        guid = spec.uniqueGuid,
+    //    };
+
+
+    //    var world3D = new UDTO_World();
+    //    var body = world3D.CreateGlb(root, url);
+    //    body.boundingBox = spec.boundingBox;
+    //    body.position = spec.position;
+
+    //    var world = new FoWorld3D(world3D);
+    //    RenderWorld3D(world);
+
+    //    return world;
+    //}
 
 
 
@@ -354,7 +356,7 @@ public class FoArena3D : FoGlyph3D, IArena
     }
 
 
-    public void PreRenderShape3D(List<FoShape3D> shapes)
+    public async void PreRenderShape3D(List<FoShape3D> shapes)
     {
 
         var glbBodies = shapes.Where((body) => body.Type.Matches("Glb")).ToList();
@@ -366,13 +368,13 @@ public class FoArena3D : FoGlyph3D, IArena
 
         foreach (var keyValuePair in bodyDict)
         {
-            FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
+            await FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
         }
 
         foreach (var body in otherBodies)
         {
             $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            body.PreRender(this, Viewer3D!);
+            await body.PreRender(this, Viewer3D!);
         };
 
     }

@@ -1,7 +1,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using Unglide;
@@ -101,8 +101,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         set
         {
             this.color = value;
-            if (value.Matches("yellow"))
-                return;
+            $"{GetType().Name} {Name} Color Change {color}".WriteNote();
         }
     }
 

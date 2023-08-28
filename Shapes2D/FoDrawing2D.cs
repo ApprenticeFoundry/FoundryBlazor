@@ -8,9 +8,9 @@ using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
-using IoBTMessage.Units;
+using FoundryRulesAndUnits.Units;
 
 namespace FoundryBlazor.Shape;
 

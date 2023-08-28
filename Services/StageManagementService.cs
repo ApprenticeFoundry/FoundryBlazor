@@ -1,6 +1,6 @@
 using BlazorThreeJS.Scenes;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 

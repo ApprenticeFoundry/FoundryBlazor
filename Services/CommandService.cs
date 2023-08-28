@@ -1,10 +1,10 @@
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
+
 using FoundryBlazor.Message;
 using FoundryBlazor.Persistence;
 using FoundryBlazor.Shared;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -432,7 +432,7 @@ public class CommandService : ICommand
         var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
         $"lastVersion {lastVersion}".WriteNote();
 
-        var version = VersionInfo.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
+        var version = VersionPersistence.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());

@@ -5,6 +5,7 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using FoundryBlazor.Extensions;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 

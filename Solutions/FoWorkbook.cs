@@ -1,7 +1,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
-using IoBTMessage.Models;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
@@ -22,7 +22,6 @@ public interface IWorkbook
     void PostRender(int tick);
     Task RenderWatermark(Canvas2DContext ctx, int tick);
 
-    void ResolveTargets(List<DT_Target>? targets);
 }
 
 public class FoWorkbook: FoComponent, IWorkbook
@@ -49,9 +48,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         PubSub = foundry.PubSub();
     }  
 
-    public virtual void ResolveTargets(List<DT_Target>? targets)
-    {
-    }
+
 
     public FoPage2D EstablishCurrentPage(string pagename, string color)
     {

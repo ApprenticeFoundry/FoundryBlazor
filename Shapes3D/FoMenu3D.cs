@@ -6,8 +6,8 @@ using BlazorThreeJS.Maths;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
 using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;

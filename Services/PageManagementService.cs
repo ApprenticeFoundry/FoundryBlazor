@@ -1,7 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 
@@ -57,9 +57,25 @@ public class PageManagementService : FoComponent, IPageManagement
 {
 
     private bool RenderHitTestTree = false;
-    private FoPage2D ActivePage { get; set; }
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
+
+    private FoPage2D? _page;
+    private FoPage2D ActivePage { 
+        get 
+        {
+            if ( _page?.IsActive != true)
+                $"Get Active Page {_page?.Name} is broken".WriteInfo();
+
+            return _page!; 
+        }
+        set
+        {
+            _page = value;
+            _page.IsActive = true;
+            $"Set Active Page {_page?.Name}".WriteInfo();
+        }
+    }
 
     public PageManagementService(
         IHitTestService hit,
@@ -224,11 +240,11 @@ public class PageManagementService : FoComponent, IPageManagement
             var found = Members<FoPage2D>().Where(page => page.IsActive).FirstOrDefault();
             if (found == null)
             {
-                found = new FoPage2D("Page-1", 1000, 500, "#D3D3D3");
+                found = new FoPage2D("Page-1", 300, 200, "RED");
+                $"CurrentPage CREATING new page {found.Name}".WriteLine(ConsoleColor.White);
                 AddPage(found);
             }
-            ActivePage = found;
-            ActivePage.IsActive = true;
+            ActivePage = SetCurrentPage(found);
         }
 
         return ActivePage;
@@ -238,9 +254,8 @@ public class PageManagementService : FoComponent, IPageManagement
         if (ActivePage == page) 
             return ActivePage;
 
-        ActivePage = page;
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
-        ActivePage.IsActive = true;
+        ActivePage = page;
 
         //force refresh of hit testing
         RefreshHitTesting(null);
@@ -251,7 +266,10 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
         if (found == null)
+        {
             Slot<FoPage2D>().Add(page);
+            $"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
+        }
         return page;
     }
 
