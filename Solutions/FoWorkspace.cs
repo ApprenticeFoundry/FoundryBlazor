@@ -450,7 +450,7 @@ public class FoWorkspace : FoComponent, IWorkspace
     {
         return new Dictionary<string, Action>()
         {
-            { "New Window", () => OpenNew()},
+            //{ "New Window", () => OpenNew()},
             { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
             { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
             { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
