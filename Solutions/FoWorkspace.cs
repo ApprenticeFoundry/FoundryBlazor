@@ -45,6 +45,9 @@ public interface IWorkspace : IWorkbook
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
 
+    void virtual CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
+    Dictionary<string, Action> virtual DefaultMenu();
+
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkbook();
     List<FoWorkbook> AllWorkbooks();

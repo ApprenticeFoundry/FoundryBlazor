@@ -11,6 +11,7 @@ using Microsoft.JSInterop;
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using FoundryRulesAndUnits.Units;
+using FoundryBlazor.Shape;
 
 namespace FoundryBlazor.Shape;
 
@@ -26,7 +27,7 @@ public interface IDrawing : IRender
     Rectangle TransformRect(Rectangle rect);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
-
+    virtual Dictionary<string, Action> DefaultMenu();
 
     List<FoPage2D> GetAllPages();
     List<FoImage2D> GetAllImages();
@@ -99,6 +100,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
+
+
 
 
     public override Rectangle Rect()
@@ -431,38 +434,30 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         FoGlyph2D.ResetHitTesting = false;
     }
 
-
-    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
+    public virtual Dictionary<string, Action> DefaultMenu()
     {
-        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
+        return new Dictionary<string, Action>()
         {
-
             { "Clear", () => ClearAll()},
-
-            { "Group", () => PageManager?.GroupSelected<FoGroup2D>()},
-            // { "Ungroup", () => PageManager.UngroupSelected<FoGroup2D>()},
-
-        }, true);
-
-
-        // https://coastalcreative.com/standard-paper-sizes/
-        space.EstablishMenu2D<FoMenu2D, FoButton2D>("Page Size", new Dictionary<string, Action>()
-        {
             // { "ANSI A (Letter)", () => PageManager.SetPageSizeInches(8.5,11)}, //8.5” x 11”
             // { "ANSI B (Tabloid)", () => PageManager.SetPageSizeInches(8.5,17)},  //11” × 17”
             // { "ANSI C", () => PageManager.SetPageSizeInches(17,22)}, //17” × 22”
             // { "ANSI D", () => PageManager.SetPageSizeInches(22,34)}, //22” × 34”
             // { "ANSI E", () => PageManager.SetPageSizeInches(34,44)}, //34” × 44”
-            { "A0", () => PageManager.SetPageSize(840,1120, "mm")},
+            { "A0", () => PageManager.SetPageSize(840, 1120, "mm")},
             { "A1", () => PageManager.SetPageSize(600, 840, "mm")},
             { "A2", () => PageManager.SetPageSize(420, 600, "mm")},
             { "A3", () => PageManager.SetPageSize(300, 420, "mm")},
             { "A4", () => PageManager.SetPageSize(200, 300, "mm")},
             { "Landscape", () => { PageManager.SetPageLandscape(); ResetPanZoom(); } },
             { "Portrait", () => { PageManager.SetPagePortrait(); ResetPanZoom(); } },
-        }, true)
-        .ToggleLayout().MoveTo(0, 80);
+        };
+    }
 
+    public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
+    {
+        var menu = space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", DefaultMenu(), true);
+        menu.ToggleLayout().MoveTo(0, 80);
     }
 
 
