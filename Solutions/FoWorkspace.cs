@@ -45,6 +45,9 @@ public interface IWorkspace : IWorkbook
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
 
+    void virtual CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
+    Dictionary<string, Action> virtual DefaultMenu();
+
     List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkbook();
     List<FoWorkbook> AllWorkbooks();
@@ -427,44 +430,33 @@ public class FoWorkspace : FoComponent, IWorkspace
         GetSlot<FoMenu2D>()?.Clear();
         GetSlot<FoMenu3D>()?.Clear();
 
+        var OpenNew = async () =>
+        {
+            var target = nav!.ToAbsoluteUri("/");
+            try
+            {
+                await js.InvokeAsync<object>("open", target); //, "_blank", "height=600,width=1200");
+            }
+            catch { }
+        };
+
         "FoWorkspace CreateMenus".WriteWarning();
         ActiveWorkbook?.CreateMenus(space, js, nav);
 
         // GetDrawing()?.CreateMenus(space, js, nav);
         // GetArena()?.CreateMenus(space, js, nav);
     }
-    public virtual void CreateMenus_DEPRECATED(IWorkspace space, IJSRuntime js, NavigationManager nav)
+    public virtual Dictionary<string, Action> DefaultMenu()
     {
-        GetSlot<FoMenu2D>()?.Clear();
-        GetSlot<FoMenu3D>()?.Clear();
-
-        "FoWorkspace CreateMenus".WriteWarning();
-        // var OpenNew = async () =>
-        // {
-        //     var target = nav!.ToAbsoluteUri("/");
-        //     try
-        //     {
-        //         await js.InvokeAsync<object>("open", target); //, "_blank", "height=600,width=1200");
-        //     }
-        //     catch { }
-        // };
-
-        // space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", new Dictionary<string, Action>()
-        //  {
-        //      { "New Window", () => OpenNew()},
-        //      { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
-        //      { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
-        //      { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
-        //    //  { "View None", () => PubSub.Publish<ViewStyle>(ViewStyle.None)},
-        //      { "Save Drawing", () => Command.Save()},
-        //      { "Restore Drawing", () => Command.Restore()},
-        //  }, true);
-
-        ActiveWorkbook?.CreateMenus(space, js, nav);
-
-
-        GetDrawing()?.CreateMenus(space, js, nav);
-        GetArena()?.CreateMenus(space, js, nav);
+        return new Dictionary<string, Action>()
+        {
+            { "New Window", () => OpenNew()},
+            { "View 2D", () => PubSub.Publish<ViewStyle>(ViewStyle.View2D)},
+            { "View 3D", () => PubSub.Publish<ViewStyle>(ViewStyle.View3D)},
+            { "Pan Zoom", () => GetDrawing()?.TogglePanZoomWindow()},
+            { "Save Drawing", () => Command.Save()},
+            { "Restore Drawing", () => Command.Restore()},
+        };
     }
 
 
