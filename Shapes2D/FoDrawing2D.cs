@@ -27,7 +27,7 @@ public interface IDrawing : IRender
     Rectangle TransformRect(Rectangle rect);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
-    virtual Dictionary<string, Action> DefaultMenu();
+    Dictionary<string, Action> DefaultMenu();
 
     List<FoPage2D> GetAllPages();
     List<FoImage2D> GetAllImages();

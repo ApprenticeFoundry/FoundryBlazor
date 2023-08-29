@@ -16,7 +16,7 @@ public interface IWorkbook
     void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
-
+    Dictionary<string, Action> DefaultMenu();
     bool SetSignalRHub(HubConnection hub, string panid);
     void PreRender(int tick);
     void PostRender(int tick);
@@ -78,7 +78,10 @@ public class FoWorkbook: FoComponent, IWorkbook
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
     }
-
+    public virtual Dictionary<string, Action> DefaultMenu()
+    {
+        return new Dictionary<string, Action>();
+    }
     public virtual List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
         return list;
