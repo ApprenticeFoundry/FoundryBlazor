@@ -352,13 +352,6 @@ public class FoWorkspace : FoComponent, IWorkspace
     }
 
 
-    //public void ResolveTargets(List<DT_Target>? targets)
-    //{
-    //    AllWorkbooks()?.ForEach(item =>
-    //    {
-    //        item.ResolveTargets(targets);
-    //    });
-    //}
 
     public List<IFoMenu> CollectMenus(List<IFoMenu> list)
     {
@@ -369,10 +362,10 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
     {
+        RefreshMenus = true;
         var menu = Find<U>(name);
         if (menu == null)
         {
-            RefreshMenus = true;
             menu = Activator.CreateInstance(typeof(U), name) as U;
             Add<U>(menu!);
         }

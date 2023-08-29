@@ -26,7 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
-    <ProjectReference Include="..\FoundryRulesAndUnits\FoundryRulesAndUnits.csproj" />
+    <!-- <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
+    <ProjectReference Include="..\FoundryRulesAndUnits\FoundryRulesAndUnits.csproj" /> -->
+    <PackageReference Include="BlazorThreeJS" Version="1.5.0" />
+    <PackageReference Include="FoundryRulesAndUnits" Version="1.0.3" />
    </ItemGroup>
 </Project>
