@@ -134,21 +134,24 @@ function mouseMove(e) {
 
 //Handle the canvas.keydown event
 function keyDown(e) {
-    e.preventDefault();
+    // NOTE: prevent default will disable ability for HTML input fields to accept key events
+    // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
     theInstance.invokeMethodAsync('OnKeyDown', args);
 }
 
 //Handle the canvas.keyup event
 function keyUp(e) {
-    e.preventDefault();
+    // NOTE: prevent default will disable ability for HTML input fields to accept key events
+    // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
     theInstance.invokeMethodAsync('OnKeyUp', args);
 }
 
 //Handle the canvas.keypress event
 function keyPress(e) {
-    e.preventDefault();
+    // NOTE: prevent default will disable ability for HTML input fields to accept key events
+    // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
     theInstance.invokeMethodAsync('OnKeyPress', args);
 }
@@ -299,12 +302,12 @@ function hideFileInput() {
 }
 
 function saveAsFile(filename, bytesBase64) {
-  var link = document.createElement("a");
-  link.download = filename;
-  link.href = "data:application/octet-stream;base64," + bytesBase64;
-  document.body.appendChild(link); // Needed for Firefox
-  link.click();
-  document.body.removeChild(link);
+    var link = document.createElement('a');
+    link.download = filename;
+    link.href = 'data:application/octet-stream;base64,' + bytesBase64;
+    document.body.appendChild(link); // Needed for Firefox
+    link.click();
+    document.body.removeChild(link);
 }
 
 function canvasPNGBase64() {
