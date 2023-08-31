@@ -2,8 +2,10 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
+using Microsoft.AspNetCore.Components;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.Xml;
 using Unglide;
 
 namespace FoundryBlazor.Shape;
@@ -44,6 +46,10 @@ public interface IRender
     public Task Draw(Canvas2DContext ctx, int tick);
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
+
+    
+    public void DrawSVG(ElementReference ctx, int tick);
+    public bool RenderSVG(ElementReference ctx, int tick, bool deep = true);
 }
 
 
@@ -354,6 +360,20 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return this;
     }
 
+    public virtual void UpdateContext(ElementReference  ctx, int tick)
+    {
+        ContextLink?.Invoke(this, tick);
+
+        var mtx = this.GetMatrix();
+        //you must use Transform so the context can acumlate the positions
+        // if (mtx != null)  //this should NEVER be the case unless cleared by another process
+        //     await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
+
+        //await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
+
+        //await ctx.SetFillStyleAsync(Color);
+    }
+
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);
@@ -466,6 +486,14 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return true;
     }
 
+    public virtual void DrawSVG(ElementReference ctx, int tick)
+    {
+        //await ctx.SaveAsync();
+        //ShapeDraw?.Invoke(ctx, this);
+        //await ctx.RestoreAsync();
+        //await DrawPin(ctx);
+    }
+
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
         await ctx.SaveAsync();
@@ -504,6 +532,40 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
         await ctx.RestoreAsync();
+        return true;
+    }
+
+
+    public virtual bool RenderSVG(ElementReference ctx, int tick, bool deep = true)
+    {
+        if (CannotRender()) return false;
+
+        //await ctx.SaveAsync();
+        UpdateContext(ctx, tick);
+
+        //PreDraw?.Invoke(ctx, this);
+        DrawSVG(ctx, tick);
+        // if (!IsSelected)
+        //     HoverDraw?.Invoke(ctx, this);
+
+        // await DrawTag(ctx);
+
+        // PostDraw?.Invoke(ctx, this);
+
+        // if (IsSelected)
+        //     await DrawWhenSelected(ctx, tick, deep);
+
+        if (deep)
+        {
+            GetMembers<FoShape1D>()?.ForEach(child => child.RenderSVG(ctx, tick, deep));
+            GetMembers<FoShape2D>()?.ForEach(child => child.RenderSVG(ctx, tick, deep));
+        }
+
+        // if (GetMembers<FoGlue2D>()?.Count > 0)
+        //     await DrawTriangle(ctx, "Black");
+
+
+       // await ctx.RestoreAsync();
         return true;
     }
 

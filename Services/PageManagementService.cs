@@ -2,6 +2,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 
@@ -379,6 +380,10 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
+    public virtual  void DrawSVG(ElementReference ctx, int tick)
+    {
+        CurrentPage().DrawSVG(ctx, tick);
+    }
 
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -411,5 +416,18 @@ public class PageManagementService : FoComponent, IPageManagement
         return true;
     }
 
+    public bool RenderSVG(ElementReference ctx, int tick, bool deep = true)
+    {
+        var page = CurrentPage();
+
+        //await page.RenderNoItems(ctx, tick++);
+        page.RenderSVG(ctx, tick++, deep);
+
+        // if (RenderHitTestTree)
+        //     await _hitTestService.RenderQuadTree(ctx, true);
+
+
+        return true;
+    }
 
 }

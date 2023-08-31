@@ -207,7 +207,7 @@ namespace FoundryBlazor.Canvas
         public async Task OnMouseMove(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_MOVE";
-            PubSub?.Publish<CanvasMouseArgs>(args);D
+            PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseMove.InvokeAsync(args);
         }
 
