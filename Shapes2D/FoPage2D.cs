@@ -4,6 +4,7 @@ using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
 using Microsoft.AspNetCore.Components;
@@ -591,7 +592,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return true;
     }
 
-    public override bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true)
+    public override bool RenderSVG(SVGComponent ctx, int tick, bool deep = true)
     {
         // if (!IsVisible) return false;
 

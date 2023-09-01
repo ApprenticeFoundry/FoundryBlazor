@@ -1,6 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -381,7 +382,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public virtual void DrawSVG(List<RenderFragment> ctx, int tick)
+    public virtual void DrawSVG(SVGComponent ctx, int tick)
     {
         CurrentPage().DrawSVG(ctx, tick);
     }
@@ -417,7 +418,7 @@ public class PageManagementService : FoComponent, IPageManagement
         return true;
     }
 
-    public bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true)
+    public bool RenderSVG(SVGComponent ctx, int tick, bool deep = true)
     {
         var page = CurrentPage();
 
