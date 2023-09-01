@@ -37,7 +37,7 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
 
-    void RenderDrawingSVG(ElementReference ctx, int tick, double fps);
+    void RenderDrawingSVG(List<RenderFragment> ctx, int tick, double fps);
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
     void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
@@ -487,7 +487,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-    public void RenderDrawingSVG(ElementReference ctx, int tick, double fps)
+    public void RenderDrawingSVG(List<RenderFragment> ctx, int tick, double fps)
     {
 
         //skip this frame is still working 
@@ -509,7 +509,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
 
-        PageManager.RenderSVG(ctx, tick, true);
+        page.RenderSVG(ctx, tick, true);
 
         // if (PostRender != null)
         //     await PostRender.Invoke(ctx, tick);

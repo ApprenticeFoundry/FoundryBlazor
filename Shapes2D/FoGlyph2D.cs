@@ -47,9 +47,9 @@ public interface IRender
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
 
-    
-    public void DrawSVG(ElementReference ctx, int tick);
-    public bool RenderSVG(ElementReference ctx, int tick, bool deep = true);
+
+    public void DrawSVG(List<RenderFragment> ctx, int tick);
+    public bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true);
 }
 
 
@@ -360,7 +360,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return this;
     }
 
-    public virtual void UpdateContext(ElementReference  ctx, int tick)
+    public virtual void UpdateContext(List<RenderFragment> ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);
 
@@ -486,7 +486,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return true;
     }
 
-    public virtual void DrawSVG(ElementReference ctx, int tick)
+    public virtual void DrawSVG(List<RenderFragment> ctx, int tick)
     {
         //await ctx.SaveAsync();
         //ShapeDraw?.Invoke(ctx, this);
@@ -536,9 +536,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
 
 
-    public virtual bool RenderSVG(ElementReference ctx, int tick, bool deep = true)
+    public virtual bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true)
     {
-        if (CannotRender()) return false;
+        // if (CannotRender()) return false;
+        $"FoGlyph2D RenderSVG ctx.Count = {ctx.Count}".WriteInfo();
 
         //await ctx.SaveAsync();
         UpdateContext(ctx, tick);
@@ -565,7 +566,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         //     await DrawTriangle(ctx, "Black");
 
 
-       // await ctx.RestoreAsync();
+        // await ctx.RestoreAsync();
         return true;
     }
 

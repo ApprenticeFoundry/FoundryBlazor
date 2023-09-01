@@ -62,13 +62,14 @@ public class PageManagementService : FoComponent, IPageManagement
     private readonly ISelectionService _selectService;
 
     private FoPage2D? _page;
-    private FoPage2D ActivePage { 
-        get 
+    private FoPage2D ActivePage
+    {
+        get
         {
-            if ( _page?.IsActive != true)
+            if (_page?.IsActive != true)
                 $"Get Active Page {_page?.Name} is broken".WriteInfo();
 
-            return _page!; 
+            return _page!;
         }
         set
         {
@@ -252,7 +253,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
-        if (ActivePage == page) 
+        if (ActivePage == page)
             return ActivePage;
 
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
@@ -380,7 +381,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public virtual  void DrawSVG(ElementReference ctx, int tick)
+    public virtual void DrawSVG(List<RenderFragment> ctx, int tick)
     {
         CurrentPage().DrawSVG(ctx, tick);
     }
@@ -416,7 +417,7 @@ public class PageManagementService : FoComponent, IPageManagement
         return true;
     }
 
-    public bool RenderSVG(ElementReference ctx, int tick, bool deep = true)
+    public bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true)
     {
         var page = CurrentPage();
 

@@ -6,6 +6,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Radzen.Blazor.Rendering;
 
@@ -590,4 +591,42 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return true;
     }
 
+    public override bool RenderSVG(List<RenderFragment> ctx, int tick, bool deep = true)
+    {
+        // if (!IsVisible) return false;
+
+        // await ctx.SaveAsync();
+
+        UpdateContext(ctx, tick);
+
+
+        // var margin = PageMargin.AsPixels();
+        // var width = PageWidth.AsPixels() + 2.0 * margin;
+        // var height = PageHeight.AsPixels() + 2.0 * margin;
+
+        // Width = (int)width;
+        // Height = (int)height;
+
+        // await ctx.SetFillStyleAsync("White");
+        // await ctx.FillRectAsync(0, 0, width, height);
+
+
+        // await DrawPageName(ctx);
+
+        // await ctx.SetFillStyleAsync(Color);
+        // await ctx.SetGlobalAlphaAsync(1.0F);
+        // await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
+
+        // await RenderGrid(ctx);
+
+        // //await DrawFancyPin(ctx);
+
+
+        Shapes1D.ForEach(child => child.RenderSVG(ctx, tick, deep));
+        Shapes2D.ForEach(child => child.RenderSVG(ctx, tick, deep));
+
+
+        // await ctx.RestoreAsync();
+        return true;
+    }
 }
