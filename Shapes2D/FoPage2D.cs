@@ -406,6 +406,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         void node(RenderTreeBuilder builder)
         {
+
+            builder.OpenElement(10, "g");
+            var mtx = GetMatrix();
+
+            builder.AddAttribute(20, "transform", $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})");
+            builder.AddAttribute(22, "id", GetGlyphId());
             //   <line x1="0" y1="5" x2="30" y2="5" stroke-dasharray="4 1" />
 
             // var lineAttributes = new List<KeyValuePair<string, object>>() { 
@@ -430,6 +436,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             //     await ctx.SetStrokeStyleAsync("Black");
             // }
 
+            int i = 40;
             var x = dMargin; //left;
             while (x <= dWidth)
             {
@@ -443,9 +450,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                     new("style", "stroke-width:3") 
                 };
 
-                $"DrawHorizontalGridSVG {x} {dMargin} {dHeight} {lineAttributes}".WriteLine(ConsoleColor.Blue);
-                builder.OpenElement(30, "line");
-                builder.AddMultipleAttributes(40, lineAttributes);
+                $"DrawHorizontalGridSVG {x} {dMargin} {dHeight}".WriteLine(ConsoleColor.Blue);
+                builder.OpenElement(i++, "line");
+                builder.AddMultipleAttributes(i++, lineAttributes);
                 builder.CloseElement();
 
                 // ReplaceKVP(lineAttributes, "x1", x);
@@ -457,6 +464,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                 // await ctx.StrokeAsync();
                 x += dStep;
             }
+
+            // g
+            builder.CloseElement();
         }
 
 
