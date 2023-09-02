@@ -382,7 +382,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public virtual void DrawSVG(SVGComponent ctx, int tick)
+    public virtual void DrawSVG(CanvasSVGComponentBase ctx, int tick)
     {
         CurrentPage().DrawSVG(ctx, tick);
     }
@@ -418,7 +418,7 @@ public class PageManagementService : FoComponent, IPageManagement
         return true;
     }
 
-    public bool RenderSVG(SVGComponent ctx, int tick, bool deep = true)
+    public bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true)
     {
         var page = CurrentPage();
 

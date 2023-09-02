@@ -593,7 +593,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return true;
     }
 
-    public override bool RenderSVG(SVGComponent ctx, int tick, bool deep = true)
+    public override bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true)
     {
         // if (!IsVisible) return false;
 

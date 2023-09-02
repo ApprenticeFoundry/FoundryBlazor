@@ -49,8 +49,8 @@ public interface IRender
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
 
 
-    public void DrawSVG(SVGComponent ctx, int tick);
-    public bool RenderSVG(SVGComponent ctx, int tick, bool deep = true);
+    public void DrawSVG(CanvasSVGComponentBase ctx, int tick);
+    public bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true);
 }
 
 
@@ -361,7 +361,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return this;
     }
 
-    public virtual void UpdateContext(SVGComponent ctx, int tick)
+    public virtual void UpdateContext(CanvasSVGComponentBase ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);
 
@@ -487,7 +487,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return true;
     }
 
-    public virtual void DrawSVG(SVGComponent ctx, int tick)
+    public virtual void DrawSVG(CanvasSVGComponentBase ctx, int tick)
     {
         //await ctx.SaveAsync();
         //ShapeDraw?.Invoke(ctx, this);
@@ -537,7 +537,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
 
 
-    public virtual bool RenderSVG(SVGComponent ctx, int tick, bool deep = true)
+    public virtual bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true)
     {
         // if (CannotRender()) return false;
         $"FoGlyph2D RenderSVG ctx.Count = {ctx.Nodes.Count}".WriteInfo();
