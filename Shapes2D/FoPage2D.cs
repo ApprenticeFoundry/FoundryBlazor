@@ -374,6 +374,98 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.RestoreAsync();
     }
 
+    public void RenderGridSVG(CanvasSVGComponentBase ctx)
+    {
+        //await ctx.SaveAsync();
+
+
+        DrawHorizontalGridSVG(ctx, GridMinorH, false);
+        //await HRuler2D.DrawRuler(ctx, GridMinorH, false);
+
+        //await DrawVerticalGridSVG(ctx, GridMinorV, false);
+        //await VRuler2D.DrawRuler(ctx, GridMinorV, false);
+
+        //await ctx.RestoreAsync();
+    }
+
+    private void ReplaceKVP (List<KeyValuePair<string, object>> attributes, string key, object value)
+    {
+        var item = attributes.Find(item => item.Key == key );
+        attributes.Remove(item);
+        attributes.Add(new(key, value));
+    }
+
+    public void DrawHorizontalGridSVG(CanvasSVGComponentBase ctx, Length step, bool major)
+    {
+        //await ctx.SaveAsync();
+
+        var dStep = step.AsPixels();
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
+
+        void node(RenderTreeBuilder builder)
+        {
+            //   <line x1="0" y1="5" x2="30" y2="5" stroke-dasharray="4 1" />
+
+            // var lineAttributes = new List<KeyValuePair<string, object>>() { 
+            //     new("x1", 110), 
+            //     new("y1", dMargin), 
+            //     new("x2", 110), 
+            //     new("y2", dHeight), 
+            //     new("fill", "Black"), 
+            //     new("style", $"stroke-width:3") 
+            // };
+
+
+            // if (!major)
+            // {
+            //     await ctx.SetLineWidthAsync(1);
+            //     await ctx.SetLineDashAsync(new float[] { 5, 1 });
+            //     await ctx.SetStrokeStyleAsync("White");
+            // }
+            // else
+            // {
+            //     await ctx.SetLineDashAsync(Array.Empty<float>());
+            //     await ctx.SetStrokeStyleAsync("Black");
+            // }
+
+            var x = dMargin; //left;
+            while (x <= dWidth)
+            {
+                var lineAttributes = new List<KeyValuePair<string, object>>() { 
+                    new("x1", x), 
+                    new("y1", dMargin), 
+                    new("x2", x), 
+                    new("y2", dHeight), 
+                    new("fill", "Red"), 
+                    new("stroke-dasharray", "4 1"), 
+                    new("style", "stroke-width:3") 
+                };
+
+                $"DrawHorizontalGridSVG {x} {dMargin} {dHeight} {lineAttributes}".WriteLine(ConsoleColor.Blue);
+                builder.OpenElement(30, "line");
+                builder.AddMultipleAttributes(40, lineAttributes);
+                builder.CloseElement();
+
+                // ReplaceKVP(lineAttributes, "x1", x);
+                // ReplaceKVP(lineAttributes, "x2", x);
+
+                // await ctx.BeginPathAsync();
+                // await ctx.MoveToAsync(x, dMargin);
+                // await ctx.LineToAsync(x, dHeight);
+                // await ctx.StrokeAsync();
+                x += dStep;
+            }
+        }
+
+
+
+
+
+        ctx.Nodes.Add(node);
+        //await ctx.RestoreAsync();
+    }
 
     public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length step, bool major)
     {
@@ -642,7 +734,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         // await ctx.SetGlobalAlphaAsync(1.0F);
         // await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
-        // await RenderGrid(ctx);
+        RenderGridSVG(ctx);
 
         // //await DrawFancyPin(ctx);
 

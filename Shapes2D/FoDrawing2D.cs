@@ -509,7 +509,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
 
-        //PageManager.RenderSVG(ctx, tick, true);
+        PageManager.RenderSVG(ctx, tick, true);
 
         // if (PostRender != null)
         //     await PostRender.Invoke(ctx, tick);

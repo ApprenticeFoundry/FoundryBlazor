@@ -24,7 +24,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
-    
+
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
 
@@ -33,10 +33,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
 
-    public void Refresh()
-    {
-        StateHasChanged();
-    }
+
 
     public void Dispose()
     {
@@ -111,9 +108,16 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
     }
 
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+
     public void RenderFrame(double fps)
     {
         tick++;
+
+        $"CanvasSVG RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 
