@@ -8,6 +8,7 @@ using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Radzen.Blazor.Rendering;
 
@@ -601,12 +602,35 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         UpdateContext(ctx, tick);
 
 
-        // var margin = PageMargin.AsPixels();
-        // var width = PageWidth.AsPixels() + 2.0 * margin;
-        // var height = PageHeight.AsPixels() + 2.0 * margin;
+        var margin = PageMargin.AsPixels();
+        var width = PageWidth.AsPixels() + 2.0 * margin;
+        var height = PageHeight.AsPixels() + 2.0 * margin;
 
-        // Width = (int)width;
-        // Height = (int)height;
+        Width = (int)width;
+        Height = (int)height;
+
+        var attributes = new List<KeyValuePair<string, object>>() { new("x", LocPinX(this)), new("y", LocPinY(this)), new("width", Width), new("height", Height), new("rx", 4), new("ry", 4), new("style", $"fill:{Color};stroke-width:3;stroke:rgb(0,0,0)") };
+
+        // _matrix.AppendTransform(this.PinX, this.PinY, 1.0, 1.0, RotationZ(this), LocPinX(this), LocPinY(this));
+
+        // Recommended to use literal sequence numbers in the builder:  
+        // https://learn.microsoft.com/en-us/aspnet/core/diagnostics/asp0006?view=aspnetcore-7.0
+        void node(RenderTreeBuilder builder)
+        {
+
+            var bgAttributes = new List<KeyValuePair<string, object>>() { new("x", 0), new("y", 0), new("width", Width), new("height", Height), new("fill", "white") };
+
+            builder.OpenElement(10, "rect");
+            builder.AddMultipleAttributes(20, bgAttributes);
+            builder.CloseElement();
+
+            var pageAttributes = new List<KeyValuePair<string, object>>() { new("x", margin), new("y", margin), new("width", PageWidth.AsPixels()), new("height", PageHeight.AsPixels()), new("fill", Color) };
+
+            builder.OpenElement(30, "rect");
+            builder.AddMultipleAttributes(40, pageAttributes);
+            builder.CloseElement();
+        }
+        ctx.Nodes.Add(node);
 
         // await ctx.SetFillStyleAsync("White");
         // await ctx.FillRectAsync(0, 0, width, height);
