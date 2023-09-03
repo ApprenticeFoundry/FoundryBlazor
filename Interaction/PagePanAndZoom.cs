@@ -1,5 +1,6 @@
 using FoundryBlazor.Canvas;
 using BlazorComponentBus;
+using FoundryBlazor.PubSub;
 
 
 namespace FoundryBlazor.Shape;
@@ -46,7 +47,10 @@ public class PagePanAndZoom : BaseInteraction
     public override bool MouseMove(CanvasMouseArgs args)
     {
         if ( isDraggingPage )
+        {
             drawing.MovePanBy(args.MovementX, args.MovementY);
+            pubsub!.Publish<RefreshUIEvent>(new RefreshUIEvent("PanZoom"));
+        }
 
         return true;
     }

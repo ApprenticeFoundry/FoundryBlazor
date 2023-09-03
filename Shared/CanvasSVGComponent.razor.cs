@@ -61,7 +61,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            //PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             await SVGHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
@@ -113,8 +113,8 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
-        InvokeAsync(StateHasChanged);
         $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+        StateHasChanged();
     }
 
     public void Refresh()

@@ -2,6 +2,7 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
+using FoundryRulesAndUnits.Extensions;
 
 
 namespace FoundryBlazor.Shape;
@@ -132,6 +133,7 @@ public class PanZoomService : IPanZoomService
 
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         FoGlyph2D.ResetHitTesting = true;
+        $"PanZoomService Smash".WriteWarning();
 
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
@@ -146,7 +148,7 @@ public class PanZoomService : IPanZoomService
             _matrix = Matrix2D.NewMatrix();
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
-            //"PanZoomService GetMatrix recalculate".WriteLine(ConsoleColor.Yellow);
+            $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
     }
