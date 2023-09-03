@@ -130,17 +130,15 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
         //if you are already rendering then skip it this cycle
         if (drawing.SetCurrentlyRendering(true, tick)) return;
-        //await Ctx.BeginBatchAsync();
-        //await Ctx.SaveAsync();
-        
+
+
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
         PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
         
         drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
 
-        //await Ctx.RestoreAsync();
-        //await Ctx.EndBatchAsync();
+
         drawing.SetCurrentlyRendering(false, tick);
 
         Workspace?.PostRender(tick);
