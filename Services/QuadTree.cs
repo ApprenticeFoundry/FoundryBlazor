@@ -157,7 +157,7 @@ public class QuadTree<T> where T : IHasRectangle
 
     public void DrawQuadTreeSVG(CanvasSVGComponentBase ctx, bool members = false)
     {
-        var color = IsSmashed()? "Red" : "Cyan";
+        var color = IsSmashed()? "Red" : "Blue";
 
         var attributes = new List<KeyValuePair<string, object>>()
         {
@@ -166,7 +166,8 @@ public class QuadTree<T> where T : IHasRectangle
             new("width", m_rect.Width-2), 
             new("height", m_rect.Height-2), 
             new("stroke",color),
-            new("stroke-width", 1),
+            new("fill","none"),
+            new("stroke-width", 4),
             new("stroke-dasharray", "3 3"),
         };
 
