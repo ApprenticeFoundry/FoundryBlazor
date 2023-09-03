@@ -38,6 +38,11 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     private bool IsUploading = false;
 
 
+    protected override void OnInitialized()
+    {
+        var mtx = new Matrix2D();
+        PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+    }
 
     public void Dispose()
     {
