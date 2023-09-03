@@ -172,28 +172,28 @@ public class QuadTree<T> where T : IHasRectangle
 
         void node(RenderTreeBuilder builder)
         {
-            builder.OpenElement(12, "rect");
-            builder.AddMultipleAttributes(10, attributes);
+            builder.OpenElement(100, "rect");
+            builder.AddMultipleAttributes(110, attributes);
             builder.CloseElement();
 
-            if ( members )
-                m_objects?.ForEach(item =>
-                {
-                    var rect = item.Rect();
-                    var attributes = new List<KeyValuePair<string, object>>()
-                    {
-                        new("x", rect.X+1), 
-                        new("y",  rect.Y+1), 
-                        new("width", rect.Width-2), 
-                        new("height", rect.Height-2), 
-                        new("stroke",color),
-                        new("stroke-width", 1),
-                        new("stroke-dasharray", "3 3"),
-                    };
-                    builder.OpenElement(22, "rect");
-                    builder.AddMultipleAttributes(20, attributes);
-                    builder.CloseElement();
-                });
+            // if ( members )
+            //     m_objects?.ForEach(item =>
+            //     {
+            //         var rect = item.Rect();
+            //         var attributes = new List<KeyValuePair<string, object>>()
+            //         {
+            //             new("x", rect.X+1), 
+            //             new("y",  rect.Y+1), 
+            //             new("width", rect.Width-2), 
+            //             new("height", rect.Height-2), 
+            //             new("stroke",color),
+            //             new("stroke-width", 1),
+            //             new("stroke-dasharray", "3 3"),
+            //         };
+            //         builder.OpenElement(22, "rect");
+            //         builder.AddMultipleAttributes(20, attributes);
+            //         builder.CloseElement();
+            //     });
         }
         ctx.Nodes.Add(node);
 
