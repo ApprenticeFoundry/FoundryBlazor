@@ -58,7 +58,7 @@ public interface IPageManagement : IRender
 public class PageManagementService : FoComponent, IPageManagement
 {
 
-    private bool RenderHitTestTree = false;
+    private bool RenderHitTestTree = true;
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
 
@@ -425,8 +425,8 @@ public class PageManagementService : FoComponent, IPageManagement
         //await page.RenderNoItems(ctx, tick++);
         page.RenderSVG(ctx, tick++, deep);
 
-        // if (RenderHitTestTree)
-        //     await _hitTestService.RenderQuadTree(ctx, true);
+        if (RenderHitTestTree)
+            _hitTestService.RenderQuadTreeSVG(ctx, true);
 
 
         return true;
