@@ -397,14 +397,6 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var dHeight = PageHeight.AsPixels() + dMargin;
 
 
-
-            // var mtx = GetMatrix();
-            // builder.OpenElement(10, "g");
-            // builder.AddAttribute(20, "transform", $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})");
-            // builder.AddAttribute(22, "id", GetGlyphId());
-            //   <line x1="0" y1="5" x2="30" y2="5" stroke-dasharray="4 1" />
-
-
         List<KeyValuePair<string, object>> attributes;
         if (!major)
         {

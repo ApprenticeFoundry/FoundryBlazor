@@ -174,7 +174,14 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
    public void DrawRect()
     {
         $"DrawCircle Called".WriteInfo();
-        var attributes = new List<KeyValuePair<string, object>>() { new("x", 120), new("y", 10), new("width", 300), new("height", 100), new("rx", 4), new("ry", 4), new("style", "fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)") };
+        var attributes = new List<KeyValuePair<string, object>>() { 
+            new("x", 120), 
+            new("y", 10), 
+            new("width", 300), 
+            new("height", 100), 
+            new("rx", 4), 
+            new("ry", 4), 
+            new("style", "fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)") };
 
 
         void node(RenderTreeBuilder builder)

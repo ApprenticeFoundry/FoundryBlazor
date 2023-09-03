@@ -1,5 +1,6 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared;
 using System.Drawing;
 
 
@@ -13,6 +14,7 @@ public interface IHitTestService
     List<FoGlyph2D> AllShapesEverywhere();
     List<FoGlyph2D> RefreshTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
+    void RenderQuadTreeSVG(CanvasSVGComponentBase ctx, bool showTracks);
     void SetRectangle(Rectangle rect);
 }
 
@@ -123,5 +125,26 @@ public class HitTestService : IHitTestService
         await ctx.RestoreAsync();
     }
 
+    public void RenderQuadTreeSVG(CanvasSVGComponentBase ctx, bool showTracks)
+    {
+        //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
+        // await ctx.SetLineWidthAsync(2);
+        // await ctx.SetLineDashAsync(new float[] { 20, 20 });
+
+        Tree.DrawQuadTreeSVG(ctx, false);
+
+        // if (showTracks)
+        // {
+        //     await ctx.SetLineWidthAsync(1);
+        //     await ctx.SetLineDashAsync(Array.Empty<float>());
+        //     await ctx.SetStrokeStyleAsync("Blue");
+
+        //     PreviousSearches.ForEach(async rect =>
+        //     {
+        //         //$"Render {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+        //         await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+        //     });
+        // }
+    }
 }
