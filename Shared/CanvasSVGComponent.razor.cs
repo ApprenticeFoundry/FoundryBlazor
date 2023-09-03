@@ -19,7 +19,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
 
-    [Inject] public PanZoomService? PanZoom { get; set; }
+    [Inject] public IPanZoomService? PanZoom { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
 

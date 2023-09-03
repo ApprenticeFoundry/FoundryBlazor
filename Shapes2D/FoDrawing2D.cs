@@ -506,22 +506,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
 
-        void node(RenderTreeBuilder builder)
-        {
-
-            //PageManager.RenderSVG(ctx, tick, true);
-            builder.CloseElement();
-        }
-        ctx.Nodes.Add(node);
-            
-
-        // void node1(RenderTreeBuilder builder)
-        // {
-        //     builder.CloseElement();
-        // }
-
-        //ctx.Nodes.Add(node1);
-
+        PageManager.RenderSVG(ctx, tick, true);
 
         // if (PostRender != null)
         //     await PostRender.Invoke(ctx, tick);
