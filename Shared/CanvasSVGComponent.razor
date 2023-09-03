@@ -19,10 +19,12 @@
 <div  id="canvasHolder" >
     <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame"  >
         <svg height="600" width="800" style="background-color:purple">
-            @foreach (var node in Nodes)
-            {
-                @node
-            }
+            <g transform=matrix(@PagePanZoom)>
+                @foreach (var node in Nodes)
+                {
+                    @node
+                }
+            </g>
         </svg>
     </SVGHelper>
 </div> 

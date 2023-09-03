@@ -508,10 +508,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         void node(RenderTreeBuilder builder)
         {
-            var mtx = PanZoomService.GetMatrix();
-            builder.OpenElement(10, "g");
-            builder.AddAttribute(20, "transform", $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})");
-            builder.AddAttribute(22, "id", GetGlyphId());
+
             //PageManager.RenderSVG(ctx, tick, true);
             builder.CloseElement();
         }

@@ -4,6 +4,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.PubSub;
+using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
@@ -17,6 +18,8 @@ namespace FoundryBlazor.Shared;
 public class CanvasSVGComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
+
+    [Inject] public PanZoomService? PanZoom { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
@@ -27,6 +30,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
+    public string PagePanZoom { get; set; } = "";
 
 
     public SVGHelper? SVGHelperReference;
@@ -128,7 +132,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         if (drawing.SetCurrentlyRendering(true, tick)) return;
         //await Ctx.BeginBatchAsync();
         //await Ctx.SaveAsync();
-
+        
+        var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
+        PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        
         drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
 
