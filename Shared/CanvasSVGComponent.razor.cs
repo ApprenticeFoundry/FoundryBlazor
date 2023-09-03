@@ -40,8 +40,8 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     protected override void OnInitialized()
     {
-        var mtx = new Matrix2D();
-        PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        // matrix(1, 0, 0, 1, 0, 0)
+        PagePanZoom = $"matrix(1,0,0,1,0,0)";
     }
 
     public void Dispose()
