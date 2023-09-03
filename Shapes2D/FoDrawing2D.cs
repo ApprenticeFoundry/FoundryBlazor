@@ -12,6 +12,7 @@ using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using FoundryRulesAndUnits.Units;
 using FoundryBlazor.Shape;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace FoundryBlazor.Shape;
 
@@ -499,25 +500,36 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         RefreshHitTest_IfDirty();
 
         var page = PageManager.CurrentPage();
-
-        //await ClearCanvas(ctx);
-
-        //await ctx.SaveAsync();
                 
-        var mtx = PanZoomService.GetMatrix();
         var (zoom, panx, pany) = PanZoomService;
 
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
 
-        PageManager.RenderSVG(ctx, tick, true);
+        void node(RenderTreeBuilder builder)
+        {
+            var mtx = PanZoomService.GetMatrix();
+            builder.OpenElement(10, "g");
+            builder.AddAttribute(20, "transform", $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})");
+            builder.AddAttribute(22, "id", GetGlyphId());
+            //PageManager.RenderSVG(ctx, tick, true);
+            builder.CloseElement();
+        }
+        ctx.Nodes.Add(node);
+            
+
+        // void node1(RenderTreeBuilder builder)
+        // {
+        //     builder.CloseElement();
+        // }
+
+        //ctx.Nodes.Add(node1);
+
 
         // if (PostRender != null)
         //     await PostRender.Invoke(ctx, tick);
 
         //await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
-
-        //await ctx.RestoreAsync();
     }
 
     public async Task RenderDrawing(Canvas2DContext ctx, int tick, double fps)
