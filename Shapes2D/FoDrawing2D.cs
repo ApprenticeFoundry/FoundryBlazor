@@ -499,9 +499,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var wasDirty = FoGlyph2D.ResetHitTesting;
         RefreshHitTest_IfDirty();
 
-        var page = PageManager.CurrentPage();
+        //var page = PageManager.CurrentPage();
                 
-        var (zoom, panx, pany) = PanZoomService;
+        //var (zoom, panx, pany) = PanZoomService;
 
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);

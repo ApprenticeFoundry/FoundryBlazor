@@ -134,6 +134,8 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
         PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+
+        $"CanvasSVG RenderFrame {tick} {PagePanZoom}".WriteInfo();
         
         drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
