@@ -18,6 +18,8 @@ public interface IPanZoomService
     Point PanBy(int dx, int dy);
     Point SetPan(int x, int y);
 
+    Matrix2D GetMatrix();
+    
     Point Movement();
     Rectangle HitRectStart(CanvasMouseArgs args);
     Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect);

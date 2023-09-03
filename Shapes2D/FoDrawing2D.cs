@@ -503,8 +503,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //await ClearCanvas(ctx);
 
         //await ctx.SaveAsync();
-
-        //var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
+                
+        var mtx = PanZoomService.GetMatrix();
+        var (zoom, panx, pany) = PanZoomService;
 
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
