@@ -388,9 +388,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         //await ctx.RestoreAsync();
     }
 
-    private void ReplaceKVP (List<KeyValuePair<string, object>> attributes, string key, object value)
+    private void ReplaceKVP(List<KeyValuePair<string, object>> attributes, string key, object value)
     {
-        var item = attributes.Find(item => item.Key == key );
+        var item = attributes.Find(item => item.Key == key);
         attributes.Remove(item);
         attributes.Add(new(key, value));
     }
@@ -440,14 +440,14 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             var x = dMargin; //left;
             while (x <= dWidth)
             {
-                var lineAttributes = new List<KeyValuePair<string, object>>() { 
-                    new("x1", x), 
-                    new("y1", dMargin), 
-                    new("x2", x), 
-                    new("y2", dHeight), 
-                    new("fill", "Red"), 
-                    new("stroke-dasharray", "4 1"), 
-                    new("style", "stroke-width:3") 
+                var lineAttributes = new List<KeyValuePair<string, object>>() {
+                    new("x1", x),
+                    new("y1", dMargin),
+                    new("x2", x),
+                    new("y2", dHeight),
+                    new("stroke", "Red"),
+                    new("stroke-width", 3),
+                    new("stroke-dasharray", "4 1")
                 };
 
                 $"DrawHorizontalGridSVG {x} {dMargin} {dHeight}".WriteLine(ConsoleColor.Blue);
