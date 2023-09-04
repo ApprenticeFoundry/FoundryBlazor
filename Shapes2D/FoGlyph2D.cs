@@ -108,7 +108,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         set
         {
             this.color = value;
-            $"{GetType().Name} {Name} Color Change {color}".WriteNote();
+            // $"{GetType().Name} {Name} Color Change {color}".WriteNote();
         }
     }
 
