@@ -15,5 +15,11 @@ class Browser {
             return canvasNode.toDataURL();
         }
     }
+    clickButton(id) {
+        const button = document.getElementById(id);
+        if (Boolean(button)) {
+            button.click();
+        }
+    }
 }
 window.Browser = new Browser();

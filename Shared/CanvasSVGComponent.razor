@@ -2,22 +2,22 @@
 @inherits CanvasSVGComponentBase
 
 @* <div style="position: absolute; top: 1px; right: 1px">
-    @foreach (var image in Workspace!.GetDrawing()!.GetAllImages())
-    {
-        <img @ref="image.ImageRef" src="@image.ImageUrl" style="width: 200px; height: 100px" />
-    }
+@foreach (var image in Workspace!.GetDrawing()!.GetAllImages())
+{
+<img @ref="image.ImageRef" src="@image.ImageUrl" style="width: 200px; height: 100px" />
+}
 </div>
 
 <div style="position: absolute; top: 1px; left: 1px">
-    @foreach (var video in Workspace!.GetDrawing()!.GetAllVideos())
-    {
-        <video @ref="video.ImageRef" id="@video.Id" src="@video.ImageUrl" controls="true"
-        style="width:400px;height:300px"></video>
-    }
+@foreach (var video in Workspace!.GetDrawing()!.GetAllVideos())
+{
+<video @ref="video.ImageRef" id="@video.Id" src="@video.ImageUrl" controls="true"
+style="width:400px;height:300px"></video>
+}
 </div> *@
 
-<div  id="canvasHolder" >
-    <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame"  >
+<div id="canvasHolder">
+    <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame">
         <svg height="600" width="800" style="background-color:purple">
             <g transform=@PagePanZoom>
                 @foreach (var node in Nodes)
@@ -27,8 +27,9 @@
             </g>
         </svg>
     </SVGHelper>
-</div> 
+</div>
+<button style="position: fixed; top: 0; left: -500px" id="btn-force-refresh">Force Refresh</button>
 
-@* <div  id="fileInputHolder" style=@StyleDrop>
-    <InputFile OnChange="@OnFileInputChange" style="@FileInputStyle()"/>
-</div>  *@
+@* <div id="fileInputHolder" style=@StyleDrop>
+<InputFile OnChange="@OnFileInputChange" style="@FileInputStyle()"/>
+</div> *@

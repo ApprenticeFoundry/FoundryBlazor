@@ -6,12 +6,12 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
+using FoundryBlazor.Services;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-
 
 namespace FoundryBlazor.Shared;
 
@@ -27,6 +27,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
+    [Parameter] public string RefreshMs { get; set; } = "0";
 
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
@@ -36,6 +37,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     public SVGHelper? SVGHelperReference;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
+    private Debouncer Debouncer { get; set; } = new();
 
 
     protected override void OnInitialized()
@@ -44,10 +46,35 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         PagePanZoom = $"matrix(1,0,0,1,0,0)";
     }
 
+    // protected override void OnParametersSet()
+    // {
+    //     $"CanvasSVGComponent OnParametersSet".WriteInfo(2);
+    //     // $"CanvasSVGComponent OnParametersSet Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
+    //     base.OnParametersSet();
+    // }
+
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     $"CanvasSVGComponent OnParametersSetAsync".WriteInfo(2);
+    //     // $"CanvasSVGComponent OnParametersSetAsync Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
+    //     await base.OnParametersSetAsync();
+    // }
+
+    private void OnSelectionChanged(SelectionChanged e)
+    {
+        $"CanvasSVGComponent.OnSelectionChanged e.State={e.State}".WriteInfo(2);
+        if (e.State == SelectionState.Dropped)
+        {
+            ForceRefresh();
+        }
+    }
+
+
     public void Dispose()
     {
         //Dispose(true);
         PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
+        PubSub!.UnSubscribeFrom<SelectionChanged>(OnSelectionChanged);
 
         // This object will be cleaned up by the Dispose method.
         // Therefore, you should call GC.SupressFinalize to
@@ -62,6 +89,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            PubSub!.SubscribeTo<SelectionChanged>(OnSelectionChanged);
 
             await SVGHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
@@ -90,6 +118,16 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     }
 
+    private void ForceRefresh()
+    {
+
+        Task.Run(() =>
+        {
+            var args = new List<string>() { "btn-force-refresh" };
+            JsRuntime!.InvokeAsync<string>("Browser.clickButton", "btn-render-page");
+        });
+    }
+
     private void CaptureFileAndSend(CanvasMouseArgs MouseArgs)
     {
         if (InputFile != null && IsUploading == false)
@@ -114,12 +152,18 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
-        StateHasChanged();
+        // StateHasChanged();
+        Debouncer.Debounce(() => ForceRefresh());
+
     }
 
     public void Refresh()
     {
-        StateHasChanged();
+        // $"CanvasSVGComponent Refresh Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
+        // StateHasChanged();
+        // ForceRefresh();
+        // await InvokeAsync(StateHasChanged);
+
     }
 
     public void RenderFrame(double fps)
@@ -141,7 +185,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
 
         $"CanvasSVG RenderFrame {tick} {PagePanZoom}".WriteInfo();
-        
+
         drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
 
@@ -176,16 +220,16 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     }
 
-   public void DrawRect()
+    public void DrawRect()
     {
         $"DrawCircle Called".WriteInfo();
-        var attributes = new List<KeyValuePair<string, object>>() { 
-            new("x", 120), 
-            new("y", 10), 
-            new("width", 300), 
-            new("height", 100), 
-            new("rx", 4), 
-            new("ry", 4), 
+        var attributes = new List<KeyValuePair<string, object>>() {
+            new("x", 120),
+            new("y", 10),
+            new("width", 300),
+            new("height", 100),
+            new("rx", 4),
+            new("ry", 4),
             new("style", "fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)") };
 
 
