@@ -21,6 +21,7 @@ namespace FoundryBlazor.Shape;
 public interface IDrawing : IRender
 {
     bool SetCurrentlyRendering(bool value, int tick);
+    bool IsRendering();
     bool SetCurrentlyProcessing(bool value);
     void SetCanvasPixelSize(int width, int height);
 
@@ -112,6 +113,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
         return result;
+    }
+
+    public bool IsRendering()
+    {
+        return IsCurrentlyRendering;
     }
 
     public bool SetCurrentlyRendering(bool isRendering, int tick)
@@ -500,7 +506,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         RefreshHitTest_IfDirty();
 
         //var page = PageManager.CurrentPage();
-                
+
         //var (zoom, panx, pany) = PanZoomService;
 
         // if (PreRender != null)

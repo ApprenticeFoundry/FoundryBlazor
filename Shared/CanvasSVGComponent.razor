@@ -17,18 +17,16 @@ style="width:400px;height:300px"></video>
 </div> *@
 
 <div id="canvasHolder">
-    <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame">
-        <svg height="600" width="800" style="background-color:purple">
-            <g transform=@PagePanZoom>
-                @foreach (var node in Nodes)
-                {
-                    @node
-                }
-            </g>
-        </svg>
-    </SVGHelper>
+    <svg height="600" width="800" style="background-color:purple">
+        <g transform=@PagePanZoom>
+            @foreach (var node in GetNodes())
+            {
+                @node
+            }
+        </g>
+    </svg>
 </div>
-<button style="position: fixed; top: 0; left: -500px" id="btn-force-refresh">Force Refresh</button>
+<input style="position: fixed; top:0;left:0" @bind-value="RefreshMs" />
 
 @* <div id="fileInputHolder" style=@StyleDrop>
 <InputFile OnChange="@OnFileInputChange" style="@FileInputStyle()"/>
