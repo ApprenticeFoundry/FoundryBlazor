@@ -126,12 +126,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private void ForceRefresh()
     {
-        Nodes = new();
+        // Nodes = new();
         Task.Run(() =>
         {
             OnRequestCallback.InvokeAsync(new MouseEventArgs());
-            // var args = new List<string>() { "btn-force-refresh" };
-            // JsRuntime!.InvokeAsync<string>("Browser.clickButton", "btn-render-page");
         });
     }
 
@@ -174,7 +172,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         //if you are already rendering then skip it this cycle
         if (drawing.SetCurrentlyRendering(true, tick)) return;
 
-        Nodes = new();
+        // Nodes = new();
 
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
         PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
