@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using FoundryBlazor.PubSub;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace FoundryBlazor.Shared.SVG;
 
@@ -48,5 +49,11 @@ public class PanZoomGBase : ComponentBase, IDisposable
         // from executing a second time.
         GC.SuppressFinalize(this);
     }
+
+    protected void MouseDown(MouseEventArgs evt)
+    {
+        Console.WriteLine($"In MouseDown PanZoomG {evt.ScreenX}  {evt.ScreenY}");
+    }
+
 
 }
