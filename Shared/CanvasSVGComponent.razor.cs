@@ -28,8 +28,6 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public long RefreshMs { get; set; } = 0;
     [Parameter] public EventCallback<MouseEventArgs> OnRequestCallback { get; set; }
 
-    protected PanZoomGBase? Container;
-
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
     public string PagePanZoom { get; set; } = "";
