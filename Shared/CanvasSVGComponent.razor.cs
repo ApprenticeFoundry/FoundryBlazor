@@ -30,7 +30,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
-    public string PagePanZoom { get; set; } = "";
+    // public string PagePanZoom { get; set; } = "";
 
 
     // public SVGHelper? SVGHelperReference;
@@ -41,7 +41,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     protected override void OnInitialized()
     {
         // matrix(1, 0, 0, 1, 0, 0)
-        PagePanZoom = $"matrix(1,0,0,1,0,0)";
+        // PagePanZoom = $"matrix(1,0,0,1,0,0)";
     }
 
     protected override void OnParametersSet()
@@ -172,10 +172,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
         // Nodes = new();
 
-        var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
-        PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        // var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
+        // PagePanZoom = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
 
-        $"CanvasSVG RenderFrame {tick} {PagePanZoom}".WriteInfo();
+        // $"CanvasSVG RenderFrame {tick} {PagePanZoom}".WriteInfo();
 
         drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
