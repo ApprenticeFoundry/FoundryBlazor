@@ -1,6 +1,3 @@
-using Blazor.Extensions;
-using Blazor.Extensions.Canvas.Canvas2D;
-
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.PubSub;
@@ -13,6 +10,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Web;
+using FoundryBlazor.Shared.SVG;
 
 namespace FoundryBlazor.Shared;
 
@@ -30,6 +28,8 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     [Parameter] public long RefreshMs { get; set; } = 0;
     [Parameter] public EventCallback<MouseEventArgs> OnRequestCallback { get; set; }
+
+    protected GBase? Container;
 
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
@@ -84,6 +84,12 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         }
 
         return list;
+    }
+
+    protected void DisplayContainerInfo()
+    {
+        $"{Container?.GetTransform()}".WriteInfo(2);
+        Container?.SetTransform();
     }
 
 
@@ -169,13 +175,11 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
-        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}, RefreshMs={RefreshMs}".WriteInfo();
         // StateHasChanged();
         // Debouncer.Debounce(() => ForceRefresh());
 
         Task.Run(() =>
         {
-            $"{Nodes.Count}".WriteInfo(2);
             var drawing = Workspace!.GetDrawing();
             if (!drawing.IsRendering())
                 OnRequestCallback.InvokeAsync(new MouseEventArgs());

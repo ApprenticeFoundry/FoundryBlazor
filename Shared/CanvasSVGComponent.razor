@@ -1,4 +1,4 @@
-﻿@using FoundryBlazor.Shared
+﻿@using FoundryBlazor.Shared.SVG
 @inherits CanvasSVGComponentBase
 
 @* <div style="position: absolute; top: 1px; right: 1px">
@@ -16,14 +16,16 @@ style="width:400px;height:300px"></video>
 }
 </div> *@
 
+<button @onclick="@DisplayContainerInfo">Container Info</button>
+
 <div id="canvasHolder">
     <svg height="600" width="800" style="background-color:purple">
-        <g transform=@PagePanZoom>
+        <G @ref="@Container">
             @foreach (var node in GetNodes())
             {
                 @node
             }
-        </g>
+        </G>
     </svg>
 </div>
 <input style="position: fixed; top:0;left:0" @bind-value="RefreshMs" />
