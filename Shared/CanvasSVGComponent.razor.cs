@@ -3,7 +3,6 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
-using FoundryBlazor.Services;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -29,7 +28,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public long RefreshMs { get; set; } = 0;
     [Parameter] public EventCallback<MouseEventArgs> OnRequestCallback { get; set; }
 
-    protected GBase? Container;
+    protected PanZoomGBase? Container;
 
     private int tick = 0;
     public List<RenderFragment> Nodes { get; set; } = new();
@@ -39,7 +38,6 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     // public SVGHelper? SVGHelperReference;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
-    private Debouncer Debouncer { get; set; } = new();
 
 
     protected override void OnInitialized()
@@ -51,23 +49,15 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     protected override void OnParametersSet()
     {
         $"CanvasSVGComponent OnParametersSet".WriteInfo(2);
-        // $"CanvasSVGComponent OnParametersSet Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
         base.OnParametersSet();
     }
-
-    // protected override async Task OnParametersSetAsync()
-    // {
-    //     $"CanvasSVGComponent OnParametersSetAsync".WriteInfo(2);
-    //     // $"CanvasSVGComponent OnParametersSetAsync Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
-    //     await base.OnParametersSetAsync();
-    // }
 
     private void OnSelectionChanged(SelectionChanged e)
     {
         $"CanvasSVGComponent.OnSelectionChanged e.State={e.State}".WriteInfo(2);
         if (e.State == SelectionState.Dropped)
         {
-            // ForceRefresh();
+            ForceRefresh();
         }
     }
 
@@ -86,16 +76,9 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         return list;
     }
 
-    protected void DisplayContainerInfo()
-    {
-        $"{Container?.GetTransform()}".WriteInfo(2);
-        Container?.SetTransform();
-    }
-
-
     public void Dispose()
     {
-        //Dispose(true);
+        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
         PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
         PubSub!.UnSubscribeFrom<SelectionChanged>(OnSelectionChanged);
 
@@ -175,26 +158,6 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
-        // StateHasChanged();
-        // Debouncer.Debounce(() => ForceRefresh());
-
-        Task.Run(() =>
-        {
-            var drawing = Workspace!.GetDrawing();
-            if (!drawing.IsRendering())
-                OnRequestCallback.InvokeAsync(new MouseEventArgs());
-        });
-
-        // ForceRefresh();
-    }
-
-    public void Refresh()
-    {
-        // $"CanvasSVGComponent Refresh Refresher.RefreshMs={Refresher?.RefreshMs}".WriteInfo(2);
-        // StateHasChanged();
-        // ForceRefresh();
-        // await InvokeAsync(StateHasChanged);
-
     }
 
     public void RenderFrame(double fps)
