@@ -11,7 +11,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string Transform { get; set; } = "matrix(1, 0, 0, 1, 1, 1)";
+    [Parameter] public string Transform { get; set; } = "matrix(1, 0, 0, 1, 30, 30)";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
