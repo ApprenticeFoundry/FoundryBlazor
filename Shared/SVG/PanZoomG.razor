@@ -1,6 +1,6 @@
 @inherits PanZoomGBase
 @namespace FoundryBlazor.Shared.SVG
 
-<g transform="@Transform" @onmousedown="MouseDown">
+<g transform="@GetTransform()" @onmousedown="MouseDown">
     @ChildContent
 </g>

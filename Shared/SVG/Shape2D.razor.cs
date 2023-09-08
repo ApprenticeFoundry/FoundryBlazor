@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class RectBase : ComponentBase
+public class Shape2DBase : ComponentBase
 {
     [Parameter] public FoShape2D Shape { get; set; } = new();
     private string Matrix { get; set; } = "0,0";
 
     protected override void OnInitialized()
     {
-        GetMatrix();
         base.OnInitialized();
     }
 
@@ -22,10 +21,21 @@ public class RectBase : ComponentBase
         return Matrix;
     }
 
-    protected void MouseDown(MouseEventArgs evt)
+    protected int GetWidth()
     {
-        Console.WriteLine($"In MouseDown Rect {evt.ScreenX}  {evt.ScreenY}");
+        var width = Shape.Width;
+        return (int)width;
     }
 
+    protected int GetHeight()
+    {
+        var height = Shape.Height;
+        return (int)height;
+    }
+
+    protected string GetColor()
+    {
+        return Shape.Color;
+    }
 
 }

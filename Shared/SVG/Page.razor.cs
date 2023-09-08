@@ -36,17 +36,27 @@ public class PageBase : ComponentBase
         return shapes;
     }
 
-    protected int GetWidth()
+    protected int GetPageWidth()
     {
         var margin = Page.PageMargin.AsPixels();
         var width = Page.PageWidth.AsPixels() + 2.0 * margin;
 
         return (int)width;
     }
-    protected int GetHeight()
+    protected int GetWidth()
+    {
+        var width = Page.PageWidth.AsPixels();
+        return (int)width;
+    }
+    protected int GetPageHeight()
     {
         var margin = Page.PageMargin.AsPixels();
         var height = Page.PageHeight.AsPixels() + 2.0 * margin;
+        return (int)height;
+    }
+    protected int GetHeight()
+    {
+        var height = Page.PageHeight.AsPixels();
         return (int)height;
     }
     protected int GetMargin()

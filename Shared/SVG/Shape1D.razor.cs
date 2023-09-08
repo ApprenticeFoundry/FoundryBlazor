@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class PolylineBase : ComponentBase
+public class Shape1DBase : ComponentBase
 {
     [Parameter] public FoConnector1D Shape { get; set; } = new();
 
@@ -18,12 +18,12 @@ public class PolylineBase : ComponentBase
     {
         var mtx = Shape.GetMatrix();
         var result = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
-        $"PolylineBase.GetMatrix result={result}".WriteInfo(2);
+        $"Shape1DBase.GetMatrix result={result}".WriteInfo(2);
         return result;
     }
     protected string GetPoints()
     {
-        Shape.GetMatrix();
+        //Shape.GetMatrix();
         var width = Shape.FinishX - Shape.StartX;
         var height = Shape.FinishY - Shape.StartY;
 
@@ -37,7 +37,7 @@ public class PolylineBase : ComponentBase
             result = $"0,0 {width},{height}";
 
 
-        $"PolylineBase.GetPoints result={result}".WriteInfo(2);
+        $"Shape1DBase.GetPoints result={result}".WriteInfo(2);
         return result;
     }
 }

@@ -11,7 +11,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string Transform { get; set; } = "matrix(1, 0, 0, 1, 30, 30)";
+    [Parameter] public string Transform { get; set; } = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -26,13 +26,18 @@ public class PanZoomGBase : ComponentBase, IDisposable
     {
         if (e.note == "PanZoom")
         {
-            SetTransform();
+            Transform = "";
             InvokeAsync(StateHasChanged);
         }
     }
 
-    private string SetTransform()
+
+
+    protected string GetTransform()
     {
+        if ( !string.IsNullOrEmpty(Transform) )
+            return Transform;
+            
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
         Transform = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
         return Transform;
