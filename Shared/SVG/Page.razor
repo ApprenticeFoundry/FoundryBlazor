@@ -1,0 +1,15 @@
+@inherits PageBase
+@namespace FoundryBlazor.Shared.SVG
+
+<PanZoomG>
+    <rect x="0" y="0" width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" fill="@GetColor()" stroke="black" />
+
+    @foreach (var shape in GetConnectors())
+    {
+        <Polyline Shape="@shape" />
+    }
+    @foreach (var shape in GetShapes2D())
+    {
+        <Rect Shape="@shape" />
+    }
+</PanZoomG>

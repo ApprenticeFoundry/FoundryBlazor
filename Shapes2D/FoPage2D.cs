@@ -17,7 +17,6 @@ namespace FoundryBlazor.Shape;
 
 public interface IFoPage2D
 {
-
     int MapToPageXScale(Length value);
     int MapToPageYScale(Length value);
 
@@ -27,6 +26,7 @@ public interface IFoPage2D
     double MapToModelYLoc(int value);
     string CalculateTitle(string title);
 }
+
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
 {
