@@ -6,7 +6,7 @@ namespace FoundryBlazor.Shared.SVG;
 
 public class Shape1DBase : ComponentBase
 {
-    [Parameter] public FoConnector1D Shape { get; set; } = new();
+    [Parameter] public FoShape1D Shape { get; set; } = new();
 
     private string matrix { get; set; } = "";
 
