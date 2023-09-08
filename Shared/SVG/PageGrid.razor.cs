@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Shape;
 using Microsoft.AspNetCore.Components.Web;
 using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Units;
 
 namespace FoundryBlazor.Shared.SVG;
 
@@ -22,110 +23,67 @@ public class PageGridBase : ComponentBase
         return result;
     }
 
-    public void DrawHorizontalGridSVG(CanvasSVGComponentBase ctx, Length step, bool major)
+    public List<SVGLine> GetMajortHorizontalGridSVG()
+    {
+        return GetHorizontalGridSVG(Page.GridMajorH);
+    }
+    
+    public List<SVGLine> GetMinortHorizontalGridSVG()
+    {
+        return GetHorizontalGridSVG(Page.GridMinorH);
+    }
+
+    private List<SVGLine> GetHorizontalGridSVG(Length step)
     {
         var dStep = step.AsPixels();
-        var dMargin = PageMargin.AsPixels();
-        var dWidth = PageWidth.AsPixels() + dMargin;
-        var dHeight = PageHeight.AsPixels() + dMargin;
+        var dMargin = Page.PageMargin.AsPixels();
+        var dWidth = Page.PageWidth.AsPixels() + dMargin;
+        var dHeight = Page.PageHeight.AsPixels() + dMargin;
 
-
-        List<KeyValuePair<string, object>> attributes;
-        if (!major)
-        {
-            attributes = new List<KeyValuePair<string, object>>()
-            {
-                new("stroke", "White"),
-                new("stroke-width", 1),
-                new("stroke-dasharray", "5 1"),
-            };
-        }
-        else
-        {
-            attributes = new List<KeyValuePair<string, object>>()
-            {
-                new("stroke", "Black"),
-                new("stroke-width", 3),
-            };
-        }
-
+        var list = new List<SVGLine>();
 
         var x = dMargin; //left;
         while (x <= dWidth)
         {
-            var lineAttributes = new List<KeyValuePair<string, object>>() {
-                new("x1", x),
-                new("y1", dMargin),
-                new("x2", x),
-                new("y2", dHeight)
-            };
-            lineAttributes.AddRange(attributes);
-
-            //$"DrawHorizontalGridSVG {x} {dMargin} {dHeight}".WriteLine(ConsoleColor.Blue);
-            void node(RenderTreeBuilder builder)
-            {
-                builder.OpenElement(30, "line");
-                builder.AddMultipleAttributes(31, lineAttributes);
-                builder.CloseElement();
-            }
-            ctx.Nodes.Add(node);
+            var rect = new SVGLine(x, dMargin, x, dHeight);
+            list.Add(rect);
             x += dStep;
         }
-            // g
-            //builder.CloseElement();
-        
-
+        return list;
     }
-    public void DrawVerticalGridSVG(CanvasSVGComponentBase ctx, Length step, bool major)
+                //     new("stroke", "White"),
+                // new("stroke-width", 1),
+                // new("stroke-dasharray", "5 1"),
+                //new("stroke", "Black"),
+                //new("stroke-width", 3),
+
+    public List<SVGLine> GetMajorVerticalGridSVG()
     {
+        return GetVerticalGridSVG(Page.GridMajorV);
+    }
 
+    public List<SVGLine> GetMinorVerticalGridSVG()
+    {
+        return GetVerticalGridSVG(Page.GridMinorV);
+    }
+
+    private List<SVGLine> GetVerticalGridSVG(Length step)
+    {
         var dStep = step.AsPixels();
+        var dMargin = Page.PageMargin.AsPixels();
+        var dWidth = Page.PageWidth.AsPixels() + dMargin;
+        var dHeight = Page.PageHeight.AsPixels() + dMargin;
 
-        var dMargin = PageMargin.AsPixels();
-        var dWidth = PageWidth.AsPixels() + dMargin;
-        var dHeight = PageHeight.AsPixels() + dMargin;
-
-
-        List<KeyValuePair<string, object>> attributes;
-        if (!major)
-        {
-            attributes = new List<KeyValuePair<string, object>>()
-            {
-                new("stroke", "White"),
-                new("stroke-width", 1),
-                new("stroke-dasharray", "5 1"),
-            };
-        }
-        else
-        {
-            attributes = new List<KeyValuePair<string, object>>()
-            {
-                new("stroke", "Black"),
-                new("stroke-width", 3),
-            };
-        }
+        var list = new List<SVGLine>();
 
         var x = dHeight; //left;
         while (x >= dMargin)
         {
-            var lineAttributes = new List<KeyValuePair<string, object>>() {
-                new("x1", dMargin),
-                new("y1", x),
-                new("x2", dWidth),
-                new("y2", x)
-            };
-            lineAttributes.AddRange(attributes);
-
-            //$"DrawHorizontalGridSVG {x} {dMargin} {dHeight}".WriteLine(ConsoleColor.Blue);
-            void node(RenderTreeBuilder builder)
-            {
-                builder.OpenElement(30, "line");
-                builder.AddMultipleAttributes(31, lineAttributes);
-                builder.CloseElement();
-            }
-            ctx.Nodes.Add(node);
+            var rect = new SVGLine(dMargin, x, dWidth, x);
+            list.Add(rect);
             x -= dStep;
         }
+        return list;
     }
 
     protected int GetPageWidth()

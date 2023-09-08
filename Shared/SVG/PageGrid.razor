@@ -3,18 +3,24 @@
 @namespace FoundryBlazor.Shared.SVG
 
 
-    <rect x="0" y="0" width="@GetPageWidth()" height="@GetPageHeight()" fill="White" stroke="White">
-    </rect>
-    <rect x="@GetMargin()" y="@GetMargin()" width="@GetWidth()" height="@GetHeight()" fill="@GetColor()" stroke="black">
-    </rect>
-
-    @foreach (var shape in GetShapes1D())
-    {
-        <Shape1D Shape="@shape" />
-    }
-    @foreach (var shape in GetShapes2D())
-    {
-        <Shape2D Shape="@shape" />
-    }
 
 
+@foreach (var line in GetMinortHorizontalGridSVG())
+{
+    <line stroke="white" stroke-dasharray="5 1" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}
+
+@foreach (var line in GetMinorVerticalGridSVG())
+{
+    <line stroke="white" stroke-dasharray="5 1" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}
+
+@foreach (var line in GetMajortHorizontalGridSVG())
+{
+    <line stroke="black" stroke-width="3" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}
+
+@foreach (var line in GetMajorVerticalGridSVG())
+{
+    <line stroke="black" stroke-width="3" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}
