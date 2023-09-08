@@ -8,7 +8,7 @@
     <rect x="@GetMargin()" y="@GetMargin()" width="@GetWidth()" height="@GetHeight()" fill="@GetColor()" stroke="black">
     </rect>
 
-    @foreach (var shape in GetConnectors())
+    @foreach (var shape in GetShapes1D())
     {
         <Shape1D Shape="@shape" />
     }
@@ -16,4 +16,5 @@
     {
         <Shape2D Shape="@shape" />
     }
+
 </PanZoomG>

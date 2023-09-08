@@ -131,6 +131,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public Action<FoGlyph2D, int>? ContextLink;
     public Action<FoGlyph2D>? OnMatrixRefresh;
+    public Action<FoGlyph2D>? OnMatrixSmash;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
@@ -859,6 +860,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (_matrix == null && !force) return false;
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
+        OnMatrixSmash?.Invoke(this);
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         ResetHitTesting = true;
         this._matrix = Matrix2D.SmashMatrix(this._matrix);

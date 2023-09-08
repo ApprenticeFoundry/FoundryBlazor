@@ -22,7 +22,7 @@ public class PageBase : ComponentBase
         return result;
     }
 
-    public List<FoConnector1D> GetConnectors()
+    public List<FoConnector1D> GetShapes1D()
     {
         var shapes = Page.AllShapes1D().Where((shape) => shape is FoConnector1D).Cast<FoConnector1D>().ToList();
         $"GetConnectors {shapes.Count}".WriteInfo();
