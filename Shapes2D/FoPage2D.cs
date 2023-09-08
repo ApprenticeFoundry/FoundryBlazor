@@ -762,7 +762,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         // await ctx.SetGlobalAlphaAsync(1.0F);
         // await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
-        RenderGridSVG(ctx);
+        
 
         // //await DrawFancyPin(ctx);
 
