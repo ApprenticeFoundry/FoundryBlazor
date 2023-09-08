@@ -7,7 +7,8 @@ namespace FoundryBlazor.Shared.SVG;
 
 public class PageBase : ComponentBase
 {
-    [Parameter] public FoPage2D Page { get; set; } = new ("page1", "White");
+    [Parameter] public FoPage2D Page { get; set; } = new("page1", "White");
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()
     {
@@ -21,7 +22,7 @@ public class PageBase : ComponentBase
         return result;
     }
 
-   public List<FoConnector1D> GetConnectors()
+    public List<FoConnector1D> GetConnectors()
     {
         var shapes = Page.AllShapes1D().Where((shape) => shape is FoConnector1D).Cast<FoConnector1D>().ToList();
         $"GetConnectors {shapes.Count}".WriteInfo();
@@ -50,7 +51,7 @@ public class PageBase : ComponentBase
     }
     protected int GetMargin()
     {
-         var margin = Page.PageMargin.AsPixels();
+        var margin = Page.PageMargin.AsPixels();
         return margin;
     }
 
