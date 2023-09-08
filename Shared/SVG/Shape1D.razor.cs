@@ -8,18 +8,32 @@ public class Shape1DBase : ComponentBase
 {
     [Parameter] public FoConnector1D Shape { get; set; } = new();
 
+    private string matrix { get; set; } = "";
+
     protected override void OnInitialized()
     {
 
         base.OnInitialized();
+        Shape.OnMatrixSmash = (obj) =>
+        {
+            $"Shape1DBase.OnMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
+            matrix = "";
+            StateHasChanged();
+        };
     }
 
     protected string GetMatrix()
     {
+        if ( !string.IsNullOrEmpty(matrix) )
+        {
+            $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
+            return matrix;
+        }
+
         var mtx = Shape.GetMatrix();
-        var result = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
-        $"Shape1DBase.GetMatrix result={result}".WriteInfo(2);
-        return result;
+        matrix = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        $"Shape1DBase.GetMatrix result={matrix}".WriteInfo(2);
+        return matrix;
     }
     protected string GetPoints()
     {
