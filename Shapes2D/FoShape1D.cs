@@ -17,6 +17,9 @@ public interface IGlueOwner: IGlyph2D
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
     private static int gluecount = 0;
+
+
+
     protected int x1 = 0;
     public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value, x1); } }
     protected int y1 = 0;
@@ -28,7 +31,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     private double rotation = 0;
     public float AntiRotation { get { return (float)(-1.0 * this.rotation * Matrix2D.DEG_TO_RAD); } }
-
+    public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
+    
     protected Point? startPT;
     protected Point? finishPT;
     public Point Start()

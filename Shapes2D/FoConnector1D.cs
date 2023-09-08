@@ -7,7 +7,6 @@ namespace FoundryBlazor.Shape;
 
 public class FoConnector1D : FoShape1D, IShape1D
 {
-    public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
 
     public Action<Canvas2DContext, FoConnector1D> DrawHorizontalFirst = async (ctx, obj) =>
     {

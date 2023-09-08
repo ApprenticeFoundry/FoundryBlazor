@@ -1,16 +1,11 @@
 ﻿
 using System.Drawing;
-using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
 using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Radzen.Blazor.Rendering;
 
 namespace FoundryBlazor.Shape;
 

@@ -12,7 +12,6 @@ public class Shape1DBase : ComponentBase
 
     protected override void OnInitialized()
     {
-
         base.OnInitialized();
         Shape.OnMatrixSmash = (obj) =>
         {
@@ -31,7 +30,7 @@ public class Shape1DBase : ComponentBase
         }
 
         var mtx = Shape.GetMatrix();
-        matrix = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        matrix = mtx.SVGMatrix();
         $"Shape1DBase.GetMatrix result={matrix}".WriteInfo(2);
         return matrix;
     }

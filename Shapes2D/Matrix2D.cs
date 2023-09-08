@@ -29,6 +29,7 @@ namespace FoundryBlazor.Shape;
     public static readonly double DEG_TO_RAD = Math.PI / 180;
     public static readonly double RAD_TO_DEG = 180 / Math.PI;
     public static readonly double TWO_PI = 2.0 * Math.PI;
+    private string svg = "";
 
     public double a = 1; //Position (0, 0) in a 3x3 affine transformation matrix.
     public double b = 0; //Position (0, 1) in a 3x3 affine transformation matrix.
@@ -64,6 +65,15 @@ namespace FoundryBlazor.Shape;
     public Matrix2D(Matrix2D matrix) 
     {
         Copy(matrix);
+    }
+
+    public string SVGMatrix()
+    {
+        if (!string.IsNullOrEmpty(svg))
+            return svg;
+
+        svg = $"matrix({a}, {b}, {c}, {d}, {tx}, {ty})";
+        return svg;
     }
 
     public Matrix2D Copy(Matrix2D matrix) 
@@ -131,6 +141,7 @@ namespace FoundryBlazor.Shape;
         this.d = 1;
         this.tx = 0;
         this.ty = 0;
+        this.svg = "";
         return this;
     }
 

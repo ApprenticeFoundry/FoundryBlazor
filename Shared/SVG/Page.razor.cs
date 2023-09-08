@@ -18,14 +18,14 @@ public class PageBase : ComponentBase
     protected string GetMatrix()
     {
         var mtx = Page.GetMatrix();
-        var result = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        var result = mtx.SVGMatrix();
         return result;
     }
 
-    public List<FoConnector1D> GetShapes1D()
+    public List<FoShape1D> GetShapes1D()
     {
-        var shapes = Page.AllShapes1D().Where((shape) => shape is FoConnector1D).Cast<FoConnector1D>().ToList();
-        $"GetConnectors {shapes.Count}".WriteInfo();
+        var shapes = Page.AllShapes1D();
+        $"GetShapes1D {shapes.Count}".WriteInfo();
         return shapes;
     }
 

@@ -30,8 +30,7 @@ public class Shape2DBase : ComponentBase
         }
 
         var mtx = Shape.GetMatrix();
-
-        matrix = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        matrix = mtx.SVGMatrix();
         $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
         return matrix;
     }

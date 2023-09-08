@@ -39,7 +39,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
             return transform;
             
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
-        transform = $"matrix({mtx.a}, {mtx.b}, {mtx.c}, {mtx.d}, {mtx.tx}, {mtx.ty})";
+        transform = mtx.SVGMatrix();
         return transform;
     }
 
