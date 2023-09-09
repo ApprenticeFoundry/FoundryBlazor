@@ -20,4 +20,11 @@ public class ShapeHoverUIEvent : ShapeUIEvent
     }
 }
 
+public class ShapeSelectedUIEvent : ShapeUIEvent
+{
+    public ShapeSelectedUIEvent(FoGlyph2D shape):base(shape)
+    {
+    }
+}
+
 

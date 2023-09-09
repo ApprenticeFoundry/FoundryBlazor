@@ -1,4 +1,5 @@
 using BlazorComponentBus;
+using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shape;
 
@@ -19,6 +20,7 @@ public interface ISelectionService
     ISelectionService RotateBy(double da);
     ISelectionService ZoomBy(double factor);
     List<FoGlyph2D> Selections();
+    ISelectionService PublishShapeSelectedUIEvent();
 }
 
 public class SelectionService : ISelectionService
@@ -40,6 +42,16 @@ public class SelectionService : ISelectionService
     {
         //"ClearAllWhen".WriteLine(ConsoleColor.Green);   
         if (apply) ClearAll();
+        return this;
+    }
+
+    public ISelectionService PublishShapeSelectedUIEvent()
+    {
+        Members.ForEach(item =>
+        {
+            var obj = new ShapeSelectedUIEvent(item);
+            PubSub.Publish<ShapeSelectedUIEvent>(obj);
+        });
         return this;
     }
 

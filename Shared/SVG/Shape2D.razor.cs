@@ -29,12 +29,20 @@ public class Shape2DBase : ComponentBase
     {
         if (firstRender)
         {
-            PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnRefreshUIEvent);
+            PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
+            PubSub!.SubscribeTo<ShapeSelectedUIEvent>(OnShapeSelected);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private void OnRefreshUIEvent(ShapeHoverUIEvent e)
+    private void OnShapeHover(ShapeHoverUIEvent e)
+    {
+        if (e.Shape == Shape)
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    private void OnShapeSelected(ShapeSelectedUIEvent e)
     {
         if (e.Shape == Shape)
         {

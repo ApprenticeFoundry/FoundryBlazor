@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Components;
 using FoundryBlazor.PubSub;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
-using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace FoundryBlazor.Shared.SVG;
 

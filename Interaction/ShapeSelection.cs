@@ -93,6 +93,7 @@ public class ShapeSelection : ShapeHovering
 
         // this is a fence select
 
+        selectionService?.PublishShapeSelectedUIEvent();
         //$"ShapeSelection Mouse Down ".WriteLine(ConsoleColor.Green);
         return true;
     }
@@ -118,10 +119,10 @@ public class ShapeSelection : ShapeHovering
             }
         }
 
-        //dragArea = panZoomService.HitRectStart(args);
         isFenceSelecting = false;
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
         drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        selectionService?.PublishShapeSelectedUIEvent();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
