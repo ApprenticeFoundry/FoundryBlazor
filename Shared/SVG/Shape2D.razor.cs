@@ -12,7 +12,7 @@ public class Shape2DBase : ComponentBase
     [Inject] private ComponentBus? PubSub { get; set; }
 
     [Parameter] public FoShape2D Shape { get; set; } = new();
-    private string matrix { get; set; } = "";
+
 
     protected override void OnInitialized()
     {
@@ -20,7 +20,6 @@ public class Shape2DBase : ComponentBase
         Shape.AfterMatrixSmash((obj) =>
         {
             //$"Shape2DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
-            matrix = "";
             InvokeAsync(StateHasChanged);
         });
     }
@@ -52,21 +51,16 @@ public class Shape2DBase : ComponentBase
 
     protected string GetMatrix()
     {
-        if ( !string.IsNullOrEmpty(matrix) )
+        var mtx = Shape.GetMatrix();
+        if ( mtx.IsSVGRefreshed() )
         {
             //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
-            return matrix;
+            return mtx.SVGMatrix();
         }
 
-        var mtx = Shape.GetMatrix();
-        if ( mtx.svg )
-        {
-            $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} mtx is null".WriteError(2);
-            return "";
-        }
-        matrix = mtx.SVGMatrix();
+
         //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
-        return matrix;
+        return mtx.SVGMatrix();
     }
 
     protected bool IsHovering()
