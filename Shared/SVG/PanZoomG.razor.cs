@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using FoundryBlazor.PubSub;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace FoundryBlazor.Shared.SVG;
@@ -11,7 +12,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    private string transform { get; set; } = "";
+    private string matrix { get; set; } = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -26,7 +27,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
     {
         if (e.note == "PanZoom")
         {
-            transform = "";
+            matrix = "";
             InvokeAsync(StateHasChanged);
         }
     }
@@ -35,12 +36,13 @@ public class PanZoomGBase : ComponentBase, IDisposable
 
     protected string GetTransform()
     {
-        if ( !string.IsNullOrEmpty(transform) )
-            return transform;
+        if ( !string.IsNullOrEmpty(matrix) )
+            return matrix;
             
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
-        transform = mtx.SVGMatrix();
-        return transform;
+        matrix = mtx.SVGMatrix();
+        $"PanZoomGBase.GetTransform {matrix}".WriteInfo(2);
+        return matrix;
     }
 
     public void Dispose()

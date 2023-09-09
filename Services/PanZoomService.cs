@@ -76,8 +76,8 @@ public class PanZoomService : IPanZoomService
 
     private Action? OnEventComplete;
 
-    public Action<PanZoomState>? OnMatrixRefresh;
-    public Action<PanZoomState>? OnMatrixSmash;
+    private Action<PanZoomState>? OnMatrixRefresh;
+    private Action<PanZoomState>? OnMatrixSmash;
 
     public PanZoomService()
     {

@@ -13,12 +13,12 @@ public class Shape2DBase : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Shape.OnMatrixSmash = (obj) =>
+        Shape.AfterMatrixSmash((obj) =>
         {
-            $"Shape2DBase.OnMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
+            $"Shape2DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
             matrix = "";
             StateHasChanged();
-        };
+        });
     }
 
     protected string GetMatrix()

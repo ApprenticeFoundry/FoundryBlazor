@@ -13,6 +13,7 @@ using System.Drawing;
 using FoundryRulesAndUnits.Units;
 using FoundryBlazor.Shape;
 using Microsoft.AspNetCore.Components.Rendering;
+using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shape;
 
@@ -773,6 +774,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PanZoomService.ZoomWheel(args.DeltaY);
         PanZoomService.WriteToPage(PageManager.CurrentPage());
+        
+        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("PanZoom"));
         //$"Wheel change: {args.DeltaX}, {args.DeltaY}, {args.DeltaZ}".WriteLine(ConsoleColor.Yellow);
         return true;
     }

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Shape;
-using Microsoft.AspNetCore.Components.Web;
+
 using FoundryRulesAndUnits.Extensions;
 using FoundryBlazor.Solutions;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
+using System.Drawing;
+
 
 namespace FoundryBlazor.Shared.SVG;
 
@@ -14,6 +16,9 @@ public class MouseTrackerBase : ComponentBase
     [Inject] public IPanZoomService? PanZoom { get; set; } 
     [Inject] private ComponentBus? PubSub { get; set; }
     
+
+    Rectangle dragArea = new();
+
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -22,23 +27,27 @@ public class MouseTrackerBase : ComponentBase
         {
             try
             {
-                 StateHasChanged();
+                dragArea = PanZoom!.HitRectStart(args);
+
                 // var page = Workspace!.GetDrawing().CurrentPage();
                 // var state = PanZoom!.ReadFromPage(page);
                 // var x = args.X;
                 // var y = args.Y;
                 // var mtx = state.Matrix;
                 // var mtxInv = mtx.Inverse();
-                // var pt = new Point2D(x, y);
+                // var pt = new Point(x, y);
                 // var ptInv = mtxInv.TransformPoint(pt);
                 // var xInv = ptInv.X;
                 // var yInv = ptInv.Y;
                 // $" {args.Topic} {x} {y} {xInv} {yInv}".WriteNote();
+                // StateHasChanged();
+
+                InvokeAsync(StateHasChanged);
 
             }
             catch (Exception ex)
             {
-                $" {args.Topic} {ex.Message}".WriteNote();
+                $"HELP {args.Topic} {ex.Message}".WriteNote();
             }
         });
     }
@@ -52,13 +61,13 @@ public class MouseTrackerBase : ComponentBase
 
     public int X1()
     {
-        var state = GetPanZoomState();
-        return state.LastLocation.X;
+        //var state = GetPanZoomState();
+        return dragArea.X;  //state.LastLocation.X;
     }
     public int Y1()
     {
-        var state = GetPanZoomState();
-        return state.LastLocation.Y;
+        //var state = GetPanZoomState();
+        return dragArea.Y;  //state.LastLocation.Y;
     }
 
 

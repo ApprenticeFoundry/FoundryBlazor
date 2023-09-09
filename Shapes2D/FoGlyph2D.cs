@@ -129,9 +129,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
 
+    protected Action<FoGlyph2D>? OnMatrixRefresh;
+    protected Action<FoGlyph2D>? OnMatrixSmash;
+    
     public Action<FoGlyph2D, int>? ContextLink;
-    public Action<FoGlyph2D>? OnMatrixRefresh;
-    public Action<FoGlyph2D>? OnMatrixSmash;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
