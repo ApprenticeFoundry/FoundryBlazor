@@ -25,13 +25,13 @@ public class Shape2DBase : ComponentBase
     {
         if ( !string.IsNullOrEmpty(matrix) )
         {
-            $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
+            //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
             return matrix;
         }
 
         var mtx = Shape.GetMatrix();
         matrix = mtx.SVGMatrix();
-        $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
+        //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
         return matrix;
     }
 
