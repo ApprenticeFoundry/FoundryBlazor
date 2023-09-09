@@ -50,7 +50,7 @@ public class Shape1DBase : ComponentBase
             result = $"0,0 {width},{height}";
 
 
-        $"Shape1DBase.GetPoints result={result}".WriteInfo(2);
+        //$"Shape1DBase.GetPoints result={result}".WriteInfo(2);
         return result;
     }
 }

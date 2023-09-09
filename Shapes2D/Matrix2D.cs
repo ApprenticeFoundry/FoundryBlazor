@@ -67,9 +67,16 @@ namespace FoundryBlazor.Shape;
         Copy(matrix);
     }
 
-    public string SVGMatrix()
+    public bool IsSVGRefreshed()
     {
         if (!string.IsNullOrEmpty(svg))
+            return true;
+        return false;
+    }
+
+    public string SVGMatrix()
+    {
+        if (IsSVGRefreshed())
             return svg;
 
         svg = $"matrix({a}, {b}, {c}, {d}, {tx}, {ty})";

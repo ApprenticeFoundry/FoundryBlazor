@@ -59,6 +59,11 @@ public class Shape2DBase : ComponentBase
         }
 
         var mtx = Shape.GetMatrix();
+        if ( mtx.svg )
+        {
+            $"Shape2DBase.GetMatrix {Shape.GetGlyphId()} mtx is null".WriteError(2);
+            return "";
+        }
         matrix = mtx.SVGMatrix();
         //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
         return matrix;
