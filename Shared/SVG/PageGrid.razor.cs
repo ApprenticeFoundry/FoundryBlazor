@@ -9,7 +9,7 @@ namespace FoundryBlazor.Shared.SVG;
 public class PageGridBase : ComponentBase
 {
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "Gray");
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    //[Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized()
     {
@@ -51,11 +51,7 @@ public class PageGridBase : ComponentBase
         }
         return list;
     }
-                //     new("stroke", "White"),
-                // new("stroke-width", 1),
-                // new("stroke-dasharray", "5 1"),
-                //new("stroke", "Black"),
-                //new("stroke-width", 3),
+
 
     public List<SVGLine> GetMajorVerticalGridSVG()
     {
@@ -86,38 +82,5 @@ public class PageGridBase : ComponentBase
         return list;
     }
 
-    protected int GetPageWidth()
-    {
-        var margin = Page.PageMargin.AsPixels();
-        var width = Page.PageWidth.AsPixels() + 2.0 * margin;
-
-        return (int)width;
-    }
-    protected int GetWidth()
-    {
-        var width = Page.PageWidth.AsPixels();
-        return (int)width;
-    }
-    protected int GetPageHeight()
-    {
-        var margin = Page.PageMargin.AsPixels();
-        var height = Page.PageHeight.AsPixels() + 2.0 * margin;
-        return (int)height;
-    }
-    protected int GetHeight()
-    {
-        var height = Page.PageHeight.AsPixels();
-        return (int)height;
-    }
-    protected int GetMargin()
-    {
-        var margin = Page.PageMargin.AsPixels();
-        return margin;
-    }
-
-    protected string GetColor()
-    {
-        return Page.Color;
-    }
 
 }

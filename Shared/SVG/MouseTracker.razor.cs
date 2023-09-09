@@ -28,20 +28,6 @@ public class MouseTrackerBase : ComponentBase
             try
             {
                 dragArea = PanZoom!.HitRectStart(args);
-
-                // var page = Workspace!.GetDrawing().CurrentPage();
-                // var state = PanZoom!.ReadFromPage(page);
-                // var x = args.X;
-                // var y = args.Y;
-                // var mtx = state.Matrix;
-                // var mtxInv = mtx.Inverse();
-                // var pt = new Point(x, y);
-                // var ptInv = mtxInv.TransformPoint(pt);
-                // var xInv = ptInv.X;
-                // var yInv = ptInv.Y;
-                // $" {args.Topic} {x} {y} {xInv} {yInv}".WriteNote();
-                // StateHasChanged();
-
                 InvokeAsync(StateHasChanged);
 
             }

@@ -41,7 +41,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
             
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
         matrix = mtx.SVGMatrix();
-        $"PanZoomGBase.GetTransform {matrix}".WriteInfo(2);
+        //$"PanZoomGBase.GetTransform {matrix}".WriteInfo(2);
         return matrix;
     }
 
@@ -55,11 +55,6 @@ public class PanZoomGBase : ComponentBase, IDisposable
         // and prevent finalization code for this object
         // from executing a second time.
         GC.SuppressFinalize(this);
-    }
-
-    protected void MouseDown(MouseEventArgs evt)
-    {
-        Console.WriteLine($"In MouseDown PanZoomG {evt.ScreenX}  {evt.ScreenY}");
     }
 
 

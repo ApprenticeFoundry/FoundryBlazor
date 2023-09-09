@@ -3,4 +3,13 @@
 
 <g  transform="@GetMatrix()">
     <rect  width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" fill="@GetColor()" stroke="black" />
+    @if (IsSelected())
+    {
+        <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" fill="None" 
+            stroke="White" stroke-width="5" stroke-dasharray="5 5" />
+    }
+    else if (IsHovering())
+    {
+        <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" fill="None" stroke="blue" stroke-width="3" />
+    }
 </g>
