@@ -15,9 +15,9 @@ public class Shape1DBase : ComponentBase
         base.OnInitialized();
         Shape.AfterMatrixSmash((obj) =>
         {
-            $"Shape1DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
+           // $"Shape1DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
             matrix = "";
-            StateHasChanged();
+            InvokeAsync(StateHasChanged);
         });
     }
 

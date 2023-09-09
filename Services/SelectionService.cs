@@ -61,6 +61,7 @@ public class SelectionService : ISelectionService
         PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
 
         Members.ForEach(item => item.MarkSelected(false));
+        PublishShapeSelectedUIEvent();
         Members.Clear();
         return this;
     }
@@ -73,6 +74,8 @@ public class SelectionService : ISelectionService
             if (Members.IndexOf(item) == -1)
                 Members.Add(item);
         });
+        
+        PublishShapeSelectedUIEvent();
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return list;
     }
@@ -83,32 +86,38 @@ public class SelectionService : ISelectionService
         if (Members.IndexOf(item) == -1)
             Members.Add(item);
 
+        PublishShapeSelectedUIEvent();
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
     public void MouseFirstSelected()
     {
+        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.FirstSelected(Members));
     }
     public void MouseStartDrag()
     {
+        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.StartDrag(Members));
     }
     public void MousePreDelete()
     {
+        //PublishShapeSelectedUIEvent();
         Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.PreDelete(Members));
     }
     public void MouseReselect()
     {
+        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Reselected(Members));
     }
     public void MouseDropped()
     {
+        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
     }

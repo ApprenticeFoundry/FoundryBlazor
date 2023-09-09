@@ -382,10 +382,7 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public virtual void DrawSVG(CanvasSVGComponentBase ctx, int tick)
-    {
-        CurrentPage().DrawSVG(ctx, tick);
-    }
+
 
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -418,18 +415,6 @@ public class PageManagementService : FoComponent, IPageManagement
         return true;
     }
 
-    public bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true)
-    {
-        var page = CurrentPage();
 
-        //await page.RenderNoItems(ctx, tick++);
-        page.RenderSVG(ctx, tick++, deep);
-
-        if (RenderHitTestTree)
-            _hitTestService.RenderQuadTreeSVG(ctx, true);
-
-
-        return true;
-    }
 
 }

@@ -48,9 +48,6 @@ public interface IRender
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
 
-
-    public void DrawSVG(CanvasSVGComponentBase ctx, int tick);
-    public bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true);
 }
 
 
@@ -493,13 +490,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return true;
     }
 
-    public virtual void DrawSVG(CanvasSVGComponentBase ctx, int tick)
-    {
-        //await ctx.SaveAsync();
-        //ShapeDraw?.Invoke(ctx, this);
-        //await ctx.RestoreAsync();
-        //await DrawPin(ctx);
-    }
+
 
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -543,39 +534,6 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
 
 
-    public virtual bool RenderSVG(CanvasSVGComponentBase ctx, int tick, bool deep = true)
-    {
-        // if (CannotRender()) return false;
-        $"FoGlyph2D RenderSVG ctx.Count = {ctx.Nodes.Count}".WriteInfo();
-
-        //await ctx.SaveAsync();
-        UpdateContext(ctx, tick);
-
-        //PreDraw?.Invoke(ctx, this);
-        DrawSVG(ctx, tick);
-        // if (!IsSelected)
-        //     HoverDraw?.Invoke(ctx, this);
-
-        // await DrawTag(ctx);
-
-        // PostDraw?.Invoke(ctx, this);
-
-        // if (IsSelected)
-        //     await DrawWhenSelected(ctx, tick, deep);
-
-        if (deep)
-        {
-            GetMembers<FoShape1D>()?.ForEach(child => child.RenderSVG(ctx, tick, deep));
-            GetMembers<FoShape2D>()?.ForEach(child => child.RenderSVG(ctx, tick, deep));
-        }
-
-        // if (GetMembers<FoGlue2D>()?.Count > 0)
-        //     await DrawTriangle(ctx, "Black");
-
-
-        // await ctx.RestoreAsync();
-        return true;
-    }
 
     public async virtual Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {

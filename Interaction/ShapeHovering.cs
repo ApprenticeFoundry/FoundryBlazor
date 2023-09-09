@@ -46,7 +46,7 @@ public class ShapeHovering : BaseInteraction
         lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
 
         
-        list.ForEach(item => pubsub.Publish(item));    
+        //list.ForEach(item => pubsub.Publish(item));    
 
         return true;
     }

@@ -93,8 +93,7 @@ public class ShapeSelection : ShapeHovering
 
         // this is a fence select
 
-        selectionService?.PublishShapeSelectedUIEvent();
-        //$"ShapeSelection Mouse Down ".WriteLine(ConsoleColor.Green);
+        $"ShapeSelection Mouse Down ".WriteLine(ConsoleColor.Green);
         return true;
     }
 
@@ -122,7 +121,6 @@ public class ShapeSelection : ShapeHovering
         isFenceSelecting = false;
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
         drawing.SetInteraction(InteractionStyle.ShapeHovering);
-        selectionService?.PublishShapeSelectedUIEvent();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
@@ -141,7 +139,7 @@ public class ShapeSelection : ShapeHovering
         else
             base.MouseMove(args); // this should hover
 
-        //$"ShapeSelection Mouse Move ".WriteLine(ConsoleColor.Green);
+        $"ShapeSelection Mouse Move ".WriteLine(ConsoleColor.Green);
         return true;
     }
 

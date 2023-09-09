@@ -177,7 +177,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
         // $"CanvasSVG RenderFrame {tick} {PagePanZoom}".WriteInfo();
 
-        drawing.RenderDrawingSVG(this, tick, fps);
+        //drawing.RenderDrawingSVG(this, tick, fps);
         //Workspace?.RenderWatermark(Ctx, tick);
 
 
