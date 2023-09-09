@@ -361,7 +361,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         OnMatrixRefresh = action;
         return this;
     }
-
+    public FoGlyph2D AfterMatrixSmash(Action<FoGlyph2D> action)
+    {
+        OnMatrixSmash = action;
+        return this;
+    }
     public virtual void UpdateContext(CanvasSVGComponentBase ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);

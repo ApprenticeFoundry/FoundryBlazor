@@ -204,7 +204,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         });
 
         InitSubscriptions();
-        PanZoomService.SetOnComplete(() =>
+        PanZoomService.SetOnEventComplete(() =>
         {
             //SRS refresh zoom if changed
             ResetPanZoom();

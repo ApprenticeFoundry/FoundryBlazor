@@ -31,7 +31,7 @@ public interface IPanZoomService
     Rectangle Normalize(Rectangle rect);
     public void Deconstruct(out double zoom, out int panx, out int pany);
 
-    public void SetOnComplete(Action action);
+    public void SetOnEventComplete(Action action);
 
     public PanZoomState ReadFromPage(FoPage2D page);
     public PanZoomState WriteToPage(FoPage2D page);
@@ -74,29 +74,44 @@ public class PanZoomService : IPanZoomService
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
 
-    private Action? OnComplete;
+    private Action? OnEventComplete;
+
+    public Action<PanZoomState>? OnMatrixRefresh;
+    public Action<PanZoomState>? OnMatrixSmash;
 
     public PanZoomService()
     {
     }
 
-    public void SetOnComplete(Action action)
+    public PanZoomService AfterMatrixRefresh(Action<PanZoomState> action)
     {
-        OnComplete = action;
+        OnMatrixRefresh = action;
+        return this;
+    }
+
+    public PanZoomService AfterMatrixSmash(Action<PanZoomState> action)
+    {
+        OnMatrixSmash = action;
+        return this;
+    }
+
+    public void SetOnEventComplete(Action action)
+    {
+        OnEventComplete = action;
     }
 
     public void Reset()
     {
         State.Reset();
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
     }
 
     public PanZoomState ReadFromPage(FoPage2D page)
     {
         State.SetState(page.PanZoom);
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
         return State;
     }
     public PanZoomState WriteToPage(FoPage2D page)
@@ -131,6 +146,7 @@ public class PanZoomService : IPanZoomService
     {
         if (_matrix == null && !force) return false;
 
+        OnMatrixSmash?.Invoke(State);
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         FoGlyph2D.ResetHitTesting = true;
         $"PanZoomService Smash".WriteWarning();
@@ -148,6 +164,7 @@ public class PanZoomService : IPanZoomService
             _matrix = Matrix2D.NewMatrix();
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
+            OnMatrixRefresh?.Invoke(State);
             $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
@@ -225,7 +242,7 @@ public class PanZoomService : IPanZoomService
         State.LastZoom = State.Zoom;
         State.Zoom *= delta < 0 ? 1.1 : 0.9;
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
         return State.Zoom;
     }
 
@@ -267,7 +284,7 @@ public class PanZoomService : IPanZoomService
         State.LastZoom = State.Zoom;
         State.Zoom = zoom;
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
         return State.Zoom;
     }
 
@@ -289,7 +306,7 @@ public class PanZoomService : IPanZoomService
         State.Pan.X += dx;
         State.Pan.Y += dy;
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
         return State.Pan;
     }
 
@@ -298,7 +315,7 @@ public class PanZoomService : IPanZoomService
     {
         State.Pan = new(x, y);
         Smash(true);
-        OnComplete?.Invoke();
+        OnEventComplete?.Invoke();
         return State.Pan;
     }
 }
