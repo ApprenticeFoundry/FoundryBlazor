@@ -8,6 +8,7 @@ using System.Drawing;
 using BlazorComponentBus;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Canvas
 {
@@ -117,7 +118,7 @@ namespace FoundryBlazor.Canvas
         public async Task Initialize()
         {
             // Initialize
-            await _jsRuntime!.InvokeVoidAsync("initRenderJS", DotNetObjectReference.Create(this));
+            await _jsRuntime!.InvokeVoidAsync("initSVGRenderJS", DotNetObjectReference.Create(this));
         }
 
 
@@ -189,6 +190,7 @@ namespace FoundryBlazor.Canvas
         public async Task OnMouseDown(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_DOWN";
+            $"SVGHelper OnMouseDown: {args.ClientX}, {args.ClientY}".WriteInfo();
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseDown.InvokeAsync(args);
         }
@@ -198,6 +200,7 @@ namespace FoundryBlazor.Canvas
         public async Task OnMouseUp(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_UP";
+            $"SVGHelper OnMouseUp: {args.ClientX}, {args.ClientY}".WriteInfo();
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseUp.InvokeAsync(args);
         }
@@ -207,6 +210,7 @@ namespace FoundryBlazor.Canvas
         public async Task OnMouseMove(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_MOVE";
+            $"SVGHelper OnMouseMove: {args.ClientX}, {args.ClientY}".WriteInfo();
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseMove.InvokeAsync(args);
         }

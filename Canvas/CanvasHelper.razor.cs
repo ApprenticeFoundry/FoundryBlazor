@@ -6,6 +6,7 @@
 
 using System.Drawing;
 using BlazorComponentBus;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -189,6 +190,7 @@ namespace FoundryBlazor.Canvas
         public async Task OnMouseDown(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_DOWN";
+
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseDown.InvokeAsync(args);
         }

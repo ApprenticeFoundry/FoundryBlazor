@@ -3,10 +3,10 @@
 @inherits CanvasSVGComponentBase
 @namespace FoundryBlazor.Shared
 
-<div id="canvasHolder">
+<div id="svgHolder">
     <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame">
         
-        <svg viewbox="(0,0,1000,1000)" width="1000" style="background-color:orange">
+        <svg viewbox="(0,0,1000,1000)" height="1000" width="1000" style="background-color:orange">
             <Page Page="@GetCurrentPage()" >
             </Page>
         </svg>

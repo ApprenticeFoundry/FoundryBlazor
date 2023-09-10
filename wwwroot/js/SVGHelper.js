@@ -5,66 +5,62 @@
  */
 
 /*This is called from the Blazor component's Initialize method*/
-const fileInputId = 'fileInputHolder';
-function initRenderJS(instance) {
-    // instance is the Blazor component dotnet reference
-    window.theInstance = instance;
 
-    // tell the window we want to handle the resize event
-    window.addEventListener('resize', WindowResized);
+function initSVCRenderJS(instance) {
+  // instance is the Blazor component dotnet reference
+  window.theInstance3 = instance;
 
-    window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
-    window.addEventListener('keypress', keyPress);
+  // tell the window we want to handle the resize event
+  window.addEventListener("resize", WindowResized);
 
-    const canvas = getCanvasNode();
-    // const canvasContainer = getCanvasContainer();
+  window.addEventListener("keydown", keyDown);
+  window.addEventListener("keyup", keyUp);
+  window.addEventListener("keypress", keyPress);
 
-    if (canvas) {
-        canvas.addEventListener('wheel', wheelChange);
-        canvas.addEventListener('mousedown', mouseDown);
-        canvas.addEventListener('mouseup', mouseUp);
-        canvas.addEventListener('mousemove', mouseMove);
-        canvas.addEventListener('mouseout', mouseOut);
-        canvas.addEventListener('mouseenter', mouseEnter);
-        // canvas.addEventListener('mousein', mouseIn, false);
+  const svg = getSVGNode();
 
-        //https://www.geeksforgeeks.org/html-dom-ondragover-event/
-        // canvas.addEventListener("dragstart", onDragStart);
-        // canvas.addEventListener("drag", onDrag);
-        // canvas.addEventListener("dragend", onDragEnd);
-        // canvas.addEventListener("dragenter", onDragEnter);
-        // canvas.addEventListener("dragover", onDragOver);
-        // canvas.addEventListener("dragleave", onDragLeave);
-        // canvas.addEventListener("drop", onDrop);
-    }
+  if (svg) {
+    svg.addEventListener("wheel", wheelChange);
+    svg.addEventListener("mousedown", mouseDown);
+    svg.addEventListener("mouseup", mouseUp);
+    svg.addEventListener("mousemove", mouseMove);
+    svg.addEventListener("mouseout", mouseOut);
+    svg.addEventListener("mouseenter", mouseEnter);
+    // canvas.addEventListener('mousein', mouseIn, false);
 
-    // Call resize now
-    //SRS Fix in the future
-    WindowResized();
+    //https://www.geeksforgeeks.org/html-dom-ondragover-event/
+    // canvas.addEventListener("dragstart", onDragStart);
+    // canvas.addEventListener("drag", onDrag);
+    // canvas.addEventListener("dragend", onDragEnd);
+    // canvas.addEventListener("dragenter", onDragEnter);
+    // canvas.addEventListener("dragover", onDragOver);
+    // canvas.addEventListener("dragleave", onDragLeave);
+    // canvas.addEventListener("drop", onDrop);
+  }
 
-    // request an animation frame, telling window to call renderJS
-    // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-    window.requestAnimationFrame(renderJS);
+  // Call resize now
+  //SRS Fix in the future
+  WindowResized();
+
+  // request an animation frame, telling window to call renderJS
+  // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
+  window.requestAnimationFrame(renderJS);
 }
 
-function getCanvasNode() {
-    var holder = document.getElementById('canvasHolder');
+function getSVGNode() {
+    var holder = document.getElementById("svgHolder");
     // find the canvas within the renderfragment
-    var canvas = holder.querySelector('canvas');
-    return canvas;
+    var svg = holder.querySelector('SVG');
+    return svg;
 }
 
 
-function getFileInputContainer() {
-    var node = document.getElementById(fileInputId);
-    return node;
-}
+
 
 /*This is called whenever we have requested an animation frame*/
 function renderJS(timeStamp) {
     // Call the blazor component's [JSInvokable] RenderInBlazor method
-    theInstance.invokeMethodAsync('RenderInBlazor');
+    theInstance3.invokeMethodAsync('RenderInBlazor');
     // request another animation frame
     window.requestAnimationFrame(renderJS);
 }
@@ -76,7 +72,7 @@ function WindowResized() {
     // find the canvas within the renderfragment
 
     // Call the blazor component's [JSInvokable] ResizeInBlazor method
-    theInstance.invokeMethodAsync('ResizeInBlazor', window.innerWidth, window.innerHeight);
+    theInstance3.invokeMethodAsync('ResizeInBlazor', window.innerWidth, window.innerHeight);
 }
 
 //Handle the canvas.wheel event
@@ -84,48 +80,48 @@ function WindowResized() {
 function wheelChange(e) {
     e.preventDefault();
     var args = canvasWheelChangeArgs(e);
-    theInstance.invokeMethodAsync('OnWheelChange', args);
+    theInstance3.invokeMethodAsync('OnWheelChange', args);
 }
 
 //Handle the canvas.mouseout event
 function mouseOut(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseOut', args);
+    theInstance3.invokeMethodAsync('OnMouseOut', args);
 }
 
 //Handle the canvas.mouseout event
 function mouseIn(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseIn', args);
+    theInstance3.invokeMethodAsync('OnMouseIn', args);
 }
 
 function mouseEnter(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseEnter', args);
+    theInstance3.invokeMethodAsync('OnMouseEnter', args);
 }
 
 //Handle the window.mousedown event
 function mouseDown(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseDown', args);
+    theInstance3.invokeMethodAsync('OnMouseDown', args);
 }
 
 //Handle the window.mouseup event
 function mouseUp(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseUp', args);
+    theInstance3.invokeMethodAsync('OnMouseUp', args);
 }
 
 //Handle the window.mousemove event
 function mouseMove(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseMove', args);
+    theInstance3.invokeMethodAsync('OnMouseMove', args);
 }
 
 //Handle the canvas.keydown event
@@ -133,7 +129,7 @@ function keyDown(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyDown', args);
+    theInstance3.invokeMethodAsync('OnKeyDown', args);
 }
 
 //Handle the canvas.keyup event
@@ -141,7 +137,7 @@ function keyUp(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyUp', args);
+    theInstance3.invokeMethodAsync('OnKeyUp', args);
 }
 
 //Handle the canvas.keypress event
@@ -149,7 +145,7 @@ function keyPress(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyPress', args);
+    theInstance3.invokeMethodAsync('OnKeyPress', args);
 }
 
 // function onDragStart(e) {
@@ -274,11 +270,7 @@ function canvasWheelChangeArgs(e) {
     };
 }
 
-function showFileInputNodeNotFound() {
-    window.alert(
-        `No file input node with id='${fileInputId}' was found in CanvasComponent.  You will not be able to drop files.`
-    );
-}
+
 
 function showFileInput() {
     const fileInputContainer = getFileInputContainer();
@@ -331,4 +323,4 @@ window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventLi
 window.canvasPNGBase64 = canvasPNGBase64;
 window.saveAsFile = saveAsFile;
 
-window.initRenderJS = initRenderJS;
+window.initSCVRenderJS = initSVCRenderJS;
