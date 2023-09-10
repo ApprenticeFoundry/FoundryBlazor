@@ -153,7 +153,7 @@ function WindowResized() {
 
     // Call the blazor component's [JSInvokable] ResizeInBlazor method
     DotNetCallBack.invokeMethodAsync(
-      "ResizeInBResizeWindowEventCalled",
+      "ResizeWindowEventCalled",
       window.innerWidth,
       window.innerHeight
     );

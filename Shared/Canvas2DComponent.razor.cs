@@ -55,6 +55,8 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
             await JSIntegrationRef!.Initialize();
             // maybe pass in a  reference to a canvas?
             await JSIntegrationRef!.CaptureMouseEventsForCanvas();
+            await JSIntegrationRef!.StartAnimation();
+            
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 
