@@ -6,7 +6,7 @@
 
 /*This is called from the Blazor component's Initialize method*/
 
-function initSVCRenderJS(instance) {
+function initSVGRenderJS(instance) {
   // instance is the Blazor component dotnet reference
   window.theInstance3 = instance;
 
@@ -44,7 +44,8 @@ function initSVCRenderJS(instance) {
 
   // request an animation frame, telling window to call renderJS
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-  window.requestAnimationFrame(renderJS);
+  //skip animation for now
+  //window.requestAnimationFrame(renderJS);
 }
 
 function getSVGNode() {
