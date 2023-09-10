@@ -4,9 +4,12 @@
 @namespace FoundryBlazor.Shared
 
 <div id="canvasHolder">
+    <SVGHelper @ref="SVGHelperReference" RenderFrame="RenderFrame">
+        
         <svg viewbox="(0,0,1000,1000)" width="1000" style="background-color:orange">
             <Page Page="@GetCurrentPage()" >
             </Page>
         </svg>
+    </SVGHelper>
 </div>
-<input style="position: fixed; top:0;left:0" @bind-value="RefreshMs" />
+

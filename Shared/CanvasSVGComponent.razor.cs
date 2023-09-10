@@ -14,8 +14,6 @@ namespace FoundryBlazor.Shared;
 public class CanvasSVGComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
-
-    [Inject] public IPanZoomService? PanZoom { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
@@ -23,22 +21,19 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
-    [Parameter] public long RefreshMs { get; set; } = 0;
-    [Parameter] public EventCallback<MouseEventArgs> OnRequestCallback { get; set; }
+
 
     private int tick = 0;
 
 
-
-    // public SVGHelper? SVGHelperReference;
+    public SVGHelper? SVGHelperReference;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
 
 
     protected override void OnInitialized()
     {
-        // matrix(1, 0, 0, 1, 0, 0)
-        // PagePanZoom = $"matrix(1,0,0,1,0,0)";
+
     }
 
     protected override void OnParametersSet()
@@ -52,7 +47,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         $"CanvasSVGComponent.OnSelectionChanged e.State={e.State}".WriteInfo(2);
         if (e.State == SelectionState.Dropped)
         {
-            ForceRefresh();
+
         }
     }
 
@@ -82,7 +77,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<SelectionChanged>(OnSelectionChanged);
 
-            // await SVGHelperReference!.Initialize();
+            await SVGHelperReference!.Initialize();
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 
@@ -109,14 +104,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     }
 
-    private void ForceRefresh()
-    {
-        // Nodes = new();
-        Task.Run(() =>
-        {
-            OnRequestCallback.InvokeAsync(new MouseEventArgs());
-        });
-    }
+
 
     private void CaptureFileAndSend(CanvasMouseArgs MouseArgs)
     {
