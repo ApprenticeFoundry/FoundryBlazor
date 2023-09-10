@@ -140,6 +140,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (ActiveScene == null) return;
         tick++;
 
+        $"Canvas3D RenderFrame {tick} {fps}".WriteInfo();
+
         Workspace?.PreRender(tick);
 
         var arena = Workspace?.GetArena();

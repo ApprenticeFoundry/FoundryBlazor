@@ -70,8 +70,8 @@ function CaptureCanvasEvents()
       canvas.addEventListener("mousedown", mouseDown);
       canvas.addEventListener("mouseup", mouseUp);
       canvas.addEventListener("mousemove", mouseMove);
-      canvas.addEventListener("mouseout", mouseOut);
-      canvas.addEventListener("mouseenter", mouseEnter);
+      //canvas.addEventListener("mouseout", mouseOut);
+      //canvas.addEventListener("mouseenter", mouseEnter);
     }
 }
 
@@ -83,8 +83,8 @@ function RemoveCanvasEvents() {
     canvas.removeEventListener("mousedown", mouseDown);
     canvas.removeEventListener("mouseup", mouseUp);
     canvas.removeEventListener("mousemove", mouseMove);
-    canvas.removeEventListener("mouseout", mouseOut);
-    canvas.removeEventListener("mouseenter", mouseEnter);
+    //canvas.removeEventListener("mouseout", mouseOut);
+    //canvas.removeEventListener("mouseenter", mouseEnter);
   }
 }
 
@@ -99,8 +99,8 @@ function CaptureSVGEvents() {
     canvas.addEventListener("mousedown", mouseDown);
     canvas.addEventListener("mouseup", mouseUp);
     canvas.addEventListener("mousemove", mouseMove);
-    canvas.addEventListener("mouseout", mouseOut);
-    canvas.addEventListener("mouseenter", mouseEnter);
+    //canvas.addEventListener("mouseout", mouseOut);
+    //canvas.addEventListener("mouseenter", mouseEnter);
   }
 }
 
@@ -112,8 +112,8 @@ function RemoveSVGEvents() {
     canvas.removeEventListener("mousedown", mouseDown);
     canvas.removeEventListener("mouseup", mouseUp);
     canvas.removeEventListener("mousemove", mouseMove);
-    canvas.removeEventListener("mouseout", mouseOut);
-    canvas.removeEventListener("mouseenter", mouseEnter);
+    //canvas.removeEventListener("mouseout", mouseOut);
+    //canvas.removeEventListener("mouseenter", mouseEnter);
   }
 }
 window.CaptureMouseEventsForSVG = CaptureSVGEvents;

@@ -56,7 +56,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
             // maybe pass in a  reference to a canvas?
             await JSIntegrationRef!.CaptureMouseEventsForCanvas();
             await JSIntegrationRef!.StartAnimation();
-            
+
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 
@@ -114,6 +114,8 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
     {
         if (Ctx == null) return;
         tick++;
+
+        $"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 
