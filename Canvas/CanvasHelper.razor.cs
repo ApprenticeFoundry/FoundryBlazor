@@ -97,20 +97,7 @@ namespace FoundryBlazor.Canvas
         [Parameter]
         public EventCallback<CanvasKeyboardEventArgs> KeyPress { get; set; }
 
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragStart { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> Drag { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragEnd { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragEnter { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragOver { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragLeave { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> Drop { get; set; }
+
         /// <summary>
         /// Call this in your Blazor app's OnAfterRenderAsync method when firstRender is true
         /// </summary>

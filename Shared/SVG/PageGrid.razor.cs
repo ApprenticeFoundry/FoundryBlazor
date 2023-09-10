@@ -42,8 +42,8 @@ public class PageGridBase : ComponentBase
 
         var list = new List<SVGLine>();
 
-        var x = dMargin; //left;
-        while (x <= dWidth)
+        var x = dMargin + dStep; //left;
+        while (x <= dWidth - dStep)
         {
             var rect = new SVGLine(x, dMargin, x, dHeight);
             list.Add(rect);
@@ -72,8 +72,8 @@ public class PageGridBase : ComponentBase
 
         var list = new List<SVGLine>();
 
-        var x = dHeight; //left;
-        while (x >= dMargin)
+        var x = dHeight + dStep; //left;
+        while (x >= dMargin - dStep)
         {
             var rect = new SVGLine(dMargin, x, dWidth, x);
             list.Add(rect);

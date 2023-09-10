@@ -5,10 +5,11 @@
  */
 
 /*This is called from the Blazor component's Initialize method*/
-const fileInputId = 'fileInputHolder';
+//const fileInputId = 'fileInputHolder';
+
 function initRenderJS(instance) {
     // instance is the Blazor component dotnet reference
-    window.theInstance = instance;
+    window.DotNetCallBack = instance;
 
     // tell the window we want to handle the resize event
     window.addEventListener('resize', WindowResized);
@@ -17,8 +18,9 @@ function initRenderJS(instance) {
     window.addEventListener('keyup', keyUp);
     window.addEventListener('keypress', keyPress);
 
+    const svg = getSVGNode();
+
     const canvas = getCanvasNode();
-    // const canvasContainer = getCanvasContainer();
 
     if (canvas) {
         canvas.addEventListener('wheel', wheelChange);
@@ -45,8 +47,19 @@ function initRenderJS(instance) {
 
     // request an animation frame, telling window to call renderJS
     // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
+    
     window.requestAnimationFrame(renderJS);
 }
+
+/*This is called whenever we have requested an animation frame*/
+function renderJS(timeStamp) {
+    // Call the blazor component's [JSInvokable] RenderInBlazor method
+    DotNetCallBack.invokeMethodAsync('RenderInBlazor');
+    // request another animation frame
+    window.requestAnimationFrame(renderJS);
+}
+
+window.initRenderJS = initRenderJS;
 
 function getCanvasNode() {
     var holder = document.getElementById('canvasHolder');
@@ -55,19 +68,20 @@ function getCanvasNode() {
     return canvas;
 }
 
-
-function getFileInputContainer() {
-    var node = document.getElementById(fileInputId);
-    return node;
+function getSVGNode() {
+  var holder = document.getElementById("svgHolder");
+  // find the canvas within the renderfragment
+  var svg = holder.querySelector("SVG");
+  return svg;
 }
 
-/*This is called whenever we have requested an animation frame*/
-function renderJS(timeStamp) {
-    // Call the blazor component's [JSInvokable] RenderInBlazor method
-    theInstance.invokeMethodAsync('RenderInBlazor');
-    // request another animation frame
-    window.requestAnimationFrame(renderJS);
-}
+
+// function getFileInputContainer() {
+//     var node = document.getElementById(fileInputId);
+//     return node;
+// }
+
+
 
 /*This is called whenever the browser (and therefore the canvas) is resized*/
 function WindowResized() {
@@ -76,7 +90,7 @@ function WindowResized() {
     // find the canvas within the renderfragment
 
     // Call the blazor component's [JSInvokable] ResizeInBlazor method
-    theInstance.invokeMethodAsync('ResizeInBlazor', window.innerWidth, window.innerHeight);
+    DotNetCallBack.invokeMethodAsync('ResizeInBlazor', window.innerWidth, window.innerHeight);
 }
 
 //Handle the canvas.wheel event
@@ -84,48 +98,48 @@ function WindowResized() {
 function wheelChange(e) {
     e.preventDefault();
     var args = canvasWheelChangeArgs(e);
-    theInstance.invokeMethodAsync('OnWheelChange', args);
+    DotNetCallBack.invokeMethodAsync('OnWheelChange', args);
 }
 
 //Handle the canvas.mouseout event
 function mouseOut(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseOut', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseOut', args);
 }
 
 //Handle the canvas.mouseout event
 function mouseIn(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseIn', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseIn', args);
 }
 
 function mouseEnter(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseEnter', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseEnter', args);
 }
 
 //Handle the window.mousedown event
 function mouseDown(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseDown', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseDown', args);
 }
 
 //Handle the window.mouseup event
 function mouseUp(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseUp', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseUp', args);
 }
 
 //Handle the window.mousemove event
 function mouseMove(e) {
     e.preventDefault();
     var args = canvasMouseMoveArgs(e);
-    theInstance.invokeMethodAsync('OnMouseMove', args);
+    DotNetCallBack.invokeMethodAsync('OnMouseMove', args);
 }
 
 //Handle the canvas.keydown event
@@ -133,7 +147,7 @@ function keyDown(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyDown', args);
+    DotNetCallBack.invokeMethodAsync('OnKeyDown', args);
 }
 
 //Handle the canvas.keyup event
@@ -141,7 +155,7 @@ function keyUp(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyUp', args);
+    DotNetCallBack.invokeMethodAsync('OnKeyUp', args);
 }
 
 //Handle the canvas.keypress event
@@ -149,46 +163,11 @@ function keyPress(e) {
     // NOTE: prevent default will disable ability for HTML input fields to accept key events
     // e.preventDefault();
     var args = canvasKeyboardEventArgs(e);
-    theInstance.invokeMethodAsync('OnKeyPress', args);
+    DotNetCallBack.invokeMethodAsync('OnKeyPress', args);
 }
 
-// function onDragStart(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDragStart', args);
-// }
 
-// function onDrag(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDrag', args);
-// }
 
-// function onDragEnd(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDragEnd', args);
-// }
-// function onDragEnter(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDragOver', args);
-// }
-// function onDragOver(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDragOver', args);
-// }
-// function onDragLeave(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDragLeave', args);
-// }
-// function onDrop(e) {
-//     e.preventDefault();
-//     var args = canvasDragArgs(e);
-//     theInstance.invokeMethodAsync('OnDrop', args);
-// }
 // Extend the CanvasMouseArgs.cs class (and this) as necessary
 function canvasMouseMoveArgs(e) {
     return {
@@ -210,24 +189,7 @@ function canvasMouseMoveArgs(e) {
     };
 }
 
-//https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer
-// function dataTransferArgs(e) {
-//     //var data = e.getData();
-//     //console.log(data, "dataTransferArgs")
 
-//     console.log(e, 'args');
-//     if (e.files != null) console.log(e.files[0], 'files[0]');
-
-//     if (e.items != null) console.log(e.items[0], 'items[0]');
-
-//     return {
-//         dropEffect: e.dropEffect,
-//         effectAllowed: e.effectAllowed,
-//         files: e.files,
-//         items: e.items,
-//         types: e.types,
-//     };
-// }
 
 function canvasDragArgs(e) {
     return {
@@ -274,61 +236,61 @@ function canvasWheelChangeArgs(e) {
     };
 }
 
-function showFileInputNodeNotFound() {
-    window.alert(
-        `No file input node with id='${fileInputId}' was found in CanvasComponent.  You will not be able to drop files.`
-    );
-}
+// function showFileInputNodeNotFound() {
+//     window.alert(
+//         `No file input node with id='${fileInputId}' was found in CanvasComponent.  You will not be able to drop files.`
+//     );
+// }
 
-function showFileInput() {
-    const fileInputContainer = getFileInputContainer();
-    if (fileInputContainer) {
-        fileInputContainer.style.zIndex = 20;
-    } else {
-        showFileInputNodeNotFound();
-    }
-}
+// function showFileInput() {
+//     const fileInputContainer = getFileInputContainer();
+//     if (fileInputContainer) {
+//         fileInputContainer.style.zIndex = 20;
+//     } else {
+//         showFileInputNodeNotFound();
+//     }
+// }
 
-function hideFileInput() {
-    // We *must* hide file input after file is dropped over chrome
-    const fileInputContainer = getFileInputContainer();
-    if (fileInputContainer) {
-        fileInputContainer.style.zIndex = 0;
-    }
-}
+// function hideFileInput() {
+//     // We *must* hide file input after file is dropped over chrome
+//     const fileInputContainer = getFileInputContainer();
+//     if (fileInputContainer) {
+//         fileInputContainer.style.zIndex = 0;
+//     }
+// }
 
-function saveAsFile(filename, bytesBase64) {
-    var link = document.createElement('a');
-    link.download = filename;
-    link.href = 'data:application/octet-stream;base64,' + bytesBase64;
-    document.body.appendChild(link); // Needed for Firefox
-    link.click();
-    document.body.removeChild(link);
-}
+// function saveAsFile(filename, bytesBase64) {
+//     var link = document.createElement('a');
+//     link.download = filename;
+//     link.href = 'data:application/octet-stream;base64,' + bytesBase64;
+//     document.body.appendChild(link); // Needed for Firefox
+//     link.click();
+//     document.body.removeChild(link);
+// }
 
-function canvasPNGBase64() {
-    return getCanvasNode().toDataURL();
-}
+// function canvasPNGBase64() {
+//     return getCanvasNode().toDataURL();
+// }
 
-function removeKeyEventListeners() {
-    window.removeEventListener('keydown', keyDown);
-    window.removeEventListener('keyup', keyUp);
-    window.removeEventListener('keypress', keyPress);
-}
+// function removeKeyEventListeners() {
+//     window.removeEventListener('keydown', keyDown);
+//     window.removeEventListener('keyup', keyUp);
+//     window.removeEventListener('keypress', keyPress);
+// }
 
-function addKeyEventListeners() {
-    window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
-    window.addEventListener('keypress', keyPress);
-}
+// function addKeyEventListeners() {
+//     window.addEventListener('keydown', keyDown);
+//     window.addEventListener('keyup', keyUp);
+//     window.addEventListener('keypress', keyPress);
+// }
 
-window.CanvasFileInput = {
-    ShowFileInput: showFileInput,
-    HideFileInput: hideFileInput,
-};
+// window.CanvasFileInput = {
+//     ShowFileInput: showFileInput,
+//     HideFileInput: hideFileInput,
+// };
 
-window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventListeners };
-window.canvasPNGBase64 = canvasPNGBase64;
-window.saveAsFile = saveAsFile;
+//window.keyEventListeners = { remove: removeKeyEventListeners, add: addKeyEventListeners };
+//window.canvasPNGBase64 = canvasPNGBase64;
+//window.saveAsFile = saveAsFile;
 
-window.initRenderJS = initRenderJS;
+
