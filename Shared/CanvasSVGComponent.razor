@@ -1,15 +1,12 @@
 ﻿@using FoundryBlazor.Shared.SVG
+
 @inherits CanvasSVGComponentBase
 @namespace FoundryBlazor.Shared
 
 <div id="canvasHolder">
-    <svg height="600" width="800" style="background-color:purple">
-        <PanZoomG>
-            @foreach (var node in GetNodes())
-            {
-                @node
-            }
-        </PanZoomG>
-    </svg>
+        <svg viewbox="(0,0,1000,1000)" width="1000" style="background-color:orange">
+            <Page Page="@GetCurrentPage()" >
+            </Page>
+        </svg>
 </div>
 <input style="position: fixed; top:0;left:0" @bind-value="RefreshMs" />

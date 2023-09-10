@@ -6,10 +6,8 @@ using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components.Web;
-using FoundryBlazor.Shared.SVG;
 
 namespace FoundryBlazor.Shared;
 
@@ -29,8 +27,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Parameter] public EventCallback<MouseEventArgs> OnRequestCallback { get; set; }
 
     private int tick = 0;
-    public List<RenderFragment> Nodes { get; set; } = new();
-    // public string PagePanZoom { get; set; } = "";
+
 
 
     // public SVGHelper? SVGHelperReference;
@@ -59,20 +56,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         }
     }
 
-    public List<RenderFragment> GetNodes()
+    public FoPage2D GetCurrentPage()
     {
-        var list = new List<RenderFragment>();
-        try
-        {
-            list.AddRange(Nodes);
-        }
-        catch (Exception e)
-        {
-            $"{e.Message}".WriteError();
-        }
-
-        return list;
-    }
+        return Workspace!.CurrentPage();
+    } 
 
     public void Dispose()
     {
@@ -193,54 +180,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
         var style = $"opacity:0; width:{w}; height:{h}";
         return style;
     }
-    public void DrawCircle()
-    {
-        $"DrawCircle Called".WriteInfo();
-        var attributes = new List<KeyValuePair<string, object>>() { new("r", 50), new("cx", 100), new("cy", 140), new("fill", "red") };
 
-        void node(RenderTreeBuilder builder)
-        {
-            builder.OpenElement(10, "circle");
-            builder.AddMultipleAttributes(11, attributes);
-            builder.CloseElement();
-        }
-
-        Nodes.Add(node);
-
-        StateHasChanged();
-
-    }
-
-    public void DrawRect()
-    {
-        $"DrawCircle Called".WriteInfo();
-        var attributes = new List<KeyValuePair<string, object>>() {
-            new("x", 120),
-            new("y", 10),
-            new("width", 300),
-            new("height", 100),
-            new("rx", 4),
-            new("ry", 4),
-            new("style", "fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)") };
-
-
-        void node(RenderTreeBuilder builder)
-        {
-            builder.OpenElement(10, "g");
-            builder.AddAttribute(11, "transform", "translate(20,2.5) rotate(10)");
-
-            builder.OpenElement(12, "rect");
-            builder.AddMultipleAttributes(13, attributes);
-            builder.CloseElement();
-
-            // close g
-            builder.CloseElement();
-        }
-
-        Nodes.Add(node);
-
-        StateHasChanged();
-    }
 
 
 }

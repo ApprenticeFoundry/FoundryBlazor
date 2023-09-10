@@ -364,19 +364,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         OnMatrixSmash = action;
         return this;
     }
-    public virtual void UpdateContext(CanvasSVGComponentBase ctx, int tick)
-    {
-        ContextLink?.Invoke(this, tick);
 
-        var mtx = this.GetMatrix();
-        //you must use Transform so the context can acumlate the positions
-        // if (mtx != null)  //this should NEVER be the case unless cleared by another process
-        //     await ctx.TransformAsync(mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty);
-
-        //await ctx.SetGlobalAlphaAsync(ctx.GlobalAlpha * this.Opacity);
-
-        //await ctx.SetFillStyleAsync(Color);
-    }
 
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {

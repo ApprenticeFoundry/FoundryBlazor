@@ -1,16 +1,12 @@
 using BlazorComponentBus;
 using BlazorThreeJS.Events;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
+using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
@@ -131,7 +127,11 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     }
 
 
-
+    public FoPage2D GetCurrentPage()
+    {
+        return Workspace!.CurrentPage();
+    } 
+    
     public async Task RenderFrame(double fps)
     {
         if (ActiveScene == null) return;
