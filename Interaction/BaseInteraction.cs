@@ -28,13 +28,12 @@ public interface IBaseInteraction
     bool MouseDown(CanvasMouseArgs args);
     bool MouseUp(CanvasMouseArgs args);
     bool MouseMove(CanvasMouseArgs args);
-    bool MouseIn(CanvasMouseArgs args);
-    bool MouseOut(CanvasMouseArgs args);
+
     void Abort();
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
-
 }
+
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
     public int Priority { get; set; } = 0;
@@ -123,12 +122,12 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     {
         return false;
     }
-    public virtual bool MouseIn(CanvasMouseArgs args)
-    {
-        return false;
-    }
-    public virtual bool MouseOut(CanvasMouseArgs args)
-    {
-        return false;
-    }
+    // public virtual bool MouseIn(CanvasMouseArgs args)
+    // {
+    //     return false;
+    // }
+    // public virtual bool MouseOut(CanvasMouseArgs args)
+    // {
+    //     return false;
+    // }
 }

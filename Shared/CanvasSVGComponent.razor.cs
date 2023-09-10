@@ -26,7 +26,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     private int tick = 0;
 
 
-    public SVGHelper? SVGHelperReference;
+    public CanvasHelper? SVGHelperReference;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
 

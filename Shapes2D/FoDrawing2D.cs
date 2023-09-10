@@ -644,8 +644,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
                 ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
                 ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
-                ("ON_MOUSE_IN") => GetInteraction().MouseIn(args),
-                ("ON_MOUSE_OUT") => GetInteraction().MouseOut(args),
                 _ => false
             };
         }

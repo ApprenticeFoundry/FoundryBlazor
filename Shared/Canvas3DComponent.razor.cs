@@ -31,7 +31,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
 
-    public AnimationHelper? AnimationHelperReference;
+    public CanvasHelper? AnimationHelperReference;
 
 
     public ViewerSettings GetSettings()

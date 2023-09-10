@@ -29,16 +29,6 @@ function initRenderJS(instance) {
         canvas.addEventListener('mousemove', mouseMove);
         canvas.addEventListener('mouseout', mouseOut);
         canvas.addEventListener('mouseenter', mouseEnter);
-        // canvas.addEventListener('mousein', mouseIn, false);
-
-        //https://www.geeksforgeeks.org/html-dom-ondragover-event/
-        // canvas.addEventListener("dragstart", onDragStart);
-        // canvas.addEventListener("drag", onDrag);
-        // canvas.addEventListener("dragend", onDragEnd);
-        // canvas.addEventListener("dragenter", onDragEnter);
-        // canvas.addEventListener("dragover", onDragOver);
-        // canvas.addEventListener("dragleave", onDragLeave);
-        // canvas.addEventListener("drop", onDrop);
     }
 
     // Call resize now
@@ -47,7 +37,7 @@ function initRenderJS(instance) {
 
     // request an animation frame, telling window to call renderJS
     // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-    
+
     window.requestAnimationFrame(renderJS);
 }
 
