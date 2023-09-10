@@ -149,7 +149,7 @@ public class PanZoomService : IPanZoomService
         OnMatrixSmash?.Invoke(State);
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         FoGlyph2D.ResetHitTesting = true;
-        $"PanZoomService Smash".WriteWarning();
+       // $"PanZoomService Smash".WriteWarning();
 
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
@@ -165,7 +165,7 @@ public class PanZoomService : IPanZoomService
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting = true;
             OnMatrixRefresh?.Invoke(State);
-            $"PanZoomService GetMatrix recalculate".WriteWarning();
+           // $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
     }

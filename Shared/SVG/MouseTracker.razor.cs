@@ -13,6 +13,7 @@ namespace FoundryBlazor.Shared.SVG;
 public class MouseTrackerBase : ComponentBase
 {
     [Inject] public IWorkspace? Workspace { get; set; }
+    [Inject] public IHitTestService? HitTest { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; } 
     [Inject] private ComponentBus? PubSub { get; set; }
     
@@ -38,13 +39,21 @@ public class MouseTrackerBase : ComponentBase
         });
     }
 
-    public PanZoomState GetPanZoomState()
+    public QuadTree<FoGlyph2D> GetTreeNode()
     {
-        var page = Workspace!.GetDrawing().CurrentPage();
-        var state = PanZoom!.ReadFromPage(page);
-        return state;
+        var tree = HitTest!.GetTree();
+        return tree;
     }
 
+
+    public List<Rectangle> GetSearches()
+    {
+        var list = new List<Rectangle>();
+        if ( HitTest != null)
+            list.AddRange(HitTest.GetSearches());
+        return list;
+    }
+    
     public int X1()
     {
         //var state = GetPanZoomState();

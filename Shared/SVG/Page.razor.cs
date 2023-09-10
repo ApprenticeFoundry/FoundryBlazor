@@ -25,14 +25,14 @@ public class PageBase : ComponentBase
     public List<FoShape1D> GetShapes1D()
     {
         var shapes = Page.AllShapes1D();
-        $"GetShapes1D {shapes.Count}".WriteInfo();
+        //$"GetShapes1D {shapes.Count}".WriteInfo();
         return shapes;
     }
 
     public List<FoShape2D> GetShapes2D()
     {
         var shapes = Page.AllShapes2D();
-        $"GetShapes2D {shapes.Count}".WriteInfo();
+        //$"GetShapes2D {shapes.Count}".WriteInfo();
         return shapes;
     }
 

@@ -34,10 +34,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
     public Length PageHeight { get; set; } = new Length(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = new Length(10.0, "cm"); //inches
+    public Length GridMajorH { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorH { get; set; } = new Length(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = new Length(10.0, "cm"); //inches
+    public Length GridMajorV { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
     public int ScaleAxisX { get; set; } = 1;

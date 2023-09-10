@@ -1,0 +1,25 @@
+@inherits QuadTreeBase
+@using FoundryBlazor.Shared.SVG
+@namespace FoundryBlazor.Shared.SVG
+
+
+<rect x="@Rect().X" y="@Rect().Y" width="@Rect().Width" height="@Rect().Height" fill="none" stroke="green">
+</rect>
+
+@if (TopLeftChild != null)
+{
+    <QuadTree QuadTree="@TopLeftChild" />
+}
+
+@if (TopRightChild != null)
+{
+    <QuadTree QuadTree="@TopRightChild" />
+}
+@if (BottomLeftChild != null)
+{
+    <QuadTree QuadTree="@BottomLeftChild" />
+}
+@if (BottomRightChild != null)
+{
+    <QuadTree QuadTree="@BottomRightChild" />
+}

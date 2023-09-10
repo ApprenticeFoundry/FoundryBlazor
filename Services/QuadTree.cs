@@ -155,54 +155,6 @@ public class QuadTree<T> where T : IHasRectangle
         if (BottomRightChild != null) await BottomRightChild.DrawQuadTree(ctx,members);
     }
 
-    public void DrawQuadTreeSVG(CanvasSVGComponentBase ctx, bool members = false)
-    {
-        var color = IsSmashed()? "Red" : "Blue";
-
-        var attributes = new List<KeyValuePair<string, object>>()
-        {
-            new("x", m_rect.X+1), 
-            new("y",  m_rect.Y+1), 
-            new("width", m_rect.Width-2), 
-            new("height", m_rect.Height-2), 
-            new("stroke",color),
-            new("fill","none"),
-            new("stroke-width", 4),
-            new("stroke-dasharray", "3 3"),
-        };
-
-        void node(RenderTreeBuilder builder)
-        {
-            builder.OpenElement(100, "rect");
-            builder.AddMultipleAttributes(110, attributes);
-            builder.CloseElement();
-
-            // if ( members )
-            //     m_objects?.ForEach(item =>
-            //     {
-            //         var rect = item.Rect();
-            //         var attributes = new List<KeyValuePair<string, object>>()
-            //         {
-            //             new("x", rect.X+1), 
-            //             new("y",  rect.Y+1), 
-            //             new("width", rect.Width-2), 
-            //             new("height", rect.Height-2), 
-            //             new("stroke",color),
-            //             new("stroke-width", 1),
-            //             new("stroke-dasharray", "3 3"),
-            //         };
-            //         builder.OpenElement(22, "rect");
-            //         builder.AddMultipleAttributes(20, attributes);
-            //         builder.CloseElement();
-            //     });
-        }
-        ctx.Nodes.Add(node);
-
-        TopLeftChild?.DrawQuadTreeSVG(ctx,members);
-        TopRightChild?.DrawQuadTreeSVG(ctx,members);
-        BottomLeftChild?.DrawQuadTreeSVG(ctx,members);
-        BottomRightChild?.DrawQuadTreeSVG(ctx,members);
-    }
 
     #region Private Members
     /// <summary>

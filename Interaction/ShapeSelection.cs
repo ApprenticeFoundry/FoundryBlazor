@@ -93,7 +93,7 @@ public class ShapeSelection : ShapeHovering
 
         // this is a fence select
 
-        $"ShapeSelection Mouse Down ".WriteLine(ConsoleColor.Green);
+        //$"ShapeSelection Mouse Down ".WriteLine(ConsoleColor.Green);
         return true;
     }
 
@@ -139,7 +139,7 @@ public class ShapeSelection : ShapeHovering
         else
             base.MouseMove(args); // this should hover
 
-        $"ShapeSelection Mouse Move ".WriteLine(ConsoleColor.Green);
+        //$"ShapeSelection Mouse Move ".WriteLine(ConsoleColor.Green);
         return true;
     }
 

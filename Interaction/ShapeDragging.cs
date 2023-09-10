@@ -64,7 +64,7 @@ public class ShapeDragging : ShapeHovering
             selectionService.ClearAll();
         }
 
-        $"Mouse Down {isDraggingShapes}".WriteLine(ConsoleColor.Green);
+        //$"Mouse Down {isDraggingShapes}".WriteLine(ConsoleColor.Green);
         return true;
     }
     public override bool MouseUp(CanvasMouseArgs args)
@@ -79,7 +79,7 @@ public class ShapeDragging : ShapeHovering
     public override bool MouseMove(CanvasMouseArgs args)
     {
         if (isDraggingShapes) {
-            $"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
+            //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
             dragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.Movement();
 

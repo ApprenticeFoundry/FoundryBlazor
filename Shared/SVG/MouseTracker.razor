@@ -3,7 +3,13 @@
 @namespace FoundryBlazor.Shared.SVG
 
 
-<rect x="@X1()" y="@Y1()" width="50" height="50" fill="green" stroke="White">
-</rect>
+@* <rect x="@X1()" y="@Y1()" width="50" height="50" fill="green" stroke="White">
+</rect> *@
 
+@foreach (var rect in GetSearches())
+{
+    <rect x="@rect.X" y="@rect.Y" width="@rect.Width" height="@rect.Height" fill="none" stroke="Red">
+    </rect>
+}
 
+<QuadTree TreeNode="@GetTreeNode()"></QuadTree>
