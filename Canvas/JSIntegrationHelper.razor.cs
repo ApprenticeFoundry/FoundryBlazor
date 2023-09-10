@@ -15,7 +15,7 @@ namespace FoundryBlazor.Canvas
     /// <summary>
     /// CanvasHelper component gives you render and resize callbacks for Canvas animation
     /// </summary>
-    public partial class CanvasHelper : ComponentBase //, IAsyncDisposable
+    public partial class JSIntegrationHelper : ComponentBase //, IAsyncDisposable
     {
         private DateTime _lastRender;
 
@@ -80,19 +80,40 @@ namespace FoundryBlazor.Canvas
         public EventCallback<CanvasKeyboardEventArgs> KeyPress { get; set; }
 
 
-        /// <summary>
-        /// Call this in your Blazor app's OnAfterRenderAsync method when firstRender is true
-        /// </summary>
-        /// <returns></returns>
         public async Task Initialize()
         {
-            // Initialize
-            await _jsRuntime!.InvokeVoidAsync("initRenderJS", DotNetObjectReference.Create(this));
+            await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
         }
 
+        public async Task CaptureMouseEventsForCanvas()
+        {
+            await _jsRuntime!.InvokeVoidAsync("CaptureMouseEventsForCanvas");
+        }
+        public async Task RemoveMouseEventsForCanvas()
+        {
+            await _jsRuntime!.InvokeVoidAsync("RemoveMouseEventsForCanvas");
+        }
+
+        public async Task CaptureMouseEventsForSVG()
+        {
+            await _jsRuntime!.InvokeVoidAsync("CaptureMouseEventsForSVG");
+        }
+        public async Task RemoveMouseEventsForSVG()
+        {
+            await _jsRuntime!.InvokeVoidAsync("RemoveMouseEventsForSVG");
+        }
+
+        public async Task StartAnimation()
+        {
+            await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        }
+        public async Task StopAnimation()
+        {
+            await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        }
 
         [JSInvokable]
-        public async Task ResizeInBlazor(int width, int height)
+        public async Task ResizeWindowEventCalled(int width, int height)
         {
             var size = new Size(width, height);
             // Raise the CanvasResized event to the Blazor app
@@ -107,7 +128,7 @@ namespace FoundryBlazor.Canvas
 
 
         [JSInvokable]
-        public async ValueTask RenderInBlazor()
+        public async ValueTask RenderFrameEventCalled()
         {
             // calculate frames per second
             double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;

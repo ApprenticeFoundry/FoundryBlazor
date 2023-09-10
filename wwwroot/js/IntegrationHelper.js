@@ -7,7 +7,11 @@
 /*This is called from the Blazor component's Initialize method*/
 //const fileInputId = 'fileInputHolder';
 
-function initRenderJS(instance) {
+function initJSIntegration(instance) {
+    //no need to do anything if we have already set up the callback
+    if (window.DotNetCallBack) 
+        return;
+
     // instance is the Blazor component dotnet reference
     window.DotNetCallBack = instance;
 
@@ -18,19 +22,6 @@ function initRenderJS(instance) {
     window.addEventListener('keyup', keyUp);
     window.addEventListener('keypress', keyPress);
 
-    const svg = getSVGNode();
-
-    const canvas = getCanvasNode();
-
-    if (canvas) {
-        canvas.addEventListener('wheel', wheelChange);
-        canvas.addEventListener('mousedown', mouseDown);
-        canvas.addEventListener('mouseup', mouseUp);
-        canvas.addEventListener('mousemove', mouseMove);
-        canvas.addEventListener('mouseout', mouseOut);
-        canvas.addEventListener('mouseenter', mouseEnter);
-    }
-
     // Call resize now
     //SRS Fix in the future
     WindowResized();
@@ -38,18 +29,99 @@ function initRenderJS(instance) {
     // request an animation frame, telling window to call renderJS
     // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 
-    window.requestAnimationFrame(renderJS);
+    //window.requestAnimationFrame(renderJS);
 }
+
+window.initJSIntegration = initJSIntegration;
+
+window.AnimationRequest = null;
 
 /*This is called whenever we have requested an animation frame*/
 function renderJS(timeStamp) {
     // Call the blazor component's [JSInvokable] RenderInBlazor method
-    DotNetCallBack.invokeMethodAsync('RenderInBlazor');
+    DotNetCallBack.invokeMethodAsync('RenderFrameEventCalled');
     // request another animation frame
     window.requestAnimationFrame(renderJS);
 }
 
-window.initRenderJS = initRenderJS;
+//https://stackoverflow.com/questions/10735922/how-to-stop-a-requestanimationframe-recursion-loop
+function StartAnimation() {
+  if (window.AnimationRequest == null )
+    window.AnimationRequest = window.requestAnimationFrame(renderJS);
+}
+
+function StopAnimation() {
+  if (window.AnimationRequest != null)
+    window.cancelAnimationFrame(window.AnimationRequest);
+
+  window.AnimationRequest = null;
+}
+
+
+window.StartAnimation = StartAnimation;
+window.StopAnimation = StopAnimation;
+
+function CaptureCanvasEvents() 
+{
+    const canvas = getCanvasNode();
+
+    if (canvas) {
+      canvas.addEventListener("wheel", wheelChange);
+      canvas.addEventListener("mousedown", mouseDown);
+      canvas.addEventListener("mouseup", mouseUp);
+      canvas.addEventListener("mousemove", mouseMove);
+      canvas.addEventListener("mouseout", mouseOut);
+      canvas.addEventListener("mouseenter", mouseEnter);
+    }
+}
+
+function RemoveCanvasEvents() {
+  const canvas = getCanvasNode();
+
+  if (canvas) {
+    canvas.removeEventListener("wheel", wheelChange);
+    canvas.removeEventListener("mousedown", mouseDown);
+    canvas.removeEventListener("mouseup", mouseUp);
+    canvas.removeEventListener("mousemove", mouseMove);
+    canvas.removeEventListener("mouseout", mouseOut);
+    canvas.removeEventListener("mouseenter", mouseEnter);
+  }
+}
+
+window.CaptureMouseEventsForCanvas = CaptureCanvasEvents;
+window.RemoveMouseEventsForCanvas = RemoveCanvasEvents;
+
+function CaptureSVGEvents() {
+  const canvas = getSVGNode();
+
+  if (canvas) {
+    canvas.addEventListener("wheel", wheelChange);
+    canvas.addEventListener("mousedown", mouseDown);
+    canvas.addEventListener("mouseup", mouseUp);
+    canvas.addEventListener("mousemove", mouseMove);
+    canvas.addEventListener("mouseout", mouseOut);
+    canvas.addEventListener("mouseenter", mouseEnter);
+  }
+}
+
+function RemoveSVGEvents() {
+  const canvas = getSVGNode();
+
+  if (canvas) {
+    canvas.removeEventListener("wheel", wheelChange);
+    canvas.removeEventListener("mousedown", mouseDown);
+    canvas.removeEventListener("mouseup", mouseUp);
+    canvas.removeEventListener("mousemove", mouseMove);
+    canvas.removeEventListener("mouseout", mouseOut);
+    canvas.removeEventListener("mouseenter", mouseEnter);
+  }
+}
+window.CaptureMouseEventsForSVG = CaptureSVGEvents;
+window.RemoveMouseEventsForSVG = RemoveSVGEvents;
+
+
+
+
 
 function getCanvasNode() {
     var holder = document.getElementById('canvasHolder');
@@ -80,7 +152,11 @@ function WindowResized() {
     // find the canvas within the renderfragment
 
     // Call the blazor component's [JSInvokable] ResizeInBlazor method
-    DotNetCallBack.invokeMethodAsync('ResizeInBlazor', window.innerWidth, window.innerHeight);
+    DotNetCallBack.invokeMethodAsync(
+      "ResizeInBResizeWindowEventCalled",
+      window.innerWidth,
+      window.innerHeight
+    );
 }
 
 //Handle the canvas.wheel event
@@ -284,3 +360,72 @@ function canvasWheelChangeArgs(e) {
 //window.saveAsFile = saveAsFile;
 
 
+class VideoManager {
+  id = "DEFAULT_ID";
+
+  _showAlert() {
+    const msg = `No video node with id=${this.id} is available.`;
+    window.alert(msg);
+  }
+
+  play(id) {
+    this.id = id;
+    const node = document.getElementById(id);
+    if (node) {
+      node.play();
+    } else {
+      this._showAlert();
+    }
+  }
+
+  pause(id) {
+    this.id = id;
+    const node = document.getElementById(id);
+    if (node) {
+      node.pause();
+    } else {
+      this._showAlert();
+    }
+  }
+
+  restart(id) {
+    this.id = id;
+    const node = document.getElementById(id);
+    if (node) {
+      node.pause();
+      node.currentTime = 0;
+      this.play(id);
+    } else {
+      this._showAlert();
+    }
+  }
+}
+window.VideoManager = new VideoManager();
+
+
+class Browser {
+  getWindowDimensions() {
+    return {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+    };
+  }
+  canvasPNGBase64(id = "canvasHolder") {
+    const containerNode = document.getElementById(id);
+    let canvasNode = null;
+    if (Boolean(containerNode))
+      canvasNode = containerNode.getElementsByTagName("canvas").item(0);
+
+    if (Boolean(canvasNode)) {
+      console.log("canvasNode=", canvasNode);
+      return canvasNode.toDataURL();
+    }
+  }
+  clickButton(id) {
+    const button = document.getElementById(id);
+    if (Boolean(button)) {
+      button.click();
+    }
+  }
+}
+window.Browser = new Browser();

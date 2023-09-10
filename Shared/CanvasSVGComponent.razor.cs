@@ -26,7 +26,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     private int tick = 0;
 
 
-    public CanvasHelper? SVGHelperReference;
+    public JSIntegrationHelper? JSIntegrationRef;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
 
@@ -77,7 +77,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<SelectionChanged>(OnSelectionChanged);
 
-            await SVGHelperReference!.Initialize();
+            await JSIntegrationRef!.Initialize();
+            // maybe pass in a  reference to a SVG?
+            await JSIntegrationRef!.CaptureMouseEventsForSVG();
+            
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 

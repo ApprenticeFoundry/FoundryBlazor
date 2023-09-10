@@ -26,7 +26,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
     private int tick = 0;
     private Canvas2DContext? Ctx;
     public BECanvasComponent? CanvasReference;
-    public CanvasHelper? CanvasHelperReference;
+    public JSIntegrationHelper? JSIntegrationRef;
     private IBrowserFile? InputFile;
     private bool IsUploading = false;
 
@@ -52,7 +52,9 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
             Ctx = await CanvasReference.CreateCanvas2DAsync();
             //PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
-            await CanvasHelperReference!.Initialize();
+            await JSIntegrationRef!.Initialize();
+            // maybe pass in a  reference to a canvas?
+            await JSIntegrationRef!.CaptureMouseEventsForCanvas();
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 

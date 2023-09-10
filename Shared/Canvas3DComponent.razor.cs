@@ -31,7 +31,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
 
-    public CanvasHelper? AnimationHelperReference;
+    public JSIntegrationHelper? JSIntegrationRef;
 
 
     public ViewerSettings GetSettings()
@@ -76,7 +76,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
 
-            await AnimationHelperReference!.Initialize();
+            await JSIntegrationRef!.Initialize();
+            // maybe pass in a  reference to a SVG?
+            //await JSIntegrationRef!.CaptureMouseEventsForSVG();
+
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             var arena = Workspace?.GetArena();

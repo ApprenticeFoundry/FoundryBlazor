@@ -3,13 +3,13 @@
 @inherits CanvasSVGComponentBase
 @namespace FoundryBlazor.Shared
 
-<div id="svgHolder">
-    <CanvasHelper @ref="SVGHelperReference" RenderFrame="RenderFrame">
+<div id="svgHolder" style=@StyleCanvas>
+    <JSIntegrationHelper @ref="JSIntegrationRef" RenderFrame="RenderFrame">
         
-        <svg viewbox="(0,0,1000,1000)" height="1000" width="1000" style="background-color:orange">
+        <svg viewbox="(0,0,1000,1000)" Width=@CanvasWidth Height=@CanvasHeight style="background-color:orange">
             <Page Page="@GetCurrentPage()" >
             </Page>
         </svg>
-    </CanvasHelper>
+    </JSIntegrationHelper>
 </div>
 
