@@ -1,6 +1,7 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 
 
@@ -58,6 +59,8 @@ public class HitTestService : IHitTestService
     public List<FoGlyph2D> RefreshTree(FoPage2D page)
     {
         Page = page;
+
+        $"RefreshTree {page.Name} ".WriteInfo();
 
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
         Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);

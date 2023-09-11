@@ -292,7 +292,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree, IPanZoomService panzoom)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-        // var count = Shapes2D.Count();
+        
+        var count = Shapes2D.Count();
+        $"InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
         foreach (var item in Shapes2D.Values())
         {
             if (!item.IsSelectable())

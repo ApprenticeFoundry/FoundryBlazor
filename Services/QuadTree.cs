@@ -1,6 +1,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components.Rendering;
 using Radzen.Blazor.Rendering;
 using System.Drawing;
@@ -107,6 +108,15 @@ public class QuadTree<T> where T : IHasRectangle
         m_rect = rect;
     }
 
+    public void PrintTree(int level = 0)
+    {
+        $"PrintTree {m_rect} {Count}".WriteSuccess(level);
+        if (m_childTL != null) m_childTL.PrintTree(level + 1);
+        if (m_childTR != null) m_childTR.PrintTree(level + 1);
+        if (m_childBL != null) m_childBL.PrintTree(level + 1);
+        if (m_childBR != null) m_childBR.PrintTree(level + 1);
+    }
+
     public QuadTree(int x, int y, int width, int height)
     {
         m_rect = new Rectangle(x, y, width, height);
@@ -204,6 +214,8 @@ public class QuadTree<T> where T : IHasRectangle
 
     private void Subdivide()
     {
+          $"Tree Subdivide items".WriteInfo(2);
+
         // We've reached capacity, subdivide...
         Point size = new(m_rect.Width / 2, m_rect.Height / 2);
         Point mid = new(m_rect.X + size.X, m_rect.Y + size.Y);
@@ -344,6 +356,7 @@ public class QuadTree<T> where T : IHasRectangle
 
     public void Insert(T item, Rectangle itemRect)
     {
+        $"Tree Inserting {item} items".WriteInfo(2);
         //var itemRect = item.Rect();
         // If this quad doesn't intersect the items rectangle, do nothing
         if (!m_rect.IntersectsWith(itemRect))

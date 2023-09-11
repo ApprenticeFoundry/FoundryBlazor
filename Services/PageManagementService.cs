@@ -144,6 +144,8 @@ public class PageManagementService : FoComponent, IPageManagement
     }
     public void RefreshHitTesting(FoPanZoomWindow? window)
     {
+        $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
+
         _hitTestService.RefreshTree(CurrentPage());
         if (window != null)
             _hitTestService.Insert(window);
