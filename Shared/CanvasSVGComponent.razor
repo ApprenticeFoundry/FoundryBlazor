@@ -5,10 +5,8 @@
 
 <div id="svgHolder" style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight>
     <JSIntegrationHelper @ref="JSIntegrationRef" RenderFrame="RenderFrame">
-
-        <svg width=@CanvasWidth height=@CanvasHeight style="background-color:orange">
-            <Page Page="@GetCurrentPage()">
-            </Page>
+        <svg width=@CanvasWidth height=@CanvasHeight style="@StyleCanvas">
+            <Page Page="@GetCurrentPage()" />
         </svg>
     </JSIntegrationHelper>
 </div>

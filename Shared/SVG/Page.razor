@@ -7,8 +7,7 @@
     </rect>
     <rect x="@GetMargin()" y="@GetMargin()" width="@GetWidth()" height="@GetHeight()" fill="@GetColor()" stroke="black">
     </rect>
-    <PageGrid></PageGrid>
-
+    <PageGrid />
     @foreach (var shape in GetShapes1D())
     {
         <Shape1D Shape="@shape" />
@@ -17,7 +16,6 @@
     {
         <Shape2D Shape="@shape" />
     }
-
 </PanZoomG>
 
-<MouseTracker></MouseTracker>
+<MouseTracker />

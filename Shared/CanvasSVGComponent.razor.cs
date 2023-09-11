@@ -17,8 +17,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
-    [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
-    [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
+    [Parameter] public string StyleCanvas { get; set; } = "background-color:orange";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
 
@@ -54,7 +53,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     public FoPage2D GetCurrentPage()
     {
         return Workspace!.CurrentPage();
-    } 
+    }
 
     public void Dispose()
     {
@@ -80,7 +79,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
             await JSIntegrationRef!.Initialize();
             // maybe pass in a  reference to a SVG?
             await JSIntegrationRef!.CaptureMouseEventsForSVG();
-            
+
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
 
