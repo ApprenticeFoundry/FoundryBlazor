@@ -10,21 +10,8 @@ public class PageBase : ComponentBase
 {
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "White");
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Inject] private ComponentBus? PubSub { get; set; }
     protected override void OnInitialized()
     {
-        PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
-         {
-             try
-             {
-                 InvokeAsync(StateHasChanged);
-
-             }
-             catch (Exception ex)
-             {
-                 $"HELP {args.Topic} {ex.Message}".WriteNote();
-             }
-         });
         base.OnInitialized();
     }
 

@@ -7,7 +7,6 @@ using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace FoundryBlazor.Shared;
 
@@ -131,6 +130,10 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
+        Task.Run(() =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
     }
 
     public void RenderFrame(double fps)
