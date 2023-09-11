@@ -57,7 +57,7 @@ public interface IPageManagement : IRender
 
 public class PageManagementService : FoComponent, IPageManagement
 {
-    private bool RenderHitTestTree = false;
+    private bool RenderHitTestTree = true;
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
 

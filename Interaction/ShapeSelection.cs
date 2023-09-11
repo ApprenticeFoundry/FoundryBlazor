@@ -132,7 +132,7 @@ public class ShapeSelection : ShapeHovering
         else if (selectionService.Selections().Count > 0)
         {
             DragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

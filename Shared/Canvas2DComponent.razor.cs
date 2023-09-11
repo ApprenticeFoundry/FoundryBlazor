@@ -115,7 +115,7 @@ public class Canvas2DComponentBase : ComponentBase, IDisposable
         if (Ctx == null) return;
         tick++;
 
-        $"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
+        //$"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 

@@ -21,7 +21,7 @@ public interface IPanZoomService
 
     Matrix2D GetMatrix();
     
-    Point Movement();
+    Point MouseDeltaMovement();
     Rectangle HitRectStart(CanvasMouseArgs args);
     Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect);
     Rectangle HitRectContinue(CanvasMouseArgs args, Rectangle rect);
@@ -261,7 +261,7 @@ public class PanZoomService : IPanZoomService
         return State.Zoom;
     }
 
-    public Point Movement()
+    public Point MouseDeltaMovement()
     {
         return State.Delta;
 

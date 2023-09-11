@@ -90,10 +90,13 @@ public class FoPanZoomWindow : FoGlyph2D
 
         var (zoom1, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
         await page.RenderConcise(ctx, zoom, region);
-
+       
+       
         await _hitTestService.RenderQuadTree(ctx, false);
-
         await ctx.RestoreAsync();
+
+
+
 
         PostDraw?.Invoke(ctx, this);
 
@@ -132,9 +135,10 @@ public class FoPanZoomWindow : FoGlyph2D
 
         //await page.RenderConcise(ctx, zoom, page.Rect());       
         await page.RenderDetailed(ctx, tick, deep);
-
-        await _hitTestService.RenderQuadTree(ctx, true);
         await ctx.RestoreAsync();
+
+        //do not let PanZoomService.TranslateAndScale change the ctx
+        await _hitTestService.RenderQuadTree(ctx, true);
     }
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)

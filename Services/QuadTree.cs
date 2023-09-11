@@ -146,7 +146,7 @@ public class QuadTree<T> where T : IHasRectangle
 
     public async Task DrawQuadTree(Canvas2DContext ctx, bool members = false)
     {
-        var color = IsSmashed()? "Red" : "Cyan";
+        var color = IsSmashed()? "Red" : "Green";
 
         await ctx.SetStrokeStyleAsync(color);
 
@@ -214,7 +214,7 @@ public class QuadTree<T> where T : IHasRectangle
 
     private void Subdivide()
     {
-          $"Tree Subdivide items".WriteInfo(2);
+          //$"Tree Subdivide items".WriteInfo(2);
 
         // We've reached capacity, subdivide...
         Point size = new(m_rect.Width / 2, m_rect.Height / 2);
@@ -356,7 +356,7 @@ public class QuadTree<T> where T : IHasRectangle
 
     public void Insert(T item, Rectangle itemRect)
     {
-        $"Tree Inserting {item} items".WriteInfo(2);
+        //$"Tree Inserting {item} items".WriteInfo(2);
         //var itemRect = item.Rect();
         // If this quad doesn't intersect the items rectangle, do nothing
         if (!m_rect.IntersectsWith(itemRect))

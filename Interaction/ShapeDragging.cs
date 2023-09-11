@@ -81,7 +81,7 @@ public class ShapeDragging : ShapeHovering
         if (isDraggingShapes) {
             //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
             DragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

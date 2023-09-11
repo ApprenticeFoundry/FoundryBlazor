@@ -94,7 +94,7 @@ public class MoShapeLinking : ShapeHovering
     {
 
         var loc = panZoomService.HitRectStart(args);
-        var move = panZoomService.Movement();
+        var move = panZoomService.MouseDeltaMovement();
 
         //$"Mouse Move {loc.X}  {loc.Y}".WriteLine();
 

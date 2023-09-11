@@ -69,7 +69,16 @@ public interface IGlyph2D : IHasRectangle
 public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
-    public static bool ResetHitTesting { get; set; } = false;
+    private static bool _resetHitTesting = false;
+    public static bool ResetHitTesting 
+    {         
+        get { return _resetHitTesting; }
+        set { 
+            _resetHitTesting = value; 
+            if ( _resetHitTesting )
+                $"ResetHitTesting {_resetHitTesting}".WriteInfo();
+        } 
+    }
     public float Thickness { get; set; }
     public bool Selectable { get; set; } = true;
     public bool IsSelected { get; set; } = false;

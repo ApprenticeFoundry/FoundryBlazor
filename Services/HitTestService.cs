@@ -48,7 +48,6 @@ public class HitTestService : IHitTestService
 
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
         Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
-
     }
 
     public QuadTree<FoGlyph2D> GetTree()
@@ -62,6 +61,7 @@ public class HitTestService : IHitTestService
 
         $"RefreshTree {page.Name} ".WriteInfo();
 
+        //this rectangle should not shrink based on pan or zoom
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
         Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
 
@@ -114,13 +114,14 @@ public class HitTestService : IHitTestService
         return list;
     }
 
+    //this context must be in pixel space,  no pan or zoom
     public async Task RenderQuadTree(Canvas2DContext ctx, bool showTracks)
     {
         //$"Searches Count {PreviousSearches.Count}".WriteLine(ConsoleColor.Red);
 
         await ctx.SaveAsync();
 
-        await ctx.SetLineWidthAsync(2);
+        await ctx.SetLineWidthAsync(6);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
 
         await Tree.DrawQuadTree(ctx, false);

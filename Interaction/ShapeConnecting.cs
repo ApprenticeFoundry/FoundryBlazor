@@ -119,7 +119,7 @@ public class ShapeConnecting :  ShapeHovering
         //SendUserMove(args, true);
         if (isConnecting) {
             DragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

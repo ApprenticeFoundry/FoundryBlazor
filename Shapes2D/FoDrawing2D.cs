@@ -175,7 +175,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         )
     {
         HitTestService = hittest;
-        HitTestService.SetRectangle(Rect());
+        //HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
