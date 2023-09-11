@@ -4,5 +4,9 @@
 <g transform="@GetMatrix()">
     <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" stroke-dasharray="@GetDashArray()" fill="@GetColor()"
         stroke="@GetStrokeColor()" stroke-width="3" />
-    <text>@GetText()</text>
+    <foreignObject x="8" y="8" width="@GetWidth()" height="@GetHeight()">
+        <div style="color: @GetTextColor()">
+            @GetText()
+        </div>
+    </foreignObject>
 </g>

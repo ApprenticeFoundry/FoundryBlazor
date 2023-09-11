@@ -1,17 +1,10 @@
-using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Shape;
-using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components.Web;
 using FoundryBlazor.PubSub;
-using BlazorComponentBus;
 
 namespace FoundryBlazor.Shared.SVG;
 
 public class Text2DBase : Shape2DBase
 {
-    [Inject] private ComponentBus? PubSub { get; set; }
-
-
     private FoText2D? GetTextShape()
     {
         return Shape as FoText2D;
@@ -20,6 +13,16 @@ public class Text2DBase : Shape2DBase
     protected string GetText()
     {
         return GetTextShape()?.Text ?? "";
+    }
+
+    protected string GetTextColor()
+    {
+        return GetTextShape()?.TextColor ?? "white";
+    }
+
+    protected List<string> GetDetails()
+    {
+        return GetTextShape()?.Details ?? new List<string>();
     }
 
     protected override void OnInitialized()

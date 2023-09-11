@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Shape;
-
+using BlazorComponentBus;
+using FoundryBlazor.Canvas;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shared.SVG;
 
@@ -8,9 +10,21 @@ public class PageBase : ComponentBase
 {
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "White");
     [Parameter] public RenderFragment? ChildContent { get; set; }
-
+    [Inject] private ComponentBus? PubSub { get; set; }
     protected override void OnInitialized()
     {
+        PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
+         {
+             try
+             {
+                 InvokeAsync(StateHasChanged);
+
+             }
+             catch (Exception ex)
+             {
+                 $"HELP {args.Topic} {ex.Message}".WriteNote();
+             }
+         });
         base.OnInitialized();
     }
 

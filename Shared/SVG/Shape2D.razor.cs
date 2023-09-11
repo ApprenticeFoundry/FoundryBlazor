@@ -9,7 +9,7 @@ namespace FoundryBlazor.Shared.SVG;
 
 public class Shape2DBase : ComponentBase
 {
-    [Inject] private ComponentBus? PubSub { get; set; }
+    [Inject] protected ComponentBus? PubSub { get; set; }
     [Parameter] public FoShape2D Shape { get; set; } = new();
     protected string StrokeColor { get; set; } = "black";
 
@@ -51,7 +51,7 @@ public class Shape2DBase : ComponentBase
 
     protected string GetMatrix()
     {
-        var mtx = Shape.GetMatrix();
+        var mtx = Shape?.GetMatrix() ?? new Matrix2D();
         if (mtx.IsSVGRefreshed())
         {
             //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
