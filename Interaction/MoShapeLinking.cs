@@ -29,8 +29,8 @@ public class MoShapeLinking : ShapeHovering
     
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = pageManager?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
         if (args.CtrlKey && selectedShape is FoCompound2D)
             return true;

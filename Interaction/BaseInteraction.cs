@@ -32,13 +32,15 @@ public interface IBaseInteraction
     void Abort();
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
+
 }
 
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
+    static public Rectangle DragArea = new();
+
     public int Priority { get; set; } = 0;
     public InteractionStyle Style { get; set; } = InteractionStyle.None;
-    protected Rectangle dragArea;
     protected FoGlyph2D? selectedShape;
     
     protected List<FoGlyph2D>? lastHover = null;
@@ -94,6 +96,11 @@ public class BaseInteraction : FoComponent, IBaseInteraction
 
         await ctx.RestoreAsync();
     };
+
+    public static Rectangle GetDragArea()
+    {
+        return DragArea;
+    }
 
     public virtual void Abort()
     {     

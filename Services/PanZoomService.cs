@@ -35,6 +35,10 @@ public interface IPanZoomService
 
     public PanZoomState ReadFromPage(FoPage2D page);
     public PanZoomState WriteToPage(FoPage2D page);
+
+    public bool IsFenceSelecting();
+    public bool SetFenceSelecting(bool value);
+
 }
 
 public class PanZoomState
@@ -70,6 +74,7 @@ public class PanZoomState
 public class PanZoomService : IPanZoomService
 {
     private readonly PanZoomState State = new();
+    private bool isFenceSelecting = false;
 
     protected Matrix2D? _matrix;
     protected Matrix2D? _invMatrix;
@@ -83,6 +88,16 @@ public class PanZoomService : IPanZoomService
     {
     }
 
+    public bool IsFenceSelecting()
+    {
+        return isFenceSelecting;
+    }
+    public bool SetFenceSelecting(bool value)
+    {
+        isFenceSelecting = value;
+        return isFenceSelecting;
+    }
+    
     public PanZoomService AfterMatrixRefresh(Action<PanZoomState> action)
     {
         OnMatrixRefresh = action;

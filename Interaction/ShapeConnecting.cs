@@ -35,8 +35,8 @@ public class ShapeConnecting :  ShapeHovering
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = ValidDragSource(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = ValidDragSource(DragArea);
         selectedShape = findings.LastOrDefault(); // get one on top
 
         if (findings?.Count == 1 && selectedShape != null)
@@ -55,7 +55,7 @@ public class ShapeConnecting :  ShapeHovering
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(1);
             await ctx.SetStrokeStyleAsync("Yellow");
-            var rect = panZoomService.TransformRect(dragArea);
+            var rect = panZoomService.TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }
@@ -118,7 +118,7 @@ public class ShapeConnecting :  ShapeHovering
     {
         //SendUserMove(args, true);
         if (isConnecting) {
-            dragArea = panZoomService.HitRectStart(args);
+            DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.Movement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);

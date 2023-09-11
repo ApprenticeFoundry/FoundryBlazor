@@ -65,8 +65,31 @@ public class MouseTrackerBase : ComponentBase
         return dragArea.Y;  //state.LastLocation.Y;
     }
 
+    public bool IsFenceSelecting()
+    {
+        return PanZoom?.IsFenceSelecting() ?? false;
+    }
 
+    public Rectangle GetFence()
+    {
+        var fence = BaseInteraction.GetDragArea();
+        var rect = PanZoom?.TransformRect(fence) ?? fence;
+        return rect;
+    }
 
+    // public override async Task RenderDrawing(Canvas2DContext ctx, int tick)
+    // {
+    //     if (isFenceSelecting)
+    //     {
+    //         await ctx.BeginPathAsync();
+    //         await ctx.SetLineDashAsync(new float[] { 50, 10 });
+    //         await ctx.SetLineWidthAsync(3);
+    //         await ctx.SetStrokeStyleAsync("White");
+    //         var rect = panZoomService.TransformRect(dragArea);
+    //         await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
+    //         await ctx.StrokeAsync();
+    //     }
+    // }
 
 
 }
