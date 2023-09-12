@@ -24,50 +24,52 @@ public interface IHitTestService
 
 public class HitTestService : IHitTestService
 {
-    private FoPage2D Page { get; set; }
-    private QuadTree<FoGlyph2D> Tree { get; set; }
+
+    private QuadTree<FoGlyph2D>? Tree { get; set; }
 
     private readonly List<Rectangle> PreviousSearches = new();
     private readonly IPanZoomService _panzoom;
-    private Rectangle CanvasRectangle = new(0, 0, 100, 100);
+    private Size CanvasSize = new(100, 100);
+    private Rectangle CanvasRectangle = new(50, 50, 500, 500);
 
-    public HitTestService(IPanZoomService panzoom)
+    public HitTestService(
+        IPanZoomService panzoom)
     {
         _panzoom = panzoom;
-        Page = new FoPage2D("dummy", "White");
-        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
-        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
     }
 
-    // public void SetRectangle(Rectangle rect)
-    // {
-    //     Rect.X = rect.X;
-    //     Rect.Y = rect.Y;
-    //     Rect.Width = rect.Width;
-    //     Rect.Height = rect.Height;
-
-    //     Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
-    //     Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
-    // }
+    public void SetCanvasSizeInPixels(int width, int height)
+    {
+        CanvasSize.Width = width;
+        CanvasSize.Height = height;
+    }
 
     public QuadTree<FoGlyph2D> GetTree()
     {
+        Tree ??= new QuadTree<FoGlyph2D>(CanvasRectangle);
+        return Tree;
+    }
+
+    public QuadTree<FoGlyph2D> InitTreeRoot()
+    {
+        Tree = GetTree();
+        Tree.Clear(true);
+
+        //recompute the tree rect and include the pan and zoom
+        Tree.Reset(CanvasRectangle.X, CanvasRectangle.Y, CanvasRectangle.Width, CanvasRectangle.Height);
         return Tree;
     }
     
     public List<FoGlyph2D> RefreshQuadTree(FoPage2D page)
     {
-        Page = page;
 
         $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
 
         //this rectangle should not shrink based on pan or zoom
-        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
-
-        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
+        var tree = InitTreeRoot();
 
         $"InsertShapesToQuadTree {page.Name} ".WriteSuccess();
-        Page.InsertShapesToQuadTree(Tree, _panzoom);
+        page.InsertShapesToQuadTree(tree, _panzoom);
 
         return AllShapesEverywhere();
     }

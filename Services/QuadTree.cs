@@ -283,7 +283,7 @@ public class QuadTree<T> where T : IHasRectangle
     {
         // the question is:  do we want to clear the tree if it has no smashed objects?
 
-        $"Tree Clear items {m_rect} {Count} {force}".WriteInfo(2);
+        //$"Tree Clear items {m_rect} {Count} {force}".WriteInfo(2);
         var smashed = IsSmashed();
         //no smashed objects, no need to clear
         if ( smashed && !force && !HasSubTrees()) 
