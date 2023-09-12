@@ -324,28 +324,28 @@ namespace FoundryBlazor.Shape;
         var pt = new Point(X, Y);
         return pt;
     }
-    public Rectangle TransformRectangle(int x, int y, int width, int height, Rectangle rect) 
+    public void TransformRectangle(int x, int y, int width, int height, ref Rectangle rect) 
     {
-        // rect.X = (int)(x * this.a + y * this.c + this.tx);
-        // rect.Y = (int)(x * this.b + y * this.d + this.ty);
-        // rect.Width = width;
-        // rect.Height = height;
+        rect.X = (int)(x * this.a + y * this.c + this.tx);
+        rect.Y = (int)(x * this.b + y * this.d + this.ty);
+        rect.Width = width;
+        rect.Height = height;
 
-        double X = this.a * x + this.c * y + this.tx;
-        double Y = this.b * x + this.d * y + this.ty;
+        //double X = this.a * x + this.c * y + this.tx;
+        //double Y = this.b * x + this.d * y + this.ty;
         
-        double x2 = this.a * (x + width) + this.c * (y + height) + this.tx;
-        double y2 = this.b * (x + width) + this.d * (y + height) + this.ty;
+        //double x2 = this.a * (x + width) + this.c * (y + height) + this.tx;
+        //double y2 = this.b * (x + width) + this.d * (y + height) + this.ty;
 
 
-        double Width = Math.Abs(x2 - X); 
-        double Height = Math.Abs(y2 - Y);
+        //double Width = Math.Abs(x2 - X); 
+        //double Height = Math.Abs(y2 - Y);
 
-        rect.X = (int)x;
-        rect.Y = (int)y;
-        rect.Width = (int)Width;
-        rect.Height =(int)Height;
-        return rect;
+        //rect.X = (int)X;
+        //rect.Y = (int)Y;
+        //rect.Width = (int)Width;
+        //rect.Height =(int)Height;
+        //return rect;
     }
     // public Point TransformPoint(Point pt) 
     // {

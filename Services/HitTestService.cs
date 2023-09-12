@@ -57,7 +57,7 @@ public class HitTestService : IHitTestService
 
 
         var mat = _panzoom.GetMatrix();
-        mat.TransformRectangle(0, 0, CanvasSize.Width,  CanvasSize.Height, CanvasRectangle);
+        mat.TransformRectangle(0, 0, CanvasSize.Width,  CanvasSize.Height, ref CanvasRectangle);
         
         //recompute the tree rect and include the pan and zoom
         Tree.Reset(CanvasRectangle.X, CanvasRectangle.Y, CanvasRectangle.Width, CanvasRectangle.Height);

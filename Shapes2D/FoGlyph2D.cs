@@ -303,8 +303,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public virtual Rectangle HitTestRect()
     {
         //this does not work for rotated objects
-
-        GetMatrix().TransformRectangle(0, 0, Width, Height, rectangle);
+        var mat = GetMatrix();
+        mat.TransformRectangle(0, 0, Width, Height, ref rectangle);
         return rectangle;
     }
 
