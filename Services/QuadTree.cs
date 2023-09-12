@@ -283,6 +283,7 @@ public class QuadTree<T> where T : IHasRectangle
     {
         // the question is:  do we want to clear the tree if it has no smashed objects?
 
+        $"Tree Clear items {m_rect} {Count} {force}".WriteInfo(2);
         var smashed = IsSmashed();
         //no smashed objects, no need to clear
         if ( smashed && !force && !HasSubTrees()) 
@@ -358,7 +359,7 @@ public class QuadTree<T> where T : IHasRectangle
     public void Insert(T item, Rectangle itemRect)
     {
         //$"Tree Inserting {item} items".WriteInfo(2);
-        //var itemRect = item.Rect();
+
         // If this quad doesn't intersect the items rectangle, do nothing
         if (!m_rect.IntersectsWith(itemRect))
             return;

@@ -13,7 +13,7 @@ public interface IHitTestService
     bool InsertRange(List<FoGlyph2D> list);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> AllShapesEverywhere();
-    List<FoGlyph2D> RefreshTree(FoPage2D page);
+    List<FoGlyph2D> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 
     void SetRectangle(Rectangle rect);
@@ -55,16 +55,18 @@ public class HitTestService : IHitTestService
         return Tree;
     }
     
-    public List<FoGlyph2D> RefreshTree(FoPage2D page)
+    public List<FoGlyph2D> RefreshQuadTree(FoPage2D page)
     {
         Page = page;
 
-        $"RefreshTree {page.Name} ".WriteInfo();
+        $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
 
         //this rectangle should not shrink based on pan or zoom
         Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+
         Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
 
+        $"InsertShapesToQuadTree {page.Name} ".WriteSuccess();
         Page.InsertShapesToQuadTree(Tree, _panzoom);
 
         return AllShapesEverywhere();

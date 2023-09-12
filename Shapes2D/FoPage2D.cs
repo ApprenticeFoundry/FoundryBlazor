@@ -302,6 +302,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                 continue;
 
             var rect = item.HitTestRect();
+            $"Inserting  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 

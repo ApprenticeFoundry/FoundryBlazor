@@ -443,7 +443,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
 
-        HitTestService.RefreshTree(CurrentPage());
+        HitTestService.RefreshQuadTree(CurrentPage());
         if (window != null)
             HitTestService.Insert(window);
 
