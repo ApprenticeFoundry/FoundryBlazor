@@ -12,7 +12,6 @@ namespace FoundryBlazor.Shape;
 
 public interface IPageManagement : IRender
 {
-
     List<FoGlyph2D> FindShapes(string GlyphId);
     List<FoGlyph2D> ExtractShapes(string GlyphId);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
@@ -25,9 +24,6 @@ public interface IPageManagement : IRender
 
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
     List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
-
-    void RefreshHitTesting(FoPanZoomWindow? window);
-    bool ToggleHitTestRender();
 
 
     int PageCount();
@@ -57,7 +53,7 @@ public interface IPageManagement : IRender
 
 public class PageManagementService : FoComponent, IPageManagement
 {
-    private bool RenderHitTestTree = true;
+
     private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
 
@@ -137,19 +133,8 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public bool ToggleHitTestRender()
-    {
-        RenderHitTestTree = !RenderHitTestTree;
-        return RenderHitTestTree;
-    }
-    public void RefreshHitTesting(FoPanZoomWindow? window)
-    {
-        $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
 
-        _hitTestService.RefreshTree(CurrentPage());
-        if (window != null)
-            _hitTestService.Insert(window);
-    }
+
 
     public List<FoGlyph2D> DeleteSelections()
     {
@@ -262,7 +247,7 @@ public class PageManagementService : FoComponent, IPageManagement
         ActivePage = page;
 
         //force refresh of hit testing
-        RefreshHitTesting(null);
+        FoGlyph2D.ResetHitTesting = true;
         return ActivePage;
     }
 
@@ -397,11 +382,6 @@ public class PageManagementService : FoComponent, IPageManagement
 
         //await page.RenderNoItems(ctx, tick++);
         await page.RenderDetailed(ctx, tick++, deep);
-
-        if (RenderHitTestTree)
-            await _hitTestService.RenderQuadTree(ctx, true);
-
-
         return true;
     }
 
@@ -409,9 +389,6 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         var page = CurrentPage();
         await page.RenderConcise(ctx, scale, region);
-
-        if (RenderHitTestTree)
-            await _hitTestService.RenderQuadTree(ctx, false);
 
         return true;
     }

@@ -59,14 +59,15 @@ public interface IDrawing : IRender
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
     Rectangle Rect();
+    bool ToggleHitTestRender();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-
     public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
+    private bool RenderHitTestTree = true;
 
     private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
 
@@ -211,6 +212,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
+    public bool ToggleHitTestRender()
+    {
+        RenderHitTestTree = !RenderHitTestTree;
+        return RenderHitTestTree;
+    }
     public void SetPreRenderAction(Func<Canvas2DContext, int, Task> action)
     {
         PreRender = action;
@@ -432,15 +438,17 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-
-
-    public void RefreshHitTest_IfDirty()
+    public void RefreshHitTesting(FoPanZoomWindow? window)
     {
-        if (FoGlyph2D.ResetHitTesting)
-            PageManager.RefreshHitTesting(PanZoomWindow());
+        $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
+
+        HitTestService.RefreshTree(CurrentPage());
+        if (window != null)
+            HitTestService.Insert(window);
 
         FoGlyph2D.ResetHitTesting = false;
     }
+
 
     public virtual Dictionary<string, Action> DefaultMenu()
     {
@@ -503,11 +511,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         FoGlyph2D.Animations.Update((float)0.033);
 
         var wasDirty = FoGlyph2D.ResetHitTesting;
-        RefreshHitTest_IfDirty();
+        if (FoGlyph2D.ResetHitTesting)
+            RefreshHitTesting(PanZoomWindow());
 
         var page = PageManager.CurrentPage();
 
         await ClearCanvas(ctx);
+
+
+  
 
         await ctx.SaveAsync();
 
@@ -525,7 +537,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.RestoreAsync();
 
-
+        if (RenderHitTestTree)  
+            await HitTestService.RenderQuadTree(ctx, true);
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
