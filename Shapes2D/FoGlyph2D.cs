@@ -87,12 +87,15 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
     public int Index { get; set; } = 0;
+    
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId
     {
         get { return this.id; }
         set { this.id = value; }
     }
+
+    protected Rectangle rectangle = new(0, 0, 0, 0);
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -199,7 +202,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (Level > 0 && GetParent() is FoGlyph2D parent)
         {
             var matrix = parent.GetMatrix();
-            source = matrix.TransformPoint(source);
+            source = matrix.TransformToPoint(source.X, source.Y);
             return parent.ParentAttachTo(source);
         }
 
@@ -287,9 +290,9 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public virtual Rectangle HitTestRect()
     {
         //this does not work for rotated objects
-        //var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
-        var result = new Rectangle(0, 0, Width, Height);
-        return result;
+
+        GetMatrix().TransformRectangle(0, 0, Width, Height, rectangle);
+        return rectangle;
     }
 
     public virtual FoGlyph2D ResizeTo(int width, int height) { (Width, Height) = (width, height); return this; }

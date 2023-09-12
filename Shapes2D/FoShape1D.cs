@@ -46,7 +46,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
                 return new Point();
             }
 
-            startPT = matrix.TransformPoint(StartX, StartY);
+            startPT = matrix.TransformToPoint(StartX, StartY);
         }
         return (Point)startPT;
     }
@@ -60,7 +60,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
                 "Point Finish() IMPOSSABLE".WriteError();
                 return new Point();
             }
-            finishPT = matrix.TransformPoint(FinishX, FinishY);
+            finishPT = matrix.TransformToPoint(FinishX, FinishY);
         }
         return (Point)finishPT;
     }
@@ -153,11 +153,12 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
     public override Rectangle HitTestRect()
     {
         var d = Height / 2;
-        var sz = new Size(Height, Height);
+        //var sz = new Size(Height, Height);
         var loc = PinLocation();
         var matrix = GetMatrix();
-        var pt = matrix?.TransformPoint(loc.X - d, loc.Y - d) ?? new Point(loc.X, loc.Y);
-        var result = new Rectangle(pt, sz);
+        var (x, y) = matrix.TransformPoint(loc.X - d, loc.Y - d); // ?? new Point(loc.X, loc.Y);
+        //hit test in the center 
+        var result = new Rectangle(x, y, Height, Height);
         return result;
     }
 

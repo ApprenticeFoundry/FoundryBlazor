@@ -16,7 +16,7 @@ public interface IHitTestService
     List<FoGlyph2D> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 
-    void SetRectangle(Rectangle rect);
+    //void SetRectangle(Rectangle rect);
     List<Rectangle> GetSearches();
     QuadTree<FoGlyph2D> GetTree();
 
@@ -39,16 +39,16 @@ public class HitTestService : IHitTestService
         Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
     }
 
-    public void SetRectangle(Rectangle rect)
-    {
-        Rect.X = rect.X;
-        Rect.Y = rect.Y;
-        Rect.Width = rect.Width;
-        Rect.Height = rect.Height;
+    // public void SetRectangle(Rectangle rect)
+    // {
+    //     Rect.X = rect.X;
+    //     Rect.Y = rect.Y;
+    //     Rect.Width = rect.Width;
+    //     Rect.Height = rect.Height;
 
-        Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
-        Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
-    }
+    //     Tree = Tree != null ? Tree.Clear(true) : new QuadTree<FoGlyph2D>(Rect);
+    //     Tree.Reset(Rect.X, Rect.Y, Rect.Width, Rect.Height);
+    // }
 
     public QuadTree<FoGlyph2D> GetTree()
     {

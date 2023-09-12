@@ -28,9 +28,8 @@ public class FoPanZoomWindow : FoGlyph2D
         //anti scale this window
         var pan = PanZoomService.Pan();
         var zoom = PanZoomService.Zoom();
-        var pt = GetMatrix().TransformPoint(0, 0);
-        var sz = new Size((int)(Width / zoom), (int)(Height / zoom));
-        var result = new Rectangle(pt, sz);
+        var (x,y) = GetMatrix().TransformPoint(0, 0);
+        var result = new Rectangle(x,y, (int)(Width / zoom),(int)(Height / zoom));
         return result;
     }
 

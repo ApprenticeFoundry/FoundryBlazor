@@ -301,8 +301,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
-        HitTestService.SetRectangle(HitTestRect());
     }
+    
     public Size TrueCanvasSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);

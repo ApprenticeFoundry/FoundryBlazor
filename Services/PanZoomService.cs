@@ -195,9 +195,9 @@ public class PanZoomService : IPanZoomService
     public Rectangle HitRectStart(CanvasMouseArgs args)
     {
         //$"{_pan.X} {_pan.Y}".WriteLine(ConsoleColor.Blue);
-        var pt = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
 
-        var hit = new Rectangle(pt.X, pt.Y, 1, 1);
+        var hit = new Rectangle(x, y, 1, 1);
         ComputeDelta(hit.Left, hit.Top);
         return hit;
     }
@@ -205,21 +205,21 @@ public class PanZoomService : IPanZoomService
     // for doing shape select
     public Rectangle HitRectContinue(CanvasMouseArgs args, Rectangle rect)
     {
-        var pt = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
-        rect.Width  = pt.X - rect.X;
-        rect.Height = pt.Y - rect.Y;
+        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        rect.Width  = x - rect.X;
+        rect.Height = y - rect.Y;
         return rect;
     }
 
     //for resizing and image
     public Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect)
     {
-        var pt = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
 
         var x1 = rect.Left;
         var y1 = rect.Top;
-        var x2 = pt.X;
-        var y2 = pt.Y;
+        var x2 = x;
+        var y2 = y;
         var hit = new Rectangle(x1,y1, x2-x1, y2-y1);
         State.LastLocation = new Point(0, 0);
         ComputeDelta(hit.Left, hit.Top);
@@ -229,8 +229,8 @@ public class PanZoomService : IPanZoomService
     public Rectangle TransformRect(Rectangle rect)
     {
         var matrix = GetMatrix();
-        var pt1 = matrix.TransformPoint(rect.Left, rect.Top);
-        var pt2 = matrix.TransformPoint(rect.Right, rect.Bottom);
+        var pt1 = matrix.TransformToPoint(rect.Left, rect.Top);
+        var pt2 = matrix.TransformToPoint(rect.Right, rect.Bottom);
 
         var newRect = new Rectangle(pt1.X, pt1.Y, pt2.X-pt1.X, pt2.Y-pt1.Y);
 
