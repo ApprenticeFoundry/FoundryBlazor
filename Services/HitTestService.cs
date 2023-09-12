@@ -29,7 +29,7 @@ public class HitTestService : IHitTestService
 
     private readonly List<Rectangle> PreviousSearches = new();
     private readonly IPanZoomService _panzoom;
-    private Rectangle Rect = new(0, 0, 100, 100);
+    private Rectangle CanvasRectangle = new(0, 0, 100, 100);
 
     public HitTestService(IPanZoomService panzoom)
     {
