@@ -150,7 +150,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.StrokeAsync();
     };
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
         var d = Height / 2;
         var sz = new Size(Height, Height);

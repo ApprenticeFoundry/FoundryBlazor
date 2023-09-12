@@ -112,7 +112,7 @@ public class ShapeSelection : ShapeHovering
                 //only findings that are totally inside the fence
                 foreach (var item in findings)
                 {
-                    if (GetDragArea().Contains(item.Rect()))
+                    if (GetDragArea().Contains(item.HitTestRect()))
                         selectionService?.AddItem(item);
                 }
             }

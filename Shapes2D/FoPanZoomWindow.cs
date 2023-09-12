@@ -23,7 +23,7 @@ public class FoPanZoomWindow : FoGlyph2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
         //anti scale this window
         var pan = PanZoomService.Pan();

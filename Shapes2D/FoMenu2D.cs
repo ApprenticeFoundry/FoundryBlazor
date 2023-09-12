@@ -82,7 +82,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
     public bool MouseHit(CanvasMouseArgs args) 
     {
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
         if ( found != null) {
 
             found.MarkSelected(true);
@@ -95,7 +95,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
     {
         Members<FoButton2D>().ForEach(child => child.HoverDraw = null);
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
         if ( found != null) {
             found.HoverDraw = OnHover;
             return true;

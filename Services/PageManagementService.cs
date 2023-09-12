@@ -340,10 +340,10 @@ public class PageManagementService : FoComponent, IPageManagement
 
         if (Activator.CreateInstance(typeof(T)) is not T group) return null;
 
-        Rectangle rect = first.Rect();
+        Rectangle rect = first.HitTestRect();
         _selectService.Selections().ForEach(item =>
         {
-            rect = Rectangle.Union(rect, item.Rect());
+            rect = Rectangle.Union(rect, item.HitTestRect());
             //$"Rect {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.White);
         });
 

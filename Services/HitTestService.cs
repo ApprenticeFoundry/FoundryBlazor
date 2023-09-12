@@ -73,7 +73,7 @@ public class HitTestService : IHitTestService
     public bool InsertRange(List<FoGlyph2D> list)
     {
         if (Tree != null)
-            list.ForEach(child => Tree.Insert(child, child.Rect()));
+            list.ForEach(child => Tree.Insert(child, child.HitTestRect()));
         return Tree != null;
     }
 
@@ -84,7 +84,7 @@ public class HitTestService : IHitTestService
 
     public bool Insert(FoGlyph2D glyph)
     {
-        Tree?.Insert(glyph, glyph.Rect());
+        Tree?.Insert(glyph, glyph.HitTestRect());
         return Tree != null;
     }
 
@@ -124,7 +124,7 @@ public class HitTestService : IHitTestService
         await ctx.SetLineWidthAsync(6);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
 
-        await Tree.DrawQuadTree(ctx, false);
+        await Tree.DrawQuadTree(ctx, true);
 
         if (showTracks)
         {

@@ -38,9 +38,9 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
         return (dx/distance, dy/distance, distance);
     }
 
-    public Rectangle Rect()
+    public Rectangle HitTestRect()
     {
-        return _item.Rect();
+        return _item.HitTestRect();
     }
 
     public bool IsSmashed()

@@ -51,6 +51,7 @@ public interface IDrawing : IRender
 
     void TogglePanZoomWindow();
     void ToggleHitTestDisplay();
+    void RefreshHitTesting(FoPanZoomWindow? window);
     bool MovePanBy(int dx, int dy);
 
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
@@ -58,7 +59,7 @@ public interface IDrawing : IRender
     void ClearAll();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
-    Rectangle Rect();
+
     bool ToggleHitTestRender();
 }
 
@@ -108,7 +109,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
         var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
         return result;
@@ -300,7 +301,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
-        HitTestService.SetRectangle(Rect());
+        HitTestService.SetRectangle(HitTestRect());
     }
     public Size TrueCanvasSize()
     {
@@ -434,7 +435,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void ToggleHitTestDisplay()
     {
-        PageManager.ToggleHitTestRender();
+        RenderHitTestTree = !RenderHitTestTree;
     }
 
 
@@ -533,7 +534,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (PostRender != null)
             await PostRender.Invoke(ctx, tick);
 
-        await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
+        await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
 
         await ctx.RestoreAsync();
 

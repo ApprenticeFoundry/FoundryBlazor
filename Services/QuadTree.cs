@@ -146,18 +146,19 @@ public class QuadTree<T> where T : IHasRectangle
 
     public async Task DrawQuadTree(Canvas2DContext ctx, bool members = false)
     {
-        var color = IsSmashed()? "Red" : "Green";
 
-        await ctx.SetStrokeStyleAsync(color);
-
+        await ctx.SetStrokeStyleAsync("Green");
         await ctx.StrokeRectAsync(m_rect.X+1, m_rect.Y+1, m_rect.Width-2, m_rect.Height-2);
 
         if ( members )
+        {
+            await ctx.SetStrokeStyleAsync("Yellow");
             m_objects?.ForEach(async item =>
             {
-                var rect = item.Rect();
+                var rect = item.HitTestRect();
                 await ctx.StrokeRectAsync(rect.X+1, rect.Y+1, rect.Width-2, rect.Height-2);
             });
+        }
 
         if (TopLeftChild != null) await TopLeftChild.DrawQuadTree(ctx,members);
         if (TopRightChild != null) await TopRightChild.DrawQuadTree(ctx,members);
@@ -234,7 +235,7 @@ public class QuadTree<T> where T : IHasRectangle
             if (destTree != this)
             {
                 // Insert to the appropriate tree, remove the object, and back up one in the loop
-                destTree.Insert(item, item.Rect());
+                destTree.Insert(item, item.HitTestRect());
                 Remove(item);
                 i--;
             }
@@ -251,7 +252,7 @@ public class QuadTree<T> where T : IHasRectangle
         // If a child can't contain an object, it will live in this Quad
         QuadTree<T> destTree = this;
 
-        var rect = item.Rect();
+        var rect = item.HitTestRect();
 
         if (m_childTL!.QuadRect.Contains(rect))
         {
@@ -402,7 +403,7 @@ public class QuadTree<T> where T : IHasRectangle
             // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
             if (m_objects != null)
                 for (int i = 0; i < m_objects.Count; i++)
-                    if (rect.IntersectsWith(m_objects[i].Rect()))
+                    if (rect.IntersectsWith(m_objects[i].HitTestRect()))
                         results.Add(m_objects[i]);
 
             // Get the objects for the search rectangle from the children

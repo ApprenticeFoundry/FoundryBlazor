@@ -50,7 +50,7 @@ public class ShapeResizing : ShapeHovering
             //adjust the drag ares to upper left corner of the box 
             isResizingShape = true;
 
-            DragArea = panZoomService.HitRectTopLeft(args, selectedShape.Rect());
+            DragArea = panZoomService.HitRectTopLeft(args, selectedShape.HitTestRect());
             return true;
         }
 

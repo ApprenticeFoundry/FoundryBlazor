@@ -59,11 +59,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     protected FoCollection<FoGlyph2D> Shapes2D = new();
 
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
-        var pt = new Point(PinX, PinY);
-        var sz = new Size(Width, Height);
-        var result = new Rectangle(pt, sz);
+        // var pt = new Point(PinX, PinY);
+        // var sz = new Size(Width, Height);
+        // var result = new Rectangle(pt, sz);
+        var result = new Rectangle(PinX, PinY, Width, Height);
         return result;
     }
 
@@ -292,7 +293,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree, IPanZoomService panzoom)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-        
+
         var count = Shapes2D.Count();
         $"InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
         foreach (var item in Shapes2D.Values())
@@ -300,7 +301,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             if (!item.IsSelectable())
                 continue;
 
-            var rect = item.Rect();
+            var rect = item.HitTestRect();
             tree.Insert(item, rect);
         }
 

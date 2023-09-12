@@ -38,7 +38,7 @@ public enum ClickStyle
 
 public interface IHasRectangle
 {
-    Rectangle Rect();
+    Rectangle HitTestRect();
     bool IsSmashed();
 }
 
@@ -284,10 +284,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return false;
     }
 
-    public virtual Rectangle Rect()
+    public virtual Rectangle HitTestRect()
     {
         //this does not work for rotated objects
-        var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
+        //var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
+        var result = new Rectangle(0, 0, Width, Height);
         return result;
     }
 
@@ -446,7 +447,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public bool IntersectsRegion(Rectangle region)
     {
-        return region.IntersectsWith(Rect());
+        return region.IntersectsWith(HitTestRect());
     }
 
     public bool IsInRegion(Rectangle region)
@@ -821,6 +822,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         OnMatrixSmash?.Invoke(this);
+
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         ResetHitTesting = true;
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
