@@ -62,13 +62,12 @@ public class StageManagementService : FoComponent, IStageManagement
 
     public void ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
+        FoGlyph2D.ResetHitTesting(true,"ClearAll");
        // CurrentStage().ClearAll();
     }
 
     public bool ToggleHitTestRender()
     {
-        FoGlyph2D.ResetHitTesting = true;
         RenderHitTestTree = !RenderHitTestTree;
         return RenderHitTestTree;
     }

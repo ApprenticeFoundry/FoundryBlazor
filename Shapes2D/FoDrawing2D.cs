@@ -109,12 +109,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-    public override Rectangle HitTestRect()
-    {
-        var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
-        return result;
-    }
-
     public bool IsRendering()
     {
         return IsCurrentlyRendering;
@@ -301,6 +295,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
+        HitTestService.SetCanvasSizeInPixels(width, height);
     }
     
     public Size TrueCanvasSize()
@@ -446,8 +441,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         HitTestService.RefreshQuadTree(CurrentPage());
         if (window != null)
             HitTestService.Insert(window);
-
-        FoGlyph2D.ResetHitTesting = false;
     }
 
 
@@ -511,8 +504,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         FoGlyph2D.Animations.Update((float)0.033);
 
-        var wasDirty = FoGlyph2D.ResetHitTesting;
-        if (FoGlyph2D.ResetHitTesting)
+        var wasDirty = FoGlyph2D.PeekResetHitTesting();
+        if (FoGlyph2D.MustResetHitTesting())
             RefreshHitTesting(PanZoomWindow());
 
         var page = PageManager.CurrentPage();

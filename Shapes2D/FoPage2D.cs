@@ -310,7 +310,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public FoPage2D ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
+        FoGlyph2D.ResetHitTesting(true, "FoPage ClearAll");
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
 
         Shapes1D.Clear();

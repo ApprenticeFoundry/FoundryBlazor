@@ -123,10 +123,10 @@ public class QuadTree<T> where T : IHasRectangle
     }
     public QuadTree<T> Reset(int x, int y, int width, int height)
     {
+        m_rect.X = x;   
+        m_rect.Y = y;
         m_rect.Width = width;
         m_rect.Height = height;
-        m_rect.Y = y;
-        m_rect.X = x;   
         return this;
     }
 
@@ -152,12 +152,15 @@ public class QuadTree<T> where T : IHasRectangle
 
         if ( members )
         {
-            await ctx.SetStrokeStyleAsync("Yellow");
+            await ctx.SaveAsync();
+            await ctx.SetFillStyleAsync("Yellow");
+            await ctx.SetGlobalAlphaAsync(0.75f);
             m_objects?.ForEach(async item =>
             {
                 var rect = item.HitTestRect();
-                await ctx.StrokeRectAsync(rect.X+1, rect.Y+1, rect.Width-2, rect.Height-2);
+                await ctx.FillRectAsync(rect.X+1, rect.Y+1, rect.Width-2, rect.Height-2);
             });
+            await ctx.RestoreAsync();
         }
 
         if (TopLeftChild != null) await TopLeftChild.DrawQuadTree(ctx,members);
@@ -176,6 +179,7 @@ public class QuadTree<T> where T : IHasRectangle
     {
         m_objects ??= new List<T>();
         m_objects.Add(item);
+        $"Tree Add {m_rect} {m_objects.Count} {item}".WriteInfo(2);
     }
 
     /// <summary>
@@ -403,9 +407,12 @@ public class QuadTree<T> where T : IHasRectangle
         {
             // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
             if (m_objects != null)
+            {
+                $"Tree Search Objects {m_rect} {m_objects.Count} {rect}".WriteInfo(2);
                 for (int i = 0; i < m_objects.Count; i++)
                     if (rect.IntersectsWith(m_objects[i].HitTestRect()))
                         results.Add(m_objects[i]);
+            }
 
             // Get the objects for the search rectangle from the children
 

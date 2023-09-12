@@ -16,7 +16,7 @@ public interface IHitTestService
     List<FoGlyph2D> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 
-    //void SetRectangle(Rectangle rect);
+    void SetCanvasSizeInPixels(int width, int height);
     List<Rectangle> GetSearches();
     QuadTree<FoGlyph2D> GetTree();
 
@@ -55,6 +55,10 @@ public class HitTestService : IHitTestService
         Tree = GetTree();
         Tree.Clear(true);
 
+
+        var mat = _panzoom.GetMatrix();
+        mat.TransformRectangle(0, 0, CanvasSize.Width,  CanvasSize.Height, CanvasRectangle);
+        
         //recompute the tree rect and include the pan and zoom
         Tree.Reset(CanvasRectangle.X, CanvasRectangle.Y, CanvasRectangle.Width, CanvasRectangle.Height);
         return Tree;
@@ -62,7 +66,7 @@ public class HitTestService : IHitTestService
     
     public List<FoGlyph2D> RefreshQuadTree(FoPage2D page)
     {
-
+        FoGlyph2D.ResetHitTesting(false, $"RefreshQuadTree {page.Name}");
         $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
 
         //this rectangle should not shrink based on pan or zoom
@@ -98,11 +102,11 @@ public class HitTestService : IHitTestService
             PreviousSearches.RemoveRange(0, 6);
 
         PreviousSearches.Add(rect);
-        //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+        $"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 
         List<FoGlyph2D> list = new();
         Tree?.GetObjects(rect, ref list);
-        //$"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
+        $"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
 
         // PreviousSearches.ForEach(rect =>
         // {
@@ -128,7 +132,7 @@ public class HitTestService : IHitTestService
         await ctx.SetLineWidthAsync(6);
         await ctx.SetLineDashAsync(new float[] { 20, 20 });
 
-        await Tree.DrawQuadTree(ctx, true);
+        await GetTree().DrawQuadTree(ctx, true);
 
         if (showTracks)
         {

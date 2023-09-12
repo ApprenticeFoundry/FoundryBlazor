@@ -70,15 +70,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
     private static bool _resetHitTesting = false;
-    public static bool ResetHitTesting 
-    {         
-        get { return _resetHitTesting; }
-        set { 
-            _resetHitTesting = value; 
-            if ( _resetHitTesting )
-                $"ResetHitTesting {_resetHitTesting}".WriteInfo();
-        } 
-    }
+
     public float Thickness { get; set; }
     public bool Selectable { get; set; } = true;
     public bool IsSelected { get; set; } = false;
@@ -96,6 +88,27 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
 
     protected Rectangle rectangle = new(0, 0, 0, 0);
+    public static bool PeekResetHitTesting()
+    {
+        var result = _resetHitTesting;
+        return result; 
+    }
+    public static bool MustResetHitTesting()
+    {
+        var result = _resetHitTesting;
+        _resetHitTesting = false;
+        return result; 
+    }
+    public static void ResetHitTesting(bool value, string note="")
+    {
+        if (_resetHitTesting == value)
+            return;
+
+        _resetHitTesting = value;
+        if (_resetHitTesting)
+            $"ResetHitTesting on next itteration {note}".WriteInfo();
+    }
+
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -827,7 +840,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         OnMatrixSmash?.Invoke(this);
 
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
-        ResetHitTesting = true;
+        ResetHitTesting(true,"Glyph Smashed");
+        
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 

@@ -247,7 +247,7 @@ public class PageManagementService : FoComponent, IPageManagement
         ActivePage = page;
 
         //force refresh of hit testing
-        FoGlyph2D.ResetHitTesting = true;
+        FoGlyph2D.ResetHitTesting(true);
         return ActivePage;
     }
 
