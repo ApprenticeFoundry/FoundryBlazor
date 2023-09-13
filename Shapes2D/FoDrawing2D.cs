@@ -297,7 +297,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         TrueCanvasHeight = height;
         HitTestService.SetCanvasSizeInPixels(width, height);
     }
-    
+
     public Size TrueCanvasSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
@@ -513,7 +513,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ClearCanvas(ctx);
 
 
-  
+
 
         await ctx.SaveAsync();
 
@@ -531,7 +531,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.RestoreAsync();
 
-        if (RenderHitTestTree)  
+        if (RenderHitTestTree)
             await HitTestService.RenderQuadTree(ctx, true);
 
         await GetInteraction().RenderDrawing(ctx, tick);
@@ -642,6 +642,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         try
         {
+            $"ApplyMouseArgs top {args.CtrlKey}, {args.ShiftKey}".WriteInfo(4);
             SetCurrentlyProcessing(true);
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
@@ -674,10 +675,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
         {
+            $"Subscribed To CanvasMouseArgs".WriteInfo();
             try
             {
                 if (IsCurrentlyRendering || IsCurrentlyProcessing)
                 {
+                    $"Currently rendering".WriteInfo();
                     //you should cashe the args to replayed latter
                     //when the UI is not rendering..
                     MouseArgQueue.Enqueue(args);
@@ -752,7 +755,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PanZoomService.ZoomWheel(args.DeltaY);
         PanZoomService.WriteToPage(PageManager.CurrentPage());
-        
+
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("PanZoom"));
         //$"Wheel change: {args.DeltaX}, {args.DeltaY}, {args.DeltaZ}".WriteLine(ConsoleColor.Yellow);
         return true;

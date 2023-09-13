@@ -303,9 +303,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                 continue;
 
             var rect = item.HitTestRect();
-            $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
             rect = panzoom.TransformRect(rect);
-            $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
+            // $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 
@@ -313,7 +313,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public FoPage2D ClearAll()
     {
-        FoGlyph2D.ResetHitTesting(true, "FoPage ClearAll");
+        ResetHitTesting(true, "FoPage ClearAll");
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
 
         Shapes1D.Clear();
@@ -376,7 +376,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.RestoreAsync();
     }
 
- 
+
 
 
     public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length step, bool major)
