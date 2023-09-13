@@ -80,7 +80,7 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
             await JSIntegrationRef!.CaptureMouseEventsForSVG();
 
             var drawing = Workspace!.GetDrawing();
-            drawing?.SetCanvasPixelSize(CanvasWidth, CanvasHeight);
+            drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
 
             PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);

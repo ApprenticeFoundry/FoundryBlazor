@@ -24,7 +24,7 @@ public interface IDrawing : IRender
     bool SetCurrentlyRendering(bool value, int tick);
     bool IsRendering();
     bool SetCurrentlyProcessing(bool value);
-    void SetCanvasPixelSize(int width, int height);
+    void SetCanvasSizeInPixels(int width, int height);
 
     Size TrueCanvasSize();
     Rectangle TransformRect(Rectangle rect);
@@ -291,7 +291,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return PanZoomService.TransformRect(rect);
     }
 
-    public void SetCanvasPixelSize(int width, int height)
+    public void SetCanvasSizeInPixels(int width, int height)
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
