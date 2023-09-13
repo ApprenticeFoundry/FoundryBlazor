@@ -722,7 +722,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         try
         {
-            $"ApplyMouseArgs top {args.CtrlKey}, {args.ShiftKey}".WriteInfo(4);
             SetCurrentlyProcessing(true);
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
