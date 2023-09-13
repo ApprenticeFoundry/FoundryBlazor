@@ -31,7 +31,6 @@ public class PagePanAndZoom : BaseInteraction
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        $"IsDefaultTool {args.CtrlKey}, {args.ShiftKey}".WriteInfo(4);
         return args.CtrlKey && args.ShiftKey;
     }
 
