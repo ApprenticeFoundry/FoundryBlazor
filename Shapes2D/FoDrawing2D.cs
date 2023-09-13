@@ -40,6 +40,7 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
+    Task RenderDrawingSVG(int tick, double fps);
     void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
@@ -573,6 +574,85 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
     }
+    public async Task RenderDrawingSVG(int tick, double fps)
+    {
+
+        //skip this frame is still working 
+        if (IsCurrentlyProcessing) return;
+
+        FoGlyph2D.Animations.Update((float)0.033);
+
+        var wasDirty = FoGlyph2D.PeekResetHitTesting();
+        if (FoGlyph2D.MustResetHitTesting())
+            RefreshHitTesting(PanZoomWindow());
+
+        var page = PageManager.CurrentPage();
+
+        await Task.CompletedTask;
+
+        // await ClearCanvas(ctx);
+
+
+
+
+        // await ctx.SaveAsync();
+
+        // var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
+
+        // if (PreRender != null)
+        //     await PreRender.Invoke(ctx, tick);
+
+        // await PageManager.RenderDetailed(ctx, tick, true);
+
+        // if (PostRender != null)
+        //     await PostRender.Invoke(ctx, tick);
+
+        // await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
+
+        // await ctx.RestoreAsync();
+
+        // if (RenderHitTestTree)
+        //     await HitTestService.RenderQuadTree(ctx, true);
+
+        // await GetInteraction().RenderDrawing(ctx, tick);
+
+        // if (!ShowStats) return;
+
+
+        // var offsetY = 60;
+        // var offsetX = 1400;
+
+        // await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
+        // await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+
+        // await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
+        // await ctx.SetFontAsync("26px Segoe UI");
+        // await ctx.FillTextAsync($"Foundry Canvas {UserID} {InputStyle}", offsetX, offsetY);
+
+        // await ctx.SetFontAsync("18px consolas");
+        // //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
+        // await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
+        // //await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
+
+        // int loc = 130;
+
+        // await ctx.SetTextBaselineAsync(TextBaseline.Top);
+        // OtherUserLocations.Values.ForEach(async user =>
+        // {
+        //     loc += 15;
+        //     await ctx.FillTextAsync($"{user.UserID} is helping", 20 + offsetX, loc);
+
+        //     await ctx.BeginPathAsync();
+        //     await ctx.MoveToAsync(user.X, user.Y);
+        //     await ctx.LineToAsync(user.X + 20, user.Y + 15);
+        //     await ctx.LineToAsync(user.X, user.Y + 20);
+        //     await ctx.LineToAsync(user.X, user.Y);
+        //     await ctx.ClosePathAsync();
+        //     await ctx.FillAsync();
+
+        //     await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
+        // });
+    }
 
     public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
     {
@@ -675,12 +755,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
         {
-            $"Subscribed To CanvasMouseArgs".WriteInfo();
             try
             {
                 if (IsCurrentlyRendering || IsCurrentlyProcessing)
                 {
-                    $"Currently rendering".WriteInfo();
                     //you should cashe the args to replayed latter
                     //when the UI is not rendering..
                     MouseArgQueue.Enqueue(args);

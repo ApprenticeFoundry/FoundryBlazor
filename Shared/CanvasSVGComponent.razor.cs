@@ -17,8 +17,8 @@ public class CanvasSVGComponentBase : ComponentBase, IDisposable
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
     [Parameter] public string StyleCanvas { get; set; } = "background-color:orange";
-    [Parameter] public int CanvasWidth { get; set; } = 2500;
-    [Parameter] public int CanvasHeight { get; set; } = 4000;
+    [Parameter] public int CanvasWidth { get; set; } = 1800;
+    [Parameter] public int CanvasHeight { get; set; } = 1000;
 
 
     private int tick = 0;
