@@ -36,7 +36,7 @@ public class ShapeHovering : BaseInteraction
 
 
         var loc = panZoomService.HitRectStart(args);
-        lastHover = pageManager!.FindGlyph(loc);
+        lastHover = hitTestService!.FindGlyph(loc);
 
         lastHover.ForEach(child =>
         {

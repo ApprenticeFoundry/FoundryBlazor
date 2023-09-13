@@ -59,7 +59,7 @@ public class ShapeSelection : ShapeHovering
 
 
         DragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(DragArea);
+        var findings = hitTestService?.FindGlyph(DragArea);
 
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
@@ -103,7 +103,7 @@ public class ShapeSelection : ShapeHovering
         {
             DragArea = panZoomService.Normalize(DragArea);
 
-            var findings = pageManager?.FindGlyph(DragArea);
+            var findings = hitTestService?.FindGlyph(DragArea);
             if (findings != null)
             {
                 //anything that intersects

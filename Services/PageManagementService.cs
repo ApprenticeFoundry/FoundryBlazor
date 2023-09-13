@@ -1,10 +1,6 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
-using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 
 
@@ -14,8 +10,6 @@ public interface IPageManagement : IRender
 {
     List<FoGlyph2D> FindShapes(string GlyphId);
     List<FoGlyph2D> ExtractShapes(string GlyphId);
-    List<FoGlyph2D> FindGlyph(Rectangle rect);
-    List<(FoGlyph2D,Rectangle)> AllObjects();
 
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
@@ -54,7 +48,6 @@ public interface IPageManagement : IRender
 public class PageManagementService : FoComponent, IPageManagement
 {
 
-    private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
 
     private FoPage2D? _page;
@@ -76,10 +69,8 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
     public PageManagementService(
-        IHitTestService hit,
         ISelectionService sel)
     {
-        _hitTestService = hit;
         _selectService = sel;
 
         ActivePage = CurrentPage();
@@ -201,15 +192,9 @@ public class PageManagementService : FoComponent, IPageManagement
         return CurrentPage().FindShapes(GlyphId);
     }
 
-    public List<FoGlyph2D> FindGlyph(Rectangle rect)
-    {
-        return _hitTestService.FindGlyph(rect);
-    }
 
-    public List<(FoGlyph2D,Rectangle)> AllObjects()
-    {
-        return _hitTestService.AllShapesEverywhere();
-    }
+
+
 
 
     public T AddShape<T>(T value) where T : FoGlyph2D

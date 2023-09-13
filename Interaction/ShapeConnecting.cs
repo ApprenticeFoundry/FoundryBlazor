@@ -75,14 +75,14 @@ public class ShapeConnecting :  ShapeHovering
 
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = hitTestService?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
         return heros.ToList(); 
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = hitTestService?.FindGlyph(rect);
         var targets = findings!.Where(item => item.GetType() == TargetType);
         //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 

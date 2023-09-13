@@ -27,7 +27,7 @@ public class ShapeResizing : ShapeHovering
      public override bool IsDefaultTool(CanvasMouseArgs args)
     {
         DragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(DragArea);
+        var findings = hitTestService?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
         if (args.CtrlKey && selectedShape is IImage2D)
             return true;
@@ -41,7 +41,7 @@ public class ShapeResizing : ShapeHovering
         isResizingShape = false;
 
         DragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(DragArea);
+        var findings = hitTestService?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
 
 

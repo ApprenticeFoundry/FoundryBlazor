@@ -26,7 +26,7 @@ public class ShapeDragging : ShapeHovering
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
         DragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(DragArea);
+        var findings = hitTestService?.FindGlyph(DragArea);
         var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
         return selected != null;
         //return selectionService.Selections().Count > 0;
@@ -39,7 +39,7 @@ public class ShapeDragging : ShapeHovering
         isDraggingShapes = false;
 
         DragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(DragArea);
+        var findings = hitTestService?.FindGlyph(DragArea);
         var hitShape = findings?.LastOrDefault(); 
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
 
