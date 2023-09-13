@@ -15,7 +15,7 @@ public interface IPageManagement : IRender
     List<FoGlyph2D> FindShapes(string GlyphId);
     List<FoGlyph2D> ExtractShapes(string GlyphId);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
-    List<FoGlyph2D> AllObjects();
+    List<(FoGlyph2D,Rectangle)> AllObjects();
 
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
@@ -206,7 +206,7 @@ public class PageManagementService : FoComponent, IPageManagement
         return _hitTestService.FindGlyph(rect);
     }
 
-    public List<FoGlyph2D> AllObjects()
+    public List<(FoGlyph2D,Rectangle)> AllObjects()
     {
         return _hitTestService.AllShapesEverywhere();
     }
@@ -215,9 +215,6 @@ public class PageManagementService : FoComponent, IPageManagement
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var found = ActivePage.AddShape(value);
-        if (found != null)
-            _hitTestService.Insert(value);
-
         return found!;
 
     }

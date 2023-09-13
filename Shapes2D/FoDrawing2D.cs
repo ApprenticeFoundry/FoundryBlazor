@@ -440,7 +440,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         HitTestService.RefreshQuadTree(CurrentPage());
         if (window != null)
-            HitTestService.Insert(window);
+            HitTestService.Insert(window, window.HitTestRect());
     }
 
 

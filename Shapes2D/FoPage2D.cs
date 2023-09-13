@@ -261,6 +261,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             // $"IShape1D Added {value.Name}".WriteSuccess();
         }
 
+        FoGlyph2D.ResetHitTesting(true, $"FoPage2D AddShape {value.Name}");
 
         return value;
     }
@@ -302,7 +303,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                 continue;
 
             var rect = item.HitTestRect();
-            $"Inserting  {item.Name} {rect} ".WriteSuccess(1);
+            $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            rect = panzoom.TransformRect(rect);
+            $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 

@@ -9,11 +9,10 @@ namespace FoundryBlazor.Shape;
 
 public interface IHitTestService
 {
-    bool Insert(FoGlyph2D glyph);
-    bool InsertRange(List<FoGlyph2D> list);
+    bool Insert(FoGlyph2D glyph, Rectangle rect);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
-    List<FoGlyph2D> AllShapesEverywhere();
-    List<FoGlyph2D> RefreshQuadTree(FoPage2D page);
+    List<(FoGlyph2D,Rectangle)> AllShapesEverywhere();
+    List<(FoGlyph2D,Rectangle)> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 
     void SetCanvasSizeInPixels(int width, int height);
@@ -64,7 +63,7 @@ public class HitTestService : IHitTestService
         return Tree;
     }
     
-    public List<FoGlyph2D> RefreshQuadTree(FoPage2D page)
+    public List<(FoGlyph2D,Rectangle)> RefreshQuadTree(FoPage2D page)
     {
         FoGlyph2D.ResetHitTesting(false, $"RefreshQuadTree {page.Name}");
         $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
@@ -78,21 +77,21 @@ public class HitTestService : IHitTestService
         return AllShapesEverywhere();
     }
 
-    public bool InsertRange(List<FoGlyph2D> list)
-    {
-        if (Tree != null)
-            list.ForEach(child => Tree.Insert(child, child.HitTestRect()));
-        return Tree != null;
-    }
+    // public bool InsertRange(List<FoGlyph2D> list)
+    // {
+    //     if (Tree != null)
+    //         list.ForEach(child => Tree.Insert(child, child.HitTestRect()));
+    //     return Tree != null;
+    // }
 
     public List<Rectangle> GetSearches()
     {
         return PreviousSearches;
     }
 
-    public bool Insert(FoGlyph2D glyph)
+    public bool Insert(FoGlyph2D glyph, Rectangle rect)
     {
-        Tree?.Insert(glyph, glyph.HitTestRect());
+        Tree?.Insert(glyph, rect);
         return Tree != null;
     }
 
@@ -104,7 +103,7 @@ public class HitTestService : IHitTestService
         PreviousSearches.Add(rect);
         $"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 
-        List<FoGlyph2D> list = new();
+        List<(FoGlyph2D item,Rectangle hit)> list = new();
         Tree?.GetObjects(rect, ref list);
         $"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
 
@@ -112,12 +111,12 @@ public class HitTestService : IHitTestService
         // {
         //     $"=> Searches {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
         // });
-        return list;
+        return list.Select(obj => obj.item).ToList();
     }
 
-    public List<FoGlyph2D> AllShapesEverywhere()
+    public List<(FoGlyph2D,Rectangle)> AllShapesEverywhere()
     {
-        List<FoGlyph2D> list = new();
+        List<(FoGlyph2D,Rectangle)> list = new();
         Tree?.GetAllObjects(ref list);
         return list;
     }
