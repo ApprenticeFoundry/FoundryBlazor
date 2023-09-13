@@ -1,9 +1,5 @@
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
-using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components.Rendering;
-using Radzen.Blazor.Rendering;
 using System.Drawing;
 
 // https://happycoding.io/tutorials/processing/collision-detection
@@ -107,6 +103,10 @@ public class QuadTree<T> where T : IHasRectangle
     {
         m_rect = rect;
     }
+    public QuadTree(int x, int y, int width, int height)
+    {
+        m_rect = new Rectangle(x, y, width, height);
+    }
 
     public void PrintTree(int level = 0)
     {
@@ -117,10 +117,7 @@ public class QuadTree<T> where T : IHasRectangle
         if (m_childBR != null) m_childBR.PrintTree(level + 1);
     }
 
-    public QuadTree(int x, int y, int width, int height)
-    {
-        m_rect = new Rectangle(x, y, width, height);
-    }
+
     public QuadTree<T> Reset(int x, int y, int width, int height)
     {
         m_rect.X = x;   
@@ -180,7 +177,7 @@ public class QuadTree<T> where T : IHasRectangle
     {
         m_objects ??= new List<(T item, Rectangle Hit)>();
         m_objects.Add((item,rect));
-        $"Tree Add {m_rect} {m_objects.Count} {item}".WriteInfo(2);
+        //$"Tree Add {m_rect} {m_objects.Count} {item}".WriteInfo(2);
     }
 
     /// <summary>
@@ -409,7 +406,7 @@ public class QuadTree<T> where T : IHasRectangle
             // Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
             if (m_objects != null)
             {
-                $"Tree Search Objects {m_rect} {m_objects.Count} {rect}".WriteInfo(2);
+                //$"Tree Search Objects {m_rect} {m_objects.Count} {rect}".WriteInfo(2);
                 for (int i = 0; i < m_objects.Count; i++)
                     if (rect.IntersectsWith(m_objects[i].Hit))
                         results.Add(m_objects[i]);

@@ -77,12 +77,6 @@ public class HitTestService : IHitTestService
         return AllShapesEverywhere();
     }
 
-    // public bool InsertRange(List<FoGlyph2D> list)
-    // {
-    //     if (Tree != null)
-    //         list.ForEach(child => Tree.Insert(child, child.HitTestRect()));
-    //     return Tree != null;
-    // }
 
     public List<Rectangle> GetSearches()
     {
@@ -97,6 +91,9 @@ public class HitTestService : IHitTestService
 
     public List<FoGlyph2D> FindGlyph(Rectangle rect)
     {
+
+        rect = _panzoom.TransformRect(rect);
+
         if (PreviousSearches.Count > 10)
             PreviousSearches.RemoveRange(0, 6);
 
