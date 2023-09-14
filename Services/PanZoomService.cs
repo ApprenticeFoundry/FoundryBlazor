@@ -20,12 +20,13 @@ public interface IPanZoomService
     Point SetPan(int x, int y);
 
     Matrix2D GetMatrix();
-    
+
     Point MouseDeltaMovement();
     Rectangle HitRectStart(CanvasMouseArgs args);
     Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect);
     Rectangle HitRectContinue(CanvasMouseArgs args, Rectangle rect);
     Task<PanZoomService> TranslateAndScale(Canvas2DContext ctx, FoGlyph2D page);
+    Task<PanZoomService> TranslateAndScale(FoGlyph2D page);
     Rectangle TransformRect(Rectangle rect);
     Rectangle AntiScaleRect(Rectangle rect);
     Rectangle Normalize(Rectangle rect);
@@ -66,7 +67,7 @@ public class PanZoomState
     public Point ComputeDelta(int x, int y)
     {
         Delta = new Point(x - LastLocation.X, y - LastLocation.Y);
-        LastLocation = new(x,y);
+        LastLocation = new(x, y);
         return Delta;
     }
 }
@@ -97,7 +98,7 @@ public class PanZoomService : IPanZoomService
         isFenceSelecting = value;
         return isFenceSelecting;
     }
-    
+
     public PanZoomService AfterMatrixRefresh(Action<PanZoomState> action)
     {
         OnMatrixRefresh = action;
@@ -139,18 +140,20 @@ public class PanZoomService : IPanZoomService
     {
         var left = dragArea.Left;
         var right = dragArea.Right;
-        if ( left > right) {
+        if (left > right)
+        {
             left = dragArea.Right;
             right = dragArea.Left;
         }
 
         var top = dragArea.Top;
         var bottom = dragArea.Bottom;
-        if ( top > bottom) {
+        if (top > bottom)
+        {
             top = dragArea.Bottom;
             bottom = dragArea.Top;
         }
-        return new Rectangle(left, top, right - left, bottom - top);      
+        return new Rectangle(left, top, right - left, bottom - top);
     }
     private Point ComputeDelta(int x, int y)
     {
@@ -164,7 +167,7 @@ public class PanZoomService : IPanZoomService
         OnMatrixSmash?.Invoke(State);
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
         FoGlyph2D.ResetHitTesting(true);
-       // $"PanZoomService Smash".WriteWarning();
+        // $"PanZoomService Smash".WriteWarning();
 
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
@@ -178,9 +181,9 @@ public class PanZoomService : IPanZoomService
         {
             _matrix = Matrix2D.NewMatrix();
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
-            FoGlyph2D.ResetHitTesting(true,"Pan Zoom");
+            FoGlyph2D.ResetHitTesting(true, "Pan Zoom");
             OnMatrixRefresh?.Invoke(State);
-           // $"PanZoomService GetMatrix recalculate".WriteWarning();
+            // $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
     }
@@ -195,7 +198,7 @@ public class PanZoomService : IPanZoomService
     public Rectangle HitRectStart(CanvasMouseArgs args)
     {
         //$"{_pan.X} {_pan.Y}".WriteLine(ConsoleColor.Blue);
-        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        var (x, y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
 
         var hit = new Rectangle(x, y, 1, 1);
         ComputeDelta(hit.Left, hit.Top);
@@ -205,8 +208,8 @@ public class PanZoomService : IPanZoomService
     // for doing shape select
     public Rectangle HitRectContinue(CanvasMouseArgs args, Rectangle rect)
     {
-        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
-        rect.Width  = x - rect.X;
+        var (x, y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        rect.Width = x - rect.X;
         rect.Height = y - rect.Y;
         return rect;
     }
@@ -214,13 +217,13 @@ public class PanZoomService : IPanZoomService
     //for resizing and image
     public Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect)
     {
-        var (x,y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
+        var (x, y) = GetInvMatrix().TransformPoint(args.OffsetX, args.OffsetY);
 
         var x1 = rect.Left;
         var y1 = rect.Top;
         var x2 = x;
         var y2 = y;
-        var hit = new Rectangle(x1,y1, x2-x1, y2-y1);
+        var hit = new Rectangle(x1, y1, x2 - x1, y2 - y1);
         State.LastLocation = new Point(0, 0);
         ComputeDelta(hit.Left, hit.Top);
         return hit;
@@ -232,7 +235,7 @@ public class PanZoomService : IPanZoomService
         var pt1 = matrix.TransformToPoint(rect.Left, rect.Top);
         var pt2 = matrix.TransformToPoint(rect.Right, rect.Bottom);
 
-        var newRect = new Rectangle(pt1.X, pt1.Y, pt2.X-pt1.X, pt2.Y-pt1.Y);
+        var newRect = new Rectangle(pt1.X, pt1.Y, pt2.X - pt1.X, pt2.Y - pt1.Y);
 
         return newRect;
     }
@@ -241,10 +244,10 @@ public class PanZoomService : IPanZoomService
     {
         //anti scale this window
         var zoom = State.Zoom;
-        var x = (rect.X-State.Pan.X) / zoom;
-        var y = (rect.Y-State.Pan.Y) / zoom;
+        var x = (rect.X - State.Pan.X) / zoom;
+        var y = (rect.Y - State.Pan.Y) / zoom;
         var width = rect.Width / zoom;
-        var height = rect.Height / zoom;  
+        var height = rect.Height / zoom;
 
         var newRect = new Rectangle((int)x, (int)y, (int)width, (int)height);
         //$"AntiScaleRect {x} {y} {width} {height}".WriteLine(ConsoleColor.Yellow);
@@ -272,6 +275,13 @@ public class PanZoomService : IPanZoomService
         zoom = State.Zoom;
         panx = State.Pan.X;
         pany = State.Pan.Y;
+    }
+
+    public async Task<PanZoomService> TranslateAndScale(FoGlyph2D shape)
+    {
+        var mtx = this.GetMatrix();
+        await Task.CompletedTask;
+        return this;
     }
 
     public async Task<PanZoomService> TranslateAndScale(Canvas2DContext ctx, FoGlyph2D shape)

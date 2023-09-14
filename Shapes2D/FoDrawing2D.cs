@@ -580,7 +580,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         //skip this frame is still working 
         if (IsCurrentlyProcessing) return;
 
-        FoGlyph2D.Animations.Update((float)0.033);
+        FoGlyph2D.Animations.Update((float)fps);
 
         var wasDirty = FoGlyph2D.PeekResetHitTesting();
         if (FoGlyph2D.MustResetHitTesting())
@@ -588,16 +588,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var page = PageManager.CurrentPage();
 
-        await Task.CompletedTask;
-
-        // await ClearCanvas(ctx);
-
-
-
-
-        // await ctx.SaveAsync();
-
-        // var (zoom, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
+        await PanZoomService.TranslateAndScale(page);
 
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);

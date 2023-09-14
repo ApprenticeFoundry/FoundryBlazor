@@ -303,9 +303,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
                 continue;
 
             var rect = item.HitTestRect();
-            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
             rect = panzoom.TransformRect(rect);
-            // $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
+            $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 
