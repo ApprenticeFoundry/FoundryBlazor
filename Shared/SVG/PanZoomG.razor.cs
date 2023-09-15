@@ -2,28 +2,25 @@ using Microsoft.AspNetCore.Components;
 using FoundryBlazor.PubSub;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class PanZoomGBase : ComponentBase, IDisposable
+public class PanZoomGBase : ComponentBase
 {
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
+        base.OnInitialized();
+        PanZoom?.AfterMatrixSmash((obj) =>
         {
-            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
-        }
-        await base.OnAfterRenderAsync(firstRender);
+            $"PanZoomGBase.AfterMatrixSmash ".WriteInfo(2);
+            InvokeAsync(StateHasChanged);
+        });
     }
-
-
-
-
     protected string GetTransform()
     {
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
@@ -34,6 +31,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
         }
 
         //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
+        return mtx.SVGMatrix();
     }
 
 

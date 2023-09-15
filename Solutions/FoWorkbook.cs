@@ -67,11 +67,8 @@ public class FoWorkbook: FoComponent, IWorkbook
     public FoPage2D CurrentPage()
     {
         if ( WorkPage != null)
-        {
-            var drawing = Workspace.GetDrawing()!;
-            drawing.SetCurrentPage(WorkPage);
             return WorkPage;
-        }
+
         return EstablishCurrentPage(Name, "Black");
     }
 

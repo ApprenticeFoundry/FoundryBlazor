@@ -18,7 +18,7 @@ public class SVGBase<T> : ComponentBase where T : FoGlyph2D
         Source = glyph;
         Source.AfterMatrixSmash((obj) =>
         {
-            //$"Shape2DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
+            $"Shape2DBase.AfterMatrixSmash {Source.GetGlyphId()}".WriteInfo(2);
             InvokeAsync(StateHasChanged);
         });
         return Source;

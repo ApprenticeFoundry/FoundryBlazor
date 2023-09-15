@@ -20,6 +20,8 @@ public interface IPanZoomService
     Point SetPan(int x, int y);
 
     Matrix2D GetMatrix();
+    PanZoomService AfterMatrixSmash(Action<PanZoomState> action);
+    PanZoomService AfterMatrixRefresh(Action<PanZoomState> action);
 
     Point MouseDeltaMovement();
     Rectangle HitRectStart(CanvasMouseArgs args);
@@ -162,16 +164,16 @@ public class PanZoomService : IPanZoomService
 
     public virtual bool Smash(bool force)
     {
+        $"PanZoomService Smash {force}".WriteWarning();
         if (_matrix == null && !force) return false;
 
         OnMatrixSmash?.Invoke(State);
-        //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
-        FoGlyph2D.ResetHitTesting(true);
         // $"PanZoomService Smash".WriteWarning();
-
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 
+        //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
+        FoGlyph2D.ResetHitTesting(true);
         return true;
     }
 
@@ -183,7 +185,7 @@ public class PanZoomService : IPanZoomService
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting(true, "Pan Zoom");
             OnMatrixRefresh?.Invoke(State);
-            // $"PanZoomService GetMatrix recalculate".WriteWarning();
+            $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
     }

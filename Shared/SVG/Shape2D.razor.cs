@@ -19,88 +19,16 @@ public class Shape2DBase : SVGBase<FoShape2D>
         InitSource(Shape);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
-            PubSub!.SubscribeTo<ShapeSelectedUIEvent>(OnShapeSelected);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private void OnShapeHover(ShapeHoverUIEvent e)
-    {
-        if (e.Shape == Shape)
-        {
-            InvokeAsync(StateHasChanged);
-        }
-    }
-    private void OnShapeSelected(ShapeSelectedUIEvent e)
-    {
-        if (e.Shape == Shape)
-        {
-            InvokeAsync(StateHasChanged);
-        }
-    }
-
-    protected string GetMatrix()
-    {
-        var mtx = Shape?.GetMatrix() ?? new Matrix2D();
-        if (mtx.IsSVGRefreshed())
-        {
-            //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
-            return mtx.SVGMatrix();
-        }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
+    //         PubSub!.SubscribeTo<ShapeSelectedUIEvent>(OnShapeSelected);
+    //     }
+    //     await base.OnAfterRenderAsync(firstRender);
+    // }
 
 
-        //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
-        return mtx.SVGMatrix();
-    }
-
-    protected bool IsHovering()
-    {
-        var result = Shape.HoverDraw != null;
-        return result;
-    }
-
-    protected bool IsSelected()
-    {
-        var result = Shape.IsSelected;
-        return result;
-    }
-
-    protected int GetWidth()
-    {
-        var width = Shape.Width;
-        return (int)width;
-    }
-
-    protected int GetHeight()
-    {
-        var height = Shape.Height;
-        return (int)height;
-    }
-
-    protected string GetColor()
-    {
-        return Shape.Color;
-    }
-    protected string GetDashArray()
-    {
-        if (IsSelected())
-            return "5 5";
-        else
-            return "";
-    }
-    protected string GetStrokeColor()
-    {
-        if (IsSelected())
-            return "white";
-        else if (IsHovering())
-            return "blue";
-        else
-            return "black";
-    }
 
 }

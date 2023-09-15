@@ -31,6 +31,13 @@ public class PageBase : SVGBase<FoPage2D>
         return shapes;
     }
 
+    public List<FoText2D> GetText2D()
+    {
+        var shapes = Page.AllShapes2D().Where( obj => obj is FoText2D).Cast<FoText2D>().ToList();
+        //$"GetShapes2D {shapes.Count}".WriteInfo();
+        return shapes;
+    }
+
     protected int GetPageWidth()
     {
         var margin = Page.PageMargin.AsPixels();
