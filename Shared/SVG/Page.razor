@@ -7,9 +7,9 @@
 <PanZoomG>
     <rect x="0" y="0" width="@GetPageWidth()" height="@GetPageHeight()" fill="White" stroke="White">
     </rect>
-    <rect x="@GetMargin()" y="@GetMargin()" width="@GetWidth()" height="@GetHeight()" fill="@GetColor()" stroke="black">
+    <rect x="@GetMargin()" y="@GetMargin()" width="@GetWidth()" height="@GetHeight()" fill="Grey" stroke="black">
     </rect>
-    <PageGrid />
+    @* <PageGrid /> *@
     @foreach (var shape in GetShapes1D())
     {
         <Shape1D Shape="@shape" />

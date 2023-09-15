@@ -392,6 +392,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     }
 
 
+
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
         ContextLink?.Invoke(this, tick);

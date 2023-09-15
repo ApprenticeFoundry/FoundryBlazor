@@ -589,6 +589,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var page = PageManager.CurrentPage();
 
         await PanZoomService.TranslateAndScale(page);
+        page.AllShapes2D().ForEach(shape => shape.ContextLink?.Invoke(shape, tick));
 
         // if (PreRender != null)
         //     await PreRender.Invoke(ctx, tick);
