@@ -8,7 +8,7 @@ namespace FoundryBlazor.Shared.SVG;
 
 public class PageBase : SVGBase<FoPage2D>
 {
-    [Parameter] public FoPage2D Page { get; set; } = new("page1", "White");
+    [Parameter] public FoPage2D Page { get; set; } = new("page1", "Grey");
     [Parameter] public RenderFragment? ChildContent { get; set; }
     protected override void OnInitialized()
     {
