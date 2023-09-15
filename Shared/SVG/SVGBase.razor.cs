@@ -7,17 +7,23 @@ using BlazorComponentBus;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class Shape2DBase : SVGBase<FoShape2D>
+public class SVGBase<T> : ComponentBase where T : FoGlyph2D
 {
-    [Parameter] public FoShape2D Shape { get; set; } = new();
-    protected string StrokeColor { get; set; } = "black";
+    [Inject] protected ComponentBus? PubSub { get; set; }
+    [Parameter] public T? Source { get; set; }
 
 
-    protected override void OnInitialized()
+    protected T InitSource(T glyph)
     {
-        base.OnInitialized();
-        InitSource(Shape);
+        Source = glyph;
+        Source.AfterMatrixSmash((obj) =>
+        {
+            //$"Shape2DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
+            InvokeAsync(StateHasChanged);
+        });
+        return Source;
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -31,22 +37,22 @@ public class Shape2DBase : SVGBase<FoShape2D>
 
     private void OnShapeHover(ShapeHoverUIEvent e)
     {
-        if (e.Shape == Shape)
+        if (e.Shape == Source)
         {
             InvokeAsync(StateHasChanged);
         }
     }
     private void OnShapeSelected(ShapeSelectedUIEvent e)
     {
-        if (e.Shape == Shape)
+        if (e.Shape == Source)
         {
             InvokeAsync(StateHasChanged);
         }
     }
 
-    protected string GetMatrix()
+    protected string GetSVGMatrix()
     {
-        var mtx = Shape?.GetMatrix() ?? new Matrix2D();
+        var mtx = Source?.GetMatrix() ?? new Matrix2D();
         if (mtx.IsSVGRefreshed())
         {
             //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
@@ -60,31 +66,31 @@ public class Shape2DBase : SVGBase<FoShape2D>
 
     protected bool IsHovering()
     {
-        var result = Shape.HoverDraw != null;
+        var result = Source?.HoverDraw != null;
         return result;
     }
 
     protected bool IsSelected()
     {
-        var result = Shape.IsSelected;
+        var result = Source?.IsSelected ?? false;
         return result;
     }
 
     protected int GetWidth()
     {
-        var width = Shape.Width;
+        var width = Source?.Width ?? 0;
         return (int)width;
     }
 
     protected int GetHeight()
     {
-        var height = Shape.Height;
+        var height = Source?.Height ?? 0;
         return (int)height;
     }
 
     protected string GetColor()
     {
-        return Shape.Color;
+        return Source?.Color ?? "Green";
     }
     protected string GetDashArray()
     {

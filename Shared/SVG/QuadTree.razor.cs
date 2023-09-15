@@ -14,32 +14,7 @@ namespace FoundryBlazor.Shared.SVG;
 public class QuadTreeBase : ComponentBase
 {
 
-    private QuadTree<FoGlyph2D>? treenode;
-    [Parameter]
-    public QuadTree<FoGlyph2D>? TreeNode
-    {
-        get
-        {
-            return treenode;
-        }
-        set
-        {
-            if (treenode != value)
-            {
-                treenode = value;
-                InvokeAsync(StateHasChanged);
-                $"TreeNode {treenode?.QuadRect}".WriteInfo();
-                treenode?.PrintTree();
-            }
-        }
-    }
-
-    protected List<Rectangle> GetObjectRectangles()
-    {
-        if (TreeNode?.Objects != null)
-            return TreeNode.Objects.Select((obj) => obj.Hit).ToList();
-        else return new List<Rectangle>();
-    }
+    [Parameter] public QuadTree<FoGlyph2D>? TreeNode { get; set; }
 
     protected override void OnInitialized()
     {
@@ -52,15 +27,14 @@ public class QuadTreeBase : ComponentBase
         return TreeNode?.QuadRect ?? new Rectangle(0, 0, 0, 0);
     }
 
-    public QuadTree<FoGlyph2D>? TopLeftChild
+    protected List<Rectangle> HitRectangles()
     {
-        get
-        {
-            return TreeNode?.TopLeftChild;
-        }
+        return TreeNode?.HitRectangles() ?? new List<Rectangle>();
     }
-    public QuadTree<FoGlyph2D>? TopRightChild { get { return TreeNode?.TopRightChild; } }
-    public QuadTree<FoGlyph2D>? BottomLeftChild { get { return TreeNode?.BottomLeftChild; } }
-    public QuadTree<FoGlyph2D>? BottomRightChild { get { return TreeNode?.BottomRightChild; } }
+
+    public QuadTree<FoGlyph2D>? TopLeftChild { get => TreeNode?.TopLeftChild;}
+    public QuadTree<FoGlyph2D>? TopRightChild { get => TreeNode?.TopRightChild;}
+    public QuadTree<FoGlyph2D>? BottomLeftChild { get => TreeNode?.BottomLeftChild;}
+    public QuadTree<FoGlyph2D>? BottomRightChild { get => TreeNode?.BottomRightChild;}
 
 }

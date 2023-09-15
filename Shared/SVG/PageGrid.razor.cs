@@ -6,7 +6,7 @@ using FoundryRulesAndUnits.Units;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class PageGridBase : ComponentBase
+public class PageGridBase : SVGBase<FoPage2D>
 {
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "Gray");
     //[Parameter] public RenderFragment? ChildContent { get; set; }
@@ -14,14 +14,9 @@ public class PageGridBase : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        InitSource(Page);
     }
 
-    protected string GetMatrix()
-    {
-        var mtx = Page.GetMatrix();
-        var result = mtx.SVGMatrix();
-        return result;
-    }
 
     public List<SVGLine> GetMajortHorizontalGridSVG()
     {

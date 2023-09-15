@@ -89,7 +89,12 @@ public class QuadTree<T> where T : IHasRectangle
     /// <summary>
     /// The objects contained in this QuadTree at it's level (ie, excludes children)
     /// </summary>
-    public List<(T item, Rectangle Hit)>? Objects { get { return m_objects; } }
+    public List<(T item, Rectangle Hit)>? Members() {return m_objects; }
+
+    public List<Rectangle> HitRectangles() 
+    { 
+        return m_objects?.Select(obj => obj.Hit).ToList() ?? new List<Rectangle>(); 
+    }
 
     /// <summary>
     /// How many total objects are contained within this QuadTree (ie, includes children)

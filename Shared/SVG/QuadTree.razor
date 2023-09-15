@@ -25,10 +25,11 @@
     <QuadTree TreeNode="@BottomRightChild" />
 }
 
-@foreach (var rect in @GetObjectRectangles())
-{
-    <rect x="@rect.X" y="@rect.Y" width="@rect.Width" height="@rect.Height" fill="yellow" style="opacity: 0.25"
-        stroke="green" stroke-width="6">
-    </rect>
 
-}
+    @foreach (var rect in @HitRectangles())
+    {
+        <rect x="@rect.X" y="@rect.Y" width="@rect.Width" height="@rect.Height" fill="yellow" style="opacity: 0.25"
+            stroke="green" stroke-width="6">
+        </rect>
+
+    }

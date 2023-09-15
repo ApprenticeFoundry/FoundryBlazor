@@ -10,7 +10,7 @@ public class PanZoomGBase : ComponentBase, IDisposable
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] public IPanZoomService? PanZoom { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    private string matrix { get; set; } = "";
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -21,38 +21,19 @@ public class PanZoomGBase : ComponentBase, IDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private void OnRefreshUIEvent(RefreshUIEvent e)
-    {
-        if (e.note == "PanZoom")
-        {
-            matrix = "";
-            InvokeAsync(StateHasChanged);
-        }
-    }
 
 
 
     protected string GetTransform()
     {
-        if ( !string.IsNullOrEmpty(matrix) )
-            return matrix;
-            
         var mtx = PanZoom?.GetMatrix() ?? new Matrix2D();
-        matrix = mtx.SVGMatrix();
-        //$"PanZoomGBase.GetTransform {matrix}".WriteInfo(2);
-        return matrix;
-    }
+        if (mtx.IsSVGRefreshed())
+        {
+            //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
+            return mtx.SVGMatrix();
+        }
 
-    public void Dispose()
-    {
-        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
-
-        // This object will be cleaned up by the Dispose method.
-        // Therefore, you should call GC.SupressFinalize to
-        // take this object off the finalization queue 
-        // and prevent finalization code for this object
-        // from executing a second time.
-        GC.SuppressFinalize(this);
+        //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} result={matrix}  ".WriteInfo(2);
     }
 
 

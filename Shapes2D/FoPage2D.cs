@@ -46,6 +46,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
     public string Title { get; set; } = string.Empty;
 
+  
+    public new int Width { get => this.PageWidth.AsPixels(); set { this.width = AssignInt(value, width); } }
+
+    public new int Height { get => this.PageHeight.AsPixels(); set { this.height = AssignInt(value, height); } }
+
+
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
         Drawing = new Length(1.0, "cm"),

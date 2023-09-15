@@ -6,49 +6,18 @@ using Microsoft.AspNetCore.Components;
 
 namespace FoundryBlazor.Shared.SVG;
 
-public class Shape1DBase : ComponentBase
+public class Shape1DBase : SVGBase<FoShape1D>
 {
     [Parameter] public FoShape1D Shape { get; set; } = new();
-    [Inject] private ComponentBus? PubSub { get; set; }
 
-    private string matrix { get; set; } = "";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        // PubSub!.SubscribeTo<CanvasMouseArgs>(args =>
-        //  {
-        //      try
-        //      {
-        //          InvokeAsync(StateHasChanged);
-
-        //      }
-        //      catch (Exception ex)
-        //      {
-        //          $"HELP {args.Topic} {ex.Message}".WriteNote();
-        //      }
-        //  });
-        Shape.AfterMatrixSmash((obj) =>
-        {
-            // $"Shape1DBase.AfterMatrixSmash {Shape.GetGlyphId()}".WriteInfo(2);
-            matrix = "";
-            InvokeAsync(StateHasChanged);
-        });
+        InitSource(Shape);
     }
 
-    protected string GetMatrix()
-    {
-        if (!string.IsNullOrEmpty(matrix))
-        {
-            //$"Shape2DBase.GetMatrix {Shape.GetGlyphId()} cached={matrix}  ".WriteSuccess(2);
-            return matrix;
-        }
 
-        var mtx = Shape.GetMatrix();
-        matrix = mtx.SVGMatrix();
-        //$"Shape1DBase.GetMatrix result={matrix}".WriteInfo(2);
-        return matrix;
-    }
     protected string GetPoints()
     {
         //Shape.GetMatrix();
