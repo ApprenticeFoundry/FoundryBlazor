@@ -437,7 +437,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void RefreshHitTesting(FoPanZoomWindow? window)
     {
-        $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
+        // $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
 
         HitTestService.RefreshQuadTree(CurrentPage());
         if (window != null)

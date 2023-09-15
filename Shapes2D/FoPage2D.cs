@@ -46,12 +46,6 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
     public string Title { get; set; } = string.Empty;
 
-  
-    public new int Width { get => this.PageWidth.AsPixels(); set { this.width = AssignInt(value, width); } }
-
-    public new int Height { get => this.PageHeight.AsPixels(); set { this.height = AssignInt(value, height); } }
-
-
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
         Drawing = new Length(1.0, "cm"),
@@ -302,16 +296,16 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         //Shapes1D.ForEach(child => tree.Insert(child)); 
 
         var count = Shapes2D.Count();
-        $"PAGE:: InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
+        // $"PAGE:: InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
         foreach (var item in Shapes2D.Values())
         {
             if (!item.IsSelectable())
                 continue;
 
             var rect = item.HitTestRect();
-            $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
             rect = panzoom.TransformRect(rect);
-            $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
+            // $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 

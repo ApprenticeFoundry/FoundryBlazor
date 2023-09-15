@@ -18,7 +18,6 @@ public class SVGBase<T> : ComponentBase where T : FoGlyph2D
         Source = glyph;
         Source.AfterMatrixSmash((obj) =>
         {
-            $"Shape2DBase.AfterMatrixSmash {Source.GetGlyphId()}".WriteInfo(2);
             InvokeAsync(StateHasChanged);
         });
         return Source;
@@ -76,13 +75,13 @@ public class SVGBase<T> : ComponentBase where T : FoGlyph2D
         return result;
     }
 
-    protected int GetWidth()
+    protected virtual int GetWidth()
     {
         var width = Source?.Width ?? 0;
         return (int)width;
     }
 
-    protected int GetHeight()
+    protected virtual int GetHeight()
     {
         var height = Source?.Height ?? 0;
         return (int)height;

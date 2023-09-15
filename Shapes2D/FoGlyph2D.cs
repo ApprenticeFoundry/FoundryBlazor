@@ -79,7 +79,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
     public int Index { get; set; } = 0;
-    
+
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId
     {
@@ -91,22 +91,22 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public static bool PeekResetHitTesting()
     {
         var result = _resetHitTesting;
-        return result; 
+        return result;
     }
     public static bool MustResetHitTesting()
     {
         var result = _resetHitTesting;
         _resetHitTesting = false;
-        return result; 
+        return result;
     }
-    public static void ResetHitTesting(bool value, string note="")
+    public static void ResetHitTesting(bool value, string note = "")
     {
         if (_resetHitTesting == value)
             return;
 
         _resetHitTesting = value;
-        if (_resetHitTesting)
-            $"ResetHitTesting on next itteration {note}".WriteInfo();
+        // if (_resetHitTesting)
+        //     $"ResetHitTesting on next itteration {note}".WriteInfo();
     }
 
 
@@ -153,7 +153,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     protected Action<FoGlyph2D>? OnMatrixRefresh;
     protected Action<FoGlyph2D>? OnMatrixSmash;
-    
+
     public Action<FoGlyph2D, int>? ContextLink;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
@@ -841,8 +841,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         OnMatrixSmash?.Invoke(this);
 
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
-        ResetHitTesting(true,"Glyph Smashed");
-        
+        ResetHitTesting(true, "Glyph Smashed");
+
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 

@@ -11,8 +11,8 @@ public interface IHitTestService
 {
     bool Insert(FoGlyph2D glyph, Rectangle rect);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
-    List<(FoGlyph2D,Rectangle)> AllShapesEverywhere();
-    List<(FoGlyph2D,Rectangle)> RefreshQuadTree(FoPage2D page);
+    List<(FoGlyph2D, Rectangle)> AllShapesEverywhere();
+    List<(FoGlyph2D, Rectangle)> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
 
     void SetCanvasSizeInPixels(int width, int height);
@@ -56,22 +56,22 @@ public class HitTestService : IHitTestService
 
 
         var mat = _panzoom.GetMatrix();
-        mat.TransformRectangle(0, 0, CanvasSize.Width,  CanvasSize.Height, ref CanvasRectangle);
-        
+        mat.TransformRectangle(0, 0, CanvasSize.Width, CanvasSize.Height, ref CanvasRectangle);
+
         //recompute the tree rect and include the pan and zoom
         Tree.Reset(CanvasRectangle.X, CanvasRectangle.Y, CanvasRectangle.Width, CanvasRectangle.Height);
         return Tree;
     }
-    
-    public List<(FoGlyph2D,Rectangle)> RefreshQuadTree(FoPage2D page)
+
+    public List<(FoGlyph2D, Rectangle)> RefreshQuadTree(FoPage2D page)
     {
         FoGlyph2D.ResetHitTesting(false, $"RefreshQuadTree {page.Name}");
-        $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
+        // $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
 
         //this rectangle should not shrink based on pan or zoom
         var tree = InitTreeRoot();
 
-        $"InsertShapesToQuadTree {page.Name} ".WriteSuccess();
+        // $"InsertShapesToQuadTree {page.Name} ".WriteSuccess();
         page.InsertShapesToQuadTree(tree, _panzoom);
 
         return AllShapesEverywhere();
@@ -99,7 +99,7 @@ public class HitTestService : IHitTestService
         PreviousSearches.Add(rect);
         //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
 
-        List<(FoGlyph2D item,Rectangle hit)> list = new();
+        List<(FoGlyph2D item, Rectangle hit)> list = new();
         Tree?.GetObjects(rect, ref list);
         //$"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
 
@@ -110,9 +110,9 @@ public class HitTestService : IHitTestService
         return list.Select(obj => obj.item).ToList();
     }
 
-    public List<(FoGlyph2D,Rectangle)> AllShapesEverywhere()
+    public List<(FoGlyph2D, Rectangle)> AllShapesEverywhere()
     {
-        List<(FoGlyph2D,Rectangle)> list = new();
+        List<(FoGlyph2D, Rectangle)> list = new();
         Tree?.GetAllObjects(ref list);
         return list;
     }

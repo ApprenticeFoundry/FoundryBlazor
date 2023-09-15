@@ -17,7 +17,7 @@ public class PanZoomGBase : ComponentBase
         base.OnInitialized();
         PanZoom?.AfterMatrixSmash((obj) =>
         {
-            $"PanZoomGBase.AfterMatrixSmash ".WriteInfo(2);
+            // $"PanZoomGBase.AfterMatrixSmash ".WriteInfo(2);
             InvokeAsync(StateHasChanged);
         });
     }

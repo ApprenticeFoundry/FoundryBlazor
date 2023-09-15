@@ -4,15 +4,9 @@
 <g transform="@GetSVGMatrix()">
     <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" stroke-dasharray="@GetDashArray()" fill="@GetColor()"
         stroke="@GetStrokeColor()" stroke-width="3" />
-    @* <foreignObject x="@PaddingX" y="@PaddingY" width="@GetWidth()" height="@GetHeight()"> *@
-    @* <div style="color: @GetTextColor()">
-    @GetText()
-    </div> *@
-    @* <textarea style="@GetTextareaStyle()" @onclick="OnClickText">
-    @GetText()
-    </textarea> *@
-    @* </foreignObject> *@
-    @* <foreignObject x="100" y="30" width="@GetWidth()" height="@GetHeight()" @onclick="OnClickText">
-    <button @onclick="OnClickButton">Hello</button>
-    </foreignObject> *@
+    <foreignObject x="@PaddingX" y="@PaddingY" width="@GetWidth()" height="@GetHeight()">
+        <textarea style="@GetTextareaStyle()" @onclick="OnClickText">
+            @GetText()
+        </textarea>
+    </foreignObject>
 </g>

@@ -185,7 +185,7 @@ public class PanZoomService : IPanZoomService
             _matrix.AppendTransform(State.Pan.X, State.Pan.Y, State.Zoom, State.Zoom, 0.0, 0.0, 0.0);
             FoGlyph2D.ResetHitTesting(true, "Pan Zoom");
             OnMatrixRefresh?.Invoke(State);
-            $"PanZoomService GetMatrix recalculate".WriteWarning();
+            // $"PanZoomService GetMatrix recalculate".WriteWarning();
         }
         return _matrix;
     }
