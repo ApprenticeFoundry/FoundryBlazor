@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
-using Blazor.Extensions;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Solutions;
@@ -11,7 +9,7 @@ using Microsoft.JSInterop;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas2DComponentBase : BECanvasComponent
+public class CanvasSVGComponentBase : ComponentBase
 {
     [Inject] public IHitTestService? HitTestService { get; set; }
     [Inject] public IWorkspace? Workspace { get; set; }
@@ -19,11 +17,12 @@ public class Canvas2DComponentBase : BECanvasComponent
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
-    public new BECanvasComponent? CanvasReference;
+    [Parameter] public string StyleCanvas { get; set; } = "background-color:orange";
+
     protected string CurrentKey { get; set; } = "";
     public int tick { get; private set; }
 
-    private Canvas2DContext? Ctx;
+    private DateTime _lastRender;
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,15 +36,9 @@ public class Canvas2DComponentBase : BECanvasComponent
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
 
-            // var color = "green";
-            Ctx = await CanvasReference!.CreateCanvas2DAsync();
-            CreateTickPlayground();
-            SetDoTugOfWar();
             DoStart();
-            // ReDraw();
+            // CreateTickPlayground();
 
-            // await Ctx.SetFillStyleAsync(color);
-            // await Ctx.FillRectAsync(0, 0, 200, 100);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -53,17 +46,18 @@ public class Canvas2DComponentBase : BECanvasComponent
     [JSInvokable]
     public async ValueTask RenderFrameEventCalled()
     {
-        ReDraw();
-        await Task.CompletedTask;
+        double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
+        _lastRender = DateTime.Now; // update for the next time 
+
+
+        await RenderFrame(fps);
+
+
     }
 
     public async Task RenderFrame(double fps)
     {
-        if (Ctx == null) return;
         tick++;
-
-        //$"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
-
         Workspace?.PreRender(tick);
 
         var drawing = Workspace?.GetDrawing();
@@ -71,27 +65,21 @@ public class Canvas2DComponentBase : BECanvasComponent
 
         //if you are already rendering then skip it this cycle
         if (drawing.SetCurrentlyRendering(true, tick)) return;
-        await Ctx.BeginBatchAsync();
-        await Ctx.SaveAsync();
 
-        await drawing.RenderDrawing(Ctx, tick, fps);
-        Workspace?.RenderWatermark(Ctx, tick);
+        // await drawing.RenderDrawing(Ctx, tick, fps);
+        await drawing.RenderDrawingSVG(tick, fps);
+        await InvokeAsync(StateHasChanged);
+        // Workspace?.RenderWatermark(Ctx, tick);
 
-        await Ctx.RestoreAsync();
-        await Ctx.EndBatchAsync();
         drawing.SetCurrentlyRendering(false, tick);
 
         Workspace?.PostRender(tick);
     }
 
-    public void ReDraw()
+    public FoPage2D GetCurrentPage()
     {
-        Task.Run(async () =>
-        {
-            await RenderFrame(.11);
-        });
+        return Workspace!.CurrentPage();
     }
-
     private void CreateTickPlayground()
     {
         var drawing = Workspace!.GetDrawing();
@@ -104,12 +92,12 @@ public class Canvas2DComponentBase : BECanvasComponent
             LocPinX = (obj) => obj.Width / 4
         };
         drawing.AddShape(s2);
-        s2.ContextLink = (obj, tick) =>
+        s2.BeforeShapeRefresh((obj, tick) =>
         {
             obj.PinX = s1.PinX;
             obj.PinY = s1.PinY;
             obj.Angle += 1;
-        };
+        });
     }
 
     private void SetDoTugOfWar()
@@ -178,8 +166,6 @@ public class Canvas2DComponentBase : BECanvasComponent
 
     protected void OnMouseDown(MouseEventArgs args)
     {
-        $"On Mouse Down {args.ClientX}, {args.ClientY}".WriteInfo();
-
         var topic = "ON_MOUSE_DOWN";
         CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
         PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
@@ -243,7 +229,6 @@ public class Canvas2DComponentBase : BECanvasComponent
         var topic = "ON_MOUSE_UP";
         CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
         PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-        // ReDraw();
     }
 
     protected void OnWheelMove(WheelEventArgs args)
@@ -252,7 +237,7 @@ public class Canvas2DComponentBase : BECanvasComponent
         CanvasWheelChangeArgs canvasArgs = ToCanvasWheelChangeArgs(args, topic);
 
         PubSub?.Publish<CanvasWheelChangeArgs>(canvasArgs);
-        // ReDraw();
+        FoGlyph2D.ResetHitTesting(true, "ON_WHEEL_CHANGE");
     }
 
     protected void OnMouseMove(MouseEventArgs args)
@@ -261,7 +246,6 @@ public class Canvas2DComponentBase : BECanvasComponent
         CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
 
         PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-        // ReDraw();
     }
 
     protected void OnKeyDown(KeyboardEventArgs args)
@@ -279,9 +263,5 @@ public class Canvas2DComponentBase : BECanvasComponent
     {
         var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_PRESS");
         PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-
-        if (canvasArgs.Key.ToUpper() == "R")
-            ReDraw();
-
     }
 }
