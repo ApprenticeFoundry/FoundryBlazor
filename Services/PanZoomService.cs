@@ -164,7 +164,7 @@ public class PanZoomService : IPanZoomService
 
     public virtual bool Smash(bool force)
     {
-        $"PanZoomService Smash {force}".WriteWarning();
+        // $"PanZoomService Smash {force}".WriteWarning();
         if (_matrix == null && !force) return false;
 
         OnMatrixSmash?.Invoke(State);

@@ -10,6 +10,9 @@ public class PageGridBase : SVGBase<FoPage2D>
 {
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "Gray");
     //[Parameter] public RenderFragment? ChildContent { get; set; }
+    protected string StrokeColor { get; set; } = "#d8d8d8"; // light gray
+    protected string StrokeDashArray { get; set; } = "15 0"; // dash-length, pixels between dash
+    protected int MajorAxisStrokeWidth { get; set; } = 3;
 
     protected override void OnInitialized()
     {
@@ -18,11 +21,11 @@ public class PageGridBase : SVGBase<FoPage2D>
     }
 
 
-    public List<SVGLine> GetMajortHorizontalGridSVG()
+    public List<SVGLine> GetMajorHorizontalGridSVG()
     {
         return GetHorizontalGridSVG(Page.GridMajorH);
     }
-    
+
     public List<SVGLine> GetMinortHorizontalGridSVG()
     {
         return GetHorizontalGridSVG(Page.GridMinorH);

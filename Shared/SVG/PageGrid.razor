@@ -2,26 +2,26 @@
 @using FoundryBlazor.Shared.SVG
 @namespace FoundryBlazor.Shared.SVG
 
-
-
 @foreach (var line in GetMinortHorizontalGridSVG())
 {
-    <line stroke="orange" stroke-dasharray="15 10" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
+        y2="@line.Y2" />
 }
 
 @foreach (var line in GetMinorVerticalGridSVG())
 {
-    <line stroke="orange" stroke-dasharray="15 10" x1="@line.X1" y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
+        y2="@line.Y2" />
 }
 
-@foreach (var line in GetMajortHorizontalGridSVG())
+@foreach (var line in GetMajorHorizontalGridSVG())
 {
-    <line stroke="black" stroke-dasharray="15 10" stroke-width="1" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
-        y2="@line.Y2" />
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" stroke-width="@MajorAxisStrokeWidth" x1="@line.X1"
+        y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
 }
 
 @foreach (var line in GetMajorVerticalGridSVG())
 {
-    <line stroke="black" stroke-dasharray="15 10" stroke-width="1" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
-        y2="@line.Y2" />
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" stroke-width="@MajorAxisStrokeWidth" x1="@line.X1"
+        y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
 }
