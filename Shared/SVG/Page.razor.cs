@@ -3,11 +3,15 @@ using FoundryBlazor.Shape;
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
 using FoundryRulesAndUnits.Extensions;
+using System.Drawing;
 
 namespace FoundryBlazor.Shared.SVG;
 
 public class PageBase : SVGBase<FoPage2D>
 {
+    
+    [Inject] public IPanZoomService? PanZoom { get; set; } 
+    
     [Parameter] public FoPage2D Page { get; set; } = new("page1", "Grey");
     [Parameter] public RenderFragment? ChildContent { get; set; }
     protected override void OnInitialized()
@@ -71,5 +75,15 @@ public class PageBase : SVGBase<FoPage2D>
         return margin;
     }
 
+    public bool IsFenceSelecting()
+    {
+        return PanZoom?.IsFenceSelecting() ?? false;
+    }
 
+    public Rectangle GetFence()
+    {
+        var fence = BaseInteraction.GetDragArea();
+        var rect = PanZoom?.TransformRect(fence) ?? fence;
+        return rect;
+    }
 }

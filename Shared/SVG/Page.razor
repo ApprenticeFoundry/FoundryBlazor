@@ -27,4 +27,12 @@
     }
 </PanZoomG>
 
+@if (IsFenceSelecting())
+{
+    var rec = GetFence();
+    <rect x="@rec.X" y="@rec.Y" width="@rec.Width" height="@rec.Height" fill="none" stroke-width="6" stroke="White"
+        stroke-dasharray="10 10">
+    </rect>
+}
+
 @* <MouseTracker /> *@
