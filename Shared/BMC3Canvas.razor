@@ -1,9 +1,0 @@
-﻿@inherits BMC3CanvasBase
-@namespace FoundryBlazor.Shared
-
-<div style="width:max-content; border:1px solid black;" contenteditable="true" @onkeydown="OnKeyDown"
-    @onkeypress="OnKeyPress" @onkeyup="OnKeyUp" @onmousedown="OnMouseDown" @onmouseup="OnMouseUp"
-    @onmousewheel="@OnWheelMove" @onmousemove="@OnMouseMove">
-    <BECanvas Width="@CanvasWidth" Height="@CanvasHeight" @ref="CanvasReference" />
-</div>
-<div>@CurrentKey</div>
