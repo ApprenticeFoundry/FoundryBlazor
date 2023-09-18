@@ -29,6 +29,7 @@ namespace FoundryBlazor.Shape;
     public static readonly double DEG_TO_RAD = Math.PI / 180;
     public static readonly double RAD_TO_DEG = 180 / Math.PI;
     public static readonly double TWO_PI = 2.0 * Math.PI;
+    private string svg = "";
 
     public double a = 1; //Position (0, 0) in a 3x3 affine transformation matrix.
     public double b = 0; //Position (0, 1) in a 3x3 affine transformation matrix.
@@ -64,6 +65,22 @@ namespace FoundryBlazor.Shape;
     public Matrix2D(Matrix2D matrix) 
     {
         Copy(matrix);
+    }
+
+    public bool IsSVGRefreshed()
+    {
+        if (!string.IsNullOrEmpty(svg))
+            return true;
+        return false;
+    }
+
+    public string SVGMatrix()
+    {
+        if (IsSVGRefreshed())
+            return svg;
+
+        svg = $"matrix({a}, {b}, {c}, {d}, {tx}, {ty})";
+        return svg;
     }
 
     public Matrix2D Copy(Matrix2D matrix) 
@@ -131,6 +148,7 @@ namespace FoundryBlazor.Shape;
         this.d = 1;
         this.tx = 0;
         this.ty = 0;
+        this.svg = "";
         return this;
     }
 
@@ -277,7 +295,8 @@ namespace FoundryBlazor.Shape;
 
 
 
-    public Matrix2D Clone() {
+    public Matrix2D Clone() 
+    {
         var matrix = new Matrix2D(this);
         return matrix;
     }
@@ -292,29 +311,47 @@ namespace FoundryBlazor.Shape;
         return pt;
     }
 
-    public Point TransformPoint(int x, int y) 
+    public (int, int) TransformPoint(int x, int y) 
     {
         var X = x * this.a + y * this.c + this.tx;
         var Y = x * this.b + y * this.d + this.ty;
-        var pt = new Point((int)X, (int)Y);
+        //var pt = new Point((int)X, (int)Y);
+        return ((int)X, (int)Y);
+    }
+    public Point TransformToPoint(int x, int y) 
+    {
+        var (X,Y) = TransformPoint(x, y);
+        var pt = new Point(X, Y);
         return pt;
     }
-    public Rectangle TransformRectangle(int x, int y, int width, int height) 
+    public void TransformRectangle(int x, int y, int width, int height, ref Rectangle rect) 
     {
-        var X = x * this.a + y * this.c + this.tx;
-        var Y = x * this.b + y * this.d + this.ty;
-        var rect = new Rectangle((int)X, (int)Y,width,height);
-        return rect;
+        rect.X = (int)(x * this.a + y * this.c + this.tx);
+        rect.Y = (int)(x * this.b + y * this.d + this.ty);
+        rect.Width = width;
+        rect.Height = height;
+
+        //double X = this.a * x + this.c * y + this.tx;
+        //double Y = this.b * x + this.d * y + this.ty;
+        
+        //double x2 = this.a * (x + width) + this.c * (y + height) + this.tx;
+        //double y2 = this.b * (x + width) + this.d * (y + height) + this.ty;
+
+
+        //double Width = Math.Abs(x2 - X); 
+        //double Height = Math.Abs(y2 - Y);
+
+        //rect.X = (int)X;
+        //rect.Y = (int)Y;
+        //rect.Width = (int)Width;
+        //rect.Height =(int)Height;
+        //return rect;
     }
-    public Point TransformPoint(Point pt) 
-    {
-        return TransformPoint(pt.X,pt.Y);
-    }
+    // public Point TransformPoint(Point pt) 
+    // {
+    //     return TransformPoint(pt.X,pt.Y);
+    // }
     
-    public Point InvertPoint(int x, int y)
-    {
-        var inv = this.InvertCopy();
-        return inv.TransformPoint(x, y);
-    }
+
 
  }

@@ -35,8 +35,8 @@ public class ShapeConnecting :  ShapeHovering
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = ValidDragSource(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = ValidDragSource(DragArea);
         selectedShape = findings.LastOrDefault(); // get one on top
 
         if (findings?.Count == 1 && selectedShape != null)
@@ -55,7 +55,7 @@ public class ShapeConnecting :  ShapeHovering
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(1);
             await ctx.SetStrokeStyleAsync("Yellow");
-            var rect = panZoomService.TransformRect(dragArea);
+            var rect = panZoomService.TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }
@@ -75,14 +75,14 @@ public class ShapeConnecting :  ShapeHovering
 
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = hitTestService?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
         return heros.ToList(); 
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = hitTestService?.FindGlyph(rect);
         var targets = findings!.Where(item => item.GetType() == TargetType);
         //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList(); 
@@ -118,8 +118,8 @@ public class ShapeConnecting :  ShapeHovering
     {
         //SendUserMove(args, true);
         if (isConnecting) {
-            dragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            DragArea = panZoomService.HitRectStart(args);
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

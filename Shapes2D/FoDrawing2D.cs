@@ -12,6 +12,8 @@ using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using FoundryRulesAndUnits.Units;
 using FoundryBlazor.Shape;
+using Microsoft.AspNetCore.Components.Rendering;
+using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shape;
 
@@ -20,8 +22,9 @@ namespace FoundryBlazor.Shape;
 public interface IDrawing : IRender
 {
     bool SetCurrentlyRendering(bool value, int tick);
+    bool IsRendering();
     bool SetCurrentlyProcessing(bool value);
-    void SetCanvasPixelSize(int width, int height);
+    void SetCanvasSizeInPixels(int width, int height);
 
     Size TrueCanvasSize();
     Rectangle TransformRect(Rectangle rect);
@@ -37,6 +40,7 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
+    Task RenderDrawingSVG(int tick, double fps);
     void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
@@ -48,6 +52,7 @@ public interface IDrawing : IRender
 
     void TogglePanZoomWindow();
     void ToggleHitTestDisplay();
+    void RefreshHitTesting(FoPanZoomWindow? window);
     bool MovePanBy(int dx, int dy);
 
     D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast);
@@ -55,15 +60,16 @@ public interface IDrawing : IRender
     void ClearAll();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
-    Rectangle Rect();
+
+    bool ToggleHitTestRender();
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-
     public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
+    private bool RenderHitTestTree = true;
 
     private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
 
@@ -104,10 +110,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-    public override Rectangle Rect()
+    public bool IsRendering()
     {
-        var result = new Rectangle(0, 0, TrueCanvasWidth, TrueCanvasHeight);
-        return result;
+        return IsCurrentlyRendering;
     }
 
     public bool SetCurrentlyRendering(bool isRendering, int tick)
@@ -167,7 +172,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         )
     {
         HitTestService = hittest;
-        HitTestService.SetRectangle(Rect());
+        //HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
@@ -194,7 +199,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         });
 
         InitSubscriptions();
-        PanZoomService.SetOnComplete(() =>
+        PanZoomService.SetOnEventComplete(() =>
         {
             //SRS refresh zoom if changed
             ResetPanZoom();
@@ -203,6 +208,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         SetInteraction(InteractionStyle.ShapeHovering);
     }
 
+    public bool ToggleHitTestRender()
+    {
+        RenderHitTestTree = !RenderHitTestTree;
+        return RenderHitTestTree;
+    }
     public void SetPreRenderAction(Func<Canvas2DContext, int, Task> action)
     {
         PreRender = action;
@@ -282,12 +292,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return PanZoomService.TransformRect(rect);
     }
 
-    public void SetCanvasPixelSize(int width, int height)
+    public void SetCanvasSizeInPixels(int width, int height)
     {
         TrueCanvasWidth = width;
         TrueCanvasHeight = height;
-        HitTestService.SetRectangle(Rect());
+        HitTestService.SetCanvasSizeInPixels(width, height);
     }
+
     public Size TrueCanvasSize()
     {
         return new Size(TrueCanvasWidth, TrueCanvasHeight);
@@ -420,19 +431,19 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public void ToggleHitTestDisplay()
     {
-        PageManager.ToggleHitTestRender();
+        RenderHitTestTree = !RenderHitTestTree;
     }
 
 
-
-
-    public void RefreshHitTest_IfDirty()
+    public void RefreshHitTesting(FoPanZoomWindow? window)
     {
-        if (FoGlyph2D.ResetHitTesting)
-            PageManager.RefreshHitTesting(PanZoomWindow());
+        // $"RefreshHitTesting For the Current Page{window}".WriteSuccess();
 
-        FoGlyph2D.ResetHitTesting = false;
+        HitTestService.RefreshQuadTree(CurrentPage());
+        if (window != null)
+            HitTestService.Insert(window, window.HitTestRect());
     }
+
 
     public virtual Dictionary<string, Action> DefaultMenu()
     {
@@ -483,6 +494,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
+
+
+
     public async Task RenderDrawing(Canvas2DContext ctx, int tick, double fps)
     {
 
@@ -491,12 +505,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         FoGlyph2D.Animations.Update((float)0.033);
 
-        var wasDirty = FoGlyph2D.ResetHitTesting;
-        RefreshHitTest_IfDirty();
+        var wasDirty = FoGlyph2D.PeekResetHitTesting();
+        if (FoGlyph2D.MustResetHitTesting())
+            RefreshHitTesting(PanZoomWindow());
 
         var page = PageManager.CurrentPage();
 
         await ClearCanvas(ctx);
+
+
+
 
         await ctx.SaveAsync();
 
@@ -510,11 +528,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (PostRender != null)
             await PostRender.Invoke(ctx, tick);
 
-        await PanZoomWindow().RenderConcise(ctx, zoom, page.Rect());
+        await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
 
         await ctx.RestoreAsync();
 
-
+        if (RenderHitTestTree)
+            await HitTestService.RenderQuadTree(ctx, true);
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
@@ -554,6 +573,77 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
+    }
+    public async Task RenderDrawingSVG(int tick, double fps)
+    {
+
+        //skip this frame is still working 
+        if (IsCurrentlyProcessing) return;
+
+        FoGlyph2D.Animations.Update((float)fps);
+
+        var wasDirty = FoGlyph2D.PeekResetHitTesting();
+        if (FoGlyph2D.MustResetHitTesting())
+            RefreshHitTesting(PanZoomWindow());
+
+        var page = PageManager.CurrentPage();
+
+        await PanZoomService.TranslateAndScale(page);
+        page.AllShapes2D().ForEach(shape => shape.ContextLink?.Invoke(shape, tick));
+
+        // if (PreRender != null)
+        //     await PreRender.Invoke(ctx, tick);
+
+        // await PageManager.RenderDetailed(ctx, tick, true);
+
+        // if (PostRender != null)
+        //     await PostRender.Invoke(ctx, tick);
+
+        // await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
+
+        // await ctx.RestoreAsync();
+
+        // if (RenderHitTestTree)
+        //     await HitTestService.RenderQuadTree(ctx, true);
+
+        // await GetInteraction().RenderDrawing(ctx, tick);
+
+        // if (!ShowStats) return;
+
+
+        // var offsetY = 60;
+        // var offsetX = 1400;
+
+        // await ctx.SetTextAlignAsync(Blazor.Extensions.Canvas.Canvas2D.TextAlign.Left);
+        // await ctx.SetTextBaselineAsync(TextBaseline.Middle);
+
+        // await ctx.SetFillStyleAsync(wasDirty ? "#FF0000" : "#000000");
+        // await ctx.SetFontAsync("26px Segoe UI");
+        // await ctx.FillTextAsync($"Foundry Canvas {UserID} {InputStyle}", offsetX, offsetY);
+
+        // await ctx.SetFontAsync("18px consolas");
+        // //await ctx.FillTextAsync($"zoom: {zoom:0.00} panx: {panx} panx: {pany} fps: {fps:0.00}", offsetX, offsetY + 25);
+        // await ctx.FillTextAsync($"fps: {fps:0.00} zoom {zoom:0.00} panx: {panx} panx: {pany}", offsetX, offsetY + 25);
+        // //await ctx.FillTextAsync($"{page.Name}  {ScaleDrawing.CanvasWH()} {page.DrawingWH()}", offsetX, offsetY + 50);
+
+        // int loc = 130;
+
+        // await ctx.SetTextBaselineAsync(TextBaseline.Top);
+        // OtherUserLocations.Values.ForEach(async user =>
+        // {
+        //     loc += 15;
+        //     await ctx.FillTextAsync($"{user.UserID} is helping", 20 + offsetX, loc);
+
+        //     await ctx.BeginPathAsync();
+        //     await ctx.MoveToAsync(user.X, user.Y);
+        //     await ctx.LineToAsync(user.X + 20, user.Y + 15);
+        //     await ctx.LineToAsync(user.X, user.Y + 20);
+        //     await ctx.LineToAsync(user.X, user.Y);
+        //     await ctx.ClosePathAsync();
+        //     await ctx.FillAsync();
+
+        //     await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
+        // });
     }
 
     public D2D_UserMove UpdateOtherUsers(D2D_UserMove usermove, IToast toast)
@@ -633,8 +723,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
                 ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
                 ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
                 ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
-                ("ON_MOUSE_IN") => GetInteraction().MouseIn(args),
-                ("ON_MOUSE_OUT") => GetInteraction().MouseOut(args),
                 _ => false
             };
         }
@@ -736,6 +824,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PanZoomService.ZoomWheel(args.DeltaY);
         PanZoomService.WriteToPage(PageManager.CurrentPage());
+
+        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("PanZoom"));
         //$"Wheel change: {args.DeltaX}, {args.DeltaY}, {args.DeltaZ}".WriteLine(ConsoleColor.Yellow);
         return true;
     }

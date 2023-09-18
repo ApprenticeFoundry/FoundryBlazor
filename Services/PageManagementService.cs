@@ -1,8 +1,6 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing;
 
 
@@ -10,11 +8,8 @@ namespace FoundryBlazor.Shape;
 
 public interface IPageManagement : IRender
 {
-
     List<FoGlyph2D> FindShapes(string GlyphId);
     List<FoGlyph2D> ExtractShapes(string GlyphId);
-    List<FoGlyph2D> FindGlyph(Rectangle rect);
-    List<FoGlyph2D> AllObjects();
 
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
@@ -23,9 +18,6 @@ public interface IPageManagement : IRender
 
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
     List<FoVideo2D> CollectVideos(List<FoVideo2D> list, bool deep = true);
-
-    void RefreshHitTesting(FoPanZoomWindow? window);
-    bool ToggleHitTestRender();
 
 
     int PageCount();
@@ -56,18 +48,17 @@ public interface IPageManagement : IRender
 public class PageManagementService : FoComponent, IPageManagement
 {
 
-    private bool RenderHitTestTree = false;
-    private readonly IHitTestService _hitTestService;
     private readonly ISelectionService _selectService;
 
     private FoPage2D? _page;
-    private FoPage2D ActivePage { 
-        get 
+    private FoPage2D ActivePage
+    {
+        get
         {
-            if ( _page?.IsActive != true)
+            if (_page?.IsActive != true)
                 $"Get Active Page {_page?.Name} is broken".WriteInfo();
 
-            return _page!; 
+            return _page!;
         }
         set
         {
@@ -78,10 +69,8 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
     public PageManagementService(
-        IHitTestService hit,
         ISelectionService sel)
     {
-        _hitTestService = hit;
         _selectService = sel;
 
         ActivePage = CurrentPage();
@@ -135,17 +124,8 @@ public class PageManagementService : FoComponent, IPageManagement
     }
 
 
-    public bool ToggleHitTestRender()
-    {
-        RenderHitTestTree = !RenderHitTestTree;
-        return RenderHitTestTree;
-    }
-    public void RefreshHitTesting(FoPanZoomWindow? window)
-    {
-        _hitTestService.RefreshTree(CurrentPage());
-        if (window != null)
-            _hitTestService.Insert(window);
-    }
+
+
 
     public List<FoGlyph2D> DeleteSelections()
     {
@@ -212,23 +192,14 @@ public class PageManagementService : FoComponent, IPageManagement
         return CurrentPage().FindShapes(GlyphId);
     }
 
-    public List<FoGlyph2D> FindGlyph(Rectangle rect)
-    {
-        return _hitTestService.FindGlyph(rect);
-    }
 
-    public List<FoGlyph2D> AllObjects()
-    {
-        return _hitTestService.AllShapesEverywhere();
-    }
+
+
 
 
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var found = ActivePage.AddShape(value);
-        if (found != null)
-            _hitTestService.Insert(value);
-
         return found!;
 
     }
@@ -251,14 +222,14 @@ public class PageManagementService : FoComponent, IPageManagement
     }
     public FoPage2D SetCurrentPage(FoPage2D page)
     {
-        if (ActivePage == page) 
+        if (ActivePage == page)
             return ActivePage;
 
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
         ActivePage = page;
 
         //force refresh of hit testing
-        RefreshHitTesting(null);
+        FoGlyph2D.ResetHitTesting(true);
         return ActivePage;
     }
 
@@ -351,10 +322,10 @@ public class PageManagementService : FoComponent, IPageManagement
 
         if (Activator.CreateInstance(typeof(T)) is not T group) return null;
 
-        Rectangle rect = first.Rect();
+        Rectangle rect = first.HitTestRect();
         _selectService.Selections().ForEach(item =>
         {
-            rect = Rectangle.Union(rect, item.Rect());
+            rect = Rectangle.Union(rect, item.HitTestRect());
             //$"Rect {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.White);
         });
 
@@ -380,6 +351,7 @@ public class PageManagementService : FoComponent, IPageManagement
 
 
 
+
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
         await CurrentPage().Draw(ctx, tick);
@@ -392,11 +364,6 @@ public class PageManagementService : FoComponent, IPageManagement
 
         //await page.RenderNoItems(ctx, tick++);
         await page.RenderDetailed(ctx, tick++, deep);
-
-        if (RenderHitTestTree)
-            await _hitTestService.RenderQuadTree(ctx, true);
-
-
         return true;
     }
 
@@ -405,11 +372,9 @@ public class PageManagementService : FoComponent, IPageManagement
         var page = CurrentPage();
         await page.RenderConcise(ctx, scale, region);
 
-        if (RenderHitTestTree)
-            await _hitTestService.RenderQuadTree(ctx, false);
-
         return true;
     }
+
 
 
 }

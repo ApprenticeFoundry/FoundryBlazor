@@ -1,5 +1,6 @@
 using BlazorComponentBus;
 using FoundryBlazor.Canvas;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -24,8 +25,8 @@ public class ShapeDragging : ShapeHovering
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
         return selected != null;
         //return selectionService.Selections().Count > 0;
@@ -37,8 +38,8 @@ public class ShapeDragging : ShapeHovering
 
         isDraggingShapes = false;
 
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         var hitShape = findings?.LastOrDefault(); 
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
 
@@ -63,7 +64,7 @@ public class ShapeDragging : ShapeHovering
             selectionService.ClearAll();
         }
 
-        //$"Mouse Down {isSelecting}".WriteLine(ConsoleColor.Green);
+        //$"Mouse Down {isDraggingShapes}".WriteLine(ConsoleColor.Green);
         return true;
     }
     public override bool MouseUp(CanvasMouseArgs args)
@@ -78,8 +79,9 @@ public class ShapeDragging : ShapeHovering
     public override bool MouseMove(CanvasMouseArgs args)
     {
         if (isDraggingShapes) {
-            dragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
+            DragArea = panZoomService.HitRectStart(args);
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

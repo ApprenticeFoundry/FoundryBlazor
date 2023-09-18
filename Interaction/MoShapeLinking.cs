@@ -29,8 +29,8 @@ public class MoShapeLinking : ShapeHovering
     
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
         if (args.CtrlKey && selectedShape is FoCompound2D)
             return true;
@@ -66,7 +66,7 @@ public class MoShapeLinking : ShapeHovering
         {
             var hits = panZoomService.HitRectStart(args);
 
-            lastHoverTarget = pageManager.FindGlyph(hits).Where(child => child is FoCompound2D && child != selectedShape).Cast<FoCompound2D>().ToList();
+            lastHoverTarget = hitTestService.FindGlyph(hits).Where(child => child is FoCompound2D && child != selectedShape).Cast<FoCompound2D>().ToList();
             var TargetShape = lastHoverTarget.LastOrDefault();
 
             //delete the dragTarget and it's connector
@@ -94,7 +94,7 @@ public class MoShapeLinking : ShapeHovering
     {
 
         var loc = panZoomService.HitRectStart(args);
-        var move = panZoomService.Movement();
+        var move = panZoomService.MouseDeltaMovement();
 
         //$"Mouse Move {loc.X}  {loc.Y}".WriteLine();
 
@@ -102,7 +102,7 @@ public class MoShapeLinking : ShapeHovering
         if (dragTarget != null)
         {
             lastHoverTarget?.ForEach(child => child.HoverDraw = null);
-            lastHoverTarget = pageManager.FindGlyph(loc).Where(child => child is FoCompound2D && child != selectedShape).Cast<FoCompound2D>().ToList();
+            lastHoverTarget = hitTestService.FindGlyph(loc).Where(child => child is FoCompound2D && child != selectedShape).Cast<FoCompound2D>().ToList();
 
             lastHoverTarget?.ForEach(child => child.HoverDraw = OnHoverTarget);
 

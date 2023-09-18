@@ -7,8 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoundryBlazor", "FoundryBla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorThreeJS", "..\BlazorThreeJS\BlazorThreeJS.csproj", "{EB56CA83-976C-4DEA-BC70-4D1F13B9692D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoBTMessageLibrary", "..\IoBTMessageLibrary\IoBTMessageLibrary.csproj", "{5833B17E-6AD6-4ADF-9410-955CDDF9FA27}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

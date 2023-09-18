@@ -17,11 +17,11 @@
 </div>
 
 <div  id="canvasHolder" style=@StyleCanvas>
-    <CanvasHelper @ref="CanvasHelperReference" RenderFrame="RenderFrame"  >
+    <JSIntegrationHelper @ref="JSIntegrationRef" RenderFrame="RenderFrame">
         <BECanvas Width=@CanvasWidth Height=@CanvasHeight @ref="CanvasReference"></BECanvas>
-    </CanvasHelper>
+    </JSIntegrationHelper>
 </div> 
 
-<div  id="fileInputHolder" style=@StyleDrop>
+@* <div  id="fileInputHolder" style=@StyleDrop>
     <InputFile OnChange="@OnFileInputChange" style="@FileInputStyle()"/>
-</div> 
+</div>  *@

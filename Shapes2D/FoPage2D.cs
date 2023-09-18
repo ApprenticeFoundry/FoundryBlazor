@@ -1,20 +1,17 @@
 ﻿
 using System.Drawing;
-using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
+using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Units;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Radzen.Blazor.Rendering;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace FoundryBlazor.Shape;
 
 
 public interface IFoPage2D
 {
-
     int MapToPageXScale(Length value);
     int MapToPageYScale(Length value);
 
@@ -24,6 +21,7 @@ public interface IFoPage2D
     double MapToModelYLoc(int value);
     string CalculateTitle(string title);
 }
+
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
 {
@@ -36,10 +34,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
     public Length PageHeight { get; set; } = new Length(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = new Length(1.0, "m"); //inches
+    public Length GridMajorH { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorH { get; set; } = new Length(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = new Length(1.0, "m"); //inches
+    public Length GridMajorV { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
     public int ScaleAxisX { get; set; } = 1;
@@ -61,11 +59,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     protected FoCollection<FoGlyph2D> Shapes2D = new();
 
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
-        var pt = new Point(PinX, PinY);
-        var sz = new Size(Width, Height);
-        var result = new Rectangle(pt, sz);
+        // var pt = new Point(PinX, PinY);
+        // var sz = new Size(Width, Height);
+        // var result = new Rectangle(pt, sz);
+        var result = new Rectangle(PinX, PinY, Width, Height);
         return result;
     }
 
@@ -262,6 +261,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             // $"IShape1D Added {value.Name}".WriteSuccess();
         }
 
+        FoGlyph2D.ResetHitTesting(true, $"FoPage2D AddShape {value.Name}");
 
         return value;
     }
@@ -294,13 +294,18 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree, IPanZoomService panzoom)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-        // var count = Shapes2D.Count();
+
+        var count = Shapes2D.Count();
+        // $"PAGE:: InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
         foreach (var item in Shapes2D.Values())
         {
             if (!item.IsSelectable())
                 continue;
 
-            var rect = item.Rect();
+            var rect = item.HitTestRect();
+            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            rect = panzoom.TransformRect(rect);
+            // $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
             tree.Insert(item, rect);
         }
 
@@ -308,7 +313,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
     public FoPage2D ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
+        ResetHitTesting(true, "FoPage ClearAll");
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
 
         Shapes1D.Clear();
@@ -370,6 +375,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.RestoreAsync();
     }
+
+
 
 
     public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length step, bool major)
@@ -589,5 +596,4 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.RestoreAsync();
         return true;
     }
-
 }

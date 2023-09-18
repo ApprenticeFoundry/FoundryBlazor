@@ -23,8 +23,8 @@ public class ShapeMenu : ShapeDragging
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         var menu = findings?.LastOrDefault() as FoMenu2D;
         return menu != null;
     }
@@ -33,8 +33,8 @@ public class ShapeMenu : ShapeDragging
     {
         //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
 
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
 
         var menu = findings?.LastOrDefault() as FoMenu2D;
         menu?.OnShapeClick(ClickStyle.MouseDown, args);

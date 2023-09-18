@@ -28,18 +28,19 @@ public interface IBaseInteraction
     bool MouseDown(CanvasMouseArgs args);
     bool MouseUp(CanvasMouseArgs args);
     bool MouseMove(CanvasMouseArgs args);
-    bool MouseIn(CanvasMouseArgs args);
-    bool MouseOut(CanvasMouseArgs args);
+
     void Abort();
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
 
 }
+
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
+    static public Rectangle DragArea = new();
+
     public int Priority { get; set; } = 0;
     public InteractionStyle Style { get; set; } = InteractionStyle.None;
-    protected Rectangle dragArea;
     protected FoGlyph2D? selectedShape;
     
     protected List<FoGlyph2D>? lastHover = null;
@@ -96,6 +97,11 @@ public class BaseInteraction : FoComponent, IBaseInteraction
         await ctx.RestoreAsync();
     };
 
+    public static Rectangle GetDragArea()
+    {
+        return DragArea;
+    }
+
     public virtual void Abort()
     {     
     }
@@ -123,12 +129,12 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     {
         return false;
     }
-    public virtual bool MouseIn(CanvasMouseArgs args)
-    {
-        return false;
-    }
-    public virtual bool MouseOut(CanvasMouseArgs args)
-    {
-        return false;
-    }
+    // public virtual bool MouseIn(CanvasMouseArgs args)
+    // {
+    //     return false;
+    // }
+    // public virtual bool MouseOut(CanvasMouseArgs args)
+    // {
+    //     return false;
+    // }
 }

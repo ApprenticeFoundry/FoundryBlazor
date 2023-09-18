@@ -1,16 +1,12 @@
 using BlazorComponentBus;
 using BlazorThreeJS.Events;
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Materials;
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 
 using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
+using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
@@ -35,7 +31,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
 
-    public AnimationHelper? AnimationHelperReference;
+    public JSIntegrationHelper? JSIntegrationRef;
 
 
     public ViewerSettings GetSettings()
@@ -80,7 +76,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (firstRender)
         {
 
-            await AnimationHelperReference!.Initialize();
+            await JSIntegrationRef!.Initialize();
+            // maybe pass in a  reference to a SVG?
+            //await JSIntegrationRef!.CaptureMouseEventsForSVG();
+
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             var arena = Workspace?.GetArena();
@@ -131,11 +130,17 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     }
 
 
-
+    public FoPage2D GetCurrentPage()
+    {
+        return Workspace!.CurrentPage();
+    } 
+    
     public async Task RenderFrame(double fps)
     {
         if (ActiveScene == null) return;
         tick++;
+
+        $"Canvas3D RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 

@@ -26,8 +26,8 @@ public class ShapeResizing : ShapeHovering
     
      public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
         if (args.CtrlKey && selectedShape is IImage2D)
             return true;
@@ -40,8 +40,8 @@ public class ShapeResizing : ShapeHovering
 
         isResizingShape = false;
 
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = hitTestService?.FindGlyph(DragArea);
         selectedShape = findings?.LastOrDefault(); // get one on top
 
 
@@ -50,7 +50,7 @@ public class ShapeResizing : ShapeHovering
             //adjust the drag ares to upper left corner of the box 
             isResizingShape = true;
 
-            dragArea = panZoomService.HitRectTopLeft(args, selectedShape.Rect());
+            DragArea = panZoomService.HitRectTopLeft(args, selectedShape.HitTestRect());
             return true;
         }
 
@@ -62,7 +62,7 @@ public class ShapeResizing : ShapeHovering
 
         if (isResizingShape && selectedShape != null)
         {
-            var newSize = panZoomService.HitRectContinue(args, dragArea);
+            var newSize = panZoomService.HitRectContinue(args, DragArea);
             selectedShape.ResizeToBox(newSize);
         }
 
@@ -75,7 +75,7 @@ public class ShapeResizing : ShapeHovering
 
         if (isResizingShape && selectedShape != null)
         {
-            var newSize = panZoomService.HitRectContinue(args, dragArea);
+            var newSize = panZoomService.HitRectContinue(args, DragArea);
             selectedShape.ResizeToBox(newSize);
         } else {
             base.MouseMove(args); // this should hover    

@@ -6,6 +6,7 @@
 
 using System.Drawing;
 using BlazorComponentBus;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -14,7 +15,7 @@ namespace FoundryBlazor.Canvas
     /// <summary>
     /// CanvasHelper component gives you render and resize callbacks for Canvas animation
     /// </summary>
-    public partial class CanvasHelper : ComponentBase //, IAsyncDisposable
+    public partial class JSIntegrationHelper : ComponentBase //, IAsyncDisposable
     {
         private DateTime _lastRender;
 
@@ -49,24 +50,6 @@ namespace FoundryBlazor.Canvas
         public EventCallback<CanvasMouseArgs> MouseDown { get; set; }
 
         /// <summary>
-        /// Event called on mouse out
-        /// </summary>
-        [Parameter]
-        public EventCallback<CanvasMouseArgs> MouseOut { get; set; }
-
-        /// <summary>
-        /// Event called on mouse in
-        /// </summary>
-        [Parameter]
-        public EventCallback<CanvasMouseArgs> MouseIn { get; set; }
-
-        /// <summary>
-        /// Event called on mouse enter
-        /// </summary>
-        [Parameter]
-        public EventCallback<CanvasMouseArgs> MouseEnter { get; set; }
-
-        /// <summary>
         /// Event called on mouse up
         /// </summary>
         [Parameter]
@@ -96,33 +79,41 @@ namespace FoundryBlazor.Canvas
         [Parameter]
         public EventCallback<CanvasKeyboardEventArgs> KeyPress { get; set; }
 
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragStart { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> Drag { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragEnd { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragEnter { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragOver { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> DragLeave { get; set; }
-        [Parameter]
-        public EventCallback<CanvasDragArgs> Drop { get; set; }
-        /// <summary>
-        /// Call this in your Blazor app's OnAfterRenderAsync method when firstRender is true
-        /// </summary>
-        /// <returns></returns>
+
         public async Task Initialize()
         {
-            // Initialize
-            await _jsRuntime!.InvokeVoidAsync("initRenderJS", DotNetObjectReference.Create(this));
+            await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
         }
 
+        public async Task CaptureMouseEventsForCanvas()
+        {
+            await _jsRuntime!.InvokeVoidAsync("CaptureMouseEventsForCanvas");
+        }
+        public async Task RemoveMouseEventsForCanvas()
+        {
+            await _jsRuntime!.InvokeVoidAsync("RemoveMouseEventsForCanvas");
+        }
+
+        public async Task CaptureMouseEventsForSVG()
+        {
+            await _jsRuntime!.InvokeVoidAsync("CaptureMouseEventsForSVG");
+        }
+        public async Task RemoveMouseEventsForSVG()
+        {
+            await _jsRuntime!.InvokeVoidAsync("RemoveMouseEventsForSVG");
+        }
+
+        public async Task StartAnimation()
+        {
+            await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        }
+        public async Task StopAnimation()
+        {
+            await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        }
 
         [JSInvokable]
-        public async Task ResizeInBlazor(int width, int height)
+        public async Task ResizeWindowEventCalled(int width, int height)
         {
             var size = new Size(width, height);
             // Raise the CanvasResized event to the Blazor app
@@ -137,7 +128,7 @@ namespace FoundryBlazor.Canvas
 
 
         [JSInvokable]
-        public async ValueTask RenderInBlazor()
+        public async ValueTask RenderFrameEventCalled()
         {
             // calculate frames per second
             double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
@@ -160,35 +151,10 @@ namespace FoundryBlazor.Canvas
 
 
         [JSInvokable]
-        public async Task OnMouseOut(CanvasMouseArgs args)
-        {
-            args.Topic = "ON_MOUSE_OUT";
-            PubSub?.Publish<CanvasMouseArgs>(args);
-            await MouseOut.InvokeAsync(args);
-        }
-
-
-        [JSInvokable]
-        public async Task OnMouseIn(CanvasMouseArgs args)
-        {
-            args.Topic = "ON_MOUSE_IN";
-            PubSub?.Publish<CanvasMouseArgs>(args);
-            await MouseIn.InvokeAsync(args);
-        }
-
-        [JSInvokable]
-        public async Task OnMouseEnter(CanvasMouseArgs args)
-        {
-            args.Topic = "ON_MOUSE_ENTER";
-            PubSub?.Publish<CanvasMouseArgs>(args);
-            await MouseEnter.InvokeAsync(args);
-        }
-
-
-        [JSInvokable]
         public async Task OnMouseDown(CanvasMouseArgs args)
         {
             args.Topic = "ON_MOUSE_DOWN";
+
             PubSub?.Publish<CanvasMouseArgs>(args);
             await MouseDown.InvokeAsync(args);
         }
@@ -238,56 +204,7 @@ namespace FoundryBlazor.Canvas
             await KeyPress.InvokeAsync(args);
         }
 
-        [JSInvokable]
-        public async Task OnDragStart(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG_START";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await DragStart.InvokeAsync(args);
-        }
 
-        [JSInvokable]
-        public async Task OnDrag(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await Drag.InvokeAsync(args);
-        }
-        [JSInvokable]
-        public async Task OnDragEnd(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG_END";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await DragEnd.InvokeAsync(args);
-        }
-        [JSInvokable]
-        public async Task OnDragEnter(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG_ENTER";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await DragEnter.InvokeAsync(args);
-        }
-        [JSInvokable]
-        public async Task OnDragOver(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG_OVER";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await DragOver.InvokeAsync(args);
-        }
-        [JSInvokable]
-        public async Task OnDragLeave(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DRAG_LEAVE";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await DragLeave.InvokeAsync(args);
-        }
-        [JSInvokable]
-        public async Task OnDrop(CanvasDragArgs args)
-        {
-            args.Topic = "ON_DROP";
-            PubSub?.Publish<CanvasDragArgs>(args);
-            await Drop.InvokeAsync(args);
-        }
 
         /// <summary>
         /// Dispose of our module resource

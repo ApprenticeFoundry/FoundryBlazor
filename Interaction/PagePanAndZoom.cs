@@ -1,5 +1,7 @@
 using FoundryBlazor.Canvas;
 using BlazorComponentBus;
+using FoundryBlazor.PubSub;
+using FoundryRulesAndUnits.Extensions;
 
 
 namespace FoundryBlazor.Shape;
@@ -18,12 +20,12 @@ public class PagePanAndZoom : BaseInteraction
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
-    
+
     public override void Abort()
-    {     
+    {
         isDraggingPage = false;
     }
 
@@ -45,10 +47,15 @@ public class PagePanAndZoom : BaseInteraction
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
-        if ( isDraggingPage )
+        if (isDraggingPage)
+        {
             drawing.MovePanBy(args.MovementX, args.MovementY);
+            pubsub!.Publish<RefreshUIEvent>(new RefreshUIEvent("PanZoom"));
+        }
 
         return true;
     }
+
+
 
 }

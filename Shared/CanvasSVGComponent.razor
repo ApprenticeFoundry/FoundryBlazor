@@ -1,0 +1,12 @@
+﻿@using FoundryBlazor.Shared.SVG
+
+@inherits CanvasSVGComponentBase
+@namespace FoundryBlazor.Shared
+
+<div id="svgHolder" style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight>
+    <JSIntegrationHelper @ref="JSIntegrationRef" RenderFrame="RenderFrame">
+        <svg width=@CanvasWidth height=@CanvasHeight style="@StyleCanvas">
+            <Page Page="@GetCurrentPage()" />
+        </svg>
+    </JSIntegrationHelper>
+</div>

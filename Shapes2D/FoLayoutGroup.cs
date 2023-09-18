@@ -93,9 +93,9 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
         return (dx/distance, dy/distance, distance);
     }
 
-    public Rectangle Rect()
+    public Rectangle HitTestRect()
     {
-        return _item.Rect();
+        return _item.HitTestRect();
     }
 
     public bool IsSmashed()

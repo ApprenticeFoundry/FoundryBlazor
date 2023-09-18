@@ -17,6 +17,9 @@ public interface IGlueOwner: IGlyph2D
 public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 {
     private static int gluecount = 0;
+
+
+
     protected int x1 = 0;
     public int StartX { get { return this.x1; } set { this.x1 = AssignInt(value, x1); } }
     protected int y1 = 0;
@@ -28,7 +31,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
 
     private double rotation = 0;
     public float AntiRotation { get { return (float)(-1.0 * this.rotation * Matrix2D.DEG_TO_RAD); } }
-
+    public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
+    
     protected Point? startPT;
     protected Point? finishPT;
     public Point Start()
@@ -42,7 +46,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
                 return new Point();
             }
 
-            startPT = matrix.TransformPoint(StartX, StartY);
+            startPT = matrix.TransformToPoint(StartX, StartY);
         }
         return (Point)startPT;
     }
@@ -56,7 +60,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
                 "Point Finish() IMPOSSABLE".WriteError();
                 return new Point();
             }
-            finishPT = matrix.TransformPoint(FinishX, FinishY);
+            finishPT = matrix.TransformToPoint(FinishX, FinishY);
         }
         return (Point)finishPT;
     }
@@ -146,14 +150,15 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         await ctx.StrokeAsync();
     };
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
         var d = Height / 2;
-        var sz = new Size(Height, Height);
+        //var sz = new Size(Height, Height);
         var loc = PinLocation();
         var matrix = GetMatrix();
-        var pt = matrix?.TransformPoint(loc.X - d, loc.Y - d) ?? new Point(loc.X, loc.Y);
-        var result = new Rectangle(pt, sz);
+        var (x, y) = matrix.TransformPoint(loc.X - d, loc.Y - d); // ?? new Point(loc.X, loc.Y);
+        //hit test in the center 
+        var result = new Rectangle(x, y, Height, Height);
         return result;
     }
 

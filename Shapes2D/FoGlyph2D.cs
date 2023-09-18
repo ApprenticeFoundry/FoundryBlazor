@@ -1,9 +1,12 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Canvas;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
+using Microsoft.AspNetCore.Components;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.Xml;
 using Unglide;
 
 namespace FoundryBlazor.Shape;
@@ -35,7 +38,7 @@ public enum ClickStyle
 
 public interface IHasRectangle
 {
-    Rectangle Rect();
+    Rectangle HitTestRect();
     bool IsSmashed();
 }
 
@@ -44,6 +47,7 @@ public interface IRender
     public Task Draw(Canvas2DContext ctx, int tick);
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
+
 }
 
 
@@ -65,7 +69,8 @@ public interface IGlyph2D : IHasRectangle
 public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 {
     public static Tweener Animations { get; set; } = new Tweener();
-    public static bool ResetHitTesting { get; set; } = false;
+    private static bool _resetHitTesting = false;
+
     public float Thickness { get; set; }
     public bool Selectable { get; set; } = true;
     public bool IsSelected { get; set; } = false;
@@ -74,12 +79,36 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
     public int Index { get; set; } = 0;
+
     public string id = Guid.NewGuid().ToString(); //use this to trap changes in GlyphId
     public string GlyphId
     {
         get { return this.id; }
         set { this.id = value; }
     }
+
+    protected Rectangle rectangle = new(0, 0, 0, 0);
+    public static bool PeekResetHitTesting()
+    {
+        var result = _resetHitTesting;
+        return result;
+    }
+    public static bool MustResetHitTesting()
+    {
+        var result = _resetHitTesting;
+        _resetHitTesting = false;
+        return result;
+    }
+    public static void ResetHitTesting(bool value, string note = "")
+    {
+        if (_resetHitTesting == value)
+            return;
+
+        _resetHitTesting = value;
+        // if (_resetHitTesting)
+        //     $"ResetHitTesting on next itteration {note}".WriteInfo();
+    }
+
 
     protected int x = 0;
     public int PinX { get { return this.x; } set { this.x = AssignInt(value, x); } }
@@ -101,7 +130,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         set
         {
             this.color = value;
-            $"{GetType().Name} {Name} Color Change {color}".WriteNote();
+            // $"{GetType().Name} {Name} Color Change {color}".WriteNote();
         }
     }
 
@@ -122,8 +151,10 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
 
+    protected Action<FoGlyph2D>? OnMatrixRefresh;
+    protected Action<FoGlyph2D>? OnMatrixSmash;
+
     public Action<FoGlyph2D, int>? ContextLink;
-    public Action<FoGlyph2D>? OnMatrixRefresh;
     public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
     public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
     public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
@@ -184,7 +215,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (Level > 0 && GetParent() is FoGlyph2D parent)
         {
             var matrix = parent.GetMatrix();
-            source = matrix.TransformPoint(source);
+            source = matrix.TransformToPoint(source.X, source.Y);
             return parent.ParentAttachTo(source);
         }
 
@@ -269,11 +300,12 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return false;
     }
 
-    public virtual Rectangle Rect()
+    public virtual Rectangle HitTestRect()
     {
         //this does not work for rotated objects
-        var result = GetMatrix().TransformRectangle(0, 0, Width, Height);
-        return result;
+        var mat = GetMatrix();
+        mat.TransformRectangle(0, 0, Width, Height, ref rectangle);
+        return rectangle;
     }
 
     public virtual FoGlyph2D ResizeTo(int width, int height) { (Width, Height) = (width, height); return this; }
@@ -353,6 +385,13 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         OnMatrixRefresh = action;
         return this;
     }
+    public FoGlyph2D AfterMatrixSmash(Action<FoGlyph2D> action)
+    {
+        OnMatrixSmash = action;
+        return this;
+    }
+
+
 
     public virtual async Task UpdateContext(Canvas2DContext ctx, int tick)
     {
@@ -425,7 +464,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public bool IntersectsRegion(Rectangle region)
     {
-        return region.IntersectsWith(Rect());
+        return region.IntersectsWith(HitTestRect());
     }
 
     public bool IsInRegion(Rectangle region)
@@ -465,6 +504,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
         return true;
     }
+
+
 
     public virtual async Task Draw(Canvas2DContext ctx, int tick)
     {
@@ -506,6 +547,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         await ctx.RestoreAsync();
         return true;
     }
+
+
 
     public async virtual Task DrawWhenSelected(Canvas2DContext ctx, int tick, bool deep)
     {
@@ -795,8 +838,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (_matrix == null && !force) return false;
         //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
+        OnMatrixSmash?.Invoke(this);
+
         //SRS SET THIS IN ORDER TO Do ANY HITTEST!!!!
-        ResetHitTesting = true;
+        ResetHitTesting(true, "Glyph Smashed");
+
         this._matrix = Matrix2D.SmashMatrix(this._matrix);
         this._invMatrix = Matrix2D.SmashMatrix(this._invMatrix);
 
