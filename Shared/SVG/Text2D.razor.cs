@@ -2,6 +2,7 @@ using FoundryBlazor.Shape;
 using FoundryBlazor.PubSub;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
+using System.Text;
 
 namespace FoundryBlazor.Shared.SVG;
 
@@ -43,8 +44,13 @@ public class Text2DBase : SVGBase<FoText2D>
 
     protected string GetTextareaStyle()
     {
-        // return $"background-color: {GetColor()};color: {GetTextColor()};width: {GetWidth() - 2 * PaddingX}px;height: {GetHeight() - 2 * PaddingY}px";
-        return $"background-color: orange;color: {GetTextColor()};width: {GetWidth() - 2 * PaddingX}px;height: {GetHeight() - 2 * PaddingY}px";
+        var style = new StringBuilder();
+        style.Append("resize: none").Append(";")
+            .Append("background-color:").Append(GetColor()).Append(";")
+            .Append("color:").Append(GetTextColor()).Append(";")
+            .Append("width:").Append(GetWidth() - 2 * PaddingX).Append("px").Append(";")
+            .Append("height:").Append(GetHeight() - 2 * PaddingY).Append("px").Append(";");
+        return style.ToString();
     }
 
     protected void OnClickText()
