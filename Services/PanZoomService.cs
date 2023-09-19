@@ -257,6 +257,8 @@ public class PanZoomService : IPanZoomService
         return newRect;
     }
 
+
+
     public double ZoomWheel(double delta)
     {
         State.LastZoom = State.Zoom;

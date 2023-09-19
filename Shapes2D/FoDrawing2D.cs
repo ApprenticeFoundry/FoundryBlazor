@@ -66,7 +66,7 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-    public bool ShowStats { get; set; } = false;
+    public bool ShowStats { get; set; } = true;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
     private bool RenderHitTestTree = true;
@@ -512,9 +512,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         var page = PageManager.CurrentPage();
 
         await ClearCanvas(ctx);
-
-
-
 
         await ctx.SaveAsync();
 

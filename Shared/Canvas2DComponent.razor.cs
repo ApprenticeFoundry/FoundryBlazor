@@ -22,6 +22,7 @@ public class Canvas2DComponentBase : BECanvasComponent
     public new BECanvasComponent? CanvasReference;
     protected string CurrentKey { get; set; } = "";
     public int tick { get; private set; }
+    private DateTime _lastRender;
 
     private Canvas2DContext? Ctx;
 
@@ -42,10 +43,7 @@ public class Canvas2DComponentBase : BECanvasComponent
             CreateTickPlayground();
             SetDoTugOfWar();
             DoStart();
-            // ReDraw();
 
-            // await Ctx.SetFillStyleAsync(color);
-            // await Ctx.FillRectAsync(0, 0, 200, 100);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -53,8 +51,10 @@ public class Canvas2DComponentBase : BECanvasComponent
     [JSInvokable]
     public async ValueTask RenderFrameEventCalled()
     {
-        ReDraw();
-        await Task.CompletedTask;
+        double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
+        _lastRender = DateTime.Now; // update for the next time 
+
+        await RenderFrame(fps);
     }
 
     public async Task RenderFrame(double fps)
@@ -84,13 +84,6 @@ public class Canvas2DComponentBase : BECanvasComponent
         Workspace?.PostRender(tick);
     }
 
-    public void ReDraw()
-    {
-        Task.Run(async () =>
-        {
-            await RenderFrame(.11);
-        });
-    }
 
     private void CreateTickPlayground()
     {
@@ -279,9 +272,5 @@ public class Canvas2DComponentBase : BECanvasComponent
     {
         var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_PRESS");
         PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-
-        if (canvasArgs.Key.ToUpper() == "R")
-            ReDraw();
-
     }
 }
