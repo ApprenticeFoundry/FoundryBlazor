@@ -20,7 +20,7 @@ public class InputWrapperBase : ComponentBase
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-
+    [Parameter] public string style { get; set; } = "width:max-content; border:1px solid black;";
 
 
     protected void OnMouseDown(MouseEventArgs args)

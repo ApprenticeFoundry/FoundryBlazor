@@ -24,18 +24,15 @@ public class CanvasSVGComponentBase : ComponentBase
 
     private DateTime _lastRender;
 
-    protected override async Task OnInitializedAsync()
-    {
-        HitTestService!.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-        await base.OnInitializedAsync();
 
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
 
+            var drawing = Workspace!.GetDrawing();
+            drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
             DoStart();
             // CreateTickPlayground();
 
@@ -80,78 +77,15 @@ public class CanvasSVGComponentBase : ComponentBase
     {
         return Workspace!.CurrentPage();
     }
-    private void CreateTickPlayground()
-    {
-        var drawing = Workspace!.GetDrawing();
-        if (drawing == null) return;
-        var s1 = new FoShape2D(200, 200, "Green");
-        drawing.AddShape(s1);
-        s1.MoveTo(200, 200);
-        var s2 = new FoShape2D(200, 25, "Blue")
-        {
-            LocPinX = (obj) => obj.Width / 4
-        };
-        drawing.AddShape(s2);
-        s2.BeforeShapeRefresh((obj, tick) =>
-        {
-            obj.PinX = s1.PinX;
-            obj.PinY = s1.PinY;
-            obj.Angle += 1;
-        });
-    }
 
-    private void SetDoTugOfWar()
-    {
-        var drawing = Workspace!.GetDrawing();
-        if (drawing == null) return;
-        var s1 = new FoShape2D(50, 50, "Blue");
-        s1.MoveTo(300, 200);
-        var s2 = new FoShape2D(50, 50, "Orange");
-        s2.MoveTo(500, 200);
-        var service = Workspace.GetSelectionService();
-        service.AddItem(drawing.AddShape(s1));
-        service.AddItem(drawing.AddShape(s2));
-        var wire2 = new FoShape1D("Arrow", "Cyan")
-        {
-            Height = 50,
-            ShapeDraw = async (ctx, obj) => await DrawSteveArrowAsync(ctx, obj.Width, obj.Height, obj.Color)
-        };
-        wire2.GlueStartTo(s1, "RIGHT");
-        wire2.GlueFinishTo(s2, "LEFT");
-        drawing.AddShape(wire2);
-        FoGlyph2D.Animations.Tween<FoShape2D>(s1, new { PinX = s1.PinX - 150, }, 2, 2.2F);
-        FoGlyph2D.Animations.Tween<FoShape2D>(s2, new { PinX = s2.PinX + 150, PinY = s2.PinY + 50, }, 2, 2.4f).OnComplete(() =>
-        {
-            service.ClearAll();
-        });
-    }
 
-    private static async Task DrawSteveArrowAsync(Canvas2DContext ctx, int width, int height, string color)
-    {
-        var headWidth = 40;
-        var bodyHeight = height / 4;
-        var bodyWidth = width - headWidth;
-        await ctx.SetFillStyleAsync(color);
-        var y = (height - bodyHeight) / 2.0;
-        await ctx.FillRectAsync(0, y, bodyWidth, bodyHeight);
-        await ctx.BeginPathAsync();
-        await ctx.MoveToAsync(bodyWidth, 0);
-        await ctx.LineToAsync(width, height / 2);
-        await ctx.LineToAsync(bodyWidth, height);
-        await ctx.LineToAsync(bodyWidth, 0);
-        await ctx.ClosePathAsync();
-        await ctx.FillAsync();
-        await ctx.SetFillStyleAsync("#fff");
-        await ctx.FillTextAsync("→", width / 2, height / 2, 20);
-    }
-
+ 
     public void DoStart()
     {
 
         Task.Run(async () =>
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-
         });
     }
 
@@ -164,104 +98,4 @@ public class CanvasSVGComponentBase : ComponentBase
         });
     }
 
-    protected void OnMouseDown(MouseEventArgs args)
-    {
-        var topic = "ON_MOUSE_DOWN";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-    }
-
-    private static CanvasMouseArgs ToCanvasMouseArgs(MouseEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasMouseArgs
-        {
-            ScreenX = (int)args.ScreenX,
-            ScreenY = (int)args.ScreenY,
-            ClientX = (int)args.ClientX,
-            ClientY = (int)args.ClientY,
-            MovementX = (int)args.MovementX,
-            MovementY = (int)args.MovementY,
-            OffsetX = (int)args.OffsetX,
-            OffsetY = (int)args.OffsetY,
-            AltKey = args.AltKey,
-            CtrlKey = args.CtrlKey,
-            MetaKey = args.MetaKey,
-            ShiftKey = args.ShiftKey,
-            Button = (int)args.Button,
-            Buttons = (int)args.Buttons,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    private static CanvasWheelChangeArgs ToCanvasWheelChangeArgs(WheelEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasWheelChangeArgs
-        {
-            DeltaX = args.DeltaX,
-            DeltaY = args.DeltaY,
-            DeltaZ = args.DeltaZ,
-            DeltaMode = (int)args.DeltaMode,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    private static CanvasKeyboardEventArgs ToCanvasKeyboardArgs(KeyboardEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasKeyboardEventArgs
-        {
-            AltKey = args.AltKey,
-            CtrlKey = args.CtrlKey,
-            MetaKey = args.MetaKey,
-            ShiftKey = args.ShiftKey,
-            Code = args.Code,
-            Key = args.Key,
-            Repeat = args.Repeat,
-            Location = (int)args.Location,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    protected void OnMouseUp(MouseEventArgs args)
-    {
-        var topic = "ON_MOUSE_UP";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-    }
-
-    protected void OnWheelMove(WheelEventArgs args)
-    {
-        var topic = "ON_WHEEL_CHANGE";
-        CanvasWheelChangeArgs canvasArgs = ToCanvasWheelChangeArgs(args, topic);
-
-        PubSub?.Publish<CanvasWheelChangeArgs>(canvasArgs);
-        FoGlyph2D.ResetHitTesting(true, "ON_WHEEL_CHANGE");
-    }
-
-    protected void OnMouseMove(MouseEventArgs args)
-    {
-        var topic = "ON_MOUSE_MOVE";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-    }
-
-    protected void OnKeyDown(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_DOWN");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-    }
-    protected void OnKeyUp(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_UP");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-
-    }
-    protected void OnKeyPress(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_PRESS");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-    }
 }

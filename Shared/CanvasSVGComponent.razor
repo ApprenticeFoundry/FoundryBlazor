@@ -2,10 +2,8 @@
 @using FoundryBlazor.Shared.SVG
 @namespace FoundryBlazor.Shared
 
-<div style="width:max-content; border:1px solid black;cursor:default" contenteditable="true" @onkeydown="OnKeyDown"
-    @onkeypress="OnKeyPress" @onkeyup="OnKeyUp">
-    <svg width=@CanvasWidth height=@CanvasHeight style="@StyleCanvas" @onmousedown="OnMouseDown" @onmouseup="OnMouseUp"
-        @onmousewheel="@OnWheelMove" @onmousemove="@OnMouseMove">
+<InputWrapper style="width:max-content; border:1px solid black;cursor:default" >
+    <svg width=@CanvasWidth height=@CanvasHeight style="@StyleCanvas" >
         <Page Page="@GetCurrentPage()" />
     </svg>
-</div>
+</InputWrapper>
