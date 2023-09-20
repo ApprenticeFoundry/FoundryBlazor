@@ -26,12 +26,7 @@ public class Canvas2DNewComponentBase : BECanvasComponent
 
     private Canvas2DContext? Ctx;
 
-    protected override async Task OnInitializedAsync()
-    {
 
-        await base.OnInitializedAsync();
-
-    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
