@@ -12,13 +12,14 @@ public class ShapeHovering : BaseInteraction
     public ShapeHovering(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
 
@@ -45,7 +46,7 @@ public class ShapeHovering : BaseInteraction
         });
         lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
 
-        
+
         //list.ForEach(item => pubsub.Publish(item));    
 
         return true;

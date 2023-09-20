@@ -7,24 +7,25 @@ namespace FoundryBlazor.Shape;
 
 public class ShapeResizing : ShapeHovering
 {
- 
+
     private bool isResizingShape = false;
 
 
     public ShapeResizing(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
-    
-     public override bool IsDefaultTool(CanvasMouseArgs args)
+
+    public override bool IsDefaultTool(CanvasMouseArgs args)
     {
         DragArea = panZoomService.HitRectStart(args);
         var findings = hitTestService?.FindGlyph(DragArea);
@@ -77,7 +78,9 @@ public class ShapeResizing : ShapeHovering
         {
             var newSize = panZoomService.HitRectContinue(args, DragArea);
             selectedShape.ResizeToBox(newSize);
-        } else {
+        }
+        else
+        {
             base.MouseMove(args); // this should hover    
         }
 

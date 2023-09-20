@@ -8,27 +8,28 @@ using FoundryRulesAndUnits.Extensions;
 namespace FoundryBlazor.Shape;
 
 
-public class ShapeConnecting :  ShapeHovering
+public class ShapeConnecting : ShapeHovering
 {
     private bool isConnecting = false;
 
     public Type SourceType { get; set; } = typeof(FoGlyph2D);
     public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
-    public ShapeConnecting (
+    public ShapeConnecting(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
-            ComponentBus pub,
+            ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
     public override void Abort()
-    {     
+    {
         isConnecting = false;
         lastHover?.ForEach(child => child.HoverDraw = null);
     }
@@ -60,10 +61,10 @@ public class ShapeConnecting :  ShapeHovering
             await ctx.StrokeAsync();
         }
     }
-       
+
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        if ( selectedShape != null )
+        if (selectedShape != null)
         {
             isConnecting = true;
             selectionService?.ClearAllWhen(true);
@@ -77,7 +78,7 @@ public class ShapeConnecting :  ShapeHovering
     {
         var findings = hitTestService?.FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
-        return heros.ToList(); 
+        return heros.ToList();
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
@@ -85,7 +86,7 @@ public class ShapeConnecting :  ShapeHovering
         var findings = hitTestService?.FindGlyph(rect);
         var targets = findings!.Where(item => item.GetType() == TargetType);
         //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
-        return targets.ToList(); 
+        return targets.ToList();
     }
 
     public override bool MouseUp(CanvasMouseArgs args)
@@ -97,7 +98,7 @@ public class ShapeConnecting :  ShapeHovering
             var findings = ValidDropTarget(over);
             var found = findings!.Where(item => item != selectedShape).FirstOrDefault();
 
-            if ( found != null)
+            if (found != null)
             {
                 //link this in the model and force a new layout
                 var msg = new AttachAssetFileEvent()
@@ -117,7 +118,8 @@ public class ShapeConnecting :  ShapeHovering
     public override bool MouseMove(CanvasMouseArgs args)
     {
         //SendUserMove(args, true);
-        if (isConnecting) {
+        if (isConnecting)
+        {
             DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.MouseDeltaMovement();
 
@@ -129,12 +131,12 @@ public class ShapeConnecting :  ShapeHovering
 
         lastHover?.ForEach(child => child.HoverDraw = null);
 
-        if ( selectedShape != null)
+        if (selectedShape != null)
         {
             lastHover = found;
             lastHover.ForEach(child => child.HoverDraw = OnHoverTarget);
         }
-        
+
         return true;
     }
 
@@ -146,7 +148,7 @@ public class ShapeConnecting :  ShapeHovering
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
         await ctx.SetLineWidthAsync(10);
         await ctx.SetStrokeStyleAsync("White");
-        await ctx.StrokeRectAsync(-5, -5, obj.Width+10, obj.Height+10);
+        await ctx.StrokeRectAsync(-5, -5, obj.Width + 10, obj.Height + 10);
 
         await ctx.RestoreAsync();
     };

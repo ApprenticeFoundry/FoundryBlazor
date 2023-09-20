@@ -11,13 +11,14 @@ public class ShapeMenu : ShapeDragging
     public ShapeMenu(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
 
@@ -38,7 +39,7 @@ public class ShapeMenu : ShapeDragging
 
         var menu = findings?.LastOrDefault() as FoMenu2D;
         menu?.OnShapeClick(ClickStyle.MouseDown, args);
-        if (menu?.MouseHit(args) == true) 
+        if (menu?.MouseHit(args) == true)
             return true;
 
         return base.MouseDown(args);

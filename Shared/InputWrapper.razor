@@ -2,13 +2,7 @@
 @namespace FoundryBlazor.Shared
 
 
-<div style="@style" contenteditable="true" 
-    @onkeydown="OnKeyDown"
-    @onkeypress="OnKeyPress" 
-    @onkeyup="OnKeyUp" 
-    @onmousedown="OnMouseDown" 
-    @onmouseup="OnMouseUp"
-    @onmousewheel="@OnWheelMove"
-    @onmousemove="@OnMouseMove">
+<div style="@GetCursor()" contenteditable="true" @onkeydown="OnKeyDown" @onkeypress="OnKeyPress" @onkeyup="OnKeyUp"
+    @onmousedown="OnMouseDown" @onmouseup="OnMouseUp" @onmousewheel="@OnWheelMove" @onmousemove="@OnMouseMove">
     @ChildContent
 </div>

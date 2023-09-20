@@ -20,8 +20,7 @@ public class InputWrapperBase : ComponentBase
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    [Parameter] public string style { get; set; } = "width:max-content; border:1px solid black;";
-
+    [Parameter] public string style { get; set; } = "width:max-content; border:1px solid black; cursor: default";
 
     protected void OnMouseDown(MouseEventArgs args)
     {
@@ -119,6 +118,13 @@ public class InputWrapperBase : ComponentBase
             Topic = topic
         };
         return canvasArgs;
+    }
+
+    protected string GetCursor()
+    {
+        var drawing = Workspace!.GetDrawing();
+        var cursor = drawing.GetInteraction().GetCursor();
+        return $"cursor: {cursor}";
     }
 
 

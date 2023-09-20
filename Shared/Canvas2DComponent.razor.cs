@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
-using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Blazor.Extensions;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
@@ -20,7 +17,6 @@ public class Canvas2DComponentBase : BECanvasComponent
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
     public new BECanvasComponent? CanvasReference;
-    protected string CurrentKey { get; set; } = "";
     public int tick { get; private set; }
     private DateTime _lastRender;
 
@@ -36,7 +32,6 @@ public class Canvas2DComponentBase : BECanvasComponent
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
-            // var color = "green";
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
             CreateTickPlayground();
             SetDoTugOfWar();
@@ -166,7 +161,5 @@ public class Canvas2DComponentBase : BECanvasComponent
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
         });
     }
-
-
 
 }

@@ -60,7 +60,7 @@ public interface IDrawing : IRender
     void ClearAll();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
-
+    IBaseInteraction GetInteraction();
     bool ToggleHitTestRender();
 }
 
@@ -179,17 +179,18 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PubSub = pubSub;
 
 
+        // https://www.w3schools.com/cssref/pr_class_cursor.php
         interactionRules = new()
         {
-            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 11, this, pubSub, panzoom, select, manager, hittest)},
-            {new MoShapeLinking(InteractionStyle.ModelLinking, 10, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeMenu(InteractionStyle.ShapeMenu, 9, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeResizing(InteractionStyle.ShapeResizing, 7, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(InteractionStyle.ShapeDragging, 5, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(InteractionStyle.ShapeSelection, 4, this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(InteractionStyle.ShapeHovering, 3, this, pubSub, panzoom, select, manager, hittest)},
-            {new BaseInteraction(InteractionStyle.ReadOnly, 0, this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 11, "pointer", this, pubSub, panzoom, select, manager, hittest)},
+            {new MoShapeLinking(InteractionStyle.ModelLinking, 10, "default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeMenu(InteractionStyle.ShapeMenu, 9,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeResizing(InteractionStyle.ShapeResizing, 7,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(InteractionStyle.ShapeDragging, 5,"grab", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(InteractionStyle.ShapeSelection, 4,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(InteractionStyle.ShapeHovering, 3,"move", this, pubSub, panzoom, select, manager, hittest)},
+            {new BaseInteraction(InteractionStyle.ReadOnly, 0,"default", this, pubSub, panzoom, select, manager, hittest)},
         };
 
         interactionLookup = new();
@@ -571,7 +572,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
     }
-    public  void RenderDrawingSVG(int tick, double fps)
+    public void RenderDrawingSVG(int tick, double fps)
     {
 
         //skip this frame is still working 
