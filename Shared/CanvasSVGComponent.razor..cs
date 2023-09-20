@@ -67,7 +67,7 @@ public class CanvasSVGComponentBase : ComponentBase
         if (drawing.SetCurrentlyRendering(true, tick)) return;
 
         // await drawing.RenderDrawing(Ctx, tick, fps);
-        await drawing.RenderDrawingSVG(tick, fps);
+        drawing.RenderDrawingSVG(tick, fps);
         await InvokeAsync(StateHasChanged);
         // Workspace?.RenderWatermark(Ctx, tick);
 

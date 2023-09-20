@@ -28,7 +28,7 @@ public interface IPanZoomService
     Rectangle HitRectTopLeft(CanvasMouseArgs args, Rectangle rect);
     Rectangle HitRectContinue(CanvasMouseArgs args, Rectangle rect);
     Task<PanZoomService> TranslateAndScale(Canvas2DContext ctx, FoGlyph2D page);
-    Task<PanZoomService> TranslateAndScale(FoGlyph2D page);
+    PanZoomService TranslateAndScale(FoGlyph2D page);
     Rectangle TransformRect(Rectangle rect);
     Rectangle AntiScaleRect(Rectangle rect);
     Rectangle Normalize(Rectangle rect);
@@ -281,10 +281,9 @@ public class PanZoomService : IPanZoomService
         pany = State.Pan.Y;
     }
 
-    public async Task<PanZoomService> TranslateAndScale(FoGlyph2D shape)
+    public PanZoomService TranslateAndScale(FoGlyph2D shape)
     {
         var mtx = this.GetMatrix();
-        await Task.CompletedTask;
         return this;
     }
 

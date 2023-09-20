@@ -40,7 +40,7 @@ public interface IDrawing : IRender
     FoPanZoomWindow PanZoomWindow();
 
     Task RenderDrawing(Canvas2DContext ctx, int tick, double fps);
-    Task RenderDrawingSVG(int tick, double fps);
+    void RenderDrawingSVG(int tick, double fps);
     void SetPreRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
@@ -525,12 +525,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (PostRender != null)
             await PostRender.Invoke(ctx, tick);
 
-        await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
+        //await PanZoomWindow().RenderConcise(ctx, zoom, page.HitTestRect());
 
         await ctx.RestoreAsync();
 
-        if (RenderHitTestTree)
-            await HitTestService.RenderQuadTree(ctx, true);
+        // if (RenderHitTestTree)
+        //     await HitTestService.RenderQuadTree(ctx, true);
 
         await GetInteraction().RenderDrawing(ctx, tick);
 
@@ -571,7 +571,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             await ctx.FillTextAsync(user.UserID, user.X + 5, user.Y + 20);
         });
     }
-    public async Task RenderDrawingSVG(int tick, double fps)
+    public  void RenderDrawingSVG(int tick, double fps)
     {
 
         //skip this frame is still working 
@@ -585,7 +585,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         var page = PageManager.CurrentPage();
 
-        await PanZoomService.TranslateAndScale(page);
+        PanZoomService.TranslateAndScale(page);
         page.AllShapes2D().ForEach(shape => shape.ContextLink?.Invoke(shape, tick));
 
         // if (PreRender != null)
