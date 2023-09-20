@@ -13,13 +13,14 @@ public class ShapeDragging : ShapeHovering
     public ShapeDragging(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
 
@@ -40,27 +41,28 @@ public class ShapeDragging : ShapeHovering
 
         DragArea = panZoomService.HitRectStart(args);
         var findings = hitTestService?.FindGlyph(DragArea);
-        var hitShape = findings?.LastOrDefault(); 
+        var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
 
 
         selectedShape = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
-        if ( selectedShape != null ) 
+        if (selectedShape != null)
         {
             selectionService.MouseStartDrag();
-        }       
+        }
 
         if (selectedShape != null)
         {
             isDraggingShapes = true;
         }
-        else if ( hitShape != null && !hitShape.IsSelected )
+        else if (hitShape != null && !hitShape.IsSelected)
         {
             selectionService.ClearAll();
             selectionService.AddItem(hitShape);
             isDraggingShapes = true;
-        } 
-        else {
+        }
+        else
+        {
             selectionService.ClearAll();
         }
 
@@ -78,14 +80,16 @@ public class ShapeDragging : ShapeHovering
 
     public override bool MouseMove(CanvasMouseArgs args)
     {
-        if (isDraggingShapes) {
+        if (isDraggingShapes)
+        {
             //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
             DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }
-        else {
+        else
+        {
             base.MouseMove(args); // this should hover        
         }
 

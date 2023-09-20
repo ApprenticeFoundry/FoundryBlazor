@@ -17,13 +17,14 @@ public class ShapeSelection : ShapeHovering
     public ShapeSelection(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
     public override bool IsDefaultTool(CanvasMouseArgs args)

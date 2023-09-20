@@ -17,16 +17,17 @@ public class MoShapeLinking : ShapeHovering
     public MoShapeLinking(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
     }
-    
+
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
         DragArea = panZoomService.HitRectStart(args);
@@ -61,7 +62,7 @@ public class MoShapeLinking : ShapeHovering
     }
 
     public override bool MouseUp(CanvasMouseArgs args)
-    {        
+    {
         if (dragTarget != null && selectedShape != null)
         {
             var hits = panZoomService.HitRectStart(args);
@@ -81,7 +82,7 @@ public class MoShapeLinking : ShapeHovering
                 var shapeB = new FoShape1D(selectedShape, TargetShape, 8, "Green");
                 pageManager?.AddShape<FoShape1D>(shapeB);
             }
-            
+
 
             lastHoverTarget?.ForEach(child => child.HoverDraw = null);
             selectedShape = null;
@@ -125,7 +126,7 @@ public class MoShapeLinking : ShapeHovering
         //await ctx.SetLineDashAsync(new float[] { 10, 10 });
         await ctx.SetLineWidthAsync(thickness);
         await ctx.SetStrokeStyleAsync("Orange");
-        await ctx.StrokeRectAsync(half, half, obj.Width+thickness, obj.Height+thickness);
+        await ctx.StrokeRectAsync(half, half, obj.Width + thickness, obj.Height + thickness);
 
         await ctx.RestoreAsync();
     };

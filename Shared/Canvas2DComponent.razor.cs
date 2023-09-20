@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
-using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Blazor.Extensions;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
@@ -20,7 +17,6 @@ public class Canvas2DComponentBase : BECanvasComponent
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
     public new BECanvasComponent? CanvasReference;
-    protected string CurrentKey { get; set; } = "";
     public int tick { get; private set; }
     private DateTime _lastRender;
 
@@ -36,7 +32,6 @@ public class Canvas2DComponentBase : BECanvasComponent
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
-            // var color = "green";
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
             CreateTickPlayground();
             SetDoTugOfWar();
@@ -167,108 +162,4 @@ public class Canvas2DComponentBase : BECanvasComponent
         });
     }
 
-    protected void OnMouseDown(MouseEventArgs args)
-    {
-        $"On Mouse Down {args.ClientX}, {args.ClientY}".WriteInfo();
-
-        var topic = "ON_MOUSE_DOWN";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-    }
-
-    private static CanvasMouseArgs ToCanvasMouseArgs(MouseEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasMouseArgs
-        {
-            ScreenX = (int)args.ScreenX,
-            ScreenY = (int)args.ScreenY,
-            ClientX = (int)args.ClientX,
-            ClientY = (int)args.ClientY,
-            MovementX = (int)args.MovementX,
-            MovementY = (int)args.MovementY,
-            OffsetX = (int)args.OffsetX,
-            OffsetY = (int)args.OffsetY,
-            AltKey = args.AltKey,
-            CtrlKey = args.CtrlKey,
-            MetaKey = args.MetaKey,
-            ShiftKey = args.ShiftKey,
-            Button = (int)args.Button,
-            Buttons = (int)args.Buttons,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    private static CanvasWheelChangeArgs ToCanvasWheelChangeArgs(WheelEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasWheelChangeArgs
-        {
-            DeltaX = args.DeltaX,
-            DeltaY = args.DeltaY,
-            DeltaZ = args.DeltaZ,
-            DeltaMode = (int)args.DeltaMode,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    private static CanvasKeyboardEventArgs ToCanvasKeyboardArgs(KeyboardEventArgs args, string topic)
-    {
-        var canvasArgs = new CanvasKeyboardEventArgs
-        {
-            AltKey = args.AltKey,
-            CtrlKey = args.CtrlKey,
-            MetaKey = args.MetaKey,
-            ShiftKey = args.ShiftKey,
-            Code = args.Code,
-            Key = args.Key,
-            Repeat = args.Repeat,
-            Location = (int)args.Location,
-            Topic = topic
-        };
-        return canvasArgs;
-    }
-
-    protected void OnMouseUp(MouseEventArgs args)
-    {
-        var topic = "ON_MOUSE_UP";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-        // ReDraw();
-    }
-
-    protected void OnWheelMove(WheelEventArgs args)
-    {
-        var topic = "ON_WHEEL_CHANGE";
-        CanvasWheelChangeArgs canvasArgs = ToCanvasWheelChangeArgs(args, topic);
-
-        PubSub?.Publish<CanvasWheelChangeArgs>(canvasArgs);
-        // ReDraw();
-    }
-
-    protected void OnMouseMove(MouseEventArgs args)
-    {
-        var topic = "ON_MOUSE_MOVE";
-        CanvasMouseArgs canvasArgs = ToCanvasMouseArgs(args, topic);
-
-        PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
-        // ReDraw();
-    }
-
-    protected void OnKeyDown(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_DOWN");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-    }
-    protected void OnKeyUp(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_UP");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-
-    }
-    protected void OnKeyPress(KeyboardEventArgs args)
-    {
-        var canvasArgs = ToCanvasKeyboardArgs(args, "ON_KEY_PRESS");
-        PubSub?.Publish<CanvasKeyboardEventArgs>(canvasArgs);
-    }
 }

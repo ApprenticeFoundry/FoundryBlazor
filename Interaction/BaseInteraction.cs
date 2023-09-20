@@ -32,6 +32,7 @@ public interface IBaseInteraction
     void Abort();
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
+    string GetCursor();
 
 }
 
@@ -40,9 +41,10 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     static public Rectangle DragArea = new();
 
     public int Priority { get; set; } = 0;
+    public string Cursor { get; set; } = "default";
     public InteractionStyle Style { get; set; } = InteractionStyle.None;
     protected FoGlyph2D? selectedShape;
-    
+
     protected List<FoGlyph2D>? lastHover = null;
 
     protected FoDrawing2D drawing;
@@ -55,23 +57,25 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public BaseInteraction(
             InteractionStyle style,
             int priority,
+            string cursor,
             FoDrawing2D draw,
             ComponentBus pub,
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ): base()
-        {
-            Style = style;
-            Priority = priority;
-            drawing = draw;
-            pubsub = pub;
-            hitTestService = hitTest;
-            selectionService = select;
-            panZoomService = panzoom;
-            pageManager = manager;
-        }
+        ) : base()
+    {
+        Style = style;
+        Priority = priority;
+        Cursor = cursor;
+        drawing = draw;
+        pubsub = pub;
+        hitTestService = hitTest;
+        selectionService = select;
+        panZoomService = panzoom;
+        pageManager = manager;
+    }
 
 
 
@@ -103,7 +107,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     }
 
     public virtual void Abort()
-    {     
+    {
     }
 
     public virtual async Task RenderDrawing(Canvas2DContext ctx, int tick)
@@ -128,6 +132,11 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public virtual bool MouseMove(CanvasMouseArgs args)
     {
         return false;
+    }
+
+    public string GetCursor()
+    {
+        return Cursor;
     }
     // public virtual bool MouseIn(CanvasMouseArgs args)
     // {

@@ -1,0 +1,8 @@
+﻿@inherits InputWrapperBase
+@namespace FoundryBlazor.Shared
+
+
+<div style="@GetCursor()" contenteditable="true" @onkeydown="OnKeyDown" @onkeypress="OnKeyPress" @onkeyup="OnKeyUp"
+    @onmousedown="OnMouseDown" @onmouseup="OnMouseUp" @onmousewheel="@OnWheelMove" @onmousemove="@OnMouseMove">
+    @ChildContent
+</div>
