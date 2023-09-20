@@ -13,7 +13,7 @@ namespace FoundryBlazor.Shared;
 
 public class Canvas2DNewComponentBase : BECanvasComponent
 {
-    [Inject] public IHitTestService? HitTestService { get; set; }
+
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
@@ -28,7 +28,7 @@ public class Canvas2DNewComponentBase : BECanvasComponent
 
     protected override async Task OnInitializedAsync()
     {
-        HitTestService!.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
+
         await base.OnInitializedAsync();
 
     }
@@ -37,6 +37,9 @@ public class Canvas2DNewComponentBase : BECanvasComponent
         if (firstRender)
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
+
+            var drawing = Workspace!.GetDrawing();
+            drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
             // var color = "green";
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
