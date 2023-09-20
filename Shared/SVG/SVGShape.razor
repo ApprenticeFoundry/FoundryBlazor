@@ -1,0 +1,6 @@
+@inherits SVGShapeBase
+@namespace FoundryBlazor.Shared.SVG
+
+<g transform="@GetSVGMatrix()">
+    @((MarkupString)Shape.GetMarkup())
+</g>

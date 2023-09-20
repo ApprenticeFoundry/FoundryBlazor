@@ -16,9 +16,13 @@
     }
     @foreach (var shape in GetShapes2D())
     {
-        if (shape is FoText2D obj)
+        if (shape is FoText2D obj1)
         {
-            <Text2D Shape="@obj" />
+            <Text2D Shape="@obj1" />
+        }
+        else if (shape is FoSVGShape2D obj2)
+        {
+            <SVGShape Shape="@obj2" />
         }
         else
         {
