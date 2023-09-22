@@ -1,0 +1,12 @@
+@inherits VideoBase
+@namespace FoundryBlazor.Shared.SVG
+
+<g transform="@GetSVGMatrix()">
+    <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" stroke-dasharray="@GetDashArray()" fill="@GetColor()"
+        stroke="@GetStrokeColor()" stroke-width="3" />
+    <foreignObject x="@PaddingX" y="@PaddingY" width="@GetWidth()" height="@GetHeight()">
+        <video controls style="@GetStyle()">
+            <source src="@GetURL()" type="video/mp4" />
+        </video>
+    </foreignObject>
+</g>
