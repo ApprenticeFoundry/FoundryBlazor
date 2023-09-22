@@ -8,7 +8,7 @@ using Microsoft.JSInterop;
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoVideo2D : FoGlyph2D, IImage2D
+public class FoVideo2D : FoShape2D, IImage2D
 {
     // TODO: can we figure out how to inject JsRuntime?
     public IJSRuntime? JsRuntime { get; set; }
@@ -196,7 +196,7 @@ public class FoVideo2D : FoGlyph2D, IImage2D
 
     private async void RunJavascript(string action)
     {
-        if (JsRuntime != null) 
+        if (JsRuntime != null)
             await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
     }
 

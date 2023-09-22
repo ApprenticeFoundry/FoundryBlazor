@@ -22,6 +22,7 @@
 
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
+    <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="Radzen.Blazor" Version="4.11.2" />
   </ItemGroup>
 
