@@ -1,6 +1,8 @@
 import { App } from './app';
 
 export class AppBrowser extends App {
+    public AnimationRequest: any = null;
+
     public CopyText(text: string) {
         navigator.clipboard.writeText(text).then(
             () => {
@@ -26,5 +28,23 @@ export class AppBrowser extends App {
     }
     public HTMLWindow(): { InnerWidth: number; InnerHeight: number } {
         return { InnerWidth: window.innerWidth, InnerHeight: window.innerHeight };
+    }
+
+    private RenderJS(self: any) {
+        // Call the blazor component's [JSInvokable] RenderInBlazor method
+        self.dotNetObjectReference.invokeMethodAsync('RenderFrameEventCalled');
+        // request another animation frame
+        self.AnimationRequest = window.requestAnimationFrame(() => self.RenderJS(self));
+    }
+    public StartAnimation() {
+        if (this.AnimationRequest == null)
+            this.AnimationRequest = window.requestAnimationFrame(() => {
+                this.RenderJS(this);
+            });
+    }
+    public StopAnimation() {
+        if (this.AnimationRequest != null) window.cancelAnimationFrame(this.AnimationRequest);
+
+        this.AnimationRequest = null;
     }
 }

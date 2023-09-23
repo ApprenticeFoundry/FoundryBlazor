@@ -29,9 +29,9 @@ public class CanvasSVGComponentBase : ComponentBase
     {
         if (firstRender)
         {
-            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
-           await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
- 
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
+            //    await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
+
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
             await DoStart();
@@ -80,7 +80,7 @@ public class CanvasSVGComponentBase : ComponentBase
     }
 
 
- 
+
     public async Task DoStart()
     {
         await _jsRuntime!.InvokeVoidAsync("StartAnimation");
