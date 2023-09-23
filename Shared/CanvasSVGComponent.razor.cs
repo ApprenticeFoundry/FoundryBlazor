@@ -83,14 +83,14 @@ public class CanvasSVGComponentBase : ComponentBase
 
     public async Task DoStart()
     {
-        await _jsRuntime!.InvokeVoidAsync("StartAnimation");
-        //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+        // await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
     }
 
     public async Task DoStop()
     {
-        await _jsRuntime!.InvokeVoidAsync("StopAnimation");
-        //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+        // await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
     }
 
 }
