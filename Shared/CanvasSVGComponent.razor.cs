@@ -29,11 +29,12 @@ public class CanvasSVGComponentBase : ComponentBase
     {
         if (firstRender)
         {
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
-
+            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
+           await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
+ 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-            DoStart();
+            await DoStart();
             // CreateTickPlayground();
 
         }
@@ -80,22 +81,16 @@ public class CanvasSVGComponentBase : ComponentBase
 
 
  
-    public void DoStart()
+    public async Task DoStart()
     {
-
-        Task.Run(async () =>
-        {
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-        });
+        await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
     }
 
-    public void DoStop()
+    public async Task DoStop()
     {
-
-        Task.Run(async () =>
-        {
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
-        });
+        await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
     }
 
 }
