@@ -5,6 +5,7 @@ using BlazorComponentBus;
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shared;
 
@@ -49,7 +50,14 @@ public class Canvas2DComponentBase : BECanvasComponent
         double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
         _lastRender = DateTime.Now; // update for the next time 
 
-        await RenderFrame(fps);
+        try
+        {
+            await RenderFrame(fps);
+        }
+        catch (Exception ex)
+        {
+            $"RenderFrameEventCalled Error {ex.Message}".WriteError();
+        }
     }
 
     public async Task RenderFrame(double fps)
@@ -67,12 +75,19 @@ public class Canvas2DComponentBase : BECanvasComponent
         //if you are already rendering then skip it this cycle
         if (drawing.SetCurrentlyRendering(true, tick)) return;
         await Ctx.BeginBatchAsync();
-        await Ctx.SaveAsync();
 
-        await drawing.RenderDrawing(Ctx, tick, fps);
-        Workspace?.RenderWatermark(Ctx, tick);
+        try
+        {
+            await Ctx.SaveAsync();
+            await drawing.RenderDrawing(Ctx, tick, fps);
+            Workspace?.RenderWatermark(Ctx, tick);
+            await Ctx.RestoreAsync();
+        }
+        catch(Exception ex) 
+        {
+            $"Error {ex.Message}".WriteError();
+        }
 
-        await Ctx.RestoreAsync();
         await Ctx.EndBatchAsync();
         drawing.SetCurrentlyRendering(false, tick);
 
