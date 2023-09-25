@@ -25,9 +25,9 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.jsx', '.js'],
     },
     output: {
-        path: path.resolve(__dirname, '../wwwroot/dist'),
+        path: path.resolve(__dirname, '../wwwroot/js'),
         filename: 'app-lib.js',
         library: 'AppLib',
-        clean: true,
+        clean: false,
     },
 };
