@@ -11,6 +11,7 @@ using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Text;
 
 namespace FoundryBlazor.Shared;
 
@@ -37,6 +38,12 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     public ViewerSettings GetSettings()
     {
         return Settings!;
+    }
+
+    public string GetCanvasStyle()
+    {
+        var style = new StringBuilder(StyleCanvas).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        return style;
     }
 
     public Scene GetActiveScene()
@@ -133,8 +140,8 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
     public FoPage2D GetCurrentPage()
     {
         return Workspace!.CurrentPage();
-    } 
-    
+    }
+
     public async Task RenderFrame(double fps)
     {
         if (ActiveScene == null) return;
@@ -164,7 +171,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
         //Workspace?.PostRender(tick);
 
-        if ( stage.IsDirty)
+        if (stage.IsDirty)
         {
             stage.IsDirty = false;
             await ThreeJSView3D.UpdateScene();
