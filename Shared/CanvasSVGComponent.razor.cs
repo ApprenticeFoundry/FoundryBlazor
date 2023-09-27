@@ -34,8 +34,7 @@ public class CanvasSVGComponentBase : ComponentBase
 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-        
-            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+            await DoStart();
             // CreateTickPlayground();
 
         }
