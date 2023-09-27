@@ -38,7 +38,7 @@ public class Canvas2DComponentBase : BECanvasComponent
             // CreateTickPlayground();
             // SetDoTugOfWar();
             // DoStart();
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
 
         }
         await base.OnAfterRenderAsync(firstRender);

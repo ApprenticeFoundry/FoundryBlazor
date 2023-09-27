@@ -34,7 +34,8 @@ public class CanvasSVGComponentBase : ComponentBase
 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-            await DoStart();
+        
+            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
             // CreateTickPlayground();
 
         }
@@ -47,10 +48,7 @@ public class CanvasSVGComponentBase : ComponentBase
         double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
         _lastRender = DateTime.Now; // update for the next time 
 
-
         await RenderFrame(fps);
-
-
     }
 
     public async Task RenderFrame(double fps)

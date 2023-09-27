@@ -433,7 +433,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         "FoWorkspace CreateMenus".WriteWarning();
         ActiveWorkbook?.CreateMenus(space, js, nav);
 
-        // GetDrawing()?.CreateMenus(space, js, nav);
+        GetDrawing()?.CreateMenus(space, js, nav);
         // GetArena()?.CreateMenus(space, js, nav);
     }
     public virtual Dictionary<string, Action> DefaultMenu()
