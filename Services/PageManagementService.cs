@@ -51,7 +51,7 @@ public class PageManagementService : FoComponent, IPageManagement
     private readonly ISelectionService _selectService;
 
     private FoPage2D? _page;
-    private FoPage2D ActivePage
+    public FoPage2D ActivePage
     {
         get
         {
@@ -60,20 +60,13 @@ public class PageManagementService : FoComponent, IPageManagement
 
             return _page!;
         }
-        set
-        {
-            _page = value;
-            _page.IsActive = true;
-            $"Set Active Page {_page?.Name}".WriteInfo();
-        }
     }
 
     public PageManagementService(
         ISelectionService sel)
     {
         _selectService = sel;
-
-        ActivePage = CurrentPage();
+        CurrentPage();
     }
 
 
@@ -215,7 +208,7 @@ public class PageManagementService : FoComponent, IPageManagement
                 $"CurrentPage CREATING new page {found.Name}".WriteLine(ConsoleColor.White);
                 AddPage(found);
             }
-            ActivePage = SetCurrentPage(found);
+            return SetCurrentPage(found);
         }
 
         return ActivePage;
@@ -226,11 +219,12 @@ public class PageManagementService : FoComponent, IPageManagement
             return ActivePage;
 
         Slot<FoPage2D>().ForEach(item => item.IsActive = false);
-        ActivePage = page;
+        _page = page;
+        _page.IsActive = true;
 
         //force refresh of hit testing
         FoGlyph2D.ResetHitTesting(true);
-        return ActivePage;
+        return _page;
     }
 
     public FoPage2D AddPage(FoPage2D page)

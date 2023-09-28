@@ -196,12 +196,16 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public FoWorkbook SetCurrentWorkbook(FoWorkbook book)
     {
-        if (ActiveWorkbook == book) return ActiveWorkbook;
+        if (ActiveWorkbook == book) 
+            return ActiveWorkbook;
 
         ActiveWorkbook = book;
         AllWorkbooks().ForEach(item => item.IsActive = false);
         ActiveWorkbook.IsActive = true;
+        $"SetCurrentWorkbook: {ActiveWorkbook.Name}".WriteSuccess();
 
+        var drawing = GetDrawing();
+        drawing.SetCurrentPage(ActiveWorkbook.CurrentPage());
         return ActiveWorkbook;
     }
 
@@ -339,8 +343,8 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public FoWorkbook? FindWorkbook(string name)
     {
-
-        return AllWorkbooks().Where(item => item.Name.Matches(name)).FirstOrDefault();
+        var found = AllWorkbooks().Where(item => item.Name.Matches(name)).FirstOrDefault();
+        return found;
     }
 
     public List<FoWorkbook> AllWorkbooks()
