@@ -511,7 +511,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             RefreshHitTesting(PanZoomWindow());
 
         var page = PageManager.CurrentPage();
-        $"RenderDrawing {page.Name} {page.Title} ".WriteSuccess();
+        //$"RenderDrawing {page.Name} {page.Title} ".WriteSuccess();
 
         await ClearCanvas(ctx);
 
