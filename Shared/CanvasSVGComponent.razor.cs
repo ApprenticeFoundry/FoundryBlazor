@@ -6,6 +6,8 @@ using FoundryBlazor.Canvas;
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
+using FoundryBlazor.PubSub;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shared;
 
@@ -37,6 +39,7 @@ public class CanvasSVGComponentBase : ComponentBase
             await DoStart();
             // CreateTickPlayground();
 
+            PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -48,6 +51,15 @@ public class CanvasSVGComponentBase : ComponentBase
         _lastRender = DateTime.Now; // update for the next time 
 
         await RenderFrame(fps);
+    }
+
+    private void OnTriggerRedrawEvent(TriggerRedrawEvent e)
+    {
+        Task.Run(async () =>
+        {
+            await RenderFrame(0);
+            $"CanvasSVGComponentBase TriggerRedrawEvent StateHasChanged {e.note}".WriteInfo();
+        });
     }
 
     public async Task RenderFrame(double fps)

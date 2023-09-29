@@ -6,6 +6,7 @@ using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
 using FoundryRulesAndUnits.Extensions;
+using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shared;
 
@@ -38,6 +39,8 @@ public class Canvas2DComponentBase : BECanvasComponent
             await DoStart();
             // CreateTickPlayground();
             // SetDoTugOfWar();
+
+            PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
  
         }
         await base.OnAfterRenderAsync(firstRender);
@@ -57,6 +60,15 @@ public class Canvas2DComponentBase : BECanvasComponent
         {
             $"RenderFrameEventCalled Error {ex.Message}".WriteError();
         }
+    }
+
+    private void OnTriggerRedrawEvent(TriggerRedrawEvent e)
+    {
+        Task.Run(async () =>
+        {
+            await RenderFrame(0);
+            $"Canvas2DComponentBase TriggerRedrawEvent StateHasChanged {e.note}".WriteInfo();
+        });
     }
 
     public async Task RenderFrame(double fps)

@@ -17,7 +17,7 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
-    [Inject] protected IJSRuntime? JsRuntime { get; set; }
+    [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
     [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
     [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
@@ -36,7 +36,7 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
     {
         Ctx = null;
         //Dispose(true);
-        PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
+        //PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
 
         // This object will be cleaned up by the Dispose method.
         // Therefore, you should call GC.SupressFinalize to
@@ -62,7 +62,9 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
 
-            PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
+            //PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
+
+            PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -100,20 +102,33 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
         }
     }
 
-    private void OnCanvasMouseEvent(CanvasMouseArgs MouseArgs)
-    {
-        CaptureFileAndSend(MouseArgs);
-    }
+    // private void OnCanvasMouseEvent(CanvasMouseArgs MouseArgs)
+    // {
+    //     CaptureFileAndSend(MouseArgs);
+    // }
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
         InvokeAsync(StateHasChanged);
-        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+        $"Canvas2DClassicComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+    }
+
+    private void OnTriggerRedrawEvent(TriggerRedrawEvent e)
+    {
+        Task.Run(async () =>
+        {
+            await RenderFrame(0);
+            $"Canvas2DClassicComponentBase TriggerRedrawEvent StateHasChanged {e.note}".WriteInfo();
+        });
     }
 
     public async Task RenderFrame(double fps)
     {
-        if (Ctx == null) return;
+        if (Ctx == null)
+        {
+            $"Canvas2D has no context".WriteInfo();
+            return;
+        }
         tick++;
 
         $"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
@@ -145,5 +160,17 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
         var style = $"opacity:0; width:{w}; height:{h}";
         return style;
     }
+
+     public async Task DoStart()
+    {
+        // await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+    }
+
+    public async Task DoStop()
+    {
+        // await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+    }   
 
 }

@@ -11,4 +11,14 @@ public class RefreshUIEvent
     }
 }
 
+public class TriggerRedrawEvent
+{
+    public string? note { get; set; }
+
+    public TriggerRedrawEvent(string? note)
+    {
+        this.note = note;
+    }
+}
+
 
