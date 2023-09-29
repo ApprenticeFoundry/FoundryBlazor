@@ -233,7 +233,7 @@ public class PageManagementService : FoComponent, IPageManagement
         if (found == null)
         {
             Slot<FoPage2D>().Add(page);
-            $"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
+            //$"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
         }
         return page;
     }
