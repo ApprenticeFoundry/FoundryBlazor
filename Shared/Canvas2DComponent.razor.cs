@@ -31,15 +31,14 @@ public class Canvas2DComponentBase : BECanvasComponent
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
             //    await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
 
+            Ctx = await CanvasReference!.CreateCanvas2DAsync();
+
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-
-            Ctx = await CanvasReference!.CreateCanvas2DAsync();
+            await DoStart();
             // CreateTickPlayground();
             // SetDoTugOfWar();
-            // DoStart();
-            //await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-
+ 
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -160,20 +159,16 @@ public class Canvas2DComponentBase : BECanvasComponent
         await ctx.FillTextAsync("→", width / 2, height / 2, 20);
     }
 
-    // public void DoStart()
-    // {
-    //     Task.Run(async () =>
-    //     {
-    //         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-    //     });
-    // }
+    public async Task DoStart()
+    {
+        // await _jsRuntime!.InvokeVoidAsync("StartAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+    }
 
-    // public void DoStop()
-    // {
-    //     Task.Run(async () =>
-    //     {
-    //         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
-    //     });
-    // }
+    public async Task DoStop()
+    {
+        // await _jsRuntime!.InvokeVoidAsync("StopAnimation");
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+    }
 
 }
