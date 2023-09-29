@@ -73,10 +73,15 @@ public class Canvas2DComponentBase : BECanvasComponent
 
     public async Task RenderFrame(double fps)
     {
-        if (Ctx == null) return;
+        if (Ctx == null)
+        {
+            //Ctx = await CanvasReference.CreateCanvas2DAsync();
+            $"Canvas2D has no context".WriteError();
+            return;
+        }
         tick++;
 
-        //$"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
+        $"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 

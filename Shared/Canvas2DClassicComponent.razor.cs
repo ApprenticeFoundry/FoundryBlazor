@@ -34,7 +34,7 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
 
     public void Dispose()
     {
-        Ctx = null;
+        //Ctx = null;
         //Dispose(true);
         //PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
 
@@ -126,12 +126,13 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
     {
         if (Ctx == null)
         {
-            $"Canvas2D has no context".WriteInfo();
+            Ctx = await CanvasReference.CreateCanvas2DAsync();
+            $"Canvas2D Classic has no context".WriteError();
             return;
         }
         tick++;
 
-        $"Canvas2D RenderFrame {tick} {fps}".WriteInfo();
+        $"Canvas2D Classic RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 
