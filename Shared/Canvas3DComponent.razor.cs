@@ -90,6 +90,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             var arena = Workspace?.GetArena();
+            arena?.SetViewer(ThreeJSView3D, GetActiveScene());
             arena?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
             ThreeJSView3D.ObjectLoaded += ThreeJSView3D_ObjectLoaded;
