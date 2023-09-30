@@ -9,12 +9,12 @@ namespace FoundryBlazor.Shape;
 
 public interface IQRCodeService
 {
-    FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing);
+    FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing, double scale=0.1);
 }
 
 public class QRCodeService : IQRCodeService
 {
-    public FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing)
+    public FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing, double scale=0.1)
     {
         if (string.IsNullOrEmpty(url)) 
             return null;
@@ -32,8 +32,8 @@ public class QRCodeService : IQRCodeService
         var qrShape = new FoImage2D(80, 80, "White")
         {
             ImageUrl = dataURL,
-            ScaleX = 0.10,
-            ScaleY = 0.10,
+            ScaleX = scale,
+            ScaleY = scale,
         };
 
         // qrShape.BeforeShapeRefresh((obj,tick) => {
