@@ -16,6 +16,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
+
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
     [Parameter] public bool AutoRender { get; set; } = true;
@@ -73,7 +74,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     {
         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
     }
-    
+
     [JSInvokable]
     public async ValueTask RenderFrameEventCalled()
     {
