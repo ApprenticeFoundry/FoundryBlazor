@@ -21,6 +21,8 @@ public interface IFoundryService
     IPanZoomService PanZoom();
     ISelectionService Selection();
     IHitTestService HitTest();
+
+    IQRCodeService QRCode();
 }
 
 public class FoundryService : IFoundryService
@@ -32,6 +34,7 @@ public class FoundryService : IFoundryService
     protected IPanZoomService panzoom { get; set; }
     protected ISelectionService selection { get; set; }
     protected IHitTestService hittest { get; set; }
+    protected IQRCodeService qrcode { get; set; }
     protected DialogService dialog { get; set; }
     protected IJSRuntime js { get; set; }
     protected ComponentBus pubsub { get; set; }
@@ -41,6 +44,7 @@ public class FoundryService : IFoundryService
         ICommand command,
         ISelectionService selection,
         IHitTestService hittest,
+        IQRCodeService qrcode,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
@@ -58,6 +62,7 @@ public class FoundryService : IFoundryService
         this.panzoom = panzoom;
         this.selection = selection;
         this.hittest = hittest;
+        this.qrcode = qrcode;
     }
 
 
