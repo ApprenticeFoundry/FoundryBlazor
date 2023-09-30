@@ -53,8 +53,16 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
 
     public async ValueTask DisposeAsync()
     {
-        await DoStop();
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+        try
+        {
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+            await DoStop();
+        }
+        catch (Exception ex)
+        {
+            $"Canvas2DComponentBase DisposeAsync Error {ex.Message}".WriteError();
+        }
+
 
     }
 
@@ -67,12 +75,20 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
 
     public async Task DoStart()
     {
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+        try {
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+        } catch (Exception ex) {
+            $"Canvas2DComponentBase DoStart Error {ex.Message}".WriteError();
+        }
     }
 
     public async Task DoStop()
     {
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+        try {
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+        } catch (Exception ex) {
+            $"Canvas2DComponentBase DoStop Error {ex.Message}".WriteError();
+        }
     }
 
     [JSInvokable]
