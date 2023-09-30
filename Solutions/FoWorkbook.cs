@@ -28,11 +28,12 @@ public class FoWorkbook: FoComponent, IWorkbook
 {
     protected IWorkspace Workspace { get; set; }
     protected ICommand Command { get; set; }
-    protected IFoundryService Foundry { get; set; }
+    protected IFoundryService FoundryService { get; set; }
     protected DialogService Dialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
-    
     protected ComponentBus PubSub { get; set; }
+
+    protected IQRCodeService QRCode { get; set; }
 
     public bool IsActive { get; set; } = false;
     public bool IsDirty { get; set; } = false;
@@ -41,11 +42,12 @@ public class FoWorkbook: FoComponent, IWorkbook
     public FoWorkbook(IWorkspace space, IFoundryService foundry)
     {
         Workspace = space;
-        Foundry = foundry;
+        FoundryService = foundry;
         Command = foundry.Command();
         Dialog = foundry.Dialog();
         JsRuntime = foundry.JS();
         PubSub = foundry.PubSub();
+        QRCode = foundry.QRCode();
     }  
 
 

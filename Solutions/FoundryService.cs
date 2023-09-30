@@ -1,9 +1,6 @@
-using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
 
@@ -21,7 +18,6 @@ public interface IFoundryService
     IPanZoomService PanZoom();
     ISelectionService Selection();
     IHitTestService HitTest();
-
     IQRCodeService QRCode();
 }
 
@@ -112,5 +108,10 @@ public class FoundryService : IFoundryService
     public ISelectionService Selection()
     {
         return selection;
+    }
+
+    public IQRCodeService QRCode()
+    {
+        return qrcode;
     }
 }
