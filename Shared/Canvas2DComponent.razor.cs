@@ -10,7 +10,7 @@ using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas2DComponentBase : BECanvasComponent
+public class Canvas2DComponentBase : ComponentBase
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }
@@ -18,10 +18,12 @@ public class Canvas2DComponentBase : BECanvasComponent
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
-    public new BECanvasComponent? CanvasReference;
+    [Parameter] public bool AutoRender { get; set; } = true;
+    
     public int tick { get; private set; }
     private DateTime _lastRender;
 
+    public BECanvasComponent? CanvasReference;
     private Canvas2DContext? Ctx;
 
 
@@ -30,13 +32,13 @@ public class Canvas2DComponentBase : BECanvasComponent
         if (firstRender)
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
-            //    await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
-
+ 
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-            await DoStart();
+            if ( AutoRender)
+                await DoStart();
             // CreateTickPlayground();
             // SetDoTugOfWar();
 
@@ -178,13 +180,11 @@ public class Canvas2DComponentBase : BECanvasComponent
 
     public async Task DoStart()
     {
-        // await _jsRuntime!.InvokeVoidAsync("StartAnimation");
         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
     }
 
     public async Task DoStop()
     {
-        // await _jsRuntime!.InvokeVoidAsync("StopAnimation");
         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
     }
 

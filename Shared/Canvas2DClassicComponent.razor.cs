@@ -13,38 +13,23 @@ using Microsoft.JSInterop;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
+public class Canvas2DClassicComponentBase : ComponentBase
 {
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
     [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
-    [Parameter] public string StyleDrop { get; set; } = "position: absolute; top: 100px; left: 20px; z-index: 0; border: 6px dashed red";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
+
+    [Parameter] public bool AutoRender { get; set; } = true;
 
     private int tick = 0;
     private Canvas2DContext? Ctx;
     public BECanvasComponent? CanvasReference;
     public JSIntegrationHelper? JSIntegrationRef;
-    private IBrowserFile? InputFile;
-    private bool IsUploading = false;
 
-
-    public void Dispose()
-    {
-        //Ctx = null;
-        //Dispose(true);
-        //PubSub!.UnSubscribeFrom<CanvasMouseArgs>(OnCanvasMouseEvent);
-
-        // This object will be cleaned up by the Dispose method.
-        // Therefore, you should call GC.SupressFinalize to
-        // take this object off the finalization queue 
-        // and prevent finalization code for this object
-        // from executing a second time.
-        GC.SuppressFinalize(this);
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -56,56 +41,20 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
             await JSIntegrationRef!.Initialize();
             // maybe pass in a  reference to a canvas?
             await JSIntegrationRef!.CaptureMouseEventsForCanvas();
-            await JSIntegrationRef!.StartAnimation();
+            
+            if ( AutoRender )
+                await DoStart();
 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-
-
-            //PubSub!.SubscribeTo<CanvasMouseArgs>(OnCanvasMouseEvent);
 
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    public void OnFileInputChange(InputFileChangeEventArgs e)
-    {
-        InputFile = e.File;
-        $"OnFileInputChange {InputFile.Name} {InputFile.Size} {DateTime.Now.ToLongTimeString()}".WriteInfo();
 
-        CaptureFileAndSend(new CanvasMouseArgs()
-        {
-            OffsetX = 300,
-            OffsetY = 300
-        });
-        //Task.Run(async () =>
-        //{
-        //    await JsRuntime!.InvokeVoidAsync("CanvasFileInput.HideFileInput");
-        //});
 
-    }
-
-    private void CaptureFileAndSend(CanvasMouseArgs MouseArgs)
-    {
-        if (InputFile != null && IsUploading == false)
-        {
-            IsUploading = true;
-            $"DropFileCreateShape OnCanvasMouseEvent {MouseArgs.OffsetX} {MouseArgs.OffsetY} {DateTime.Now.ToLongTimeString()}".WriteInfo();
-            Task.Run(async () =>
-            {
-                //await JsRuntime!.InvokeVoidAsync("CanvasFileInput.ShowFileInput");
-                await Workspace!.DropFileCreateShape(InputFile, MouseArgs);
-                InputFile = null;
-                IsUploading = false;
-            });
-        }
-    }
-
-    // private void OnCanvasMouseEvent(CanvasMouseArgs MouseArgs)
-    // {
-    //     CaptureFileAndSend(MouseArgs);
-    // }
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
@@ -154,24 +103,16 @@ public class Canvas2DClassicComponentBase : ComponentBase, IDisposable
         Workspace?.PostRender(tick);
     }
 
-    public string FileInputStyle()
-    {
-        var w = $"{CanvasWidth - 40}px";
-        var h = $"{CanvasHeight - 40}px";
-        var style = $"opacity:0; width:{w}; height:{h}";
-        return style;
-    }
+
 
      public async Task DoStart()
     {
-        // await _jsRuntime!.InvokeVoidAsync("StartAnimation");
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+        await JSIntegrationRef!.StartAnimation();
     }
 
     public async Task DoStop()
     {
-        // await _jsRuntime!.InvokeVoidAsync("StopAnimation");
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+         await JSIntegrationRef!.StopAnimation();
     }   
 
 }

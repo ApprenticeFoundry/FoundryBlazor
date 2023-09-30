@@ -19,6 +19,7 @@ public class CanvasSVGComponentBase : ComponentBase
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
+    [Parameter] public bool AutoRender { get; set; } = true;
     [Parameter] public string StyleCanvas { get; set; } = "background-color:lightsteelblue";
 
     protected string CurrentKey { get; set; } = "";
@@ -32,11 +33,12 @@ public class CanvasSVGComponentBase : ComponentBase
         if (firstRender)
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
-            //    await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
-
+ 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-            await DoStart();
+            if ( AutoRender)
+                await DoStart();
+                
             // CreateTickPlayground();
 
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
