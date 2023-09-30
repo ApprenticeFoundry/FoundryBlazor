@@ -14,13 +14,15 @@ public interface IQRCodeService
 
 public class QRCodeService : IQRCodeService
 {
-        public FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing)
+    public FoImage2D? AttachQRCode(string url, FoGlyph2D parent, IDrawing drawing)
     {
         if (string.IsNullOrEmpty(url)) 
             return null;
             
         var qrGenerator = new QRCodeGenerator();
         var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+
+
 
         var qrCode = new PngByteQRCode(qrCodeData);
         var qrCodeImage = qrCode.GetGraphic(20);
@@ -34,11 +36,13 @@ public class QRCodeService : IQRCodeService
             ScaleY = 0.10,
         };
 
-        qrShape.BeforeShapeRefresh((obj,tick) => {
-            obj.PinX = parent.PinX + 30;
-            obj.PinY = parent.PinY + parent.Height / 2 - 10;
-        });
+        // qrShape.BeforeShapeRefresh((obj,tick) => {
+        //     obj.PinX = parent.PinX + 30;
+        //     obj.PinY = parent.PinY + parent.Height / 2 - 10;
+        // });
         drawing.AddShape<FoImage2D>(qrShape);
         return qrShape;
     }
+
+
 }
