@@ -33,7 +33,6 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
         {
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize", DotNetObjectReference.Create(this));
  
-            Ctx = await CanvasReference!.CreateCanvas2DAsync();
 
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
@@ -45,6 +44,8 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
  
+            Ctx = await CanvasReference!.CreateCanvas2DAsync();
+             await RenderFrame(0);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -63,6 +64,16 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
         GC.SuppressFinalize(this);
     }
 
+    public async Task DoStart()
+    {
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
+    }
+
+    public async Task DoStop()
+    {
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
+    }
+    
     [JSInvokable]
     public async ValueTask RenderFrameEventCalled()
     {
@@ -99,7 +110,6 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     {
         if (Ctx == null)
         {
-            //Ctx = await CanvasReference.CreateCanvas2DAsync();
             $"Canvas2D has no context".WriteError();
             return;
         }
@@ -200,15 +210,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
         await ctx.FillTextAsync("→", width / 2, height / 2, 20);
     }
 
-    public async Task DoStart()
-    {
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-    }
 
-    public async Task DoStop()
-    {
-        await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
-    }
 
 
 }
