@@ -136,7 +136,13 @@ namespace FoundryBlazor.Canvas
             _lastRender = DateTime.Now; // update for the next time 
 
             // raise the RenderFrame event to the blazor app
-            await RenderFrame.InvokeAsync(fps);
+            try {
+                await RenderFrame.InvokeAsync(fps);
+            } 
+            catch(Exception ex) 
+            {
+                $"JSIntegrationHelper RenderFrameEventCalled Error {ex.Message}".WriteError();
+            }
         }
 
 
