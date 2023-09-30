@@ -52,7 +52,14 @@ public class CanvasSVGComponentBase : ComponentBase
         double fps = 1.0 / (DateTime.Now - _lastRender).TotalSeconds;
         _lastRender = DateTime.Now; // update for the next time 
 
-        await RenderFrame(fps);
+        try
+        {
+            await RenderFrame(fps);
+        }
+        catch (Exception ex)
+        {
+            $"CanvasSVGComponentBase RenderFrameEventCalled Error {ex.Message}".WriteError();
+        }
     }
 
     private void OnTriggerRedrawEvent(TriggerRedrawEvent e)

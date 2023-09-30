@@ -56,11 +56,13 @@ public class Canvas2DComponentBase : ComponentBase
 
         try
         {
+            //recomputing the ctx here look like it is needed and fixes moving between pages
+            Ctx = await CanvasReference!.CreateCanvas2DAsync();
             await RenderFrame(fps);
         }
         catch (Exception ex)
         {
-            $"RenderFrameEventCalled Error {ex.Message}".WriteError();
+            $"Canvas2DComponentBase RenderFrameEventCalled Error {ex.Message}".WriteError();
         }
     }
 

@@ -26,7 +26,7 @@ public class Canvas2DClassicComponentBase : ComponentBase
     [Parameter] public bool AutoRender { get; set; } = true;
 
     private int tick = 0;
-    private Canvas2DContext? Ctx;
+
     public BECanvasComponent? CanvasReference;
     public JSIntegrationHelper? JSIntegrationRef;
 
@@ -35,13 +35,13 @@ public class Canvas2DClassicComponentBase : ComponentBase
     {
         if (firstRender)
         {
-            Ctx = await CanvasReference.CreateCanvas2DAsync();
+            //Ctx = await CanvasReference.CreateCanvas2DAsync();
             //PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
 
             await JSIntegrationRef!.Initialize();
             // maybe pass in a  reference to a canvas?
             await JSIntegrationRef!.CaptureMouseEventsForCanvas();
-            
+
             if ( AutoRender )
                 await DoStart();
 
@@ -73,15 +73,16 @@ public class Canvas2DClassicComponentBase : ComponentBase
 
     public async Task RenderFrame(double fps)
     {
-        if (Ctx == null)
-        {
-            Ctx = await CanvasReference.CreateCanvas2DAsync();
-            $"Canvas2D Classic has no context".WriteError();
-            return;
-        }
+        var Ctx = await CanvasReference.CreateCanvas2DAsync();
+        // if (Ctx == null)
+        // {
+        //     //Ctx = await CanvasReference.CreateCanvas2DAsync();
+        //     $"Canvas2D Classic has no context".WriteError();
+        //     return;
+        // }
         tick++;
 
-        $"Canvas2D Classic RenderFrame {tick} {fps}".WriteInfo();
+        //$"Canvas2D Classic RenderFrame {tick} {fps}".WriteInfo();
 
         Workspace?.PreRender(tick);
 
