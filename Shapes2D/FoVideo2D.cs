@@ -1,6 +1,7 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Canvas;
+ 
+using FoundryBlazor.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 

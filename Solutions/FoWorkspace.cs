@@ -1,6 +1,6 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 
 using FoundryBlazor.Message;
 using FoundryBlazor.Shape;

@@ -10,12 +10,12 @@ using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace FoundryBlazor.Canvas
+namespace FoundryBlazor.Shared
 {
     /// <summary>
     /// CanvasHelper component gives you render and resize callbacks for Canvas animation
     /// </summary>
-    public partial class JSIntegrationHelper : ComponentBase //, IAsyncDisposable
+    public partial class JSIntegrationHelper : ComponentBase, IAsyncDisposable
     {
         private DateTime _lastRender;
 
@@ -24,58 +24,30 @@ namespace FoundryBlazor.Canvas
         [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
 
-
-        /// <summary>RenderFrame
-        /// Event called when the browser (and therefore the canvas) is resized
-        /// </summary>
         [Parameter]
         public EventCallback<Size> UserWindowResized { get; set; }
 
-        /// <summary>
-        /// Event called every time a frame can be redrawn
-        /// </summary>
         [Parameter]
         public EventCallback<double> RenderFrame { get; set; }
 
-        /// <summary>
-        /// Event called on wheel rotation
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasWheelChangeArgs> WheelChange { get; set; }
 
-        /// <summary>
-        /// Event called on mouse down
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasMouseArgs> MouseDown { get; set; }
 
-        /// <summary>
-        /// Event called on mouse up
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasMouseArgs> MouseUp { get; set; }
 
-        /// <summary>
-        /// Event called on mouse move
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasMouseArgs> MouseMove { get; set; }
 
-        /// <summary>
-        /// Event called on key down
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasKeyboardEventArgs> KeyDown { get; set; }
 
-        /// <summary>
-        /// Event called on key up
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasKeyboardEventArgs> KeyUp { get; set; }
 
-        /// <summary>
-        /// Event called on key press
-        /// </summary>
         [Parameter]
         public EventCallback<CanvasKeyboardEventArgs> KeyPress { get; set; }
 
@@ -83,6 +55,17 @@ namespace FoundryBlazor.Canvas
         public async Task Initialize()
         {
             await _jsRuntime!.InvokeVoidAsync("initJSIntegration", DotNetObjectReference.Create(this));
+        }
+
+        public async Task Finalize()
+        {
+            await _jsRuntime!.InvokeVoidAsync("destroyJSIntegration");
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            "JSIntegrationHelper DisposeAsync".WriteInfo();
+            await Finalize();
         }
 
         public async Task CaptureMouseEventsForCanvas()
@@ -212,17 +195,5 @@ namespace FoundryBlazor.Canvas
 
 
 
-        /// <summary>
-        /// Dispose of our module resource
-        /// </summary>
-        /// <returns></returns>
-        //public async ValueTask DisposeAsync()
-        //{
-        //    if (_moduleTask != null && _moduleTask.IsValueCreated)
-        //    {
-        //        var module = await _moduleTask.Value;
-        //        await module.DisposeAsync();
-        //    }
-        //}
     }
 }

@@ -30,11 +30,28 @@ export class AppBrowser extends App {
         return { InnerWidth: window.innerWidth, InnerHeight: window.innerHeight };
     }
 
+    public Initialize(ref: any): void {
+        if (this.dotNetObjectReference == null)
+            this.SetDotNetObjectReference(ref);
+    }
+
+    public Finalize(): void {
+        if (this.dotNetObjectReference != null)
+        {
+            this.StopAnimation();
+            this.dotNetObjectReference.dispose();
+            this.dotNetObjectReference = null;
+        }
+    }
+
     private RenderJS(self: any) {
         // Call the blazor component's [JSInvokable] RenderInBlazor method
-        self.dotNetObjectReference.invokeMethodAsync('RenderFrameEventCalled');
-        // request another animation frame
-        self.AnimationRequest = window.requestAnimationFrame(() => self.RenderJS(self));
+        if ( self.dotNetObjectReference != null)
+        {
+            self.dotNetObjectReference.invokeMethodAsync('RenderFrameEventCalled');
+            // request another animation frame
+            self.AnimationRequest = window.requestAnimationFrame(() => self.RenderJS(self));
+        }
     }
     public StartAnimation() {
         if (this.AnimationRequest == null)
@@ -43,7 +60,8 @@ export class AppBrowser extends App {
             });
     }
     public StopAnimation() {
-        if (this.AnimationRequest != null) window.cancelAnimationFrame(this.AnimationRequest);
+        if (this.AnimationRequest != null) 
+            window.cancelAnimationFrame(this.AnimationRequest);
 
         this.AnimationRequest = null;
     }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;

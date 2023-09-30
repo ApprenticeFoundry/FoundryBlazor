@@ -4,7 +4,7 @@ using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Settings;
 using BlazorThreeJS.Viewers;
 
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
@@ -15,29 +15,36 @@ using System.Text;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas3DComponentBase : ComponentBase, IDisposable
+public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposable
 {
 
-    public Viewer ThreeJSView3D = null!;
+    public Viewer ThreeJSViewer3D = null!;
     private ViewerSettings? Settings { get; set; }
     private Scene? ActiveScene { get; set; }
 
 
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
-    [Inject] protected IJSRuntime? JsRuntime { get; set; }
 
     [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
 
-    public JSIntegrationHelper? JSIntegrationRef;
-
 
     public ViewerSettings GetSettings()
     {
-        return Settings!;
+        Settings ??= new()
+        {
+            CanSelect = true,// default is false
+            SelectedColor = "black",
+            WebGLRendererSettings = new WebGLRendererSettings
+            {
+                Antialias = false // if you need poor quality for some reasons
+            }
+        };
+
+        return Settings;
     }
 
     public string GetCanvasStyle()
@@ -48,81 +55,47 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
     public Scene GetActiveScene()
     {
-        return ActiveScene!;
+        ActiveScene ??= new Scene();
+        return ActiveScene;
     }
 
     public void Dispose()
     {
+        "Canvas3DComponentBase Dispose".WriteInfo();
         ActiveScene = null;
-        //Dispose(true);
-
-        // This object will be cleaned up by the Dispose method.
-        // Therefore, you should call GC.SupressFinalize to
-        // take this object off the finalization queue 
-        // and prevent finalization code for this object
-        // from executing a second time.
+        Settings = null;
+         
+        ThreeJSViewer3D.ObjectLoaded -= OnThreeJSObjectLoaded;
+        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
         GC.SuppressFinalize(this);
     }
 
-    protected override void OnInitialized()
+    public async ValueTask DisposeAsync()
     {
-        ActiveScene = new Scene();
-        Settings = new()
-        {
-            CanSelect = true,// default is false
-            SelectedColor = "black",
-            WebGLRendererSettings = new WebGLRendererSettings
-            {
-                Antialias = false // if you need poor quality for some reasons
-            }
-        };
+        "Canvas3DComponentBase DisposeAsync".WriteInfo();
+        await ValueTask.CompletedTask;
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-
-            await JSIntegrationRef!.Initialize();
-            // maybe pass in a  reference to a SVG?
-            //await JSIntegrationRef!.CaptureMouseEventsForSVG();
-
-            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
-
             var arena = Workspace?.GetArena();
-            arena?.SetViewer(ThreeJSView3D, GetActiveScene());
+            arena?.SetViewer(ThreeJSViewer3D, GetActiveScene());
             arena?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
-            ThreeJSView3D.ObjectLoaded += ThreeJSView3D_ObjectLoaded;
 
-            // var ShapeMesh = new Mesh
-            // {
-            //     Geometry = new BoxGeometry(1, 2, 3),
-            //     Position = new Vector3(8, 4, 0),
-            //     Material = new MeshStandardMaterial()
-            //     {
-            //         Color = "green",
-            //         //Wireframe = true
-            //     }
-            // };
-            // ActiveScene?.Add(ShapeMesh);
-
-            // $"OnAfterRenderAsync ActiveScene={ActiveScene}, Mesh={ShapeMesh}".WriteInfo();
-
-
-
-            // await ThreeJSView3D.UpdateScene();
-
-            // $"OnAfterRenderAsync Viewer={View3D1}".WriteInfo();
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            ThreeJSViewer3D.ObjectLoaded += OnThreeJSObjectLoaded;
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task ThreeJSView3D_ObjectLoaded(Object3DArgs e)
+    private async Task OnThreeJSObjectLoaded(Object3DArgs e)
     {
-        $"Returned  {e.UUID}".WriteInfo();
+        $"OnThreeJSObjectLoaded Returned  {e.UUID}".WriteInfo();
         await Task.CompletedTask;
-
     }
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
@@ -132,7 +105,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
 
         Task.Run(async () =>
         {
-            await ThreeJSView3D.UpdateScene();
+            await ThreeJSViewer3D.UpdateScene();
             $"after ThreeJSView3D.UpdateScene() {e.note}".WriteInfo();
         });
     }
@@ -143,9 +116,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         return Workspace!.CurrentPage();
     }
 
-    public async Task RenderFrame(double fps)
+    public async Task RenderFrameOBSOLITE(double fps)
     {
-        if (ActiveScene == null) return;
+        if (ActiveScene == null) 
+            return;
         tick++;
 
         $"Canvas3D RenderFrame {tick} {fps}".WriteInfo();
@@ -175,11 +149,10 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable
         if (stage.IsDirty)
         {
             stage.IsDirty = false;
-            await ThreeJSView3D.UpdateScene();
+            await ThreeJSViewer3D.UpdateScene();
             //$"RenderFrame stage.IsDirty  so... ThreeJSView3D.UpdateScene()  {tick} {stage.Name}".WriteSuccess();
         }
     }
-
 
 
 }

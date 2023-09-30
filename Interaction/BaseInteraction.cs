@@ -2,8 +2,9 @@ using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using BlazorComponentBus;
+using FoundryBlazor.Shared;
 
-using FoundryBlazor.Canvas;
+
 
 namespace FoundryBlazor.Shape;
 

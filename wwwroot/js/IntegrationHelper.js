@@ -28,10 +28,35 @@ function initJSIntegration(instance) {
     // request an animation frame, telling window to call renderJS
     // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 
-    window.requestAnimationFrame(renderJS);
+    StartAnimation();
 }
 
 window.initJSIntegration = initJSIntegration;
+
+
+function destroyJSIntegration() {
+  //no need to do anything if we have already set up the callback
+  if (window.DotNetCallBack == null) return;
+
+  // instance is the Blazor component dotnet reference
+  window.DotNetCallBack = null;
+
+  // tell the window we want to handle the resize event
+  window.removeEventListener("resize", WindowResized);
+
+  window.removeEventListener("keydown", keyDown);
+  window.removeEventListener("keyup", keyUp);
+  window.removeEventListener("keypress", keyPress);
+
+
+  // request an animation frame, telling window to call renderJS
+  // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
+
+    StopAnimation();
+}
+
+window.destroyJSIntegration = destroyJSIntegration;
+
 
 window.AnimationRequest = null;
 
@@ -45,11 +70,13 @@ function renderJS(timeStamp) {
 
 //https://stackoverflow.com/questions/10735922/how-to-stop-a-requestanimationframe-recursion-loop
 function StartAnimation() {
-    if (window.AnimationRequest == null) window.AnimationRequest = window.requestAnimationFrame(renderJS);
+    if (window.AnimationRequest == null) 
+        window.AnimationRequest = window.requestAnimationFrame(renderJS);
 }
 
 function StopAnimation() {
-    if (window.AnimationRequest != null) window.cancelAnimationFrame(window.AnimationRequest);
+    if (window.AnimationRequest != null) 
+        window.cancelAnimationFrame(window.AnimationRequest);
     window.AnimationRequest = null;
 }
 

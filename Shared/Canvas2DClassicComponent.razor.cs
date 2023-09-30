@@ -2,7 +2,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.PubSub;
 using FoundryBlazor.Solutions;
 using FoundryRulesAndUnits.Extensions;
@@ -13,7 +13,7 @@ using Microsoft.JSInterop;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas2DClassicComponentBase : ComponentBase
+public class Canvas2DClassicComponentBase : ComponentBase, IAsyncDisposable, IDisposable
 {
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
@@ -26,17 +26,30 @@ public class Canvas2DClassicComponentBase : ComponentBase
     [Parameter] public bool AutoRender { get; set; } = true;
 
     private int tick = 0;
+    private Canvas2DContext? Ctx = null;
 
     public BECanvasComponent? CanvasReference;
     public JSIntegrationHelper? JSIntegrationRef;
 
+     public async Task DoStart()
+    {
+        await JSIntegrationRef!.StartAnimation();
+    }
 
+    public async Task DoStop()
+    {
+         await JSIntegrationRef!.StopAnimation();
+    }   
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            //Ctx = await CanvasReference.CreateCanvas2DAsync();
-            //PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+            Ctx = await CanvasReference.CreateCanvas2DAsync();
 
             await JSIntegrationRef!.Initialize();
             // maybe pass in a  reference to a canvas?
@@ -48,13 +61,32 @@ public class Canvas2DClassicComponentBase : ComponentBase
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
 
+    public void Dispose()
+    {
 
+        "Canvas2DClassicComponentBase Dispose".WriteInfo();
+
+        Ctx?.Dispose();
+
+        Ctx = null;
+        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
+        PubSub!.UnSubscribeFrom<TriggerRedrawEvent>(OnTriggerRedrawEvent);
+        GC.SuppressFinalize(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JSIntegrationRef!.Finalize();
+        "Canvas2DClassicComponentBase DisposeAsync".WriteInfo();
+        await DoStop();
+    }
 
     private void OnRefreshUIEvent(RefreshUIEvent e)
     {
@@ -73,13 +105,11 @@ public class Canvas2DClassicComponentBase : ComponentBase
 
     public async Task RenderFrame(double fps)
     {
-        var Ctx = await CanvasReference.CreateCanvas2DAsync();
-        // if (Ctx == null)
-        // {
-        //     //Ctx = await CanvasReference.CreateCanvas2DAsync();
-        //     $"Canvas2D Classic has no context".WriteError();
-        //     return;
-        // }
+        if (Ctx == null)
+        {
+            $"Canvas2D Classic has no context".WriteError();
+            return;
+        }
         tick++;
 
         //$"Canvas2D Classic RenderFrame {tick} {fps}".WriteInfo();
@@ -104,16 +134,5 @@ public class Canvas2DClassicComponentBase : ComponentBase
         Workspace?.PostRender(tick);
     }
 
-
-
-     public async Task DoStart()
-    {
-        await JSIntegrationRef!.StartAnimation();
-    }
-
-    public async Task DoStop()
-    {
-         await JSIntegrationRef!.StopAnimation();
-    }   
 
 }

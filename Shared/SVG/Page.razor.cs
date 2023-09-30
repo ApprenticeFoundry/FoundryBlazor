@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using FoundryBlazor.Shape;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 

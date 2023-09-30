@@ -1,4 +1,4 @@
-﻿namespace FoundryBlazor.Canvas
+﻿namespace FoundryBlazor.Shared
 {
     public class CanvasArgsBase
     {

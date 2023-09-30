@@ -4,23 +4,34 @@ using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Blazor.Extensions;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
 
 namespace FoundryBlazor.Shared;
 
-public class InputWrapperBase : ComponentBase
+public class InputWrapperBase : ComponentBase, IAsyncDisposable, IDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
-    [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     [Parameter] public string style { get; set; } = "width:max-content; border:1px solid black; cursor: default";
+
+    public ValueTask DisposeAsync()
+    {
+        $"InputWrapperBase DisposeAsync".WriteInfo();
+        return ValueTask.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        $"InputWrapperBase Dispose".WriteInfo();
+        GC.SuppressFinalize(this);
+    }
 
     protected void OnMouseDown(MouseEventArgs args)
     {

@@ -3,7 +3,5 @@
 @inherits Canvas3DComponentBase
 
 <div id="worldHolder" style="@GetCanvasStyle()" Width="@CanvasWidth" Height="@CanvasHeight">
-  <JSIntegrationHelper @ref="JSIntegrationRef" RenderFrame="RenderFrame">
-    <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene() />
-  </JSIntegrationHelper>
+    <Viewer @ref="ThreeJSViewer3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene() />
 </div>

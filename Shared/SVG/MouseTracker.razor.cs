@@ -4,7 +4,7 @@ using FoundryBlazor.Shape;
 using FoundryRulesAndUnits.Extensions;
 using FoundryBlazor.Solutions;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using System.Drawing;
 
 

@@ -1,4 +1,4 @@
-﻿namespace FoundryBlazor.Canvas
+﻿namespace FoundryBlazor.Shared
 {
     /// <summary>
     /// Mouse wheel information passed from JavaScript

@@ -1,5 +1,5 @@
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Shape;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;

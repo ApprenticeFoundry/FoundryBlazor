@@ -1,7 +1,8 @@
 
-using FoundryBlazor.Canvas;
+ 
 using BlazorComponentBus;
 using FoundryBlazor.PubSub;
+using FoundryBlazor.Shared;
 
 
 namespace FoundryBlazor.Shape;

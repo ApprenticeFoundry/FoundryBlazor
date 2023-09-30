@@ -10,7 +10,7 @@ using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas2DComponentBase : ComponentBase
+public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }
@@ -31,7 +31,7 @@ public class Canvas2DComponentBase : ComponentBase
     {
         if (firstRender)
         {
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize", DotNetObjectReference.Create(this));
  
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
 
@@ -42,10 +42,25 @@ public class Canvas2DComponentBase : ComponentBase
             // CreateTickPlayground();
             // SetDoTugOfWar();
 
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
  
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DoStop();
+        await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+
+    }
+
+    public void Dispose()
+    {
+        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
+        PubSub!.UnSubscribeFrom<TriggerRedrawEvent>(OnTriggerRedrawEvent);
+        GC.SuppressFinalize(this);
     }
 
     [JSInvokable]
@@ -66,6 +81,11 @@ public class Canvas2DComponentBase : ComponentBase
         }
     }
 
+    private void OnRefreshUIEvent(RefreshUIEvent e)
+    {
+        InvokeAsync(StateHasChanged);
+        $"Canvas2DComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
+    }
     private void OnTriggerRedrawEvent(TriggerRedrawEvent e)
     {
         Task.Run(async () =>
@@ -189,5 +209,6 @@ public class Canvas2DComponentBase : ComponentBase
     {
         await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
     }
+
 
 }

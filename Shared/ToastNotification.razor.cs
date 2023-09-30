@@ -36,6 +36,7 @@ public class ToastNotificationComponent : ComponentBase, IDisposable
             Toast?.ClearNotificationService();
             Service.Messages.CollectionChanged -= Update!;
         }
+        GC.SuppressFinalize(this);
     }
 
     protected override void OnInitialized()
