@@ -7,7 +7,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
     <AssemblyVersion>10.0.5</AssemblyVersion>
-    <Version>10.0.3</Version>
+    <Version>10.0.5</Version>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <JsLibRoot>JsLib\</JsLibRoot>
@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.0.5" />
     <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="1.0.5" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
@@ -29,16 +30,9 @@
     <PackageReference Include="Radzen.Blazor" Version="4.11.2" />
     <PackageReference Include="SkiaSharp" Version="2.88.6" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
-    <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" /> -->
-    <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
-    <ProjectReference Include="..\FoundryRulesAndUnits\FoundryRulesAndUnits.csproj" />
-    <PackageReference Include="BlazorThreeJS" Version="1.5.0" />
-    <!-- <PackageReference Include="FoundryRulesAndUnits" Version="1.0.3" /> -->
-   </ItemGroup>
+  
 
   <ItemGroup>
     <Content Remove="$(JsLibRoot)**" />
