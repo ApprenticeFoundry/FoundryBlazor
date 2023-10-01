@@ -6,12 +6,26 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
-    <AssemblyVersion>10.0.5</AssemblyVersion>
-    <Version>10.0.5</Version>
+
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>   
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <JsLibRoot>JsLib\</JsLibRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(JsLibRoot)node_modules\**</DefaultItemExcludes>
+
+    <Title>Apprentice Foundry Blazor</Title>
+    <description>2D and 3D graphics for blazor applications</description>
+    <packageTags>Foundry, 2D, 3D, Visio, Blazor</packageTags>
+    <RepositoryUrl>hhttps://github.com/ApprenticeFoundry/FoundryBlazor</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>ApprenticeFoundryBlazor</PackageId>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Copyright>Copyright © 2020</Copyright>
+    <AssemblyVersion>10.0.5</AssemblyVersion>
+    <Version>10.0.5</Version>
+    <Authors>Stephen Strong</Authors>
+    <Company>Stephen Strong</Company>
+    <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
+
   </PropertyGroup>
 
   <ItemGroup>
