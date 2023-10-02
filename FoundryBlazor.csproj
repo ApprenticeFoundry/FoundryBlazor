@@ -20,8 +20,8 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2020</Copyright>
-    <AssemblyVersion>10.1.6</AssemblyVersion>
-    <Version>10.1.6</Version>
+    <AssemblyVersion>10.1.7</AssemblyVersion>
+    <Version>10.1.7</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
