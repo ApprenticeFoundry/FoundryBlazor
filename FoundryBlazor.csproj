@@ -20,7 +20,7 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2020</Copyright>
-    <AssemblyVersion>10.0.5</AssemblyVersion>
+    <AssemblyVersion>10.1.5</AssemblyVersion>
     <Version>10.0.5</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.0.5" />
+    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.1.5" />
     <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="1.0.5" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
