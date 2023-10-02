@@ -21,7 +21,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2020</Copyright>
     <AssemblyVersion>10.1.5</AssemblyVersion>
-    <Version>10.0.5</Version>
+    <Version>10.1.5</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
