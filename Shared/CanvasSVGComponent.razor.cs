@@ -11,7 +11,7 @@ using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shared;
 
-public class CanvasSVGComponentBase : ComponentBase
+public class CanvasSVGComponentBase : ComponentBase, IAsyncDisposable, IDisposable
 {
     [Inject] public IHitTestService? HitTestService { get; set; }
     [Inject] public IWorkspace? Workspace { get; set; }
@@ -32,7 +32,7 @@ public class CanvasSVGComponentBase : ComponentBase
     {
         if (firstRender)
         {
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.SetDotNetObjectReference", DotNetObjectReference.Create(this));
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize", DotNetObjectReference.Create(this));
  
             var drawing = Workspace!.GetDrawing();
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
@@ -42,8 +42,37 @@ public class CanvasSVGComponentBase : ComponentBase
             // CreateTickPlayground();
 
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
+            PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
+
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+            await DoStop();
+        }
+        catch (Exception ex)
+        {
+            $"CanvasSVGComponentBase DisposeAsync Error {ex.Message}".WriteError();
+        }
+
+
+    }
+
+    public void Dispose()
+    {
+        PubSub!.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
+        PubSub!.UnSubscribeFrom<TriggerRedrawEvent>(OnTriggerRedrawEvent);
+        GC.SuppressFinalize(this);
+    }
+    private void OnRefreshUIEvent(RefreshUIEvent e)
+    {
+        InvokeAsync(StateHasChanged);
+        $"CanvasSVGComponentBase OnRefreshUIEvent StateHasChanged {e.note}".WriteInfo();
     }
 
     [JSInvokable]
