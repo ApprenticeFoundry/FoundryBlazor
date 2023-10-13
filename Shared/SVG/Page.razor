@@ -12,11 +12,13 @@
     <PageGrid />
     @foreach (var shape in GetShapes1D())
     {
-        <Shape1D Shape="@shape" />
+        @* <Shape1D Shape="@shape" /> *@
+        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
     }
     @foreach (var shape in GetShapes2D())
     {
-        if (shape is FoText2D obj1)
+        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
+        @* if (shape is FoText2D obj1)
         {
             <Text2D Shape="@obj1" />
         }
@@ -35,7 +37,7 @@
         else
         {
             <Shape2D Shape="@shape" />
-        }
+        } *@
     }
 </PanZoomG>
 
