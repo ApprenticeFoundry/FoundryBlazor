@@ -25,7 +25,7 @@
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
-
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
