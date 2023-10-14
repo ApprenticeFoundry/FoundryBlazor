@@ -2,6 +2,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
  
 using FoundryBlazor.Extensions;
 using FoundryBlazor.Shared;
+using FoundryBlazor.Shared.SVG;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components;
 using System.Drawing;
@@ -87,6 +88,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         set { this.id = value; }
     }
 
+
     protected Rectangle rectangle = new(0, 0, 0, 0);
     public static bool PeekResetHitTesting()
     {
@@ -132,6 +134,14 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             this.color = value;
             // $"{GetType().Name} {Name} Color Change {color}".WriteNote();
         }
+    }
+
+
+    protected FoDynamicRender? foDynamicRender;
+    public virtual FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Shape2D), this);
+        return foDynamicRender;
     }
 
     public Func<FoGlyph2D?> GetParent = () => null;

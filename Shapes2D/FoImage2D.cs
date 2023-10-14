@@ -1,5 +1,6 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 using Microsoft.AspNetCore.Components;
 
 //  https://learn.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-7.0
@@ -57,6 +58,12 @@ public class FoImage2D : FoShape2D, IImage2D
     }
     public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
     {
+    }
+
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Image2D), this);
+        return foDynamicRender;
     }
 
     public override FoImage2D ZoomBy(double factor)

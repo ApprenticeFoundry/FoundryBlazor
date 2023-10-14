@@ -1,4 +1,5 @@
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 
 
 namespace FoundryBlazor.Shape;
@@ -35,6 +36,12 @@ public class FoText2D : FoShape2D, IShape2D
     public FoText2D(int width, int height, string color) : base("", width, height, color)
     {
         Text = "Hello Everyone";
+    }
+
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Text2D), this);
+        return foDynamicRender;
     }
 
     protected string CreateDetails(string details="")

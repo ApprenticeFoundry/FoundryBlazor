@@ -1,5 +1,6 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 using Microsoft.AspNetCore.Components;
 
 //  https://learn.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-7.0
@@ -56,6 +57,12 @@ public class FoSymbol2D : FoShape2D, IShape2D
     {
     }
     
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(SVGShape), this);
+        return foDynamicRender;
+    }
+
     public override FoSymbol2D ZoomBy(double factor) 
     { 
         ShrinkBy(factor); return this; 
