@@ -35,6 +35,16 @@ public class PageBase : SVGBase<FoPage2D>
         return found;
     }
 
+    public virtual Dictionary<string, object> GetGlyphParameters(FoGlyph2D glyph)
+    {
+        var result = new Dictionary<string, object>()
+        {
+            {"Shape",  glyph }
+        };
+   
+        return result;
+    }
+
 
     public List<FoShape1D> GetShapes1D()
     {

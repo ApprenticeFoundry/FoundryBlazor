@@ -12,11 +12,11 @@
     <PageGrid />
     @foreach (var shape in GetShapes1D())
     {
-        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
+        <DynamicComponent Type="@GetGlyphView(shape)" Parameters="@GetGlyphParameters(shape)" />
     }
     @foreach (var shape in GetShapes2D())
     {
-        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
+        <DynamicComponent Type="@GetGlyphView(shape)" Parameters="@GetGlyphParameters(shape)" />
     }
 </PanZoomG>
 
