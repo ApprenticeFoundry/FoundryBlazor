@@ -20,6 +20,21 @@ public class PageBase : SVGBase<FoPage2D>
         InitSource(Page);
     }
 
+    public virtual Type GetGlyphView(FoGlyph2D glyph)
+    {
+        var found = glyph switch
+        {
+            FoText2D _ => typeof(Text2D),
+            FoSymbol2D _ => typeof(SVGShape),
+            FoVideo2D _ => typeof(Video),
+            FoImage2D _ => typeof(Image),
+            FoShape1D _ => typeof(Shape1D),
+            FoShape2D _ => typeof(Shape2D),
+            _ => typeof(Shape2D)
+        };
+        return found;
+    }
+
 
     public List<FoShape1D> GetShapes1D()
     {

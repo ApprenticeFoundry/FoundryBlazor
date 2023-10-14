@@ -12,30 +12,11 @@
     <PageGrid />
     @foreach (var shape in GetShapes1D())
     {
-        <Shape1D Shape="@shape" />
+        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
     }
     @foreach (var shape in GetShapes2D())
     {
-        if (shape is FoText2D obj1)
-        {
-            <Text2D Shape="@obj1" />
-        }
-        else if (shape is FoSymbol2D obj2)
-        {
-            <SVGShape Shape="@obj2" />
-        }
-        else if (shape is FoVideo2D obj3)
-        {
-            <Video Shape="@obj3" />
-        }
-        else if (shape is FoImage2D obj4)
-        {
-            <Image Shape="@obj4" />
-        }
-        else
-        {
-            <Shape2D Shape="@shape" />
-        }
+        <DynamicComponent Type="@GetGlyphView(shape)" Shape="@shape" />
     }
 </PanZoomG>
 
