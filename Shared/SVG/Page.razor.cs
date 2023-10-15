@@ -20,34 +20,23 @@ public class PageBase : SVGBase<FoPage2D>
         InitSource(Page);
     }
 
-    public virtual Type GetGlyphView(FoGlyph2D glyph)
-    {
-        var found = glyph switch
-        {
-            FoText2D _ => typeof(Text2D),
-            FoSymbol2D _ => typeof(SVGShape),
-            FoVideo2D _ => typeof(Video),
-            FoImage2D _ => typeof(Image),
-            FoShape1D _ => typeof(Shape1D),
-            FoShape2D _ => typeof(Shape2D),
-            _ => typeof(Shape2D)
-        };
-        return found;
-    }
 
 
-    public List<FoShape1D> GetShapes1D()
+ 
+
+
+    public List<FoDynamicRender> GetShapes1D()
     {
-        var shapes = Page.AllShapes1D();
+        var shapes = Page.AllShapes1D().Select(shape => shape.GetDynamicRender());
         //$"GetShapes1D {shapes.Count}".WriteInfo();
-        return shapes;
+        return shapes.ToList();
     }
 
-    public List<FoShape2D> GetShapes2D()
+    public List<FoDynamicRender> GetShapes2D()
     {
-        var shapes = Page.AllShapes2D();
+        var shapes = Page.AllShapes2D().Select(shape => shape.GetDynamicRender());
         //$"GetShapes2D {shapes.Count}".WriteInfo();
-        return shapes;
+        return shapes.ToList();;
     }
 
     public List<FoText2D> GetText2D()

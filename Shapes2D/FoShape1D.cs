@@ -1,4 +1,5 @@
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 
@@ -104,6 +105,11 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         GlueFinishTo(finish);
     }
 
+   public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Shape1D), this);
+        return foDynamicRender;
+    }
     public (int, int) ComputeLocation(double percent)
     {
         if ( percent <= 0)

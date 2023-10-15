@@ -1,4 +1,6 @@
 
+using FoundryBlazor.Shared.SVG;
+
 namespace FoundryBlazor.Shape;
 
 public class FoShape2D : FoGlyph2D, IShape2D
@@ -23,7 +25,11 @@ public class FoShape2D : FoGlyph2D, IShape2D
         ShapeDraw = DrawRect;
     }
 
-
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Shape2D), this);
+        return foDynamicRender;
+    }
 
 
 
