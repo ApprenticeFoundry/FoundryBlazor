@@ -1,10 +1,21 @@
 
 using FoundryBlazor.Shape;
+using FoundryBlazor.Shared.SVG;
 
 public class FoDynamicRender 
 {
     private Type _type { get; set; }
     private Dictionary<string,object> _source { get; set; }
+
+    public static FoDynamicRender Video2D(Dictionary<string,object> parameters) 
+    {
+        return new FoDynamicRender(typeof(Video2D), parameters);
+    }
+    
+    public static FoDynamicRender Image2D(Dictionary<string,object> parameters) 
+    {
+        return new FoDynamicRender(typeof(Image2D), parameters);
+    }
 
     public FoDynamicRender(Type target, FoGlyph2D item) 
     {
@@ -14,6 +25,13 @@ public class FoDynamicRender
             {"Shape",  item }
         };
     }
+
+    public FoDynamicRender(Type target, Dictionary<string,object> parameters) 
+    {
+         _type = target;
+        _source = parameters;
+    }
+
 
     public Type DynamicType()
     {
