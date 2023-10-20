@@ -66,7 +66,7 @@ public interface IDrawing : IRender
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
 {
-    public bool ShowStats { get; set; } = true;
+    public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
     private bool RenderHitTestTree = true;
