@@ -47,6 +47,7 @@ public interface IRender
 {
     public Task Draw(Canvas2DContext ctx, int tick);
     public Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true);
+    public bool RenderDeepDetailed(Canvas2DContext ctx, int tick);
     public Task<bool> RenderConcise(Canvas2DContext ctx, double scale, Rectangle region);
 
 }
@@ -525,6 +526,11 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         //await DrawPin(ctx);
     }
 
+    public virtual bool RenderDeepDetailed(Canvas2DContext ctx, int tick)
+    {
+        GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick));
+        GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick)); 
+    }
     public virtual async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
         if (CannotRender()) return false;
@@ -545,10 +551,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
             await DrawWhenSelected(ctx, tick, deep);
 
         if (deep)
-        {
-            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        }
+            RenderDeepDetailed(ctx, tick);
+
 
         // if (GetMembers<FoGlue2D>()?.Count > 0)
         //     await DrawTriangle(ctx, "Black");

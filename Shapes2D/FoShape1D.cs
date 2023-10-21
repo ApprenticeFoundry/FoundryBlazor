@@ -408,10 +408,8 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             await DrawWhenSelected(ctx, tick, deep);
 
         if (deep)
-        {
-            GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-            GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
-        }
+            RenderDeepDetailed(ctx, tick);
+
 
         // if (GetMembers<FoGlue2D>()?.Count > 0)
         //     await DrawTriangle(ctx, "Black");
