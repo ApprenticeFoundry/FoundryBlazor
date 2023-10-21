@@ -434,7 +434,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        "FoWorkspace CreateMenus".WriteWarning();
+        // $"FoWorkspace CreateMenus".WriteWarning();
         ActiveWorkbook?.CreateMenus(space, js, nav);
 
         GetDrawing()?.CreateMenus(space, js, nav);
