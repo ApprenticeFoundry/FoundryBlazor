@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.1.5" />
-    <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="1.0.5" />
+    <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="1.0.6" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 
