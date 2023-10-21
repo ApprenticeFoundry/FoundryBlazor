@@ -87,7 +87,6 @@ public class ShapeSelection : ShapeHovering
         }
         else
         {
-
             panZoomService.SetFenceSelecting(true);
             selectionService?.ClearAllWhen(mustClear);
         }
