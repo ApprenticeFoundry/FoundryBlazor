@@ -54,7 +54,7 @@ public class ShapeSelection : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        $"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
+        //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
 
         panZoomService.SetFenceSelecting(false);
         var mustClear = args.ShiftKey == false;

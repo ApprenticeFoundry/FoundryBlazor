@@ -35,7 +35,7 @@ public class InputWrapperBase : ComponentBase, IAsyncDisposable, IDisposable
 
     protected void OnMouseDown(MouseEventArgs args)
     {
-        $"On Mouse Down {args.ClientX}, {args.ClientY}".WriteInfo();
+        //$"On Mouse Down {args.ClientX}, {args.ClientY}".WriteInfo();
 
         var canvasArgs = ToCanvasMouseArgs(args, "ON_MOUSE_DOWN");
         PubSub?.Publish<CanvasMouseArgs>(canvasArgs);
