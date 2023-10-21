@@ -70,7 +70,7 @@ public class FoGlyph3D : FoComponent
     public virtual bool Smash(bool force)
     {
         //if ( _matrix == null && !force) return false;
-        $"Smashing {Name} {GetType().Name}".WriteInfo(2);
+        //$"Smashing {Name} {GetType().Name}".WriteInfo(2);
 
         // ResetHitTesting = true;
         // this._matrix = null;

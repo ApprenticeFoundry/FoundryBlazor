@@ -235,7 +235,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public override bool Smash(bool force)
     {
         if (_matrix == null && !force) return false;
-        $"Smashing Page {Name} {GetType().Name} force {force}".WriteInfo(2);
+        //$"Smashing Page {Name} {GetType().Name} force {force}".WriteInfo(2);
 
         return base.Smash(force);
     }
