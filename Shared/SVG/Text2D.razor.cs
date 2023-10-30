@@ -55,14 +55,14 @@ public class Text2DBase : SVGBase<FoText2D>
 
     protected void OnClickText()
     {
-        $"OnClickText".WriteInfo();
+        //$"OnClickText".WriteInfo();
         SelectionService?.ClearAll();
         SelectionService?.AddItem(Shape);
     }
 
     protected void OnClickButton()
     {
-        $"OnClickButton".WriteInfo();
+       // $"OnClickButton".WriteInfo();
     }
 
 }
