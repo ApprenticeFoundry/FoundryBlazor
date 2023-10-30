@@ -529,7 +529,8 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     public virtual bool RenderDeepDetailed(Canvas2DContext ctx, int tick)
     {
         GetMembers<FoShape1D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick));
-        GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick)); 
+        GetMembers<FoShape2D>()?.ForEach(async child => await child.RenderDetailed(ctx, tick));
+        return true;
     }
     public virtual async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {

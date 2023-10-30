@@ -351,7 +351,11 @@ public class PageManagementService : FoComponent, IPageManagement
         await CurrentPage().Draw(ctx, tick);
     }
 
-
+    public virtual bool RenderDeepDetailed(Canvas2DContext ctx, int tick)
+    {
+        return false;
+    }
+    
     public async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
         var page = CurrentPage();
