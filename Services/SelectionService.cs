@@ -105,7 +105,7 @@ public class SelectionService : ISelectionService
     public void MousePreDelete()
     {
         //PublishShapeSelectedUIEvent();
-        Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
+        //Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.PreDelete(Members));
     }

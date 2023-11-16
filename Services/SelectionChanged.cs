@@ -87,7 +87,7 @@ public class SelectionChanged
 
     public static SelectionChanged PreDelete(List<FoGlyph2D> selections)
     {
-        Console.WriteLine("SelectionChanged PreDelete");
+        //Console.WriteLine("SelectionChanged PreDelete");
         var list = new List<FoGlyph2D>();
         list.AddRange(selections);
         var result = new SelectionChanged()
