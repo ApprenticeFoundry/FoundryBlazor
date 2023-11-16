@@ -595,10 +595,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public bool SetupHitTest(Scene ctx, int tick = 0, double fps = 0, bool deep = true)
     {
-        $"SetupHitTest for {Name}".WriteInfo();
+        //$"SetupHitTest for {Name}".WriteInfo();
         UserHit = (ImportSettings model3D) =>
         {
-            $"In UserHit".WriteInfo();
+            //$"In UserHit".WriteInfo();
 
             var list = EstablishTextPanels(model3D);
             foreach (var item in list)

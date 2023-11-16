@@ -346,6 +346,12 @@ public class FoArena3D : FoGlyph3D, IArena
             label.Render(Scene, 0, 0);
         });
 
+        world.Panels()?.ForEach(panel =>
+        {
+            //$"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
+            panel.Render(Scene, 0, 0);
+        });
+
         world.Datums()?.ForEach(datum =>
         {
             // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
