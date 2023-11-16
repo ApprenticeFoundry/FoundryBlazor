@@ -13,6 +13,7 @@ public class FoText3D : FoGlyph3D, IShape3D
     private string text = "";
     private LabelText? Label { get; set; }
     public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
+    public double FontSize { get; set; } = 0.5;
     public List<string>? Details { get; set; }
 
     public Vector3? Position { get; set; }
@@ -53,8 +54,8 @@ public class FoText3D : FoGlyph3D, IShape3D
 
     public override Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
     {
-        if (Position == null) 
-            return base.GetPosition(x,y,z);
+        if (Position == null)
+            return base.GetPosition(x, y, z);
 
         var result = Position;
         return result;
@@ -65,7 +66,8 @@ public class FoText3D : FoGlyph3D, IShape3D
         Label = new LabelText(text)
         {
             Color = Color ?? "Yellow",
-            Position = GetPosition()
+            Position = GetPosition(),
+            FontSize = FontSize
         };
         ctx.Add(Label);
         return true;

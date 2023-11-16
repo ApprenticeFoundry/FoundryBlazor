@@ -97,6 +97,19 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Connections().Select((item) => item.EstablishPathway3D()).ToList();
     }
 
+    public bool UpdateTextLines(List<string> lines)
+    {
+        TextLines = lines;
+        //"Update label text".WriteSuccess();
+        if (TextPanel != null)
+        {
+            TextPanel.TextLines = TextLines;
+            return true;
+        }
+
+        return false;
+    }
+
 
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
@@ -115,7 +128,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
             TextPanel = null;
         }
 
-        if ( HasPanels())
+        if (HasPanels())
         {
             PanelGroup = EstablishGroup3D();
             ctx.Add(PanelGroup);
