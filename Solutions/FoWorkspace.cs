@@ -626,6 +626,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual async Task RefreshRender(int tick)
     {
+        AllWorkbooks().ForEach(async wb => await wb.RefreshRender(tick));
         await Task.CompletedTask;
     }
 }
