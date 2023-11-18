@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
+using System.Runtime.CompilerServices;
 
 namespace FoundryBlazor.Solutions;
 
@@ -98,9 +99,9 @@ public class FoWorkbook : FoComponent, IWorkbook
     {
     }
 
-    public virtual Task RefreshRender(int tick)
+    public virtual async Task RefreshRender(int tick)
     {
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     public virtual void PostRender(int tick)

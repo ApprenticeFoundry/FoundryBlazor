@@ -500,10 +500,10 @@ public class FoWorkspace : FoComponent, IWorkspace
         space.EstablishCommand<FoCommand2D, FoButton2D>("CMD", new Dictionary<string, Action>()
         {
             { "Ping", () => DoPing()},
-                        { "Clear", () => DoClear()},
+            { "Clear", () => DoClear()},
             { "FileDrop", () => SetFileDropStyle()},
             { "Draw", () => SetDrawingStyle()},
-               { "Save", () => DoSave()},
+            { "Save", () => DoSave()},
             // { "1:1", () => PanZoom.Reset()},
             // { "Zoom 2.0", () => PanZoom.SetZoom(2.0)},
             // { "Zoom 0.5", () => PanZoom.SetZoom(0.5)},
@@ -622,5 +622,10 @@ public class FoWorkspace : FoComponent, IWorkspace
     public ComponentBus GetPubSub()
     {
         return PubSub;
+    }
+
+    public virtual async Task RefreshRender(int tick)
+    {
+        await Task.CompletedTask;
     }
 }
