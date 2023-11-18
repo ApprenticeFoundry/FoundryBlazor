@@ -19,12 +19,12 @@ public interface IWorkbook
     Dictionary<string, Action> DefaultMenu();
     bool SetSignalRHub(HubConnection hub, string panid);
     void PreRender(int tick);
+    Task RefreshRender(int tick);
     void PostRender(int tick);
     Task RenderWatermark(Canvas2DContext ctx, int tick);
-
 }
 
-public class FoWorkbook: FoComponent, IWorkbook
+public class FoWorkbook : FoComponent, IWorkbook
 {
     protected IWorkspace Workspace { get; set; }
     protected ICommand Command { get; set; }
@@ -48,7 +48,7 @@ public class FoWorkbook: FoComponent, IWorkbook
         JsRuntime = foundry.JS();
         PubSub = foundry.PubSub();
         QRCode = foundry.QRCode();
-    }  
+    }
 
 
 
@@ -68,7 +68,7 @@ public class FoWorkbook: FoComponent, IWorkbook
 
     public FoPage2D CurrentPage()
     {
-        if ( WorkPage != null)
+        if (WorkPage != null)
             return WorkPage;
 
         return EstablishCurrentPage(Name, "Black");
@@ -96,17 +96,18 @@ public class FoWorkbook: FoComponent, IWorkbook
     }
     public virtual void PreRender(int tick)
     {
-
     }
+
+    public virtual Task RefreshRender(int tick)
+    {
+        return Task.CompletedTask;
+    }
+
     public virtual void PostRender(int tick)
     {
-
     }
     public virtual async Task RenderWatermark(Canvas2DContext ctx, int tick)
     {
         await Task.CompletedTask;
     }
-
-
-
 }
