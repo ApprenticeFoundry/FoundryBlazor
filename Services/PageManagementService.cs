@@ -205,7 +205,7 @@ public class PageManagementService : FoComponent, IPageManagement
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 300, 200, "RED");
-                $"CurrentPage CREATING new page {found.Name}".WriteLine(ConsoleColor.White);
+                $"CurrentPage CREATING new page {found.Name}".WriteNote();
                 AddPage(found);
             }
             return SetCurrentPage(found);

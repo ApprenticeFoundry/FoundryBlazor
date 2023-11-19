@@ -311,7 +311,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     public void PreRenderWorld3D(FoWorld3D? world)
     {
-        $"PreRenderWorld world={world}".WriteInfo();
+        //$"PreRenderWorld world={world}".WriteInfo();
         if (world == null)
         {
             $"world is empty or viewer is not preent".WriteError();
@@ -383,7 +383,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         foreach (var body in otherBodies)
         {
-            $"PreRenderPlatform Body {body.Name}".WriteInfo();
+            //$"PreRenderPlatform Body {body.Name}".WriteInfo();
             await body.PreRender(this, Viewer3D!);
         };
 
