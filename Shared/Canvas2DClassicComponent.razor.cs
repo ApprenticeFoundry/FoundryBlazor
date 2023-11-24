@@ -19,7 +19,7 @@ public class Canvas2DClassicComponentBase : ComponentBase, IAsyncDisposable, IDi
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
-    [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
+    [Parameter] public string CanvasStyle { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
 

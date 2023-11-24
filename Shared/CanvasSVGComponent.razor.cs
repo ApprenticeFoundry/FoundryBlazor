@@ -8,6 +8,7 @@ using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
 using FoundryBlazor.PubSub;
 using FoundryRulesAndUnits.Extensions;
+using System.Text;
 
 namespace FoundryBlazor.Shared;
 
@@ -17,17 +18,23 @@ public class CanvasSVGComponentBase : ComponentBase, IAsyncDisposable, IDisposab
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
+    [Parameter] public string CanvasStyle { get; set; } = "width:max-content; border:1px solid black;cursor:default";
+
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
     [Parameter] public bool AutoRender { get; set; } = true;
-    [Parameter] public string StyleCanvas { get; set; } = "background-color:lightsteelblue";
+
 
     protected string CurrentKey { get; set; } = "";
     public int tick { get; private set; }
 
     private DateTime _lastRender;
 
-
+    public string GetCanvasStyle()
+    {
+        var style = new StringBuilder(CanvasStyle).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        return style;
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

@@ -26,7 +26,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
 
-    [Parameter] public string StyleCanvas { get; set; } = "width:max-content; border:1px solid black;cursor:default";
+    [Parameter] public string CanvasStyle { get; set; } = "width:max-content; border:1px solid black;cursor:default";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;
@@ -49,7 +49,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
 
     public string GetCanvasStyle()
     {
-        var style = new StringBuilder(StyleCanvas).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        var style = new StringBuilder(CanvasStyle).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
         return style;
     }
 

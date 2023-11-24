@@ -18,7 +18,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
-    [Parameter] public string StyleCanvas { get; set; } = "width:max-content; border:1px solid black;cursor:default";
+    [Parameter] public string CanvasStyle { get; set; } = "width:max-content; border:1px solid black;cursor:default";
 
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
@@ -32,7 +32,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
 
     public string GetCanvasStyle()
     {
-        var style = new StringBuilder(StyleCanvas).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        var style = new StringBuilder(CanvasStyle).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
         return style;
     }
     

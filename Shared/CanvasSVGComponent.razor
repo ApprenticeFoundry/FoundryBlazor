@@ -2,8 +2,8 @@
 @using FoundryBlazor.Shared.SVG
 @namespace FoundryBlazor.Shared
 
-<CanvasInputWrapper style="width:max-content; border:1px solid black;cursor:default" >
-    <svg width=@CanvasWidth height=@CanvasHeight style="@StyleCanvas" >
+<CanvasInputWrapper  CanvasStyle="@GetCanvasStyle()" CanvasWidth="@CanvasWidth" CanvasHeight="@CanvasHeight">
+    <svg width=@CanvasWidth height=@CanvasHeight style="@GetCanvasStyle()">
         <Page Page="@GetCurrentPage()" />
     </svg>
 </CanvasInputWrapper>

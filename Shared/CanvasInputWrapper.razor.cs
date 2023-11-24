@@ -5,6 +5,7 @@ using BlazorComponentBus;
 
 using FoundryBlazor.Solutions;
 using FoundryBlazor.Shared;
+using System.Text;
 
 namespace FoundryBlazor.Shared;
 
@@ -16,8 +17,25 @@ public class CanvasInputWrapperBase : ComponentBase, IAsyncDisposable, IDisposab
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    [Parameter] public string style { get; set; } = "width:max-content; border:1px solid black; cursor: default";
+    [Parameter] public string CanvasStyle { get; set; } = "width:max-content; border:1px solid black; cursor: default";
 
+    [Parameter] public int CanvasWidth { get; set; } = 1800;
+    [Parameter] public int CanvasHeight { get; set; } = 1200;
+
+
+
+    public string GetCanvasStyle()
+    {
+        var drawing = Workspace!.GetDrawing();
+        var cursor = drawing.GetInteraction().GetCursor();
+        var style = new StringBuilder(CanvasStyle).Append("; ")
+                    .Append("cursor:").Append(cursor).Append("; ")
+                    .Append("width:")
+                    .Append(CanvasWidth).Append("px; ")
+                    .Append("height:")
+                    .Append(CanvasHeight).Append("px; ").ToString();
+        return style;
+    }
     public ValueTask DisposeAsync()
     {
         $"InputWrapperBase DisposeAsync".WriteInfo();
@@ -128,12 +146,7 @@ public class CanvasInputWrapperBase : ComponentBase, IAsyncDisposable, IDisposab
         return canvasArgs;
     }
 
-    protected string GetCursor()
-    {
-        var drawing = Workspace!.GetDrawing();
-        var cursor = drawing.GetInteraction().GetCursor();
-        return $"cursor: {cursor}";
-    }
+
 
 
 }
