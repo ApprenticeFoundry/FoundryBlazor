@@ -26,7 +26,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
 
-    [Parameter] public string StyleCanvas { get; set; } = "position: absolute; top: 80px; left: 0px; z-index: 10";
+    [Parameter] public string StyleCanvas { get; set; } = "width:max-content; border:1px solid black;cursor:default";
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
     private int tick = 0;

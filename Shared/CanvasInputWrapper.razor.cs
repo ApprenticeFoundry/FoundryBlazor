@@ -1,17 +1,14 @@
 ﻿using Microsoft.AspNetCore.Components;
 using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.Components.Web;
-using Blazor.Extensions.Canvas.Canvas2D;
-using Blazor.Extensions;
 using BlazorComponentBus;
- 
+
 using FoundryBlazor.Solutions;
-using FoundryBlazor.Shape;
-using Microsoft.JSInterop;
+using FoundryBlazor.Shared;
 
 namespace FoundryBlazor.Shared;
 
-public class InputWrapperBase : ComponentBase, IAsyncDisposable, IDisposable
+public class CanvasInputWrapperBase : ComponentBase, IAsyncDisposable, IDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }

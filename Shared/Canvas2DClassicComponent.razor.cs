@@ -83,8 +83,8 @@ public class Canvas2DClassicComponentBase : ComponentBase, IAsyncDisposable, IDi
 
     public async ValueTask DisposeAsync()
     {
-        await JSIntegrationRef!.Finalize();
         "Canvas2DClassicComponentBase DisposeAsync".WriteInfo();
+        await JSIntegrationRef!.Finalize();
         await DoStop();
     }
 

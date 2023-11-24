@@ -482,7 +482,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         return commandBar!;
     }
 
-    public virtual void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl)
+    public virtual void CreateCommands(IWorkspace space, IJSRuntime JsRuntime, NavigationManager nav, string serverUrl)
     {
         GetSlot<FoCommand2D>()?.Clear();
 
@@ -491,7 +491,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             var target = nav!.ToAbsoluteUri(serverUrl);
             try
             {
-                await js!.InvokeAsync<object>("open", target);
+                await JsRuntime!.InvokeAsync<object>("open", target);
             }
             catch { }
         };
@@ -515,7 +515,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             { "Hit", () => ActiveDrawing?.ToggleHitTestDisplay()},
         }, true);
 
-        ActiveWorkbook?.CreateCommands(space, js, nav, serverUrl);
+        ActiveWorkbook?.CreateCommands(space, JsRuntime, nav, serverUrl);
 
         FoWorkspace.RefreshCommands = true;
     }

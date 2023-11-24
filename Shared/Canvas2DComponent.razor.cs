@@ -7,6 +7,7 @@ using FoundryBlazor.Shape;
 using Microsoft.JSInterop;
 using FoundryRulesAndUnits.Extensions;
 using FoundryBlazor.PubSub;
+using System.Text;
 
 namespace FoundryBlazor.Shared;
 
@@ -16,6 +17,8 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
+
+    [Parameter] public string StyleCanvas { get; set; } = "width:max-content; border:1px solid black;cursor:default";
 
     [Parameter] public int CanvasWidth { get; set; } = 1800;
     [Parameter] public int CanvasHeight { get; set; } = 1200;
@@ -27,7 +30,12 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     public BECanvasComponent? CanvasReference;
     private Canvas2DContext? Ctx;
 
-
+    public string GetCanvasStyle()
+    {
+        var style = new StringBuilder(StyleCanvas).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        return style;
+    }
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -39,14 +47,15 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
             if ( AutoRender)
                 await DoStart();
-            // CreateTickPlayground();
-            // SetDoTugOfWar();
+
+            CreateTickPlayground();
+            SetDoTugOfWar();
 
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
  
             Ctx = await CanvasReference!.CreateCanvas2DAsync();
-             await RenderFrame(0);
+            await RenderFrame(0);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -55,15 +64,14 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     {
         try
         {
+            "Canvas2DComponentBase DisposeAsync".WriteInfo();
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
             await DoStop();
         }
         catch (Exception ex)
         {
-            $"Canvas2DComponentBase DisposeAsync Error {ex.Message}".WriteError();
+            $"Canvas2DComponentBase DisposeAsync Exception {ex.Message}".WriteError();
         }
-
-
     }
 
     public void Dispose()

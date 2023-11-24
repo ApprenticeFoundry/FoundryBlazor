@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Radzen;
-using System.Runtime.CompilerServices;
 
 namespace FoundryBlazor.Solutions;
 

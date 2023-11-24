@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
@@ -37,8 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.2.3" />
-    <!-- <ProjectReference Include="..\..\Core\BlazorThreeJS\BlazorThreeJS.csproj" />     -->
+    <!--<PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.2.3" />-->
+    <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 
