@@ -22,7 +22,11 @@ public class FoGlyph3D : FoComponent
     public double Height { get { return this.height; } set { this.height = AssignDouble(value, height); } }
     protected double depth = 0;
     public double Depth { get { return this.depth; } set { this.depth = AssignDouble(value, depth); } }
-    public bool IsVisible { get; set; } = true;
+    public bool IsVisible
+    {
+        get { return this.StatusBits.IsVisible; }
+        set { this.StatusBits.IsVisible = value; }
+    }
 
     public FoGlyph3D() : base("")
     {

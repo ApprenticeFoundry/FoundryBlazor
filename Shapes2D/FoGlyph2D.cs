@@ -93,6 +93,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         get { return this.StatusBits.ShouldRender; } 
         set { this.StatusBits.ShouldRender = value; } 
     }
+    
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
     public int Index { get; set; } = 0;
