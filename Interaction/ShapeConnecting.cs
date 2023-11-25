@@ -17,7 +17,6 @@ public class ShapeConnecting : ShapeHovering
     public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
     public ShapeConnecting(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -26,8 +25,9 @@ public class ShapeConnecting : ShapeHovering
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<ShapeConnecting>();
     }
     public override void Abort()
     {
@@ -113,7 +113,7 @@ public class ShapeConnecting : ShapeHovering
                 return true;
             }
         }
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        drawing.SetInteraction<ShapeHovering>();
         return false;
     }
     public override bool MouseMove(CanvasMouseArgs args)

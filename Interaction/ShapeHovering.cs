@@ -11,7 +11,6 @@ namespace FoundryBlazor.Shape;
 public class ShapeHovering : BaseInteraction
 {
     public ShapeHovering(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -20,8 +19,9 @@ public class ShapeHovering : BaseInteraction
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<ShapeHovering>();
     }
 
     public override bool MouseMove(CanvasMouseArgs args)

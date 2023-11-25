@@ -11,7 +11,6 @@ public class ShapeDragging : ShapeHovering
 
 
     public ShapeDragging(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -20,8 +19,9 @@ public class ShapeDragging : ShapeHovering
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<ShapeDragging>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
@@ -73,7 +73,7 @@ public class ShapeDragging : ShapeHovering
     {
         selectedShape?.OnShapeClick(ClickStyle.MouseUp, args);
         isDraggingShapes = false;
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        drawing.SetInteraction<ShapeHovering>();
         selectionService?.MouseDropped();
         return true;
     }

@@ -16,7 +16,6 @@ public class MoShapeLinking : ShapeHovering
 
 
     public MoShapeLinking(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -25,8 +24,9 @@ public class MoShapeLinking : ShapeHovering
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<MoShapeLinking>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

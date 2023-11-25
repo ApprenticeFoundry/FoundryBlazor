@@ -10,7 +10,6 @@ public class ShapeMenu : ShapeDragging
 {
 
     public ShapeMenu(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -19,8 +18,9 @@ public class ShapeMenu : ShapeDragging
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<ShapeMenu>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

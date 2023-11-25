@@ -94,8 +94,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private ComponentBus PubSub { get; set; }
 
     protected readonly List<BaseInteraction> interactionRules;
-    protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
-    protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
+    protected readonly Dictionary<string, BaseInteraction> interactionLookup;
+    protected string Style = BaseInteraction.InteractionStyle<BaseInteraction>();
     private IBaseInteraction? lastInteraction;
 
 
@@ -182,16 +182,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // https://www.w3schools.com/cssref/pr_class_cursor.php
         interactionRules = new()
         {
-            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 1010, "pointer", this, pubSub, panzoom, select, manager, hittest)},
-             {new MentorConstruction(InteractionStyle.MentorConstruction, 105, "default", this, pubSub, panzoom, select, manager, hittest)},
-           {new MoShapeLinking(InteractionStyle.ModelLinking, 100, "default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeMenu(InteractionStyle.ShapeMenu, 90,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 80,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeResizing(InteractionStyle.ShapeResizing, 70,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(InteractionStyle.ShapeDragging, 50,"grab", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(InteractionStyle.ShapeSelection, 40,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(InteractionStyle.ShapeHovering, 30,"move", this, pubSub, panzoom, select, manager, hittest)},
-            {new BaseInteraction(InteractionStyle.ReadOnly, 0,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(1010, "pointer", this, pubSub, panzoom, select, manager, hittest)},
+             {new MentorConstruction(105, "default", this, pubSub, panzoom, select, manager, hittest)},
+           {new MoShapeLinking(100, "default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeMenu(90,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeConnecting(80,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeResizing(70,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(50,"grab", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(40,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(30,"move", this, pubSub, panzoom, select, manager, hittest)},
+            {new BaseInteraction(0,"default", this, pubSub, panzoom, select, manager, hittest)},
         };
 
         interactionLookup = new();
@@ -207,7 +207,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             ResetPanZoom();
         });
 
-        SetInteraction(InteractionStyle.ShapeHovering);
+        SetInteraction<BaseInteraction>();
     }
 
     public bool ToggleHitTestRender()
@@ -223,17 +223,22 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PostRender = action;
     }
-    public void AddInteraction(InteractionStyle style, BaseInteraction interaction)
+    public void AddInteraction(string style, BaseInteraction interaction)
     {
         interactionLookup.Add(style, interaction);
 
         //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
-    public void SetInteraction(InteractionStyle style)
+    public void SetInteraction<T>() where T: BaseInteraction
     {
-        if (interactionStyle == style) return;
+        var style = BaseInteraction.InteractionStyle<T>();
+        SetInteraction(style);
+    }
+    public void SetInteraction(string style)
+    {
+        if (Style == style) return;
         lastInteraction?.Abort();
-        interactionStyle = style;
+        Style = style;
         lastInteraction = null;
 
         //$"SetInteraction {interactionStyle}".WriteSuccess();
@@ -241,7 +246,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public IBaseInteraction GetInteraction()
     {
-        lastInteraction ??= interactionLookup[interactionStyle];
+        lastInteraction ??= interactionLookup[Style];
         return lastInteraction;
     }
 
@@ -704,7 +709,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             if (TestRule(rule, args))
                 return GetInteraction();
         }
-        SetInteraction(InteractionStyle.ReadOnly);
+        SetInteraction<BaseInteraction>();
         return GetInteraction();
     }
 

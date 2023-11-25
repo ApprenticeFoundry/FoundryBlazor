@@ -13,7 +13,6 @@ public class ShapeResizing : ShapeHovering
 
 
     public ShapeResizing(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -22,8 +21,9 @@ public class ShapeResizing : ShapeHovering
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+        Style = InteractionStyle<ShapeResizing>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
@@ -69,7 +69,7 @@ public class ShapeResizing : ShapeHovering
         }
 
         isResizingShape = false;
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        drawing.SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

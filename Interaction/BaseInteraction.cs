@@ -8,23 +8,23 @@ using FoundryBlazor.Shared;
 
 namespace FoundryBlazor.Shape;
 
-public enum InteractionStyle
-{
-    None,
-    ReadOnly,
-    PagePanAndZoom,
-    ShapeSelection,
-    ShapeHovering,
-    ShapeDragging,
-    ShapeMenu,
-    ShapeResizing,
-    ShapeCreating,
-    ShapeConnecting,
-    ModelLinking,
-    MentorConstruction,
+// public enum InteractionStyle
+// {
+//     None,
+//     ReadOnly,
+//     PagePanAndZoom,
+//     ShapeSelection,
+//     ShapeHovering,
+//     ShapeDragging,
+//     ShapeMenu,
+//     ShapeResizing,
+//     ShapeCreating,
+//     ShapeConnecting,
+//     ModelLinking,
+//     MentorConstruction,
 
-    UserExtension,
-}
+//     UserExtension,
+// }
 
 public interface IBaseInteraction
 {
@@ -41,11 +41,16 @@ public interface IBaseInteraction
 
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
-    static public Rectangle DragArea = new();
+    public static Rectangle DragArea = new();
+    public static string InteractionStyle<T>() where T : IBaseInteraction
+    {
+        return typeof(T).Name;
+    }
+
 
     public int Priority { get; set; } = 0;
     public string Cursor { get; set; } = "default";
-    public InteractionStyle Style { get; set; } = InteractionStyle.None;
+    public string Style { get; set; } = "none";
     protected FoGlyph2D? selectedShape;
 
     protected List<FoGlyph2D>? lastHover = null;
@@ -58,7 +63,6 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     protected ISelectionService selectionService;
 
     public BaseInteraction(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -69,7 +73,6 @@ public class BaseInteraction : FoComponent, IBaseInteraction
             IHitTestService hitTest
         ) : base()
     {
-        Style = style;
         Priority = priority;
         Cursor = cursor;
         drawing = draw;
@@ -78,6 +81,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
         selectionService = select;
         panZoomService = panzoom;
         pageManager = manager;
+        Style = InteractionStyle<BaseInteraction>();
     }
 
 

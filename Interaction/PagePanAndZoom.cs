@@ -13,7 +13,6 @@ public class PagePanAndZoom : BaseInteraction
     private bool isDraggingPage = false;
 
     public PagePanAndZoom(
-            InteractionStyle style,
             int priority,
             string cursor,
             FoDrawing2D draw,
@@ -22,8 +21,9 @@ public class PagePanAndZoom : BaseInteraction
             ISelectionService select,
             IPageManagement manager,
             IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
     {
+         Style = InteractionStyle<PagePanAndZoom>();
     }
 
     public override void Abort()
@@ -44,7 +44,7 @@ public class PagePanAndZoom : BaseInteraction
     public override bool MouseUp(CanvasMouseArgs args)
     {
         isDraggingPage = false;
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        drawing.SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
