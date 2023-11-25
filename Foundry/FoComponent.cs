@@ -1,3 +1,4 @@
+using FoundryRulesAndUnits.Models;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.Reflection;
 using static System.Reflection.Metadata.BlobBuilder;
@@ -52,6 +53,7 @@ public class FoComponent : FoBase, IFoComponent
 {
     public string ClassType { get; init; }
     private SlotGroups Slots { get; set; } = new();
+
 
     public FoComponent(string name = "") : base(name)
     {

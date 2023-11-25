@@ -182,14 +182,15 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         // https://www.w3schools.com/cssref/pr_class_cursor.php
         interactionRules = new()
         {
-            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 11, "pointer", this, pubSub, panzoom, select, manager, hittest)},
-            {new MoShapeLinking(InteractionStyle.ModelLinking, 10, "default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeMenu(InteractionStyle.ShapeMenu, 9,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 8,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeResizing(InteractionStyle.ShapeResizing, 7,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(InteractionStyle.ShapeDragging, 5,"grab", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(InteractionStyle.ShapeSelection, 4,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(InteractionStyle.ShapeHovering, 3,"move", this, pubSub, panzoom, select, manager, hittest)},
+            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 1010, "pointer", this, pubSub, panzoom, select, manager, hittest)},
+             {new MentorConstruction(InteractionStyle.MentorConstruction, 105, "default", this, pubSub, panzoom, select, manager, hittest)},
+           {new MoShapeLinking(InteractionStyle.ModelLinking, 100, "default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeMenu(InteractionStyle.ShapeMenu, 90,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 80,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeResizing(InteractionStyle.ShapeResizing, 70,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeDragging(InteractionStyle.ShapeDragging, 50,"grab", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeSelection(InteractionStyle.ShapeSelection, 40,"default", this, pubSub, panzoom, select, manager, hittest)},
+            {new ShapeHovering(InteractionStyle.ShapeHovering, 30,"move", this, pubSub, panzoom, select, manager, hittest)},
             {new BaseInteraction(InteractionStyle.ReadOnly, 0,"default", this, pubSub, panzoom, select, manager, hittest)},
         };
 
@@ -531,8 +532,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.RestoreAsync();
 
-        // if (RenderHitTestTree)
-        //     await HitTestService.RenderQuadTree(ctx, true);
+        if (RenderHitTestTree)
+            await HitTestService.RenderQuadTree(ctx, true);
 
         await GetInteraction().RenderDrawing(ctx, tick);
 

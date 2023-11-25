@@ -21,6 +21,8 @@ public enum InteractionStyle
     ShapeCreating,
     ShapeConnecting,
     ModelLinking,
+    MentorConstruction,
+
     UserExtension,
 }
 

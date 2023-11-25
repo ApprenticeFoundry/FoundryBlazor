@@ -48,8 +48,8 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
             if ( AutoRender)
                 await DoStart();
 
-            CreateTickPlayground();
-            SetDoTugOfWar();
+            // CreateTickPlayground();
+            // SetDoTugOfWar();
 
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub!.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
@@ -170,7 +170,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
     }
 
 
-    private void CreateTickPlayground()
+    public void CreateTickPlayground()
     {
         var drawing = Workspace!.GetDrawing();
         if (drawing == null) return;
@@ -190,7 +190,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable, IDisposabl
         };
     }
 
-    private void SetDoTugOfWar()
+    public void SetDoTugOfWar()
     {
         var drawing = Workspace!.GetDrawing();
         if (drawing == null) return;

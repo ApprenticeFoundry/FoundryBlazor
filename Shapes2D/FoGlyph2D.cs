@@ -74,10 +74,25 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     private static bool _resetHitTesting = false;
 
     public float Thickness { get; set; }
-    public bool Selectable { get; set; } = true;
-    public bool IsSelected { get; set; } = false;
-    public bool IsVisible { get; set; } = true;
-    public bool ShouldRender { get; set; } = true;
+    public bool Selectable 
+    { 
+        get { return this.StatusBits.IsSelectable; } 
+        set { this.StatusBits.IsSelectable = value; } 
+    }
+    public bool IsSelected
+    {
+        get { return this.StatusBits.IsSelected; }
+        set { this.StatusBits.IsSelected = value; }
+    }
+    public bool IsVisible
+    {
+        get { return this.StatusBits.IsVisible; }
+        set { this.StatusBits.IsVisible = value; }
+    }
+    public bool ShouldRender { 
+        get { return this.StatusBits.ShouldRender; } 
+        set { this.StatusBits.ShouldRender = value; } 
+    }
     public string Tag { get; set; } = "";
     public int Level { get; set; } = 0;
     public int Index { get; set; } = 0;
