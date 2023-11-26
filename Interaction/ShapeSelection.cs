@@ -16,17 +16,14 @@ public class ShapeSelection : ShapeHovering
 
 
     public ShapeSelection(
-            InteractionStyle style,
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
+        ToolType = ToolManagement.InteractionStyle<ShapeSelection>();
     }
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
@@ -35,11 +32,12 @@ public class ShapeSelection : ShapeHovering
 
     public override void Abort()
     {
-        panZoomService.SetFenceSelecting(false);
+        GetPanZoomService().SetFenceSelecting(false);
     }
 
     public override async Task RenderDrawing(Canvas2DContext ctx, int tick)
     {
+        var panZoomService = GetPanZoomService();
         if (panZoomService.IsFenceSelecting())
         {
             await ctx.BeginPathAsync();
@@ -56,12 +54,15 @@ public class ShapeSelection : ShapeHovering
     {
         //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
 
+        var panZoomService = GetPanZoomService();
+        var selectionService = GetSelectionService();
+
         panZoomService.SetFenceSelecting(false);
         var mustClear = args.ShiftKey == false;
 
 
         DragArea = panZoomService.HitRectStart(args);
-        var findings = hitTestService?.FindGlyph(DragArea);
+        var findings = GetHitTestService().FindGlyph(DragArea);
 
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
@@ -76,9 +77,8 @@ public class ShapeSelection : ShapeHovering
                 selectionService?.MouseFirstSelected();
 
                 //Restart this interaction in Drag Shape mode
-                drawing.SetInteraction(InteractionStyle.ShapeDragging);
-                var interact = drawing.GetInteraction();
-                interact.MouseDown(args);
+                SetInteraction<ShapeDragging>();
+                drawing.Tools().MouseDown(args);
             }
             else
             {
@@ -100,11 +100,12 @@ public class ShapeSelection : ShapeHovering
 
     public override bool MouseUp(CanvasMouseArgs args)
     {
+        var panZoomService = GetPanZoomService();
         if (panZoomService.IsFenceSelecting())
         {
             DragArea = panZoomService.Normalize(DragArea);
 
-            var findings = hitTestService?.FindGlyph(DragArea);
+            var findings = GetHitTestService().FindGlyph(DragArea);
             if (findings != null)
             {
                 //anything that intersects
@@ -114,23 +115,25 @@ public class ShapeSelection : ShapeHovering
                 foreach (var item in findings)
                 {
                     if (GetDragArea().Contains(item.HitTestRect()))
-                        selectionService?.AddItem(item);
+                        GetSelectionService().AddItem(item);
                 }
             }
         }
 
-        panZoomService.SetFenceSelecting(false);
+        GetPanZoomService().SetFenceSelecting(false);
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
+
+        var panZoomService = GetPanZoomService();
         if (panZoomService.IsFenceSelecting())
         {
             DragArea = panZoomService.HitRectContinue(args, DragArea);
         }
-        else if (selectionService.Selections().Count > 0)
+        else if (GetSelectionService().Selections().Count > 0)
         {
             DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.MouseDeltaMovement();

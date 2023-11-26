@@ -11,23 +11,20 @@ public class ShapeDragging : ShapeHovering
 
 
     public ShapeDragging(
-            InteractionStyle style,
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(style, priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
+        ToolType = ToolManagement.InteractionStyle<ShapeDragging>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        DragArea = panZoomService.HitRectStart(args);
-        var findings = hitTestService?.FindGlyph(DragArea);
+        DragArea = GetPanZoomService().HitRectStart(args);
+        var findings = GetHitTestService().FindGlyph(DragArea);
         var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
         return selected != null;
         //return selectionService.Selections().Count > 0;
@@ -35,12 +32,13 @@ public class ShapeDragging : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
+        //$"DRAGINF Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
 
         isDraggingShapes = false;
+        var selectionService = GetSelectionService();
 
-        DragArea = panZoomService.HitRectStart(args);
-        var findings = hitTestService?.FindGlyph(DragArea);
+        DragArea = GetPanZoomService().HitRectStart(args);
+        var findings = GetHitTestService()?.FindGlyph(DragArea);
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
 
@@ -73,8 +71,8 @@ public class ShapeDragging : ShapeHovering
     {
         selectedShape?.OnShapeClick(ClickStyle.MouseUp, args);
         isDraggingShapes = false;
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
-        selectionService?.MouseDropped();
+        SetInteraction<ShapeHovering>();
+        GetSelectionService().MouseDropped();
         return true;
     }
 
@@ -82,9 +80,10 @@ public class ShapeDragging : ShapeHovering
     {
         if (isDraggingShapes)
         {
-            //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
+            var panZoomService = GetPanZoomService();
             DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.MouseDeltaMovement();
+            //$"MouseMove isDraggingShapes {move.X} {move.Y}".WriteSuccess();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

@@ -1,8 +1,6 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
- 
-using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
@@ -11,8 +9,6 @@ using Microsoft.JSInterop;
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using FoundryRulesAndUnits.Units;
-using FoundryBlazor.Shape;
-using Microsoft.AspNetCore.Components.Rendering;
 using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shape;
@@ -48,6 +44,9 @@ public interface IDrawing : IRender
     V AddShape<V>(V shape) where V : FoGlyph2D;
     FoPage2D CurrentPage();
     IPageManagement Pages();
+    IToolManagement Tools();
+    T AddToolType<T>(int priority, string cursor) where T : BaseInteraction;
+    
     List<FoGlyph2D> ExtractShapes(string glyphId);
 
     void TogglePanZoomWindow();
@@ -60,8 +59,9 @@ public interface IDrawing : IRender
     void ClearAll();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
-    IBaseInteraction GetInteraction();
     bool ToggleHitTestRender();
+    bool MoveSelectionsBy(int x, int y);
+    bool RotateSelectionsBy(int angle);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -81,8 +81,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
     public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
+    private IToolManagement? ToolManager { get; set; }
     private IPageManagement PageManager { get; set; }
-
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -93,22 +93,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public List<FoVideo2D> AllVideos = new();
     private ComponentBus PubSub { get; set; }
 
-    protected readonly List<BaseInteraction> interactionRules;
-    protected readonly Dictionary<InteractionStyle, BaseInteraction> interactionLookup;
-    protected InteractionStyle interactionStyle = InteractionStyle.ReadOnly;
-    private IBaseInteraction? lastInteraction;
-
-
-
 
     //private readonly Stopwatch stopwatch = new();
     //private int lastTick = 0;
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
-
-
-
 
     public bool IsRendering()
     {
@@ -172,33 +162,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         )
     {
         HitTestService = hittest;
-        //HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
-        PubSub = pubSub;
-
-
-        // https://www.w3schools.com/cssref/pr_class_cursor.php
-        interactionRules = new()
-        {
-            {new PagePanAndZoom(InteractionStyle.PagePanAndZoom, 1010, "pointer", this, pubSub, panzoom, select, manager, hittest)},
-             {new MentorConstruction(InteractionStyle.MentorConstruction, 105, "default", this, pubSub, panzoom, select, manager, hittest)},
-           {new MoShapeLinking(InteractionStyle.ModelLinking, 100, "default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeMenu(InteractionStyle.ShapeMenu, 90,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeConnecting(InteractionStyle.ShapeConnecting, 80,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeResizing(InteractionStyle.ShapeResizing, 70,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(InteractionStyle.ShapeDragging, 50,"grab", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(InteractionStyle.ShapeSelection, 40,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(InteractionStyle.ShapeHovering, 30,"move", this, pubSub, panzoom, select, manager, hittest)},
-            {new BaseInteraction(InteractionStyle.ReadOnly, 0,"default", this, pubSub, panzoom, select, manager, hittest)},
-        };
-
-        interactionLookup = new();
-        interactionRules.ForEach(x =>
-        {
-            interactionLookup.Add(x.Style, x);
-        });
+        PubSub = pubSub;  
 
         InitSubscriptions();
         PanZoomService.SetOnEventComplete(() =>
@@ -206,9 +173,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             //SRS refresh zoom if changed
             ResetPanZoom();
         });
-
-        SetInteraction(InteractionStyle.ShapeHovering);
     }
+
+
 
     public bool ToggleHitTestRender()
     {
@@ -223,27 +190,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PostRender = action;
     }
-    public void AddInteraction(InteractionStyle style, BaseInteraction interaction)
-    {
-        interactionLookup.Add(style, interaction);
-
-        //$"SetInteraction {interactionStyle}".WriteSuccess();
-    }
-    public void SetInteraction(InteractionStyle style)
-    {
-        if (interactionStyle == style) return;
-        lastInteraction?.Abort();
-        interactionStyle = style;
-        lastInteraction = null;
-
-        //$"SetInteraction {interactionStyle}".WriteSuccess();
-    }
-
-    public IBaseInteraction GetInteraction()
-    {
-        lastInteraction ??= interactionLookup[interactionStyle];
-        return lastInteraction;
-    }
+  
 
     public Rectangle UserWindow()
     {
@@ -330,6 +277,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public IPageManagement Pages()
     {
         return PageManager;
+    }
+
+    public IToolManagement Tools()
+    {
+        if ( ToolManager == null)
+        {
+            ToolManager = new ToolManagement(PanZoomService, SelectionService, PageManager, HitTestService);
+            ToolManager.CreateInteractions(this, PubSub);
+        }
+        return ToolManager;
     }
 
     public FoPage2D CurrentPage()
@@ -535,7 +492,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (RenderHitTestTree)
             await HitTestService.RenderQuadTree(ctx, true);
 
-        await GetInteraction().RenderDrawing(ctx, tick);
+        await Tools().RenderDrawing(ctx, tick);
 
         if (!ShowStats) return;
 
@@ -683,30 +640,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 
-    protected bool TestRule(BaseInteraction interact, CanvasMouseArgs args)
-    {
-        if (interact.IsDefaultTool(args) == false)
-        {
-            //$"{style} No Match".WriteError();
-            return false;
-        }
-
-        var style = interact.Style;
-        //$"{style} Match".WriteSuccess();
-        SetInteraction(style);
-        return true;
-    }
-
-    protected virtual IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args)
-    {
-        foreach (var rule in interactionRules)
-        {
-            if (TestRule(rule, args))
-                return GetInteraction();
-        }
-        SetInteraction(InteractionStyle.ReadOnly);
-        return GetInteraction();
-    }
 
     private void ApplyMouseArgs(CanvasMouseArgs args)
     {
@@ -720,9 +653,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
             var isEventHandled = (args.Topic) switch
             {
-                ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
-                ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
-                ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
+                ("ON_MOUSE_DOWN") => Tools().MouseDown(args),
+                ("ON_MOUSE_MOVE") => Tools().MouseMove(args),
+                ("ON_MOUSE_UP") => Tools().MouseUp(args),
                 _ => false
             };
         }
@@ -955,4 +888,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
+    public T AddToolType<T>(int priority, string cursor) where T : BaseInteraction
+    {
+        return Tools().AddToolType<T>(priority, cursor, this, PubSub);
+    }
 }
