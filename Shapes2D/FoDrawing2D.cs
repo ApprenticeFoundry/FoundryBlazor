@@ -636,10 +636,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-    protected virtual IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args)
-    {
-        return InteractionManager?.SelectInteractionByRuleFor(args);
-    }
+
 
     private void ApplyMouseArgs(CanvasMouseArgs args)
     {
@@ -651,9 +648,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
 
+
             var isEventHandled = (args.Topic) switch
             {
-                ("ON_MOUSE_DOWN") => SelectInteractionByRuleFor(args).MouseDown(args),
+                ("ON_MOUSE_DOWN") => InteractionManager?.SelectInteractionByRuleFor(args).MouseDown(args),
                 ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
                 ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
                 _ => false
