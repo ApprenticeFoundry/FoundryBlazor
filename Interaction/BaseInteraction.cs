@@ -16,6 +16,7 @@ public interface IBaseInteraction
     bool MouseMove(CanvasMouseArgs args);
 
     void Abort();
+    void SetActive();
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
     string GetCursor();
@@ -97,6 +98,10 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     }
 
     public virtual void Abort()
+    {
+    }
+
+    public virtual void SetActive()
     {
     }
 

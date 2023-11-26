@@ -1,8 +1,6 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
- 
-using FoundryBlazor.Extensions;
 using FoundryBlazor.Message;
 using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
@@ -11,8 +9,6 @@ using Microsoft.JSInterop;
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 using FoundryRulesAndUnits.Units;
-using FoundryBlazor.Shape;
-using Microsoft.AspNetCore.Components.Rendering;
 using FoundryBlazor.PubSub;
 
 namespace FoundryBlazor.Shape;
@@ -49,6 +45,7 @@ public interface IDrawing : IRender
     FoPage2D CurrentPage();
     IPageManagement Pages();
     IToolManagement Tools();
+    T AddToolType<T>(int priority, string cursor) where T : BaseInteraction;
     
     List<FoGlyph2D> ExtractShapes(string glyphId);
 
@@ -891,5 +888,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
-
+    public T AddToolType<T>(int priority, string cursor) where T : BaseInteraction
+    {
+        return Tools().AddToolType<T>(priority, cursor, this, PubSub);
+    }
 }

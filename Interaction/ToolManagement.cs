@@ -7,12 +7,11 @@ using FoundryRulesAndUnits.Extensions;
 
 public interface IToolManagement :IBaseInteraction
 {
+    T AddToolType<T>(int priority, string cursor, IDrawing draw, ComponentBus pubsub) where T : BaseInteraction;
+    T AddInteraction<T>(string style, T interaction) where T : BaseInteraction;
     void CreateInteractions(IDrawing draw, ComponentBus pubsub);
     void SetInteraction<T>() where T : BaseInteraction;
     IBaseInteraction GetInteraction();
-
-    
-    void MouseDropped();
 
 }
 
@@ -80,8 +79,8 @@ public class ToolManagement : IToolManagement
         var rules = new List<BaseInteraction>()
         {
             {new PagePanAndZoom(1010, "pointer", draw, pubsub, this)},
-            {new MentorConstruction(105, "default", draw, pubsub, this)},
-            {new MoShapeLinking(100, "default", draw, pubsub, this)},
+            // {new MentorConstruction(105, "default", draw, pubsub, this)},
+            // {new MoShapeLinking(100, "default", draw, pubsub, this)},
             {new ShapeMenu(90,"default", draw, pubsub, this)},
             {new ShapeConnecting(80,"default", draw, pubsub, this)},
             {new ShapeResizing(70,"nwse-resize", draw, pubsub, this)},
@@ -101,13 +100,21 @@ public class ToolManagement : IToolManagement
         lastInteraction = null;
     }
 
-    public void AddInteraction(string style, BaseInteraction interaction)
+    public T AddToolType<T>(int priority, string cursor, IDrawing draw, ComponentBus pubsub) where T : BaseInteraction
+    {
+        var style = InteractionStyle<T>();
+        var item = Activator.CreateInstance(typeof(T), priority, cursor, draw, pubsub, this);
+        return AddInteraction<T>(style, (T)item!);
+    }
+
+    public T AddInteraction<T>(string style, T interaction) where T : BaseInteraction
     {
         interactionLookup.Add(style, interaction);
         interactionRules = interactionLookup.Values.OrderByDescending(r => r.Priority).ToList();
         lastInteraction = interactionRules.LastOrDefault();
 
         //$"SetInteraction {interactionStyle}".WriteSuccess();
+        return interaction;
     }
     public void SetInteraction<T>() where T : BaseInteraction
     {
@@ -119,11 +126,12 @@ public class ToolManagement : IToolManagement
         if (ToolType == style) 
             return;
 
-        $"SetInteraction Changed from {ToolType} to {style}".WriteSuccess();
+        //$"SetInteraction Changed from {ToolType} to {style}".WriteSuccess();
 
         lastInteraction?.Abort();
         ToolType = style;
         lastInteraction = interactionLookup[ToolType];
+        lastInteraction.SetActive();
     }
 
     public IBaseInteraction GetInteraction()
@@ -158,10 +166,7 @@ public class ToolManagement : IToolManagement
         return GetInteraction().MouseMove(args);
     }
 
-    public void MouseDropped()
-    {
-        SelectionService.MouseDropped();
-    }
+
 
     public void Abort()
     {
@@ -196,5 +201,10 @@ public class ToolManagement : IToolManagement
     public string GetToolType()
     {
         return ToolType;
+    }
+
+    public void SetActive()
+    {
+        
     }
 }
