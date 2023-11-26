@@ -19,6 +19,7 @@ public interface IBaseInteraction
     Task RenderDrawing(Canvas2DContext ctx, int tick);
     bool IsDefaultTool(CanvasMouseArgs args);
     string GetCursor();
+    string GetToolType();
 
     IPageManagement GetPageService();
     IHitTestService GetHitTestService();
@@ -35,7 +36,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
 
     public int Priority { get; set; } = 0;
     public string Cursor { get; set; } = "default";
-    public string Style { get; set; } = "none";
+    public string ToolType { get; set; } = "none";
 
     public ToolManagement ToolManager { get; set; }
 
@@ -60,7 +61,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
         drawing = draw;
         pubsub = pub;
         ToolManager = manager;
-        Style = ToolManagement.InteractionStyle<BaseInteraction>();
+        ToolType = ToolManagement.InteractionStyle<BaseInteraction>();
     }
 
     protected void SetInteraction<T>() where T : BaseInteraction
@@ -146,6 +147,11 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public ISelectionService GetSelectionService()
     {
         return ToolManager.GetSelectionService();
+    }
+
+    public string GetToolType()
+    {
+        return ToolType;
     }
     // public virtual bool MouseIn(CanvasMouseArgs args)
     // {

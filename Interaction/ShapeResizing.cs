@@ -20,7 +20,7 @@ public class ShapeResizing : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeResizing>();
+        ToolType = ToolManagement.InteractionStyle<ShapeResizing>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

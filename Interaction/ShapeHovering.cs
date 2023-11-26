@@ -18,7 +18,7 @@ public class ShapeHovering : BaseInteraction
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeHovering>();
+        ToolType = ToolManagement.InteractionStyle<ShapeHovering>();
     }
 
     public override bool MouseMove(CanvasMouseArgs args)

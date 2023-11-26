@@ -23,7 +23,7 @@ public class MoShapeLinking : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<MoShapeLinking>();
+        ToolType = ToolManagement.InteractionStyle<MoShapeLinking>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

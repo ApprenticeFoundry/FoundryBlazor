@@ -24,7 +24,7 @@ public class MentorConstruction : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<MentorConstruction>();
+        ToolType = ToolManagement.InteractionStyle<MentorConstruction>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

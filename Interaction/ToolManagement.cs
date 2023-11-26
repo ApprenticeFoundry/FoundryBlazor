@@ -3,6 +3,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 
 public interface IToolManagement :IBaseInteraction
 {
@@ -21,7 +22,7 @@ public class ToolManagement : IToolManagement
 {
     protected List<BaseInteraction> interactionRules = new();
     protected Dictionary<string, BaseInteraction> interactionLookup = new();
-    protected string Style = InteractionStyle<BaseInteraction>();
+    protected string ToolType = InteractionStyle<BaseInteraction>();
     private IBaseInteraction? lastInteraction;
 
 
@@ -56,7 +57,7 @@ public class ToolManagement : IToolManagement
             return false;
         }
 
-        var style = interact.Style;
+        var style = interact.ToolType;
         //$"{style} Match".WriteSuccess();
         SetInteraction(style);
         return true;
@@ -76,7 +77,7 @@ public class ToolManagement : IToolManagement
     public void CreateInteractions(IDrawing draw, ComponentBus pubsub)
     {
        // https://www.w3schools.com/cssref/pr_class_cursor.php
-        interactionRules = new List<BaseInteraction>()
+        var rules = new List<BaseInteraction>()
         {
             {new PagePanAndZoom(1010, "pointer", draw, pubsub, this)},
             {new MentorConstruction(105, "default", draw, pubsub, this)},
@@ -91,17 +92,20 @@ public class ToolManagement : IToolManagement
         };
 
         interactionLookup = new Dictionary<string, BaseInteraction>();
-        interactionRules.ForEach(rule =>
+        rules.ForEach(rule =>
         {
-            interactionLookup.Add(rule.Style, rule);
+            interactionLookup.Add(rule.ToolType, rule);
         });
+        interactionRules = interactionLookup.Values.OrderByDescending(r => r.Priority).ToList();
 
-        lastInteraction = interactionRules[0];
+        lastInteraction = null;
     }
 
     public void AddInteraction(string style, BaseInteraction interaction)
     {
         interactionLookup.Add(style, interaction);
+        interactionRules = interactionLookup.Values.OrderByDescending(r => r.Priority).ToList();
+        lastInteraction = interactionRules.LastOrDefault();
 
         //$"SetInteraction {interactionStyle}".WriteSuccess();
     }
@@ -112,9 +116,9 @@ public class ToolManagement : IToolManagement
     }
     public void SetInteraction(string style)
     {
-        if (Style == style) return;
+        if (ToolType == style) return;
         lastInteraction?.Abort();
-        Style = style;
+        ToolType = style;
         lastInteraction = null;
 
         //$"SetInteraction {interactionStyle}".WriteSuccess();
@@ -122,7 +126,8 @@ public class ToolManagement : IToolManagement
 
     public IBaseInteraction GetInteraction()
     {
-        lastInteraction ??= interactionLookup[Style];
+        lastInteraction ??= interactionLookup[ToolType];
+        $"GetInteraction {lastInteraction.GetToolType()}".WriteSuccess();
         return lastInteraction;
     }
 
@@ -184,5 +189,10 @@ public class ToolManagement : IToolManagement
     public ISelectionService GetSelectionService()
     {
         return SelectionService;
+    }
+
+    public string GetToolType()
+    {
+        return ToolType;
     }
 }

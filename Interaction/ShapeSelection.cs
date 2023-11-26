@@ -23,7 +23,7 @@ public class ShapeSelection : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeSelection>();
+        ToolType = ToolManagement.InteractionStyle<ShapeSelection>();
     }
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {

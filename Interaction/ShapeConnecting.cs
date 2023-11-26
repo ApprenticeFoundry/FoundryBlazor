@@ -24,7 +24,7 @@ public class ShapeConnecting : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeConnecting>();
+        ToolType = ToolManagement.InteractionStyle<ShapeConnecting>();
     }
     public override void Abort()
     {

@@ -18,7 +18,7 @@ public class ShapeDragging : ShapeHovering
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeDragging>();
+        ToolType = ToolManagement.InteractionStyle<ShapeDragging>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)

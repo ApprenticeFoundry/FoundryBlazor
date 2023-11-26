@@ -20,7 +20,7 @@ public class PagePanAndZoom : BaseInteraction
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-         Style = ToolManagement.InteractionStyle<PagePanAndZoom>();
+         ToolType = ToolManagement.InteractionStyle<PagePanAndZoom>();
     }
 
     public override void Abort()

@@ -17,7 +17,7 @@ public class ShapeMenu : ShapeDragging
             ToolManagement tools
         ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = ToolManagement.InteractionStyle<ShapeMenu>();
+        ToolType = ToolManagement.InteractionStyle<ShapeMenu>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
