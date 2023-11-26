@@ -32,7 +32,7 @@ public class ShapeDragging : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
+        $"DRAGINF Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
 
         isDraggingShapes = false;
         var selectionService = GetSelectionService();
@@ -78,12 +78,12 @@ public class ShapeDragging : ShapeHovering
 
     public override bool MouseMove(CanvasMouseArgs args)
     {
-        var panZoomService = GetPanZoomService();
         if (isDraggingShapes)
         {
-            //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);
+            var panZoomService = GetPanZoomService();
             DragArea = panZoomService.HitRectStart(args);
             var move = panZoomService.MouseDeltaMovement();
+            $"MouseMove isDraggingShapes {move.X} {move.Y}".WriteSuccess();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

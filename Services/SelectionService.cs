@@ -1,5 +1,6 @@
 using BlazorComponentBus;
 using FoundryBlazor.PubSub;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -129,6 +130,7 @@ public class SelectionService : ISelectionService
     }
     public ISelectionService MoveBy(int dx, int dy)
     {
+        $"SelectionService.MoveBy({dx},{dy})".WriteSuccess();
         Members.ForEach(item => item.MoveBy(dx, dy));
         return this;
     }
