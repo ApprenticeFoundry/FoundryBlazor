@@ -13,7 +13,7 @@ public class ShapeDragging : ShapeHovering
     public ShapeDragging(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
@@ -73,7 +73,7 @@ public class ShapeDragging : ShapeHovering
     {
         selectedShape?.OnShapeClick(ClickStyle.MouseUp, args);
         isDraggingShapes = false;
-        drawing.SetInteraction<ShapeHovering>();
+        SetInteraction<ShapeHovering>();
         selectionService?.MouseDropped();
         return true;
     }

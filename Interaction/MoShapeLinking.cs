@@ -18,7 +18,7 @@ public class MoShapeLinking : ShapeHovering
     public MoShapeLinking(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,

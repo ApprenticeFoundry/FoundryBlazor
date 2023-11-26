@@ -13,7 +13,7 @@ public class ShapeHovering : BaseInteraction
     public ShapeHovering(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,

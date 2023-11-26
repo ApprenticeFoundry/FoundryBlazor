@@ -51,11 +51,14 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public int Priority { get; set; } = 0;
     public string Cursor { get; set; } = "default";
     public string Style { get; set; } = "none";
+
+    public InteractionManager? InteractionManager { get; set; }
+
     protected FoGlyph2D? selectedShape;
 
     protected List<FoGlyph2D>? lastHover = null;
 
-    protected FoDrawing2D drawing;
+    protected IDrawing drawing;
     protected IPageManagement pageManager;
     protected ComponentBus pubsub;
     protected IHitTestService hitTestService;
@@ -65,7 +68,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public BaseInteraction(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pub,
             IPanZoomService panzoom,
             ISelectionService select,
@@ -84,7 +87,10 @@ public class BaseInteraction : FoComponent, IBaseInteraction
         Style = InteractionStyle<BaseInteraction>();
     }
 
-
+    protected void SetInteraction<T>() where T : BaseInteraction
+    {
+        InteractionManager?.SetInteraction<T>();
+    }
 
     public Action<Canvas2DContext, FoGlyph2D>? OnHover { get; set; } = async (ctx, obj) =>
     {

@@ -19,7 +19,7 @@ public class MentorConstruction : ShapeHovering
     public MentorConstruction(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,

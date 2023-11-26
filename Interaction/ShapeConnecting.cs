@@ -19,7 +19,7 @@ public class ShapeConnecting : ShapeHovering
     public ShapeConnecting(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
@@ -113,9 +113,12 @@ public class ShapeConnecting : ShapeHovering
                 return true;
             }
         }
-        drawing.SetInteraction<ShapeHovering>();
+        SetInteraction<ShapeHovering>();
         return false;
     }
+
+
+
     public override bool MouseMove(CanvasMouseArgs args)
     {
         //SendUserMove(args, true);

@@ -15,7 +15,7 @@ public class ShapeResizing : ShapeHovering
     public ShapeResizing(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
@@ -69,7 +69,7 @@ public class ShapeResizing : ShapeHovering
         }
 
         isResizingShape = false;
-        drawing.SetInteraction<ShapeHovering>();
+        SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

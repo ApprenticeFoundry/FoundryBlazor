@@ -62,6 +62,7 @@ public interface IDrawing : IRender
     List<FoGlyph2D> DeleteSelections();
     IBaseInteraction GetInteraction();
     bool ToggleHitTestRender();
+    void MoveSelectionsBy(int x, int y);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -83,6 +84,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
     private IPageManagement PageManager { get; set; }
 
+    private IInteractionManager InteractionManager { get; set; }
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -93,22 +95,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public List<FoVideo2D> AllVideos = new();
     private ComponentBus PubSub { get; set; }
 
-    protected readonly List<BaseInteraction> interactionRules;
-    protected readonly Dictionary<string, BaseInteraction> interactionLookup;
-    protected string Style = BaseInteraction.InteractionStyle<BaseInteraction>();
-    private IBaseInteraction? lastInteraction;
-
-
-
 
     //private readonly Stopwatch stopwatch = new();
     //private int lastTick = 0;
     private bool IsCurrentlyRendering = false;
     private bool IsCurrentlyProcessing = false;
     private readonly Queue<CanvasMouseArgs> MouseArgQueue = new();
-
-
-
 
     public bool IsRendering()
     {
@@ -164,6 +156,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
     public FoDrawing2D(
+        IInteractionManager interact,
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
@@ -171,34 +164,12 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         ComponentBus pubSub
         )
     {
+        InteractionManager = interact;
         HitTestService = hittest;
-        //HitTestService.SetRectangle(Rect());
         SelectionService = select;
         PanZoomService = panzoom;
         PageManager = manager;
-        PubSub = pubSub;
-
-
-        // https://www.w3schools.com/cssref/pr_class_cursor.php
-        interactionRules = new()
-        {
-            {new PagePanAndZoom(1010, "pointer", this, pubSub, panzoom, select, manager, hittest)},
-             {new MentorConstruction(105, "default", this, pubSub, panzoom, select, manager, hittest)},
-           {new MoShapeLinking(100, "default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeMenu(90,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeConnecting(80,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeResizing(70,"nwse-resize", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeDragging(50,"grab", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeSelection(40,"default", this, pubSub, panzoom, select, manager, hittest)},
-            {new ShapeHovering(30,"move", this, pubSub, panzoom, select, manager, hittest)},
-            {new BaseInteraction(0,"default", this, pubSub, panzoom, select, manager, hittest)},
-        };
-
-        interactionLookup = new();
-        interactionRules.ForEach(x =>
-        {
-            interactionLookup.Add(x.Style, x);
-        });
+        PubSub = pubSub;  
 
         InitSubscriptions();
         PanZoomService.SetOnEventComplete(() =>
@@ -206,9 +177,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             //SRS refresh zoom if changed
             ResetPanZoom();
         });
-
-        SetInteraction<BaseInteraction>();
     }
+
+
 
     public bool ToggleHitTestRender()
     {
@@ -223,32 +194,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         PostRender = action;
     }
-    public void AddInteraction(string style, BaseInteraction interaction)
-    {
-        interactionLookup.Add(style, interaction);
-
-        //$"SetInteraction {interactionStyle}".WriteSuccess();
-    }
-    public void SetInteraction<T>() where T: BaseInteraction
-    {
-        var style = BaseInteraction.InteractionStyle<T>();
-        SetInteraction(style);
-    }
-    public void SetInteraction(string style)
-    {
-        if (Style == style) return;
-        lastInteraction?.Abort();
-        Style = style;
-        lastInteraction = null;
-
-        //$"SetInteraction {interactionStyle}".WriteSuccess();
-    }
-
-    public IBaseInteraction GetInteraction()
-    {
-        lastInteraction ??= interactionLookup[Style];
-        return lastInteraction;
-    }
+  
 
     public Rectangle UserWindow()
     {
@@ -688,29 +634,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         await ctx.StrokeRectAsync(-win.X + 10, -win.Y + 10, win.Width - 20, win.Height - 20);
     }
 
-    protected bool TestRule(BaseInteraction interact, CanvasMouseArgs args)
-    {
-        if (interact.IsDefaultTool(args) == false)
-        {
-            //$"{style} No Match".WriteError();
-            return false;
-        }
 
-        var style = interact.Style;
-        //$"{style} Match".WriteSuccess();
-        SetInteraction(style);
-        return true;
-    }
 
     protected virtual IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args)
     {
-        foreach (var rule in interactionRules)
-        {
-            if (TestRule(rule, args))
-                return GetInteraction();
-        }
-        SetInteraction<BaseInteraction>();
-        return GetInteraction();
+        return InteractionManager?.SelectInteractionByRuleFor(args);
     }
 
     private void ApplyMouseArgs(CanvasMouseArgs args)
@@ -960,4 +888,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
+    public IBaseInteraction GetInteraction()
+    {
+        throw new NotImplementedException();
+    }
+
+    void IDrawing.MoveSelectionsBy(int x, int y)
+    {
+        throw new NotImplementedException();
+    }
 }

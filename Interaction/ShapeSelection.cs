@@ -18,7 +18,7 @@ public class ShapeSelection : ShapeHovering
     public ShapeSelection(
             int priority,
             string cursor,
-            FoDrawing2D draw,
+            IDrawing draw,
             ComponentBus pubsub,
             IPanZoomService panzoom,
             ISelectionService select,
@@ -76,7 +76,7 @@ public class ShapeSelection : ShapeHovering
                 selectionService?.MouseFirstSelected();
 
                 //Restart this interaction in Drag Shape mode
-                drawing.SetInteraction<ShapeDragging>();
+                SetInteraction<ShapeDragging>();
                 var interact = drawing.GetInteraction();
                 interact.MouseDown(args);
             }
@@ -121,7 +121,7 @@ public class ShapeSelection : ShapeHovering
 
         panZoomService.SetFenceSelecting(false);
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
-        drawing.SetInteraction<ShapeHovering>();
+        SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
