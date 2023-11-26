@@ -48,6 +48,8 @@ public interface IDrawing : IRender
     V AddShape<V>(V shape) where V : FoGlyph2D;
     FoPage2D CurrentPage();
     IPageManagement Pages();
+    IToolManagement Tools();
+    
     List<FoGlyph2D> ExtractShapes(string glyphId);
 
     void TogglePanZoomWindow();
@@ -60,9 +62,9 @@ public interface IDrawing : IRender
     void ClearAll();
     List<FoGlyph2D> Selections();
     List<FoGlyph2D> DeleteSelections();
-    IBaseInteraction GetInteraction();
     bool ToggleHitTestRender();
-    void MoveSelectionsBy(int x, int y);
+    bool MoveSelectionsBy(int x, int y);
+    bool RotateSelectionsBy(int angle);
 }
 
 public class FoDrawing2D : FoGlyph2D, IDrawing
@@ -82,9 +84,8 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
     public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
+    private IToolManagement? ToolManager { get; set; }
     private IPageManagement PageManager { get; set; }
-
-    private IInteractionManager InteractionManager { get; set; }
     private IHitTestService HitTestService { get; set; }
     private FoPanZoomWindow? PanZoomShape { get; set; }
     private IPanZoomService PanZoomService { get; set; }
@@ -156,7 +157,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
     public FoDrawing2D(
-        IInteractionManager interact,
         IPanZoomService panzoom,
         ISelectionService select,
         IPageManagement manager,
@@ -164,7 +164,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         ComponentBus pubSub
         )
     {
-        InteractionManager = interact;
         HitTestService = hittest;
         SelectionService = select;
         PanZoomService = panzoom;
@@ -281,6 +280,16 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public IPageManagement Pages()
     {
         return PageManager;
+    }
+
+    public IToolManagement Tools()
+    {
+        if ( ToolManager == null)
+        {
+            ToolManager = new ToolManagement(PanZoomService, SelectionService, PageManager, HitTestService);
+            ToolManager.CreateInteractions(this, PubSub);
+        }
+        return ToolManager;
     }
 
     public FoPage2D CurrentPage()
@@ -486,7 +495,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         if (RenderHitTestTree)
             await HitTestService.RenderQuadTree(ctx, true);
 
-        await GetInteraction().RenderDrawing(ctx, tick);
+        await Tools().RenderDrawing(ctx, tick);
 
         if (!ShowStats) return;
 
@@ -637,7 +646,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
 
 
-
     private void ApplyMouseArgs(CanvasMouseArgs args)
     {
         if (args == null) return;
@@ -648,12 +656,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             // call IsDefaultTool method on each interaction to
             // determine what is the right interaction for this case?
 
-
             var isEventHandled = (args.Topic) switch
             {
-                ("ON_MOUSE_DOWN") => InteractionManager?.SelectInteractionByRuleFor(args).MouseDown(args),
-                ("ON_MOUSE_MOVE") => GetInteraction().MouseMove(args),
-                ("ON_MOUSE_UP") => GetInteraction().MouseUp(args),
+                ("ON_MOUSE_DOWN") => Tools().MouseDown(args),
+                ("ON_MOUSE_MOVE") => Tools().MouseMove(args),
+                ("ON_MOUSE_UP") => Tools().MouseUp(args),
                 _ => false
             };
         }
@@ -886,13 +893,5 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         return true;
     }
 
-    public IBaseInteraction GetInteraction()
-    {
-        throw new NotImplementedException();
-    }
 
-    void IDrawing.MoveSelectionsBy(int x, int y)
-    {
-        throw new NotImplementedException();
-    }
 }

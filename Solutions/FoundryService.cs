@@ -19,6 +19,7 @@ public interface IFoundryService
     ISelectionService Selection();
     IHitTestService HitTest();
     IQRCodeService QRCode();
+    IToolManagement Tools();
 }
 
 public class FoundryService : IFoundryService
@@ -113,5 +114,10 @@ public class FoundryService : IFoundryService
     public IQRCodeService QRCode()
     {
         return qrcode;
+    }
+
+    public IToolManagement Tools()
+    {
+        return Drawing().Tools();
     }
 }

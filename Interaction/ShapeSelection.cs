@@ -77,8 +77,7 @@ public class ShapeSelection : ShapeHovering
 
                 //Restart this interaction in Drag Shape mode
                 SetInteraction<ShapeDragging>();
-                var interact = drawing.GetInteraction();
-                interact.MouseDown(args);
+                drawing.Tools().MouseDown(args);
             }
             else
             {

@@ -26,8 +26,7 @@ public class CanvasInputWrapperBase : ComponentBase, IAsyncDisposable, IDisposab
 
     public string GetCanvasStyle()
     {
-        var drawing = Workspace!.GetDrawing();
-        var cursor = drawing.GetInteraction().GetCursor();
+        var cursor = Workspace!.GetDrawing().Tools().GetCursor();
         var style = new StringBuilder(CanvasStyle).Append("; ")
                     .Append("cursor:").Append(cursor).Append("; ")
                     .Append("width:")

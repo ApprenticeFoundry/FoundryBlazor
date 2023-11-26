@@ -1,20 +1,28 @@
 
+using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
 
-public interface IInteractionManager
+public interface IToolManagement
 {
+    void CreateInteractions(IDrawing draw, ComponentBus pubsub);
     IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args);
     void SetInteraction<T>() where T : BaseInteraction;
+    IBaseInteraction GetInteraction();
+    string GetCursor();
+    Task RenderDrawing(Canvas2DContext ctx, int tick);
+    bool MouseDown(CanvasMouseArgs args);
+    bool MouseUp(CanvasMouseArgs args);
+    bool MouseMove(CanvasMouseArgs args);
 }
 
 
 
-public class InteractionManager : IInteractionManager
+public class ToolManagement : IToolManagement
 {
-    protected List<BaseInteraction> interactionRules;
-    protected Dictionary<string, BaseInteraction> interactionLookup;
+    protected List<BaseInteraction> interactionRules = new();
+    protected Dictionary<string, BaseInteraction> interactionLookup = new();
     protected string Style = BaseInteraction.InteractionStyle<BaseInteraction>();
     private IBaseInteraction? lastInteraction;
 
@@ -24,7 +32,7 @@ public class InteractionManager : IInteractionManager
     private ISelectionService SelectionService { get; set; }
     private IPageManagement PageService { get; set; }
 
-    public InteractionManager (
+    public ToolManagement (
             IPanZoomService panzoom,
             ISelectionService select,
             IPageManagement manager,
@@ -83,6 +91,7 @@ public class InteractionManager : IInteractionManager
         interactionRules.ForEach(rule =>
         {
             interactionLookup.Add(rule.Style, rule);
+            rule.InteractionManager = this;
         });
 
         lastInteraction = interactionRules[0];
@@ -113,5 +122,30 @@ public class InteractionManager : IInteractionManager
     {
         lastInteraction ??= interactionLookup[Style];
         return lastInteraction;
+    }
+
+    public string GetCursor()
+    {
+        return GetInteraction().GetCursor();
+    }
+
+    public Task RenderDrawing(Canvas2DContext ctx, int tick)
+    {
+        return GetInteraction().RenderDrawing(ctx, tick);
+    }
+
+    public bool MouseDown(CanvasMouseArgs args)
+    {
+        return SelectInteractionByRuleFor(args).MouseDown(args);
+    }
+
+    public bool MouseUp(CanvasMouseArgs args)
+    {
+        return GetInteraction().MouseUp(args);
+    }
+
+    public bool MouseMove(CanvasMouseArgs args)
+    {
+        return GetInteraction().MouseMove(args);
     }
 }

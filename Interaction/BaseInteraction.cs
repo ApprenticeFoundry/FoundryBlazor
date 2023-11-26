@@ -52,7 +52,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public string Cursor { get; set; } = "default";
     public string Style { get; set; } = "none";
 
-    public InteractionManager? InteractionManager { get; set; }
+    public ToolManagement? InteractionManager { get; set; }
 
     protected FoGlyph2D? selectedShape;
 
