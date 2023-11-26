@@ -37,13 +37,14 @@ public class ShapeSelection : ShapeHovering
 
     public override async Task RenderDrawing(Canvas2DContext ctx, int tick)
     {
-        if (GetPanZoomService().IsFenceSelecting())
+        var panZoomService = GetPanZoomService();
+        if (panZoomService.IsFenceSelecting())
         {
             await ctx.BeginPathAsync();
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(3);
             await ctx.SetStrokeStyleAsync("White");
-            var rect = GetPanZoomService().TransformRect(DragArea);
+            var rect = panZoomService.TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }

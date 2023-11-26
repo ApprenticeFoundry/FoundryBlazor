@@ -116,12 +116,14 @@ public class ToolManagement : IToolManagement
     }
     public void SetInteraction(string style)
     {
-        if (ToolType == style) return;
+        if (ToolType == style) 
+            return;
+
+        $"SetInteraction Changed from {ToolType} to {style}".WriteSuccess();
+
         lastInteraction?.Abort();
         ToolType = style;
-        lastInteraction = null;
-
-        //$"SetInteraction {interactionStyle}".WriteSuccess();
+        lastInteraction = interactionLookup[ToolType];
     }
 
     public IBaseInteraction GetInteraction()
