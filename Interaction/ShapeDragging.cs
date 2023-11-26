@@ -15,19 +15,16 @@ public class ShapeDragging : ShapeHovering
             string cursor,
             IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = InteractionStyle<ShapeDragging>();
+        Style = ToolManagement.InteractionStyle<ShapeDragging>();
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        DragArea = panZoomService.HitRectStart(args);
-        var findings = hitTestService?.FindGlyph(DragArea);
+        DragArea = GetPanZoomService().HitRectStart(args);
+        var findings = GetHitTestService().FindGlyph(DragArea);
         var selected = findings?.Where(item => item.IsSelected).LastOrDefault(); // get one on top
         return selected != null;
         //return selectionService.Selections().Count > 0;
@@ -38,9 +35,10 @@ public class ShapeDragging : ShapeHovering
         //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteLine(ConsoleColor.Green);
 
         isDraggingShapes = false;
+        var selectionService = GetSelectionService();
 
-        DragArea = panZoomService.HitRectStart(args);
-        var findings = hitTestService?.FindGlyph(DragArea);
+        DragArea = GetPanZoomService().HitRectStart(args);
+        var findings = GetHitTestService()?.FindGlyph(DragArea);
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
 
@@ -74,12 +72,13 @@ public class ShapeDragging : ShapeHovering
         selectedShape?.OnShapeClick(ClickStyle.MouseUp, args);
         isDraggingShapes = false;
         SetInteraction<ShapeHovering>();
-        selectionService?.MouseDropped();
+        GetSelectionService().MouseDropped();
         return true;
     }
 
     public override bool MouseMove(CanvasMouseArgs args)
     {
+        var panZoomService = GetPanZoomService();
         if (isDraggingShapes)
         {
             //$"MouseMove isDraggingShapes".WriteLine(ConsoleColor.Green);

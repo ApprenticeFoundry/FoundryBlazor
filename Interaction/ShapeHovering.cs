@@ -15,13 +15,10 @@ public class ShapeHovering : BaseInteraction
             string cursor,
             IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = InteractionStyle<ShapeHovering>();
+        Style = ToolManagement.InteractionStyle<ShapeHovering>();
     }
 
     public override bool MouseMove(CanvasMouseArgs args)
@@ -37,8 +34,8 @@ public class ShapeHovering : BaseInteraction
 
 
 
-        var loc = panZoomService.HitRectStart(args);
-        lastHover = hitTestService!.FindGlyph(loc);
+        var loc = GetPanZoomService().HitRectStart(args);
+        lastHover = GetHitTestService().FindGlyph(loc);
 
         lastHover.ForEach(child =>
         {

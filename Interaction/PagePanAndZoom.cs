@@ -17,13 +17,10 @@ public class PagePanAndZoom : BaseInteraction
             string cursor,
             IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
-         Style = InteractionStyle<PagePanAndZoom>();
+         Style = ToolManagement.InteractionStyle<PagePanAndZoom>();
     }
 
     public override void Abort()
@@ -44,7 +41,7 @@ public class PagePanAndZoom : BaseInteraction
     public override bool MouseUp(CanvasMouseArgs args)
     {
         isDraggingPage = false;
-        InteractionManager?.SetInteraction<ShapeHovering>();
+        SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)

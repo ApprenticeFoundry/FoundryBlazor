@@ -644,8 +644,6 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
-
-
     private void ApplyMouseArgs(CanvasMouseArgs args)
     {
         if (args == null) return;

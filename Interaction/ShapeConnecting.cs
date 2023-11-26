@@ -21,13 +21,10 @@ public class ShapeConnecting : ShapeHovering
             string cursor,
             IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(priority, cursor, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
-        Style = InteractionStyle<ShapeConnecting>();
+        Style = ToolManagement.InteractionStyle<ShapeConnecting>();
     }
     public override void Abort()
     {
@@ -37,7 +34,7 @@ public class ShapeConnecting : ShapeHovering
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        DragArea = panZoomService.HitRectStart(args);
+        DragArea = GetPanZoomService().HitRectStart(args);
         var findings = ValidDragSource(DragArea);
         selectedShape = findings.LastOrDefault(); // get one on top
 
@@ -57,7 +54,7 @@ public class ShapeConnecting : ShapeHovering
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(1);
             await ctx.SetStrokeStyleAsync("Yellow");
-            var rect = panZoomService.TransformRect(DragArea);
+            var rect = GetPanZoomService().TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }
@@ -68,6 +65,7 @@ public class ShapeConnecting : ShapeHovering
         if (selectedShape != null)
         {
             isConnecting = true;
+             var selectionService = GetSelectionService();
             selectionService?.ClearAllWhen(true);
             selectionService?.AddItem(selectedShape);
         }
@@ -77,14 +75,14 @@ public class ShapeConnecting : ShapeHovering
 
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
-        var findings = hitTestService?.FindGlyph(rect);
+        var findings = GetHitTestService().FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
         return heros.ToList();
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
-        var findings = hitTestService?.FindGlyph(rect);
+        var findings = GetHitTestService().FindGlyph(rect);
         var targets = findings!.Where(item => item.GetType() == TargetType);
         //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
         return targets.ToList();
@@ -95,7 +93,7 @@ public class ShapeConnecting : ShapeHovering
         if (isConnecting && selectedShape != null)
         {
             isConnecting = false;
-            var over = panZoomService.HitRectStart(args);
+            var over = GetPanZoomService().HitRectStart(args);
             var findings = ValidDropTarget(over);
             var found = findings!.Where(item => item != selectedShape).FirstOrDefault();
 
@@ -122,6 +120,7 @@ public class ShapeConnecting : ShapeHovering
     public override bool MouseMove(CanvasMouseArgs args)
     {
         //SendUserMove(args, true);
+        var panZoomService = GetPanZoomService();
         if (isConnecting)
         {
             DragArea = panZoomService.HitRectStart(args);

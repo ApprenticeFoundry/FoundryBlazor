@@ -4,17 +4,15 @@ using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
 
-public interface IToolManagement
+public interface IToolManagement :IBaseInteraction
 {
     void CreateInteractions(IDrawing draw, ComponentBus pubsub);
-    IBaseInteraction SelectInteractionByRuleFor(CanvasMouseArgs args);
     void SetInteraction<T>() where T : BaseInteraction;
     IBaseInteraction GetInteraction();
-    string GetCursor();
-    Task RenderDrawing(Canvas2DContext ctx, int tick);
-    bool MouseDown(CanvasMouseArgs args);
-    bool MouseUp(CanvasMouseArgs args);
-    bool MouseMove(CanvasMouseArgs args);
+
+    
+    void MouseDropped();
+
 }
 
 
@@ -23,7 +21,7 @@ public class ToolManagement : IToolManagement
 {
     protected List<BaseInteraction> interactionRules = new();
     protected Dictionary<string, BaseInteraction> interactionLookup = new();
-    protected string Style = BaseInteraction.InteractionStyle<BaseInteraction>();
+    protected string Style = InteractionStyle<BaseInteraction>();
     private IBaseInteraction? lastInteraction;
 
 
@@ -43,6 +41,11 @@ public class ToolManagement : IToolManagement
         PanZoomService = panzoom;
         SelectionService = select;
         PageService = manager;
+    }
+
+    public static string InteractionStyle<T>() where T : IBaseInteraction
+    {
+        return typeof(T).Name;
     }
 
     protected bool TestRule(BaseInteraction interact, CanvasMouseArgs args)
@@ -75,23 +78,22 @@ public class ToolManagement : IToolManagement
        // https://www.w3schools.com/cssref/pr_class_cursor.php
         interactionRules = new List<BaseInteraction>()
         {
-            {new PagePanAndZoom(1010, "pointer", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new MentorConstruction(105, "default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new MoShapeLinking(100, "default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeMenu(90,"default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeConnecting(80,"default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeResizing(70,"nwse-resize", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeDragging(50,"grab", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeSelection(40,"default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new ShapeHovering(30,"move", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
-            {new BaseInteraction(0,"default", draw, pubsub, PanZoomService, SelectionService, PageService, HitTestService)},
+            {new PagePanAndZoom(1010, "pointer", draw, pubsub, this)},
+            {new MentorConstruction(105, "default", draw, pubsub, this)},
+            {new MoShapeLinking(100, "default", draw, pubsub, this)},
+            {new ShapeMenu(90,"default", draw, pubsub, this)},
+            {new ShapeConnecting(80,"default", draw, pubsub, this)},
+            {new ShapeResizing(70,"nwse-resize", draw, pubsub, this)},
+            {new ShapeDragging(50,"grab", draw, pubsub, this)},
+            {new ShapeSelection(40,"default", draw, pubsub, this)},
+            {new ShapeHovering(30,"move", draw, pubsub, this)},
+            {new BaseInteraction(0,"default", draw, pubsub, this)},
         };
 
         interactionLookup = new Dictionary<string, BaseInteraction>();
         interactionRules.ForEach(rule =>
         {
             interactionLookup.Add(rule.Style, rule);
-            rule.InteractionManager = this;
         });
 
         lastInteraction = interactionRules[0];
@@ -105,7 +107,7 @@ public class ToolManagement : IToolManagement
     }
     public void SetInteraction<T>() where T : BaseInteraction
     {
-        var style = BaseInteraction.InteractionStyle<T>();
+        var style = ToolManagement.InteractionStyle<T>();
         SetInteraction(style);
     }
     public void SetInteraction(string style)
@@ -147,5 +149,40 @@ public class ToolManagement : IToolManagement
     public bool MouseMove(CanvasMouseArgs args)
     {
         return GetInteraction().MouseMove(args);
+    }
+
+    public void MouseDropped()
+    {
+        SelectionService.MouseDropped();
+    }
+
+    public void Abort()
+    {
+         GetInteraction().Abort();
+    }
+
+    public bool IsDefaultTool(CanvasMouseArgs args)
+    {
+        return GetInteraction().IsDefaultTool(args);
+    }
+
+    public IPageManagement GetPageService()
+    {
+        return PageService;
+    }
+
+    public IHitTestService GetHitTestService()
+    {
+        return HitTestService;
+    }
+
+    public IPanZoomService GetPanZoomService()
+    {
+        return PanZoomService;
+    }
+
+    public ISelectionService GetSelectionService()
+    {
+        return SelectionService;
     }
 }

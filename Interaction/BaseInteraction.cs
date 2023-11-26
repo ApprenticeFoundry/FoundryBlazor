@@ -8,23 +8,6 @@ using FoundryBlazor.Shared;
 
 namespace FoundryBlazor.Shape;
 
-// public enum InteractionStyle
-// {
-//     None,
-//     ReadOnly,
-//     PagePanAndZoom,
-//     ShapeSelection,
-//     ShapeHovering,
-//     ShapeDragging,
-//     ShapeMenu,
-//     ShapeResizing,
-//     ShapeCreating,
-//     ShapeConnecting,
-//     ModelLinking,
-//     MentorConstruction,
-
-//     UserExtension,
-// }
 
 public interface IBaseInteraction
 {
@@ -37,59 +20,52 @@ public interface IBaseInteraction
     bool IsDefaultTool(CanvasMouseArgs args);
     string GetCursor();
 
+    IPageManagement GetPageService();
+    IHitTestService GetHitTestService();
+    IPanZoomService GetPanZoomService();
+    ISelectionService GetSelectionService();
+
 }
 
 public class BaseInteraction : FoComponent, IBaseInteraction
 {
     public static Rectangle DragArea = new();
-    public static string InteractionStyle<T>() where T : IBaseInteraction
-    {
-        return typeof(T).Name;
-    }
+
 
 
     public int Priority { get; set; } = 0;
     public string Cursor { get; set; } = "default";
     public string Style { get; set; } = "none";
 
-    public ToolManagement? InteractionManager { get; set; }
+    public ToolManagement ToolManager { get; set; }
 
     protected FoGlyph2D? selectedShape;
 
     protected List<FoGlyph2D>? lastHover = null;
 
     protected IDrawing drawing;
-    protected IPageManagement pageManager;
     protected ComponentBus pubsub;
-    protected IHitTestService hitTestService;
-    protected IPanZoomService panZoomService;
-    protected ISelectionService selectionService;
+
 
     public BaseInteraction(
             int priority,
             string cursor,
             IDrawing draw,
             ComponentBus pub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
+            ToolManagement manager
         ) : base()
     {
         Priority = priority;
         Cursor = cursor;
         drawing = draw;
         pubsub = pub;
-        hitTestService = hitTest;
-        selectionService = select;
-        panZoomService = panzoom;
-        pageManager = manager;
-        Style = InteractionStyle<BaseInteraction>();
+        ToolManager = manager;
+        Style = ToolManagement.InteractionStyle<BaseInteraction>();
     }
 
     protected void SetInteraction<T>() where T : BaseInteraction
     {
-        InteractionManager?.SetInteraction<T>();
+        ToolManager.SetInteraction<T>();
     }
 
     public Action<Canvas2DContext, FoGlyph2D>? OnHover { get; set; } = async (ctx, obj) =>
@@ -139,7 +115,7 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     }
     public virtual bool MouseUp(CanvasMouseArgs args)
     {
-        selectionService.MouseDropped();
+        GetSelectionService().MouseDropped();
         return false;
     }
     public virtual bool MouseMove(CanvasMouseArgs args)
@@ -150,6 +126,26 @@ public class BaseInteraction : FoComponent, IBaseInteraction
     public string GetCursor()
     {
         return Cursor;
+    }
+
+    public IPageManagement GetPageService()
+    {
+        return ToolManager.GetPageService();
+    }
+
+    public IHitTestService GetHitTestService()
+    {
+        return ToolManager.GetHitTestService();
+    }
+
+    public IPanZoomService GetPanZoomService()
+    {
+        return ToolManager.GetPanZoomService();
+    }
+
+    public ISelectionService GetSelectionService()
+    {
+        return ToolManager.GetSelectionService();
     }
     // public virtual bool MouseIn(CanvasMouseArgs args)
     // {
