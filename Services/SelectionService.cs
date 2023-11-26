@@ -130,7 +130,7 @@ public class SelectionService : ISelectionService
     }
     public ISelectionService MoveBy(int dx, int dy)
     {
-        $"SelectionService.MoveBy({dx},{dy})".WriteSuccess();
+       // $"SelectionService.MoveBy({dx},{dy} Members {Members.Count})".WriteSuccess();
         Members.ForEach(item => item.MoveBy(dx, dy));
         return this;
     }

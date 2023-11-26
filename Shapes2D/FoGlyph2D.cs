@@ -1,13 +1,8 @@
 using Blazor.Extensions.Canvas.Canvas2D;
- 
-using FoundryBlazor.Extensions;
 using FoundryBlazor.Shared;
 using FoundryBlazor.Shared.SVG;
 using FoundryRulesAndUnits.Extensions;
-using Microsoft.AspNetCore.Components;
 using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.Xml;
 using Unglide;
 
 namespace FoundryBlazor.Shape;
@@ -132,7 +127,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     protected int x = 0;
     public int PinX { 
         get { return this.x; } 
-        set { $"PinX {value} != {x}".WriteNote();  this.x = AssignInt(value, x); } }
+        set { this.x = AssignInt(value, x); } }
     protected int y = 0;
     public int PinY { get { return this.y; } set { this.y = AssignInt(value, y); } }
     protected int width = 0;
@@ -832,7 +827,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (Math.Abs(newValue - oldValue) > 0)
         {
             Smash(true);
-            $"AssignInt {Name} {GetType().Name} {oldValue} -> {newValue}".WriteInfo(2);
+            //$"AssignInt {Name} {GetType().Name} {oldValue} -> {newValue}".WriteInfo(2);
         }
 
         return newValue;

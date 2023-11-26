@@ -127,7 +127,7 @@ public class ToolManagement : IToolManagement
     public IBaseInteraction GetInteraction()
     {
         lastInteraction ??= interactionLookup[ToolType];
-        $"GetInteraction {lastInteraction.GetToolType()}".WriteSuccess();
+        //$"GetInteraction {lastInteraction.GetToolType()}".WriteSuccess();
         return lastInteraction;
     }
 
