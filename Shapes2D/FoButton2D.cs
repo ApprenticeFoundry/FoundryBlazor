@@ -40,7 +40,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
         if (this.countdown == 0)
         {
             this.Color = "Orange";
-            this.PreDraw = null;
+            this.ClearPreDraw();
         }
         countdown--;
     }

@@ -65,7 +65,7 @@ public class SVGBase<T> : ComponentBase where T : FoGlyph2D
 
     protected bool IsHovering()
     {
-        var result = Source?.HoverDraw != null;
+        var result = Source?.IsHovering() ?? false;
         return result;
     }
 

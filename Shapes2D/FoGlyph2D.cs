@@ -179,9 +179,9 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
     protected Action<FoGlyph2D>? OnMatrixSmash;
 
     public Action<FoGlyph2D, int>? ContextLink;
-    public Action<Canvas2DContext, FoGlyph2D>? PreDraw;
-    public Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
-    public Action<Canvas2DContext, FoGlyph2D>? PostDraw;
+    protected Action<Canvas2DContext, FoGlyph2D>? PreDraw;
+    protected Action<Canvas2DContext, FoGlyph2D>? HoverDraw;
+    protected Action<Canvas2DContext, FoGlyph2D>? PostDraw;
     public Action<Canvas2DContext, FoGlyph2D>? ShapeDraw;
     public Action<Canvas2DContext, FoGlyph2D>? ShapeDrawSelected;
 
@@ -246,7 +246,46 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return source;
     }
 
+    public FoGlyph2D ClearPreDraw()
+    {
+        PreDraw = null;
+        return this;
+    }
 
+    public bool IsHovering()
+    {
+        var result = HoverDraw != null;
+        return result;
+    }
+    
+    public FoGlyph2D ClearHoverDraw()
+    {
+        HoverDraw = null;
+        return this;
+    }
+    public FoGlyph2D ClearPostDraw()
+    {
+        PostDraw = null;
+        return this;
+    }
+
+    public FoGlyph2D SetPreDraw(Action<Canvas2DContext, FoGlyph2D> action)
+    {
+        PreDraw = action;
+        return this;
+    }
+
+    public FoGlyph2D SetHoverDraw(Action<Canvas2DContext, FoGlyph2D> action)
+    {
+        HoverDraw = action;
+        return this;
+    }
+    public FoGlyph2D SetPostDraw(Action<Canvas2DContext, FoGlyph2D> action)
+    {
+        PostDraw = action;
+        return this;
+    }
+    
     public virtual Point AttachTo()
     {
         var point = new Point(PinX, PinY);

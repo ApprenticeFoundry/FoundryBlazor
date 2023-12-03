@@ -27,7 +27,7 @@ public class ShapeHovering : BaseInteraction
 
         lastHover?.ForEach(child =>
         {
-            child.HoverDraw = null;
+            child.ClearHoverDraw();
             list.Add(new ShapeHoverUIEvent(child));
         });
         lastHover?.ForEach(child => child.LocalMouseHover(args, null));
@@ -39,7 +39,7 @@ public class ShapeHovering : BaseInteraction
 
         lastHover.ForEach(child =>
         {
-            child.HoverDraw = OnHover;
+            child.SetHoverDraw(OnHover);
             list.Add(new ShapeHoverUIEvent(child));
         });
         lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));

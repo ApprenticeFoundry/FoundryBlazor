@@ -29,7 +29,7 @@ public class ShapeConnecting : ShapeHovering
     public override void Abort()
     {
         isConnecting = false;
-        lastHover?.ForEach(child => child.HoverDraw = null);
+        lastHover?.ForEach(child => child.ClearHoverDraw());
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
@@ -132,12 +132,12 @@ public class ShapeConnecting : ShapeHovering
         var over = panZoomService.HitRectStart(args);
         var found = ValidDropTarget(over);
 
-        lastHover?.ForEach(child => child.HoverDraw = null);
+        lastHover?.ForEach(child => child.ClearHoverDraw());
 
         if (selectedShape != null)
         {
             lastHover = found;
-            lastHover.ForEach(child => child.HoverDraw = OnHoverTarget);
+            lastHover.ForEach(child => child.SetHoverDraw(OnHoverTarget));
         }
 
         return true;

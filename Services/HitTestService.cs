@@ -11,6 +11,7 @@ public interface IHitTestService
 {
     bool Insert(FoGlyph2D glyph, Rectangle rect);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
+    List<FoGlyph2D> FindGlyphExclude(Rectangle rect, FoGlyph2D? exclude);
     List<(FoGlyph2D, Rectangle)> AllShapesEverywhere();
     List<(FoGlyph2D, Rectangle)> RefreshQuadTree(FoPage2D page);
     Task RenderQuadTree(Canvas2DContext ctx, bool showTracks);
@@ -109,6 +110,28 @@ public class HitTestService : IHitTestService
         // });
         return list.Select(obj => obj.item).ToList();
     }
+
+    public List<FoGlyph2D> FindGlyphExclude(Rectangle rect, FoGlyph2D? exclude)
+    {
+        rect = _panzoom.TransformRect(rect);
+
+        if (PreviousSearches.Count > 10)
+            PreviousSearches.RemoveRange(0, 6);
+
+        PreviousSearches.Add(rect);
+        //$"Search {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+
+        List<(FoGlyph2D item, Rectangle hit)> list = new();
+        Tree?.GetObjects(rect, ref list);
+        //$"Found {list.Count} Searches {PreviousSearches.Count}".WriteLine(ConsoleColor.Blue);
+
+        // PreviousSearches.ForEach(rect =>
+        // {
+        //     $"=> Searches {rect.X} {rect.Y} {rect.Width} {rect.Height}".WriteLine(ConsoleColor.Blue);
+        // });
+        return list.Select(obj => obj.item).Where(item => item != exclude).ToList();
+    }
+
 
     public List<(FoGlyph2D, Rectangle)> AllShapesEverywhere()
     {

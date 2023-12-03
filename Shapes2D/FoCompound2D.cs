@@ -40,11 +40,11 @@ public class FoCompound2D : FoGlyph2D, IShape2D
 
     public override bool LocalMouseHover(CanvasMouseArgs args, Action<Canvas2DContext, FoGlyph2D>? OnHover) 
     {
-        Members<FoButton2D>().ForEach(child => child.HoverDraw = null);
+        Members<FoButton2D>().ForEach(child => child.ClearHoverDraw());
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
         var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
-        if ( found != null) {
-            found.HoverDraw = OnHover;
+        if ( found != null && OnHover != null) {
+            found.SetHoverDraw(OnHover);
             return true;
         }
 
