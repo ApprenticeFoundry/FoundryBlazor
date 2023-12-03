@@ -137,7 +137,7 @@ public class ShapeConnecting : ShapeHovering
         if (selectedShape != null)
         {
             lastHover = found;
-            lastHover.ForEach(child => child.SetHoverDraw(OnHoverTarget));
+            lastHover.ForEach(child => child.SetHoverDraw(OnHoverTarget!));
         }
 
         return true;
