@@ -47,8 +47,8 @@ public interface IDrawing : IRender
     IToolManagement Tools();
     T AddToolType<T>(int priority, string cursor) where T : BaseInteraction;
     
+    List<FoGlyph2D> FindShapes(string glyphId);
     List<FoGlyph2D> ExtractShapes(string glyphId);
-
     void TogglePanZoomWindow();
     void ToggleHitTestDisplay();
     void RefreshHitTesting(FoPanZoomWindow? window);
@@ -210,6 +210,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public void SetUserID(string panID)
     {
         UserID = panID;
+    }
+    public List<FoGlyph2D> FindShapes(string GlyphId)
+    {
+    return PageManager.FindShapes(GlyphId);
     }
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
