@@ -519,6 +519,9 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         if (child != null)
         {
             this._children ??= new List<FoLayoutTree<V>>();
+            if ( _children.Contains(child)) 
+                return child;
+
             this._children.Add(child);
             child._parent = this;
             child.level = level + 1;
