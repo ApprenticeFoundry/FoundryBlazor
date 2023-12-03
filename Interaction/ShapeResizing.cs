@@ -36,7 +36,6 @@ public class ShapeResizing : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-
         isResizingShape = false;
 
         DragArea = GetPanZoomService().HitRectStart(args);
