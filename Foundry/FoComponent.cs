@@ -8,6 +8,7 @@ namespace FoundryBlazor;
 public interface IFoComponent
 {
     bool HasSlot<T>() where T : FoBase;
+    bool RemoveSlot<T>() where T : FoBase;
     T Establish<T>(string key) where T : FoBase;
     T? Find<T>(string key) where T : FoBase;
     List<T> Members<T>() where T : FoBase;
@@ -81,6 +82,16 @@ public class FoComponent : FoBase, IFoComponent
     {
         var key = typeof(T).Name;
         return Slots.ContainsKey(key);
+    }
+    public bool RemoveSlot<T>() where T : FoBase
+    {
+        var key = typeof(T).Name;
+        if (Slots.ContainsKey(key) )
+        {
+            Slots.Remove(key);
+            return true;
+        }
+        return false;
     }
 
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
