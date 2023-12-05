@@ -1,12 +1,14 @@
 using FoundryBlazor.Shape;
 using FoundryBlazor.Solutions;
+using FoundryRulesAndUnits.Extensions;
+
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class MenuManager : ComponentBase, IDisposable
+public class WorkspaceMenuBase : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
@@ -56,7 +58,7 @@ public class MenuManager : ComponentBase, IDisposable
 
     public List<IFoMenu> GetAllMenus()
     {
-        //"GetAllMenus".WriteWarning(3);
+        "GetAllMenus".WriteWarning(3);
         if (FoWorkspace.RefreshMenus && Workspace != null)
         {
             
@@ -65,14 +67,14 @@ public class MenuManager : ComponentBase, IDisposable
             AllMenus = Workspace.CollectMenus(AllMenus);
             FoWorkspace.RefreshMenus = false;
 
-            // AllMenus.ForEach(item =>
-            // {
-            //     item.DisplayText().WriteInfo();
-            //     // item.Buttons().ForEach(but =>
-            //     // {
-            //     //     but.DisplayText().WriteInfo(1);
-            //     // });
-            // });
+            AllMenus.ForEach(item =>
+            {
+                item.DisplayText().WriteInfo();
+                // item.Buttons().ForEach(but =>
+                // {
+                //     but.DisplayText().WriteInfo(1);
+                // });
+            });
         }
         return AllMenus;
     }
