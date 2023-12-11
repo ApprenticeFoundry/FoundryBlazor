@@ -16,7 +16,7 @@ public class D2D_Glue : D2D_Base
     public D2D_Glue(FoGlue2D glue)
     {
         var (source, target, body) = glue;
-        Name = glue.Name;
+        Name = glue.Key;
         TargetId = target.GetGlyphId();
         BodyId = body.GetGlyphId();
         SourceId = source.GetGlyphId();

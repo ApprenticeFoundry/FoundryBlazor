@@ -34,13 +34,13 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
 
     public string GroupName()
     {
-        return _item.Name;
+        return _item.Key;
     }
     
     public string SetGroupName(string name)
     {
-        _item.Name = name;
-        return _item.Name;
+        _item.Key = name;
+        return _item.Key;
     }
 
     public List<FoLayoutNode<U>> GetMembers()

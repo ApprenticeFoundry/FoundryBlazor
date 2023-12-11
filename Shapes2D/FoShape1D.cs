@@ -229,7 +229,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
             var (source, target, body) = glue;
             if (source == this && target != null)
             {
-                var found = glue.Name[..3] switch
+                var found = glue.Key[..3] switch
                 {
                     "STA" => ComputeStartFor(target),
                     "FIN" => ComputeFinishFor(target),
@@ -307,7 +307,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if (target == null) return null;
 
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
-        var name = part != target ? $"START_{part.Name}_{gluecount++}" : $"START_CENTER_{gluecount++}";
+        var name = part != target ? $"START_{part.Key}_{gluecount++}" : $"START_CENTER_{gluecount++}";
 
         var glue = new FoGlue2D(name);
         glue.GlueTo(this, part, target);
@@ -320,7 +320,7 @@ public class FoShape1D : FoGlyph2D, IGlueOwner, IShape1D
         if (target == null) return null;
         
         var part = string.IsNullOrEmpty(child) ? target : target.FindConnectionPoint(child, true) ?? target;
-        var name = part != target ? $"FINISH_{part.Name}_{gluecount++}" : $"FINISH_CENTER_{gluecount++}";
+        var name = part != target ? $"FINISH_{part.Key}_{gluecount++}" : $"FINISH_CENTER_{gluecount++}";
 
         var glue = new FoGlue2D(name);
         glue.GlueTo(this, part, target);

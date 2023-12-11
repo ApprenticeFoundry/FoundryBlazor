@@ -212,7 +212,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
     public string GetName()
     {
-        return Name;
+        return Key;
     }
     public virtual string GetText()
     {
@@ -354,7 +354,7 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         if (Selectable)
             this.IsSelected = value;
         else
-            $"Shape {Name} is not selectable".WriteNote();
+            $"Shape {Key} is not selectable".WriteNote();
         return this;
     }
 

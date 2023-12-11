@@ -110,17 +110,17 @@ public class FoStage3D : FoGlyph3D, IStage
     {
 
         var collection = DynamicSlot(value.GetType());
-        if (string.IsNullOrEmpty(value.Name))
+        if (string.IsNullOrEmpty(value.Key))
         {
-            value.Name = collection.NextItemName();
+            value.Key = collection.NextItemName();
         }
 
-        collection.AddObject(value.Name, value);
+        collection.AddObject(value.Key, value);
 
         if (value is IShape3D)
         {
             Shapes3D.Add(value);
-            $"IShape3D Added {value.Name}".WriteSuccess();
+            $"IShape3D Added {value.Key}".WriteSuccess();
         }
         else if (value is IPipe3D)
         {

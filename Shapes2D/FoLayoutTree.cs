@@ -164,7 +164,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     {
         if (string.IsNullOrEmpty(name)) return null;
 
-        if (_item.Name == name) return this;
+        if (_item.Key == name) return this;
 
         if (_children != null)
             foreach (var child in _children)

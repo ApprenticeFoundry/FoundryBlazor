@@ -82,10 +82,10 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     } 
     public T Add(T value)
     {
-        if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = NextItemName();
+        if ( string.IsNullOrEmpty(value.Key)) {
+            value.Key = NextItemName();
         }
-        return this.Add(value.Name, value);
+        return this.Add(value.Key, value);
     }
     public T Add(string key, T value)
     {
@@ -97,10 +97,10 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     }
     public T Remove(T value)
     {
-        if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = NextItemName();
+        if ( string.IsNullOrEmpty(value.Key)) {
+            value.Key = NextItemName();
         }
-        return this.Remove(value.Name, value);
+        return this.Remove(value.Key, value);
     }
     public bool Remove(string key)
     {
@@ -128,7 +128,7 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     public List<T> ExtractWhere(Func<T,bool> whereClause)
     {
         var extraction = FindWhere(whereClause);
-        extraction.ForEach(item => this.members.Remove(item.Name));
+        extraction.ForEach(item => this.members.Remove(item.Key));
         return extraction;
     }
     public List<T> FindWhere(Func<T,bool> whereClause)

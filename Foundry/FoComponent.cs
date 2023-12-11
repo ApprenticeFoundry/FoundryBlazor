@@ -52,11 +52,12 @@ public class SlotGroups: Dictionary<string, object>
 
 public class FoComponent : FoBase, IFoComponent
 {
+    public string? Name { get; set; }
     public string ClassType { get; init; }
     private SlotGroups Slots { get; set; } = new();
 
 
-    public FoComponent(string name = "") : base(name)
+    public FoComponent(string key = "") : base(key)
     {
         ClassType = GetType().Name;
     }
@@ -174,7 +175,7 @@ public class FoComponent : FoBase, IFoComponent
         if (target.TryGetValue(key, out T? found) == false)
         {
             found = Activator.CreateInstance<T>();
-            found.Name = key;
+            found.Key = key;
             target.Add(key, found);
         }
         return (found as T)!;

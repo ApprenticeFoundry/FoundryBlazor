@@ -257,7 +257,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 var h = (double)shape.Height / pixels;
                 var x = (double)shape.PinX / pixels;
                 var y = (double)shape.PinY / pixels;
-                var panel = new FoPanel3D(shape.Name)
+                var panel = new FoPanel3D(shape.Key)
                 {
                     Width = w,
                     Height = h,
@@ -302,7 +302,7 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         if (world == null) return false;
 
-        $"RenderWorld {world.Name}".WriteNote();
+        $"RenderWorld {world.Key}".WriteNote();
 
         PreRenderWorld3D(world);
         return RenderWorld3DToScene(world);

@@ -19,7 +19,7 @@ public class FoPanel3D : FoGlyph3D, IShape3D
 
     public string DisplayText()
     {
-        return Name;
+        return Key;
     }
 
     public FoPanel3D() { }

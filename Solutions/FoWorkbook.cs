@@ -71,7 +71,7 @@ public class FoWorkbook : FoComponent, IWorkbook
         if (WorkPage != null)
             return WorkPage;
 
-        return EstablishCurrentPage(Name, "Black");
+        return EstablishCurrentPage(Key, "Black");
     }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)

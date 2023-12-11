@@ -41,7 +41,7 @@ public class FoGroup3D : FoGlyph3D
 
     public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
-        this.Name = name;
+        this.Key = name;
         BoundingBox = new Vector3(width, height, depth);
         Position = new Vector3();
         Offset = new Vector3();
@@ -52,25 +52,25 @@ public class FoGroup3D : FoGlyph3D
 
     public T CreateUsingDTBASE<T>(FoGlyph3D obj) where T : FoGlyph3D
     {
-        return CreateUsing<T>(obj.Name, obj.GlyphId);
+        return CreateUsing<T>(obj.Key, obj.GlyphId);
     }
 
     public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateCylinder(obj.Name, width, height, depth);
+        return result.CreateCylinder(obj.Key, width, height, depth);
     }
 
     public FoShape3D CreateBlock(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateBox(obj.Name, width, height, depth);
+        return result.CreateBox(obj.Key, width, height, depth);
     }
 
     public FoShape3D CreateSphere(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
         var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateSphere(obj.Name, width, height, depth);
+        return result.CreateSphere(obj.Key, width, height, depth);
     }
 
     public FoShape3D CreateGlb(FoGlyph3D obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0)
@@ -138,7 +138,7 @@ public class FoGroup3D : FoGlyph3D
     private T CreateItem<T>(string name) where T : FoGlyph3D
     {
         var found = Activator.CreateInstance<T>() as T;
-        found.Name = name;
+        found.Key = name;
         found.PlatformName = PlatformName;
         found.GlyphId = Guid.NewGuid().ToString();
         return found;

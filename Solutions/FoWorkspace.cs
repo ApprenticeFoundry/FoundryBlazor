@@ -183,7 +183,7 @@ public class FoWorkspace : FoComponent, IWorkspace
             {
                 found = new FoWorkbook(this, Foundry)
                 {
-                    Name = "Book-1"
+                    Key = "Book-1"
                 };
                 AddWorkbook(found);
             }
@@ -202,7 +202,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         ActiveWorkbook = book;
         AllWorkbooks().ForEach(item => item.IsActive = false);
         ActiveWorkbook.IsActive = true;
-        $"SetCurrentWorkbook: {ActiveWorkbook.Name}".WriteSuccess();
+        $"SetCurrentWorkbook: {ActiveWorkbook.Key}".WriteSuccess();
 
         var drawing = GetDrawing();
         drawing.SetCurrentPage(ActiveWorkbook.CurrentPage());
@@ -343,7 +343,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public FoWorkbook? FindWorkbook(string name)
     {
-        var found = AllWorkbooks().Where(item => item.Name.Matches(name)).FirstOrDefault();
+        var found = AllWorkbooks().Where(item => item.Key.Matches(name)).FirstOrDefault();
         return found;
     }
 

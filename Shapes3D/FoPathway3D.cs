@@ -41,7 +41,7 @@ public class FoPathway3D : FoGlyph3D, IPipe3D
 
     public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
     {
-        $"RenderPathway {Name}".WriteNote();
+        $"RenderPathway {Key}".WriteNote();
         ctx.Add(EstablishPathway3D());
         return true;
     }

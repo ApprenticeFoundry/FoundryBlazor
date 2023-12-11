@@ -66,7 +66,7 @@ public class HitTestService : IHitTestService
 
     public List<(FoGlyph2D, Rectangle)> RefreshQuadTree(FoPage2D page)
     {
-        FoGlyph2D.ResetHitTesting(false, $"RefreshQuadTree {page.Name}");
+        FoGlyph2D.ResetHitTesting(false, $"RefreshQuadTree {page.Key}");
         // $"Refresh Hit Test Tree {page.Name} ".WriteSuccess();
 
         //this rectangle should not shrink based on pan or zoom

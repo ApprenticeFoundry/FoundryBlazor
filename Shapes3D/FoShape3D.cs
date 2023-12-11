@@ -69,21 +69,21 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
         Type = "Box";
         BoundingBox = new Vector3(width, height, depth);
-        Name = name;
+        Key = name;
         return this;
     }
     public FoShape3D CreateCylinder(string name, double width, double height, double depth)
     {
         Type = "Cylinder";
         BoundingBox = new Vector3(width, height, depth);
-        Name = name;
+        Key = name;
         return this;
     }
     public FoShape3D CreateTube(string name, double radius, List<Vector3> path)
     {
         Type = "Tube";
         BoundingBox = new Vector3(radius, 0, 0);
-        Name = name;
+        Key = name;
         Path = path;
         return this;
     }
@@ -101,7 +101,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
         Type = "Sphere";
         BoundingBox = new Vector3(width, height, depth);
-        Name = name;
+        Key = name;
         return this;
     }
 

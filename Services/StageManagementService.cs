@@ -124,7 +124,7 @@ public class StageManagementService : FoComponent, IStageManagement
         var body = CodingExtensions.Dehydrate<T>(value, false);
         var shape = CodingExtensions.Hydrate<U>(body, false);
 
-        shape!.Name = "";
+        shape!.Key = "";
         //shape!.GlyphId = "";
 
         return Add<U>(shape);

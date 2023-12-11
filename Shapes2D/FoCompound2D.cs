@@ -140,7 +140,7 @@ public class FoCompound2D : FoGlyph2D, IShape2D
             await ctx.SetFontAsync(FontSpec);
 
             await ctx.SetFillStyleAsync("White");
-            await ctx.FillTextAsync(Name,LeftX()+1,TopY()+1);
+            await ctx.FillTextAsync(Key,LeftX()+1,TopY()+1);
             await ctx.RestoreAsync();
         }
     }

@@ -243,12 +243,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var collection = DynamicSlot(value.GetType());
-        if (string.IsNullOrEmpty(value.Name))
+        if (string.IsNullOrEmpty(value.Key))
         {
-            value.Name = collection.NextItemName();
+            value.Key = collection.NextItemName();
         }
 
-        collection.AddObject(value.Name, value);
+        collection.AddObject(value.Key, value);
 
         if (value is IShape2D)
         {
@@ -261,7 +261,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             // $"IShape1D Added {value.Name}".WriteSuccess();
         }
 
-        FoGlyph2D.ResetHitTesting(true, $"FoPage2D AddShape {value.Name}");
+        FoGlyph2D.ResetHitTesting(true, $"FoPage2D AddShape {value.Key}");
 
         return value;
     }
@@ -471,7 +471,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.FillTextAsync($"Page: {Key}", PinX + 5, PinY + 5);
 
         $"RenderNoItems Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
@@ -504,7 +504,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.FillTextAsync($"Page: {Key}", PinX + 5, PinY + 5);
 
         $"RenderConcise Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
@@ -537,7 +537,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             Title = title;
         else if (string.IsNullOrEmpty(Title))
         {
-            var text = $"Page: {Name} {Color} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
+            var text = $"Page: {Key} {Color} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
             text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
             Title = text;
         }

@@ -36,7 +36,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 
     public string DisplayText()
     {
-        return Name;
+        return Key;
     }
 
 

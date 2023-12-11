@@ -56,7 +56,7 @@ public class PageManagementService : FoComponent, IPageManagement
         get
         {
             if (_page?.IsActive != true)
-                $"Get Active Page {_page?.Name} is broken".WriteInfo();
+                $"Get Active Page {_page?.Key} is broken".WriteInfo();
 
             return _page!;
         }
@@ -205,7 +205,7 @@ public class PageManagementService : FoComponent, IPageManagement
             if (found == null)
             {
                 found = new FoPage2D("Page-1", 300, 200, "RED");
-                $"CurrentPage CREATING new page {found.Name}".WriteNote();
+                $"CurrentPage CREATING new page {found.Key}".WriteNote();
                 AddPage(found);
             }
             return SetCurrentPage(found);
@@ -240,7 +240,7 @@ public class PageManagementService : FoComponent, IPageManagement
 
     public FoPage2D? FindPage(string name)
     {
-        var found = Members<FoPage2D>().Where(item => item.Name.Matches(name)).FirstOrDefault();
+        var found = Members<FoPage2D>().Where(item => item.Key.Matches(name)).FirstOrDefault();
         return found;
     }
 
@@ -249,7 +249,7 @@ public class PageManagementService : FoComponent, IPageManagement
         var body = CodingExtensions.Dehydrate<T>(value, false);
         var shape = CodingExtensions.Hydrate<T>(body, false);
 
-        shape.Name = "";
+        shape.Key = "";
         shape.GlyphId = "";
 
         //SRS write a method to duplicate actions
@@ -266,7 +266,7 @@ public class PageManagementService : FoComponent, IPageManagement
         var body = CodingExtensions.Dehydrate<T>(value, false);
         var shape = CodingExtensions.Hydrate<U>(body, false);
 
-        shape.Name = "";
+        shape.Key = "";
         shape.GlyphId = "";
 
         AddShape<U>(shape);

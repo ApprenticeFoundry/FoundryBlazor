@@ -5,13 +5,13 @@ namespace FoundryBlazor;
 
 public class FoBase
 {
-    public string Name { get; set; }
+    public string Key { get; set; }
     public StatusBitArray StatusBits = new();
     private ControlParameters? metaData { get; set; }
 
     public FoBase(string name)
     {
-        Name = name;
+        Key = name;
     }
     public ControlParameters MetaData()
     {
