@@ -143,6 +143,18 @@ public class FoComponent : FoBase, IFoComponent
         return (found as T)!;
     }
 
+    public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.ExtractWhere(whereClause);
+    }
+
+    public virtual List<T>? FindWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.FindWhere(whereClause);
+    }
+    
     public virtual List<T>? GetMembers<T>() where T : FoBase
     {
         FoCollection<T>? target = GetSlot<T>();
