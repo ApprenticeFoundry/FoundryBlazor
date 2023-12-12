@@ -17,7 +17,6 @@ public class FoHandle2D : FoGlyph2D
     }
 
 
-
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)
     {
         if ( CannotRender() ) return false;

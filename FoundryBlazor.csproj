@@ -20,8 +20,8 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2020</Copyright>
-    <AssemblyVersion>11.0.4</AssemblyVersion>
-    <Version>11.0.4</Version>
+    <AssemblyVersion>11.0.5</AssemblyVersion>
+    <Version>11.0.5</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
@@ -39,7 +39,7 @@
   <ItemGroup>
     <!--<PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="2.2.3" />-->
     <!-- <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" /> -->
-    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="3.0.0" />
+    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="3.0.1" />
     <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 
