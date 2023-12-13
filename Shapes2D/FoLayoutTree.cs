@@ -148,7 +148,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         path = index.ToString().PadLeft(2, '0');
         if (_parent != null)
         {
-            path = $"{_parent.ComputePath()}.{path}";
+            path = $"{_parent.ComputeName()}.{path}";
         }
         return path;
     }
@@ -226,19 +226,17 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     {
         if (IsVisited) return;
         
-        $"Visiting {ComputeName()}".WriteNote();
         MarkVisited();
         _children?.ForEach(item => item.VisitAllNodesInTree());
     }
 
-    public FoLayoutTree<V>? FindRoot()
+    public FoLayoutTree<V> FindRoot()
     {
         if (_parent == null) return this;
-        _parent?.FindRoot();
-        return null;
+        return _parent.FindRoot();
     }
 
-    public FoLayoutTree<V> FindRoot(FoLayoutTree<V> node)
+    public static FoLayoutTree<V> FindRootOf(FoLayoutTree<V> node)
     {
         var found = node;
         while (found._parent != null)
