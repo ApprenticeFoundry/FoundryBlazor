@@ -224,6 +224,9 @@ public class FoLayoutTree<V> where V : FoGlyph2D
 
     public void VisitAllNodesInTree()
     {
+        if (IsVisited) return;
+        
+        $"Visiting {ComputeName()}".WriteNote();
         MarkVisited();
         _children?.ForEach(item => item.VisitAllNodesInTree());
     }
