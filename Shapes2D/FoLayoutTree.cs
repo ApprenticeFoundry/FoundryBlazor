@@ -70,6 +70,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     public string path = "";
 
     public bool IsExpanded = true;
+    public bool IsVisited = true;   
     private Size _branchSize = new(10, 10);
     private Point _branchULPoint = new(100, 100);
     private BoxLayoutStyle _layoutStyle = BoxLayoutStyle.None;
@@ -85,6 +86,15 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         _item = node;
         this.level = 0;
         this.index = 0;
+    }
+
+    public void ClearVisited()
+    {
+        IsVisited = false;
+    }
+    public void MarkVisited()
+    {
+        IsVisited = true;
     }
 
     public void ClearAll()
@@ -210,6 +220,12 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         });
         _children = null;
         return this;
+    }
+
+    public void VisitAllNodesInTree()
+    {
+        MarkVisited();
+        _children?.ForEach(item => item.VisitAllNodesInTree());
     }
 
     public FoLayoutTree<V>? FindRoot()
