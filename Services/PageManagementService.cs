@@ -116,10 +116,6 @@ public class PageManagementService : FoComponent, IPageManagement
         return page;
     }
 
-
-
-
-
     public List<FoGlyph2D> DeleteSelections()
     {
         var list = new List<FoGlyph2D>();
