@@ -330,25 +330,28 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         this.ConnectParentChildShapeTree<U>(pageManager, "RIGHT", TreeLayoutRules.LineLayout);
     }
 
-    public void HorizontalLayout(int PinX, int PinY, Point margin)
+    public bool HorizontalLayout(int PinX, int PinY, Point margin)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, TreeLayoutRules.HorizontalLayout);
         this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.HorizontalLayout);
+        return true;
     }
 
-    public void VerticalLayout(int PinX, int PinY, Point margin)
+    public bool VerticalLayout(int PinX, int PinY, Point margin)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, TreeLayoutRules.VerticalLayout);
         this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.VerticalLayout);
+        return true;
     }
 
-    public void Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules = null)
+    public bool Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules = null)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, rules);
         this.ComputeNodeBranchLocation(point, margin, rules);
+        return true;
     }
 
     public void ComputeNodeBranchSize(Point margin, List<BoxLayoutStyle>? styleList = null)
