@@ -430,7 +430,7 @@ public class CommandService : ICommand
     public void Save()
     {
         var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
-        $"lastVersion {lastVersion}".WriteNote();
+        //$"lastVersion {lastVersion}".WriteNote();
 
         var version = VersionPersistence.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
@@ -438,11 +438,11 @@ public class CommandService : ICommand
         model.PersistPage(CurrentPage());
 
         var json = CodingExtensions.Dehydrate<ModelPersist>(model, false);
-        StorageHelpers.WriteData("storage", version.Filename, json);
+        //StorageHelpers.WriteData("storage", version.Filename, json);
 
         var filename = version.Filename.Replace("json", "zip");
         var compress = json.Compress();
-        StorageHelpers.WriteData("storage", filename, compress);
+        //StorageHelpers.WriteData("storage", filename, compress);
         SendToast(ToastType.Success, $"{version.Filename} is Saved");
     }
 

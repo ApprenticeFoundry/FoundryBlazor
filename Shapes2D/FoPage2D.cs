@@ -340,6 +340,15 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return result;
     }
 
+    public FoGlyph2D? LookupShape2D(string GlyphId)
+    {
+
+        if ( Shapes2D.TryGetValue(GlyphId, out var found))
+            return found;
+
+        return null;
+    }
+
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
     {
         var result = new List<FoGlyph2D>();
