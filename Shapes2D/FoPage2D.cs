@@ -346,7 +346,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         if ( Shapes2D.TryGetValue(GlyphId, out var found))
             return found;
 
-        return null;
+        var list = Shapes2D.FindWhere(child => child.GlyphIdCompare(GlyphId));
+
+        return list.FirstOrDefault();
     }
 
     public List<FoGlyph2D> ExtractShapes(string GlyphId)

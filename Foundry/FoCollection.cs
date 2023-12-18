@@ -135,10 +135,6 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     {
         var list = Values();
         var extraction = list.Where(item => whereClause(item)).ToList();
-        // foreach (var item in list)
-        // {
-        //     $"FindWhere {item.Name} whereClause = {whereClause(item)}".WriteInfo();
-        // }
         return extraction;
     }
     public void Clear()
