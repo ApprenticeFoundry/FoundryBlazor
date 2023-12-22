@@ -45,7 +45,6 @@ public interface IWorkspace : IWorkbook
     U EstablishMenu3D<U, T>(string name, Dictionary<string, Action> actions, bool clear) where T : FoButton3D where U : FoMenu3D;
 
 
-    List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void ClearAllWorkbook();
     List<FoWorkbook> AllWorkbooks();
     List<FoWorkbook> AddWorkbook(FoWorkbook book);
@@ -183,7 +182,8 @@ public class FoWorkspace : FoComponent, IWorkspace
             {
                 found = new FoWorkbook(this, Foundry)
                 {
-                    Key = "Book-1"
+                    Key = "Book-1",
+                    Name = "Book-1",
                 };
                 AddWorkbook(found);
             }
@@ -196,9 +196,11 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public FoWorkbook SetCurrentWorkbook(FoWorkbook book)
     {
+        $"called SetCurrentWorkbook: {book.Key}".WriteSuccess();
         if (ActiveWorkbook == book) 
             return ActiveWorkbook;
 
+        RefreshMenus = true;
         ActiveWorkbook = book;
         AllWorkbooks().ForEach(item => item.IsActive = false);
         ActiveWorkbook.IsActive = true;
@@ -331,7 +333,6 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public T EstablishWorkbook<T>() where T : FoWorkbook
     {
-
         var found = AllWorkbooks().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
         if (found == null)
         {
@@ -354,12 +355,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
 
 
-    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
-    {
-        GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
-        GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
-        return list;
-    }
+
 
     public U EstablishMenu2D<U>(string name, bool clear) where U : FoMenu2D
     {
@@ -421,6 +417,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
+        $"ENTER FoWorkspace CreateMenus".WriteWarning();
         GetSlot<FoMenu2D>()?.Clear();
         GetSlot<FoMenu3D>()?.Clear();
 
@@ -434,9 +431,9 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-        // $"FoWorkspace CreateMenus".WriteWarning();
-        ActiveWorkbook?.CreateMenus(space, js, nav);
 
+        AllWorkbooks().ForEach(item => item.CreateMenus(space, js, nav));
+        //ActiveWorkbook?.CreateMenus(space, js, nav);
         GetDrawing()?.CreateMenus(space, js, nav);
         // GetArena()?.CreateMenus(space, js, nav);
     }
@@ -611,7 +608,13 @@ public class FoWorkspace : FoComponent, IWorkspace
         return true;
     }
 
-
+    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
+    {
+        GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
+        GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
+        ActiveWorkbook?.CollectMenus(list);
+        return list;
+    }
     public List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
         GetMembers<FoCommand2D>()?.ForEach(item => list.Add(item));

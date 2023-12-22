@@ -430,7 +430,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
-        var menu = space.EstablishMenu2D<FoMenu2D, FoButton2D>("Main", DefaultMenu(), true);
+        var menu = space.EstablishMenu2D<FoMenu2D, FoButton2D>("Drawing", DefaultMenu(), true);
         menu.ToggleLayout().MoveTo(0, 80);
     }
 

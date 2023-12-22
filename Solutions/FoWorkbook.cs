@@ -15,6 +15,7 @@ public interface IWorkbook
     FoPage2D EstablishCurrentPage(string pagename, string color = "Ivory");
     void CreateCommands(IWorkspace space, IJSRuntime js, NavigationManager nav, string serverUrl);
     List<IFoCommand> CollectCommands(List<IFoCommand> list);
+    List<IFoMenu> CollectMenus(List<IFoMenu> list);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
     Dictionary<string, Action> DefaultMenu();
     bool SetSignalRHub(HubConnection hub, string panid);
@@ -83,6 +84,12 @@ public class FoWorkbook : FoComponent, IWorkbook
     }
     public virtual List<IFoCommand> CollectCommands(List<IFoCommand> list)
     {
+        return list;
+    }
+    public List<IFoMenu> CollectMenus(List<IFoMenu> list)
+    {
+        GetMembers<FoMenu2D>()?.ForEach(item => list.Add(item));
+        GetMembers<FoMenu3D>()?.ForEach(item => list.Add(item));
         return list;
     }
 
