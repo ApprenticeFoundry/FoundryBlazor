@@ -48,7 +48,7 @@ public interface IWorkspace : IWorkbook
     void ClearAllWorkbook();
     List<FoWorkbook> AllWorkbooks();
     List<FoWorkbook> AddWorkbook(FoWorkbook book);
-    T EstablishWorkbook<T>() where T : FoWorkbook;
+    T EstablishWorkbook<T>(string key) where T : FoWorkbook;
 
     FoWorkbook? FindWorkbook(string name);
     FoWorkbook CurrentWorkbook();
@@ -109,7 +109,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         Dialog = foundry.Dialog();
         JsRuntime = foundry.JS();
 
-        ActiveWorkbook = CurrentWorkbook();
+        ActiveWorkbook = EstablishWorkbook<FoWorkbook>("Workbook");
 
         SetDrawingStyle = async () =>
         {
@@ -331,13 +331,15 @@ public class FoWorkspace : FoComponent, IWorkspace
         return Members<FoWorkbook>();
     }
 
-    public T EstablishWorkbook<T>() where T : FoWorkbook
+    public T EstablishWorkbook<T>(string key) where T : FoWorkbook
     {
         var found = AllWorkbooks().Where(item => item.GetType() == typeof(T)).FirstOrDefault() as T;
         if (found == null)
         {
             found = Activator.CreateInstance(typeof(T), this, Foundry) as T;
-            AddWorkbook(found!);
+            found!.Key = key;
+            found!.Name = key;
+            AddWorkbook(found);
         }
         return found!;
     }
