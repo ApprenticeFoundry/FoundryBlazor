@@ -109,7 +109,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         Dialog = foundry.Dialog();
         JsRuntime = foundry.JS();
 
-        ActiveWorkbook = EstablishWorkbook<FoWorkbook>("Workbook");
+        ActiveWorkbook = EstablishWorkbook<CommonWorkbook>("Shared");
 
         SetDrawingStyle = async () =>
         {
