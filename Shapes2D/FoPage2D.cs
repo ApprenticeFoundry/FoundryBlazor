@@ -20,6 +20,7 @@ public interface IFoPage2D
     double MapToModelXLoc(int value);
     double MapToModelYLoc(int value);
     string CalculateTitle(string title);
+    (int, int) DefaultDropLocation(double fraction=1.0);
 }
 
 
@@ -98,7 +99,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var m = PageMargin.AsPixels();
         var loc = m + MapToPageXScale(value);
-        var result = m + ZeroPointX.AsPixels() + ScaleAxisX * loc;
+        var result = m + ZeroPointX.AsPixels() + (ScaleAxisX * loc);
         // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;
     }
@@ -116,7 +117,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var m = PageMargin.AsPixels();
         var loc = MapToPageYScale(value);
-        var result = m + ZeroPointY.AsPixels() + ScaleAxisY * loc;
+        var result = m + ZeroPointY.AsPixels() + (ScaleAxisY * loc);
         // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
 
         return result;
@@ -471,8 +472,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await UpdateContext(ctx, tick);
 
         var margin = PageMargin.AsPixels();
-        Width = (PageWidth + 2 * margin).AsPixels();
-        Height = (PageHeight + 2 * margin).AsPixels();
+        Width = (PageWidth + (2 * margin)).AsPixels();
+        Height = (PageHeight + (2 * margin)).AsPixels();
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -504,8 +505,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await UpdateContext(ctx, 0);
 
         var margin = PageMargin.AsPixels();
-        Width = PageWidth.AsPixels() + 2 * margin;
-        Height = PageHeight.AsPixels() + 2 * margin;
+        Width = PageWidth.AsPixels() + (2 * margin);
+        Height = PageHeight.AsPixels() + (2 * margin);
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -579,8 +580,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
 
         var margin = PageMargin.AsPixels();
-        var width = PageWidth.AsPixels() + 2.0 * margin;
-        var height = PageHeight.AsPixels() + 2.0 * margin;
+        var width = PageWidth.AsPixels() + (2.0 * margin);
+        var height = PageHeight.AsPixels() + (2.0 * margin);
 
         Width = (int)width;
         Height = (int)height;
@@ -606,5 +607,18 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.RestoreAsync();
         return true;
+    }
+
+    public (int, int) DefaultDropLocation(double factor = 1.0)
+    {
+        var pWidth = PageWidth.AsPixels();
+        var pHeight = PageHeight.AsPixels();
+        var m = PageMargin.AsPixels();
+        var size = Scale2D.PixelToDrawing(pHeight - m);
+
+        return (
+            m + (int)(factor * pWidth / 2),
+            m + (int)(factor * pHeight / 2)
+        );
     }
 }
