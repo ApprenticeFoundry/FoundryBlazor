@@ -2,7 +2,8 @@
 @namespace FoundryBlazor.Shared
 
 
-<div style="@GetCanvasStyle()" contenteditable="true" @onkeydown="OnKeyDown" @onkeypress="OnKeyPress" @onkeyup="OnKeyUp"
+<div style="@GetCanvasStyle()" contenteditable="true" @onkeydown="OnKeyDown" @onkeydown:preventDefault="true"
+    @onkeypress="OnKeyPress" @onkeypress:preventDefault="true" @onkeyup="OnKeyUp" @onkeyup:preventDefault="true"
     @onmousedown="OnMouseDown" @onmouseup="OnMouseUp" @onmousewheel="@OnWheelMove" @onmousemove="@OnMouseMove">
     @ChildContent
 </div>

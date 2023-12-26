@@ -1,6 +1,8 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Shared.SVG;
 
+// https://goldfirestudios.com/canvasinput-html5-canvas-text-input
+// https://blog.steveasleep.com/how-to-draw-multi-line-text-on-an-html-canvas-in-2021
 
 namespace FoundryBlazor.Shape;
 

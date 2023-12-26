@@ -41,11 +41,16 @@ public interface IDrawing : IRender
     void SetPostRenderAction(Func<Canvas2DContext, int, Task> action);
     void SetDoCreate(Action<CanvasMouseArgs> action);
 
+
     V AddShape<V>(V shape) where V : FoGlyph2D;
     FoPage2D CurrentPage();
     IPageManagement Pages();
     IToolManagement Tools();
     T AddToolType<T>(int priority, string cursor) where T : BaseInteraction;
+    bool AddKeyHooks(Func<CanvasKeyboardEventArgs,bool>? down, Func<CanvasKeyboardEventArgs,bool>? press, Func<CanvasKeyboardEventArgs,bool>? up);
+    bool KeyDown(CanvasKeyboardEventArgs args);
+    bool KeyPress(CanvasKeyboardEventArgs args);
+    bool KeyUp(CanvasKeyboardEventArgs args);
     
     List<FoGlyph2D> FindShapes(string glyphId);
     List<FoGlyph2D> ExtractShapes(string glyphId);
@@ -78,6 +83,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     private Dictionary<string, D2D_UserMove> OtherUserLocations { get; set; } = new();
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
 
+    public Func<CanvasKeyboardEventArgs,bool> KeyPressHook { get; set; }
+    public Func<CanvasKeyboardEventArgs,bool> KeyUpHook { get; set; }
+    public Func<CanvasKeyboardEventArgs,bool> KeyDownHook { get; set; }
 
     public Func<Canvas2DContext, int, Task>? PreRender { get; set; }
     public Func<Canvas2DContext, int, Task>? PostRender { get; set; }
@@ -166,6 +174,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
         PanZoomService = panzoom;
         PageManager = manager;
         PubSub = pubSub;  
+
+        KeyDownHook = (arg) => KeyDown(arg);
+        KeyPressHook = (arg) => KeyPress(arg);
+        KeyUpHook = (arg) => KeyUp(arg);
 
         InitSubscriptions();
         PanZoomService.SetOnEventComplete(() =>
@@ -710,10 +722,9 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
              {
                  var isEventHandled = (args.Topic) switch
                  {
-
-                     ("ON_KEY_DOWN") => KeyDown(args),
-                     ("ON_KEY_UP") => KeyUp(args),
-                     ("ON_KEY_PRESS") => KeyPress(args),
+                     ("ON_KEY_DOWN") => KeyDownHook(args),
+                     ("ON_KEY_PRESS") => KeyPressHook(args),
+                     ("ON_KEY_UP") => KeyUpHook(args),
                      _ => false
                  };
              }
@@ -821,24 +832,27 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     }
 
 
+    
+
 
     public bool DuplicateSelections()
     {
-        var Duplicates = new List<FoGlyph2D>();
+        var duplicates = new List<FoGlyph2D>();
         PageManager.Selections().ForEach(shape =>
         {
             shape.IsSelected = false;
             if (shape is FoCompound2D comp2D)
-                Duplicates.Add(PageManager.Duplicate<FoCompound2D>(comp2D));
+                duplicates.Add(PageManager.Duplicate<FoCompound2D>(comp2D));
             else if (shape is FoShape2D shape2D)
-                Duplicates.Add(PageManager.Duplicate<FoShape2D>(shape2D));
+                duplicates.Add(PageManager.Duplicate<FoShape2D>(shape2D));
             else if (shape is FoImage2D image2D)
-                Duplicates.Add(PageManager.Duplicate<FoImage2D>(image2D));
+                duplicates.Add(PageManager.Duplicate<FoImage2D>(image2D));
             else if (shape is FoText2D text2D)
-                Duplicates.Add(PageManager.Duplicate<FoText2D>(text2D));
+                duplicates.Add(PageManager.Duplicate<FoText2D>(text2D));
         });
+
         SelectionService?.ClearAll();
-        SelectionService?.AddRange(Duplicates);
+        SelectionService?.AddRange(duplicates);
         SelectionService?.MoveBy(50, 50);
 
         return true;
@@ -857,10 +871,10 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             ("ArrowLeft", false, true, true) => MovePanBy(-move * 10, 0),
             ("ArrowRight", false, true, true) => MovePanBy(move * 10, 0),
 
-            ("ArrowUp", false, false, _) => MoveSelectionsBy(0, -move),
-            ("ArrowDown", false, false, _) => MoveSelectionsBy(0, move),
-            ("ArrowLeft", false, false, _) => MoveSelectionsBy(-move, 0),
-            ("ArrowRight", false, false, _) => MoveSelectionsBy(move, 0),
+            ("ArrowUp", false, false, false) => MoveSelectionsBy(0, -move),
+            ("ArrowDown", false, false, false) => MoveSelectionsBy(0, move),
+            ("ArrowLeft", false, false, false) => MoveSelectionsBy(-move, 0),
+            ("ArrowRight", false, false, false) => MoveSelectionsBy(move, 0),
 
             ("ArrowUp", true, false, false) => ZoomSelectionBy(1.25),
             ("ArrowDown", true, false, false) => ZoomSelectionBy(0.75),
@@ -895,5 +909,13 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public T AddToolType<T>(int priority, string cursor) where T : BaseInteraction
     {
         return Tools().AddToolType<T>(priority, cursor, this, PubSub);
+    }
+
+    public bool AddKeyHooks(Func<CanvasKeyboardEventArgs,bool>? down, Func<CanvasKeyboardEventArgs,bool>? press, Func<CanvasKeyboardEventArgs,bool>? up)
+    {
+        KeyDownHook = down ?? KeyDownHook;
+        KeyPressHook = press ?? KeyPressHook;
+        KeyUpHook = up ?? KeyUpHook;
+        return true;
     }
 }
