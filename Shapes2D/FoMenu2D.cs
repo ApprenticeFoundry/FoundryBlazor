@@ -13,12 +13,17 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 {
     private string _layout = "H";
 
-
-
     public FoMenu2D(string name) : base(name,100,50,"Purple")
     {
         ShapeDraw = DrawRect;
         ResetLocalPin((obj) => 0, (obj) => 0);
+    }
+
+    public FoMenu2D AddButton(string name, Action action) 
+    {
+        var button = new FoButton2D(name, action);
+        Add<FoButton2D>(button);
+        return this;
     }
 
 
