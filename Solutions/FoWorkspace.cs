@@ -196,7 +196,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public FoWorkbook SetCurrentWorkbook(FoWorkbook book)
     {
-        $"called SetCurrentWorkbook: {book.Key}".WriteSuccess();
+        //$"called SetCurrentWorkbook: {book.Key}".WriteSuccess();
         if (ActiveWorkbook == book) 
             return ActiveWorkbook;
 
@@ -204,7 +204,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         ActiveWorkbook = book;
         AllWorkbooks().ForEach(item => item.IsActive = false);
         ActiveWorkbook.IsActive = true;
-        $"SetCurrentWorkbook: {ActiveWorkbook.Key}".WriteSuccess();
+        //$"SetCurrentWorkbook: {ActiveWorkbook.Key}".WriteSuccess();
 
         var drawing = GetDrawing();
         drawing.SetCurrentPage(ActiveWorkbook.CurrentPage());
