@@ -43,6 +43,7 @@ public interface IDrawing : IRender
 
 
     V AddShape<V>(V shape) where V : FoGlyph2D;
+    V RemoveShape<V>(V shape) where V : FoGlyph2D;
     FoPage2D CurrentPage();
     IPageManagement Pages();
     IToolManagement Tools();
@@ -314,7 +315,11 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         return PageManager.AddShape<V>(shape);
     }
-
+    public V RemoveShape<V>(V shape) where V : FoGlyph2D
+    {
+        ExtractShapes(shape.GlyphId);
+        return shape;
+    }
     public void SetDoCreate(Action<CanvasMouseArgs> action)
     {
 
