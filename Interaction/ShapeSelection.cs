@@ -11,10 +11,6 @@ namespace FoundryBlazor.Shape;
 public class ShapeSelection : ShapeHovering
 {
 
-
-    //private bool isFenceSelecting = false;
-
-
     public ShapeSelection(
             int priority,
             string cursor,
