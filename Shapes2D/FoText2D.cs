@@ -92,7 +92,6 @@ public class FoText2D : FoShape2D, IShape2D
 
         await ctx.SetFillStyleAsync(TextColor);
         await ctx.FillTextAsync(Text, LeftX() + 5, TopY() + 5);
-
     }
 
 
