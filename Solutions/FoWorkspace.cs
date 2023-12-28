@@ -320,7 +320,7 @@ public class FoWorkspace : FoComponent, IWorkspace
         GetSlot<FoMenu3D>()?.Clear();
         FoWorkspace.RefreshCommands = true;
         FoWorkspace.RefreshMenus = true;
-        "ClearAllWorkbook".WriteWarning();
+        //"ClearAllWorkbook".WriteWarning();
     }
 
     public List<FoWorkbook> AddWorkbook(FoWorkbook book)
@@ -419,7 +419,7 @@ public class FoWorkspace : FoComponent, IWorkspace
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
     {
-        $"ENTER FoWorkspace CreateMenus".WriteWarning();
+        //$"ENTER FoWorkspace CreateMenus".WriteWarning();
         GetSlot<FoMenu2D>()?.Clear();
         GetSlot<FoMenu3D>()?.Clear();
 
