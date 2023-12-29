@@ -93,33 +93,27 @@ public class SelectionService : ISelectionService
     }
     public void MouseFirstSelected()
     {
-        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.FirstSelected(Members));
     }
     public void MouseStartDrag()
     {
-        //PublishShapeSelectedUIEvent();
         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.StartDrag(Members));
     }
     public void MousePreDelete()
     {
-        //PublishShapeSelectedUIEvent();
-        //Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.PreDelete(Members));
     }
     public void MouseReselect()
     {
-        //PublishShapeSelectedUIEvent();
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Reselected(Members));
     }
     public void MouseDropped()
     {
-        //PublishShapeSelectedUIEvent();
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
     }
 

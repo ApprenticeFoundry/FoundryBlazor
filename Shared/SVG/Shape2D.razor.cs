@@ -19,15 +19,7 @@ public class Shape2DBase : SVGBase<FoShape2D>
         InitSource(Shape);
     }
 
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
-    //         PubSub!.SubscribeTo<ShapeSelectedUIEvent>(OnShapeSelected);
-    //     }
-    //     await base.OnAfterRenderAsync(firstRender);
-    // }
+
 
 
 

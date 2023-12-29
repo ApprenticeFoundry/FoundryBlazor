@@ -45,7 +45,8 @@ public class ShapeHovering : BaseInteraction
         lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
 
 
-        //list.ForEach(item => pubsub.Publish(item));    
+        //SRS do you realy want to send events for every hover?
+        list.ForEach(item => pubsub.Publish(item));    
 
         return true;
     }
