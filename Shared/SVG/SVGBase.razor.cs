@@ -28,19 +28,19 @@ public class SVGBase<T> : ComponentBase where T : FoGlyph2D
     {
         if (firstRender)
         {
-            PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
+            //PubSub!.SubscribeTo<ShapeHoverUIEvent>(OnShapeHover);
             PubSub!.SubscribeTo<ShapeSelectedUIEvent>(OnShapeSelected);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private void OnShapeHover(ShapeHoverUIEvent e)
-    {
-        if (e.Shape == Source)
-        {
-            InvokeAsync(StateHasChanged);
-        }
-    }
+    // private void OnShapeHover(ShapeHoverUIEvent e)
+    // {
+    //     if (e.Shape == Source)
+    //     {
+    //         InvokeAsync(StateHasChanged);
+    //     }
+    // }
     private void OnShapeSelected(ShapeSelectedUIEvent e)
     {
         if (e.Shape == Source)

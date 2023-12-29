@@ -13,12 +13,12 @@ public class ShapeUIEvent
     }
 }
 
-public class ShapeHoverUIEvent : ShapeUIEvent
-{
-    public ShapeHoverUIEvent(FoGlyph2D shape):base(shape)
-    {
-    }
-}
+// public class ShapeHoverUIEvent : ShapeUIEvent
+// {
+//     public ShapeHoverUIEvent(FoGlyph2D shape):base(shape)
+//     {
+//     }
+// }
 
 public class ShapeSelectedUIEvent : ShapeUIEvent
 {
