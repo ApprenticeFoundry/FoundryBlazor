@@ -90,11 +90,23 @@ public class FoButton2D : FoGlyph2D, IFoButton
         await ctx.FillRectAsync(0, 0, Width, Height);
 
         await ctx.SetFontAsync($"{FontSize}px {Font}");
-        await ctx.SetTextAlignAsync(TextAlign.Left);
-        await ctx.SetTextBaselineAsync(TextBaseline.Top);
+        await ctx.SetTextAlignAsync(TextAlign.Center);
+        await ctx.SetTextBaselineAsync(TextBaseline.Middle);
 
         await ctx.SetFillStyleAsync(TextColor);
-        await ctx.FillTextAsync(Text, LeftX() + 1, TopY() + 1);
+
+        var x = Width / 2;
+        var y = Height / 2;
+        var list = text.Split(" ").ToList();
+        if ( list.Count > 1)
+        {
+            await ctx.FillTextAsync(list[0], x, y - 10);
+            await ctx.FillTextAsync(list[1], x, y + 10);
+        }
+        else
+        {
+            await ctx.FillTextAsync(Text, x, y);
+        }
 
     }
 

@@ -64,7 +64,7 @@ public interface IDrawing : IRender
     void SetUserID(string panID);
     void ClearAll();
     List<FoGlyph2D> Selections();
-    List<FoGlyph2D> DeleteSelections();
+    List<FoGlyph2D> DeleteSelections(bool withAnimations=false);
     bool ToggleHitTestRender();
     bool MoveSelectionsBy(int x, int y);
     bool RotateSelectionsBy(int angle);
@@ -237,16 +237,14 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     {
         return PageManager.GetAllPages();
     }
-    public List<FoGlyph2D> DeleteSelections()
+    public List<FoGlyph2D> DeleteSelections(bool withAnimations=false)
     {
         SelectionService?.MousePreDelete();
+        if ( withAnimations)
+            return PageManager.DeleteSelectionsWithAnimations();
         return PageManager.DeleteSelections();
     }
-    public List<FoGlyph2D> DeleteSelectionsWithAnimations()
-    {
-        SelectionService?.MousePreDelete();
-        return PageManager.DeleteSelectionsWithAnimations();
-    }
+
     public List<FoGlyph2D> Selections()
     {
         return PageManager.Selections();
@@ -893,7 +891,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             ("KeyD", false, true, false) => DuplicateSelections(),
             ("Insert", false, false, false) => DuplicateSelections(),
             ("Delete", false, false, false) => DeleteSelections(),
-            ("Delete", false, true, false) => DeleteSelectionsWithAnimations(),
+            ("Delete", false, true, false) => DeleteSelections(true),
             _ => false
         };
         return success != null;
