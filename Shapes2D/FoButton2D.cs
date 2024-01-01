@@ -97,7 +97,7 @@ public class FoButton2D : FoGlyph2D, IFoButton
 
         var x = Width / 2;
         var y = Height / 2;
-        var list = text.Split(" ").ToList();
+        var list = text.Split(' ').ToList();
         if ( list.Count > 1)
         {
             await ctx.FillTextAsync(list[0], x, y - 10);
