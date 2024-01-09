@@ -1,6 +1,7 @@
 using FoundryRulesAndUnits.Models;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace FoundryBlazor;
@@ -53,13 +54,15 @@ public class SlotGroups: Dictionary<string, object>
 public class FoComponent : FoBase, IFoComponent
 {
     public string? Name { get; set; }
-    public string ClassType { get; init; }
+
+    [JsonPropertyName("@type")]
+    public string Type { get; init; }
     private SlotGroups Slots { get; set; } = new();
 
 
     public FoComponent(string key = "") : base(key)
     {
-        ClassType = GetType().Name;
+        Type = GetType().Name;
     }
 
     public virtual bool OpenEdit() { return false; }

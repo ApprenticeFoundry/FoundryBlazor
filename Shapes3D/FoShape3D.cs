@@ -18,7 +18,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 {
 
     public string Symbol { get; set; } = "";
-    public string Type { get; set; } = "";
+    public string GeomType { get; set; } = "";
     //public List<DT_Target>? Targets { get; set; }
 
     public Vector3? Position { get; set; }
@@ -67,21 +67,21 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public FoShape3D CreateBox(string name, double width, double height, double depth)
     {
-        Type = "Box";
+        GeomType = "Box";
         BoundingBox = new Vector3(width, height, depth);
         Key = name;
         return this;
     }
     public FoShape3D CreateCylinder(string name, double width, double height, double depth)
     {
-        Type = "Cylinder";
+        GeomType = "Cylinder";
         BoundingBox = new Vector3(width, height, depth);
         Key = name;
         return this;
     }
     public FoShape3D CreateTube(string name, double radius, List<Vector3> path)
     {
-        Type = "Tube";
+        GeomType = "Tube";
         BoundingBox = new Vector3(radius, 0, 0);
         Key = name;
         Path = path;
@@ -90,7 +90,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public FoShape3D CreateGlb(string url, double width, double height, double depth)
     {
-        Type = "Glb";
+        GeomType = "Glb";
         BoundingBox = new Vector3(width, height, depth);
         Symbol = url;
         $"CreateGlb symbol [{Symbol}] ".WriteSuccess();
@@ -99,7 +99,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public FoShape3D CreateSphere(string name, double width, double height, double depth)
     {
-        Type = "Sphere";
+        GeomType = "Sphere";
         BoundingBox = new Vector3(width, height, depth);
         Key = name;
         return this;
@@ -493,7 +493,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         //await Task.CompletedTask;
 
         LoadingURL = Symbol;
-        var result = Type switch
+        var result = GeomType switch
         {
             "Collada" => await PreRenderImport(arena, viewer, Import3DFormats.Collada),
             "Fbx" => await PreRenderImport(arena, viewer, Import3DFormats.Fbx),
@@ -512,7 +512,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
         if (ShapeMesh == null && IsVisible)
         {
-            ShapeMesh = Type switch
+            ShapeMesh = GeomType switch
             {
                 "Box" => Box(),
                 "Boundary" => Boundary(),
