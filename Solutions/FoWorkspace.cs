@@ -433,10 +433,11 @@ public class FoWorkspace : FoComponent, IWorkspace
             catch { }
         };
 
-
-        AllWorkbooks().ForEach(item => item.CreateMenus(space, js, nav));
-        //ActiveWorkbook?.CreateMenus(space, js, nav);
-        GetDrawing()?.CreateMenus(space, js, nav);
+        //only the active one
+        //AllWorkbooks().ForEach(item => item.CreateMenus(space, js, nav));
+        
+        ActiveWorkbook?.CreateMenus(space, js, nav);
+        //GetDrawing()?.CreateMenus(space, js, nav);
         // GetArena()?.CreateMenus(space, js, nav);
     }
     public virtual Dictionary<string, Action> DefaultMenu()
