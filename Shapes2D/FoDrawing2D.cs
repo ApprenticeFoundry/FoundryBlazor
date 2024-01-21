@@ -75,7 +75,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
-    private bool RenderHitTestTree = true;
+    private bool RenderHitTestTree = false;
 
     private Rectangle UserWindowRect { get; set; } = new Rectangle(0, 0, 1500, 400);
 

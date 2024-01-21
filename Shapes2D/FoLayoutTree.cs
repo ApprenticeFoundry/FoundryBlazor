@@ -2,6 +2,7 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
+using Radzen;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
@@ -63,8 +64,16 @@ public static class TreeLayoutRules
     };
 };
 
+public enum LayoutType 
+{ 
+    None,
+    Horizontal,
+    Vertical,
+}
+
 public class FoLayoutTree<V> where V : FoGlyph2D
 {
+    public LayoutType SuggestedLayout { get; set; } = LayoutType.None;
     public int level = 0;
     public int index = 0;
     public string path = "";
