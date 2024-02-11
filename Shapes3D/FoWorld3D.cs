@@ -122,21 +122,6 @@ public class FoWorld3D : FoGlyph3D
     }
 
 
-    //public static string GetColor(DT_Target model)
-    //{
-    //    var Color = model.domain switch
-    //    {
-    //        "PIN" => "Pink",
-    //        "PROC" => "Wisteria",
-    //        "DOC" => "Gray",
-    //        "ASST" => "Aqua",
-    //        "CAD" => "Orange",
-    //        "WRLD" => "Green",
-    //        _ => "Yellow",
-    //    };
-    //    return Color;
-    //}
-
 
 
     public FoWorld3D RemoveDuplicates()

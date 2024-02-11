@@ -373,7 +373,7 @@ public class FoArena3D : FoGlyph3D, IArena
         var otherBodies = shapes.Where((body) => !body.Type.Matches("Glb")).ToList();
 
         var bodyDict = glbBodies
-            .GroupBy(item => item.Symbol)
+            .GroupBy(item => item.Url)
             .ToDictionary(group => group.Key, group => group.ToList());
 
         foreach (var keyValuePair in bodyDict)

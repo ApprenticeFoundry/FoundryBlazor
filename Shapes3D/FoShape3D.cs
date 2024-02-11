@@ -17,9 +17,8 @@ namespace FoundryBlazor.Shape;
 public class FoShape3D : FoGlyph3D, IShape3D
 {
 
-    public string Symbol { get; set; } = "";
+    public string Url { get; set; } = "";
     public string GeomType { get; set; } = "";
-    //public List<DT_Target>? Targets { get; set; }
 
     public Vector3? Position { get; set; }
     public List<Vector3>? Path { get; set; }
@@ -65,9 +64,19 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return false;
     }
 
+
+
+
     public FoShape3D CreateBox(string name, double width, double height, double depth)
     {
         GeomType = "Box";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
+    public FoShape3D CreateBoundry(string name, double width, double height, double depth)
+    {
+        GeomType = "Boundry";
         BoundingBox = new Vector3(width, height, depth);
         Key = name;
         return this;
@@ -92,8 +101,15 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
         GeomType = "Glb";
         BoundingBox = new Vector3(width, height, depth);
-        Symbol = url;
-        $"CreateGlb symbol [{Symbol}] ".WriteSuccess();
+        Url = url;
+        $"CreateGlb url [{Url}] ".WriteSuccess();
+        return this;
+    }
+    public FoShape3D CreateGlb(string url)
+    {
+        GeomType = "Glb";
+        Url = url;
+        $"CreateGlb url [{Url}] ".WriteSuccess();
         return this;
     }
 
@@ -105,7 +121,50 @@ public class FoShape3D : FoGlyph3D, IShape3D
         return this;
     }
 
+    public FoShape3D CreateCircle(string name, double width, double height, double depth)
+    {
+        GeomType = "Circle";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
+    public FoShape3D CreatePlane(string name, double width, double height, double depth)
+    {
+        GeomType = "Plane";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
 
+    public FoShape3D CreateRing(string name, double width, double height, double depth)
+    {
+        GeomType = "Ring";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
+
+    public FoShape3D CreateCapsule(string name, double width, double height, double depth)
+    {
+        GeomType = "Capsule";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
+    public FoShape3D CreateCone(string name, double width, double height, double depth)
+    {
+        GeomType = "Cone";
+        BoundingBox = new Vector3(width, height, depth);
+        Key = name;
+        return this;
+    }
+
+       
+
+                // "Dodecahedron" => Dodecahedron(),
+                // "Icosahedron" => Icosahedron(),
+                // "Octahedron" => Octahedron(),
+                // "Tetrahedron" => Tetrahedron(),
 
     public Mesh Box()
     {
@@ -363,7 +422,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public ImportSettings AsImportSettings(FoArena3D arena, Import3DFormats format)
     {
-        LoadingURL = Symbol;
+        LoadingURL = Url;
 
         var setting = new ImportSettings
         {
@@ -405,7 +464,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
             arena.Add<FoShape3D>(body.GetGlyphId(), body);
             settings.Add(setting);
 
-            $"AsImportSettings body.Symbol {body.Symbol} X = {setting.FileURL}".WriteSuccess();
+            $"AsImportSettings body.Symbol {body.Url} X = {setting.FileURL}".WriteSuccess();
         }
 
         var source = settings.ElementAt(0);
@@ -446,7 +505,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public override MeshStandardMaterial GetMaterial()
     {
-        if (!string.IsNullOrEmpty(Symbol))
+        if (!string.IsNullOrEmpty(Url))
             return base.GetMaterial();
 
         var result = new MeshStandardMaterial()
@@ -492,7 +551,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         //LoadingURL = Symbol.Replace("http:", "https:");
         //await Task.CompletedTask;
 
-        LoadingURL = Symbol;
+        LoadingURL = Url;
         var result = GeomType switch
         {
             "Collada" => await PreRenderImport(arena, viewer, Import3DFormats.Collada),
@@ -523,6 +582,12 @@ public class FoShape3D : FoGlyph3D, IShape3D
                 "Capsule" => Capsule(),
                 "Cone" => Cone(),
                 "Tube" => Tube(),
+                "Ring" => Ring(),
+                "Dodecahedron" => Dodecahedron(),
+                "Icosahedron" => Icosahedron(),
+                "Octahedron" => Octahedron(),
+                "Tetrahedron" => Tetrahedron(),
+
                 _ => null
             };
 
