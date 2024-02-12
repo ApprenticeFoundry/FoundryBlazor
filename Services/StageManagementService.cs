@@ -12,7 +12,7 @@ public interface IStageManagement
     FoStage3D AddStage(FoStage3D page);
 
     V AddShape<V>(V shape) where V : FoGlyph3D;
-
+    V RemoveShape<V>(V shape) where V : FoGlyph3D;
     void ClearAll();
     int StageCount();
 
@@ -82,7 +82,15 @@ public class StageManagementService : FoComponent, IStageManagement
         //    _hitTestService.Insert(value);
 
         return found!;
+    }
 
+    public T RemoveShape<T>(T value) where T : FoGlyph3D
+    {
+        var found = CurrentStage().RemoveShape(value);
+        //if ( found != null)
+        //    _hitTestService.Insert(value);
+
+        return found!;
     }
 
     public FoStage3D CurrentStage()

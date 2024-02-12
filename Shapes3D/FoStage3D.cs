@@ -139,6 +139,38 @@ public class FoStage3D : FoGlyph3D, IStage
         return value;
     }
 
+    public T RemoveShape<T>(T value) where T : FoGlyph3D
+    {
+
+        var collection = DynamicSlot(value.GetType());
+        if (string.IsNullOrEmpty(value.Key))
+        {
+            value.Key = collection.NextItemName();
+        }
+
+        collection.RemoveObject(value.Key);
+
+        if (value is IShape3D)
+        {
+            Shapes3D.Remove(value);
+            $"IShape3D Added {value.Key}".WriteSuccess();
+        }
+        else if (value is IPipe3D)
+        {
+            Pipes3D.Remove(value);
+            //$"IPipe3D Added {value.Name}".WriteSuccess();
+        }
+
+        if (CurrentScene != null)
+        {
+
+            value.RemoveFromRender(CurrentScene);
+            //IsDirty = true;
+            //FillStage();
+        }
+
+        return value;
+    }
     public async Task RenderDetailed(Scene scene, int tick, double fps)
     {
         //$"RenderDetailed {tick} {Shapes3D.Count()}".WriteInfo();

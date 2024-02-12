@@ -11,6 +11,7 @@ public interface IFoCollection
     List<string> Keys();
     List<U> ValuesOfType<U>();
     bool AddObject(string key, object value);
+    bool RemoveObject(string key);
 }
 
 [System.Serializable]
@@ -42,6 +43,16 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         return false;
     }
 
+    public bool RemoveObject(string key)
+    {
+
+        if (!TryGetValue(key, out T? found))
+        {
+            this.members.Remove(key);
+            return true;
+        }
+        return false;
+    }
     public FoCollection()
     {
         Key = typeof(T).Name;

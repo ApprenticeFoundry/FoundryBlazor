@@ -143,6 +143,10 @@ public class FoGlyph3D : FoComponent
     {
         return false;
     }
+    public virtual bool RemoveFromRender(Scene ctx, bool deep = true)
+    {
+        return false;
+    }
     public virtual bool OnModelLoadComplete(Guid PromiseGuid)
     {
         return false;

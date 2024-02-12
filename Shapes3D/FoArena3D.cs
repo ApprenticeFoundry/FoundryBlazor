@@ -29,7 +29,7 @@ public interface IArena
     bool RenderWorld3D(FoWorld3D world);
     Task<bool> PreRender(FoGlyph3D glyph);
 
-    //FoWorld3D MapToWorld3D(UDTO_World world);
+    bool RemoveShapeFromScene(FoShape3D shape);
 
     V AddShape<V>(V shape) where V : FoGlyph3D;
 
@@ -78,6 +78,11 @@ public class FoArena3D : FoGlyph3D, IArena
     public V AddShape<V>(V shape) where V : FoGlyph3D
     {
         return StageManager.AddShape<V>(shape);
+    }
+
+    public V RemoveShape<V>(V shape) where V : FoGlyph3D
+    {
+        return StageManager.RemoveShape<V>(shape);
     }
 
     public async Task ClearArena()
@@ -365,11 +370,12 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
-    public bool RemoveShape(FoShape3D shape)
+    public bool RemoveShapeFromScene(FoShape3D shape)
     {
         if ( Scene == null)
             return false;
-        return shape.DeleteFromScene(Scene);
+            
+        return shape.RemoveFromRender(Scene);
     }
 
 
