@@ -365,6 +365,13 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
+    public bool RemoveShape(FoShape3D shape)
+    {
+        if ( Scene == null)
+            return false;
+        return shape.DeleteFromScene(Scene);
+    }
+
 
     public async void PreRenderShape3D(List<FoShape3D> shapes)
     {

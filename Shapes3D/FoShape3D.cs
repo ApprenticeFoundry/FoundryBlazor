@@ -602,6 +602,17 @@ public class FoShape3D : FoGlyph3D, IShape3D
         }
     }
 
+    public bool DeleteFromScene(Scene ctx)
+    {
+        if (ShapeMesh != null && !IsVisible)
+        {
+            ctx.Remove(ShapeMesh);
+            ShapeMesh = null;
+            return true;
+        }
+        return false;
+    }
+
             // "PIN" => "Pink",
             // "PROC" => "Wisteria",
             // "DOC" => "Gray",
@@ -697,4 +708,6 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
         return true;
     }
+
+
 }

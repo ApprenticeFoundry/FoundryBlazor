@@ -41,3 +41,8 @@ public interface IPipe3D
 {
     
 }
+
+public interface ISnap3D
+{
+    
+}

@@ -508,7 +508,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
 
         await ctx.RestoreAsync();
 
-        if (RenderHitTestTree)
+        if (RenderHitTestTree )
             await HitTestService.RenderQuadTree(ctx, true);
 
         await Tools().RenderDrawing(ctx, tick);
