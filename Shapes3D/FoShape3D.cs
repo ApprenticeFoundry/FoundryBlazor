@@ -601,15 +601,19 @@ public class FoShape3D : FoGlyph3D, IShape3D
             ShapeMesh = null;
         }
     }
-    public override bool RemoveFromRender(Scene ctx, bool deep = true)
+    public override async Task<bool> RemoveFromRender(Scene ctx, Viewer viewer, bool deep = true)
     {
         if (ShapeMesh != null && ctx != null)
         {
             ctx.Remove(ShapeMesh);
             ShapeMesh = null;
-            return true;
         }
-        return false;
+        if (ShapeObject3D != null && viewer != null)
+        {
+            await viewer.RemoveByUuidAsync(ShapeObject3D.Uuid);
+            ShapeObject3D = null;
+        }
+        return true;
     }
 
 

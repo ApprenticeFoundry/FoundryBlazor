@@ -4,6 +4,7 @@ using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Viewers;
 using FoundryRulesAndUnits;
 using FoundryRulesAndUnits.Extensions;
 
@@ -12,9 +13,9 @@ namespace FoundryBlazor.Shape;
 public interface IStage
 {
     FoStage3D ClearAll();
-    Scene SetScene(Scene scene);
+    Scene SetScene(Scene scene, Viewer viewer);
     V AddShape<V>(V shape) where V : FoGlyph3D;
-
+    T RemoveShape<T>(T value) where T : FoGlyph3D;
 }
 
 public class FoStage3D : FoGlyph3D, IStage
@@ -29,6 +30,7 @@ public class FoStage3D : FoGlyph3D, IStage
 
 
     private Scene? CurrentScene { get; set; }
+    private Viewer? CurrentViewer { get; set; }
     private Mesh? ShapeMesh { get; set; }
 
 
@@ -55,27 +57,25 @@ public class FoStage3D : FoGlyph3D, IStage
     }
 
 
-    public Scene SetScene(Scene scene)
+    public Scene SetScene(Scene scene, Viewer viewer)
     {
         CurrentScene = scene;
+        CurrentViewer = viewer;
         return CurrentScene;
     }
 
 
-    public Scene InitScene(Scene scene)
+    public Scene InitScene(Scene scene, Viewer viewer)
     {
-        SetScene(scene);
         scene.Add(new AmbientLight());
         scene.Add(new PointLight()
         {
             Position = new Vector3(1, 3, 0)
         });
 
-        //EstablishBoundry();
-        //IsDirty = true;
-
-        return scene;
+        return SetScene(scene,viewer);
     }
+
     public FoStage3D ClearAll()
     {
         Shapes3D.Clear();
@@ -159,14 +159,6 @@ public class FoStage3D : FoGlyph3D, IStage
         {
             Pipes3D.Remove(value);
             //$"IPipe3D Added {value.Name}".WriteSuccess();
-        }
-
-        if (CurrentScene != null)
-        {
-
-            value.RemoveFromRender(CurrentScene);
-            //IsDirty = true;
-            //FillStage();
         }
 
         return value;

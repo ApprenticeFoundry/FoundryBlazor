@@ -82,7 +82,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
         if (firstRender)
         {
             var arena = Workspace?.GetArena();
-            arena?.SetViewer(ThreeJSViewer3D, GetActiveScene());
+            arena?.SetScene(GetActiveScene(), ThreeJSViewer3D);
             arena?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
 

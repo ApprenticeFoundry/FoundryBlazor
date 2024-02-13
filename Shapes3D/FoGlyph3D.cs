@@ -143,8 +143,9 @@ public class FoGlyph3D : FoComponent
     {
         return false;
     }
-    public virtual bool RemoveFromRender(Scene ctx, bool deep = true)
+    public virtual async Task<bool> RemoveFromRender(Scene ctx, Viewer viewer, bool deep = true)
     {
+        await Task.CompletedTask;
         return false;
     }
     public virtual bool OnModelLoadComplete(Guid PromiseGuid)

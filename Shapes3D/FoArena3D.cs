@@ -18,7 +18,7 @@ namespace FoundryBlazor.Shape;
 
 public interface IArena
 {
-    void SetViewer(Viewer viewer, Scene scene);
+    void SetScene(Scene scene, Viewer viewer);
     Task RenderArena(Scene scene, int tick, double fps);
     Task ClearArena();
     Task UpdateArena();
@@ -29,9 +29,10 @@ public interface IArena
     bool RenderWorld3D(FoWorld3D world);
     Task<bool> PreRender(FoGlyph3D glyph);
 
-    bool RemoveShapeFromScene(FoShape3D shape);
+    Task<bool> RemoveShapeFromScene(FoShape3D shape);
 
     V AddShape<V>(V shape) where V : FoGlyph3D;
+    V RemoveShape<V>(V shape) where V : FoGlyph3D;
 
     FoStage3D CurrentStage();
 
@@ -101,11 +102,11 @@ public class FoArena3D : FoGlyph3D, IArena
         //"UpdateArena".WriteInfo();
         await Viewer3D.UpdateScene();
     }
-    public void SetViewer(Viewer viewer, Scene scene)
+    public void SetScene(Scene scene, Viewer viewer)
     {
         Viewer3D = viewer;
         Scene = scene;
-        CurrentStage().InitScene(scene);
+        CurrentStage().InitScene(scene,viewer);
     }
 
     public Viewer CurrentViewer()
@@ -370,12 +371,12 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
-    public bool RemoveShapeFromScene(FoShape3D shape)
+    public async Task<bool> RemoveShapeFromScene(FoShape3D shape)
     {
         if ( Scene == null)
             return false;
-            
-        return shape.RemoveFromRender(Scene);
+
+        return await shape.RemoveFromRender(CurrentScene(), CurrentViewer());
     }
 
 
