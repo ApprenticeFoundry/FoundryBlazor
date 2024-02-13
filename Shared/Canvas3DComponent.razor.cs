@@ -49,7 +49,15 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
 
     public string GetCanvasStyle()
     {
-        var style = new StringBuilder(CanvasStyle).Append("; ").Append("width:").Append(CanvasWidth).Append("px; ").Append("height:").Append(CanvasHeight).Append("px; ").ToString();
+        var style = new StringBuilder(CanvasStyle)
+            .Append("; ")
+            .Append("width:")
+            .Append(CanvasWidth)
+            .Append("px; ")
+            .Append("height:")
+            .Append(CanvasHeight)
+            .Append("px; ")
+            .ToString();
         return style;
     }
 
