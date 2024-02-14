@@ -39,7 +39,7 @@ public interface IArena
     //FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
     //FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
-    void SetCanvasSizeInPixels(int width, int height);
+    //void SetCanvasSizeInPixels(int width, int height);
 
 }
 public class FoArena3D : FoGlyph3D, IArena
@@ -47,8 +47,8 @@ public class FoArena3D : FoGlyph3D, IArena
     public Viewer? Viewer3D { get; set; }
     public Scene? Scene { get; set; }
     private IStageManagement StageManager { get; set; }
-    private int TrueCanvasWidth = 0;
-    private int TrueCanvasHeight = 0;
+    //private int TrueCanvasWidth = 0;
+    //private int TrueCanvasHeight = 0;
 
     public ComponentBus PubSub { get; set; }
 
@@ -67,6 +67,12 @@ public class FoArena3D : FoGlyph3D, IArena
         var stage = StageManager.CurrentStage();
         return stage;
     }
+
+    // public void SetCanvasSizeInPixels(int width, int height)
+    // {
+    //     TrueCanvasWidth = width;
+    //     TrueCanvasHeight = height;
+    // }
 
     public async Task RenderArena(Scene scene, int tick, double fps)
     {
@@ -403,11 +409,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
     }
 
-    public void SetCanvasSizeInPixels(int width, int height)
-    {
-        TrueCanvasWidth = width;
-        TrueCanvasHeight = height;
-    }
+
 
 
 }

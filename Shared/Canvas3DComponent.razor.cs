@@ -63,7 +63,7 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
 
     public Scene GetActiveScene()
     {
-        ActiveScene ??= new Scene();
+        ActiveScene ??= new Scene() { Width = CanvasWidth, Height = CanvasHeight };
         return ActiveScene;
     }
 
@@ -91,8 +91,6 @@ public class Canvas3DComponentBase : ComponentBase, IDisposable, IAsyncDisposabl
         {
             var arena = Workspace?.GetArena();
             arena?.SetScene(GetActiveScene(), ThreeJSViewer3D);
-            arena?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
-
 
             PubSub!.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             ThreeJSViewer3D.ObjectLoaded += OnThreeJSObjectLoaded;
