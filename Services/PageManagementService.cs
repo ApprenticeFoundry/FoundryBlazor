@@ -230,6 +230,7 @@ public class PageManagementService : FoComponent, IPageManagement
         if (found == null)
         {
             Slot<FoPage2D>().Add(page);
+
             //$"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
         }
         return page;
@@ -238,9 +239,14 @@ public class PageManagementService : FoComponent, IPageManagement
     public FoPage2D RemovePage(FoPage2D page)
     {
         var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
-        if (found == null)
+        if (found != null)
         {
-            Slot<FoPage2D>().Remove(page);
+            Slot<FoPage2D>().Remove(found);
+            if (found == _page)
+            {
+                found = Members<FoPage2D>().FirstOrDefault();
+                SetCurrentPage(found!);
+            }
         }
         return page;
     }
