@@ -14,6 +14,7 @@ public interface IPageManagement : IRender
     FoPage2D CurrentPage();
     FoPage2D SetCurrentPage(FoPage2D page);
     FoPage2D AddPage(FoPage2D page);
+    FoPage2D RemovePage(FoPage2D page);
     FoPage2D? FindPage(string name);
 
     List<FoImage2D> CollectImages(List<FoImage2D> list, bool deep = true);
@@ -230,6 +231,16 @@ public class PageManagementService : FoComponent, IPageManagement
         {
             Slot<FoPage2D>().Add(page);
             //$"AddPage new page {page.Name}".WriteLine(ConsoleColor.White);
+        }
+        return page;
+    }
+
+    public FoPage2D RemovePage(FoPage2D page)
+    {
+        var found = Members<FoPage2D>().Where(item => item == page).FirstOrDefault();
+        if (found == null)
+        {
+            Slot<FoPage2D>().Remove(page);
         }
         return page;
     }
