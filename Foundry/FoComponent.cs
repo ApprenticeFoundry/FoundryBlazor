@@ -177,10 +177,11 @@ public class FoComponent : FoBase, IFoComponent
         FoCollection<T> target = Slot<T>();
         if (target.TryGetValue(key, out T? found) == false)
         {
-            found = Activator.CreateInstance<T>();
-            found.Key = key;
+            found = (Activator.CreateInstance(typeof(T),key) as T)!;
             target.Add(key, found);
         }
         return (found as T)!;
     }
+
+
 }
