@@ -100,8 +100,10 @@ public class CanvasInputWrapperBase : ComponentBase, IAsyncDisposable, IDisposab
             ScreenY = (int)args.ScreenY,
             ClientX = (int)args.ClientX,
             ClientY = (int)args.ClientY,
+        #if NET8_0_OR_GREATER
             MovementX = (int)args.MovementX,
             MovementY = (int)args.MovementY,
+        #endif
             OffsetX = (int)args.OffsetX,
             OffsetY = (int)args.OffsetY,
             AltKey = args.AltKey,

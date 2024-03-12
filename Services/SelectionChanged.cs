@@ -15,7 +15,7 @@ public enum SelectionState
 public class SelectionChanged
 {
     public SelectionState State { get; set; }
-    public required List<FoGlyph2D> Selections { get; set; }
+    public List<FoGlyph2D> Selections { get; set; }
     public static SelectionChanged Changed(List<FoGlyph2D> selections)
     {
         var list = new List<FoGlyph2D>();
