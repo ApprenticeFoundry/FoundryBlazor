@@ -43,7 +43,6 @@ public class ToastNotificationComponent : ComponentBase, IDisposable
     {
         if (Service != null)
         {
-            Toast?.SetNotificationService(Service);
             Service.Messages.CollectionChanged += Update!;
         }
     }

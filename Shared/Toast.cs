@@ -8,14 +8,13 @@ public interface IToast
     void Success(string message);
     void Warning(string message);
     void Error(string message);
-    void SetNotificationService(NotificationService notificationService);
     void ClearNotificationService();
     void RenderToast(D2D_UserToast toast);
 }
 
-public class Toast : IToast
+public class Toast(NotificationService notificationService) : IToast
 {
-    private NotificationService? _notificationService { get; set; }
+    private NotificationService? _notificationService { get; set; } = notificationService;
     private static NotificationMessage NotificationDefault(NotificationSeverity severity, string message)
     {
         var n = new NotificationMessage
