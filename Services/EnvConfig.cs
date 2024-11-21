@@ -1,5 +1,6 @@
 ﻿//Source: https://dusted.codes/dotenv-in-dotnet
 
+using FoundryRulesAndUnits.Extensions;
 using System.Reflection;
 
 namespace FoundryBlazor;
@@ -116,6 +117,7 @@ public class EnvConfig : IEnvConfig
 
 
 
+
 	public string RootStorageFolder()
 	{
 		return Storage;
@@ -127,7 +129,22 @@ public class EnvConfig : IEnvConfig
 	}
 
 
+    // public void RefreshStaticFiles()
+    // {
 
+    //     var source = RootKnowledgeCenterAssets();
+    //     var target = CasheFolder();
+		             
+    //     $"RefreshStaticFiles: source {source}".WriteNote();
+    //     $"RefreshStaticFiles: cashe {target}".WriteNote();
+
+    //     // CopyDirectory(source, target);
+
+    //     foreach (var subdirectory in Directory.GetDirectories(source))
+    //     {
+    //         CopyFiles(subdirectory, target);     
+    //     } 
+    // }
 
 	public string CasheFolder()
 	{

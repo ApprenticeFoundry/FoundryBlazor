@@ -23,14 +23,13 @@ public class FoPanZoomWindow : FoGlyph2D
         ResetLocalPin((obj) => 0, (obj) => 0);
     }
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
         //anti scale this window
         var pan = PanZoomService.Pan();
         var zoom = PanZoomService.Zoom();
-        var pt = GetMatrix().TransformPoint(0, 0);
-        var sz = new Size((int)(Width / zoom), (int)(Height / zoom));
-        var result = new Rectangle(pt, sz);
+        var (x,y) = GetMatrix().TransformPoint(0, 0);
+        var result = new Rectangle(x,y, (int)(Width / zoom),(int)(Height / zoom));
         return result;
     }
 
@@ -51,7 +50,7 @@ public class FoPanZoomWindow : FoGlyph2D
             y -= pan.Y;
             zoom = 1.0 / zoom;
             _matrix.AppendTransform(x, y, zoom, zoom, RotationZ(this), LocPinX(this), LocPinY(this));
-            FoGlyph2D.ResetHitTesting = true;
+            FoGlyph2D.ResetHitTesting(true);
         }
         return _matrix;
     }
@@ -90,10 +89,13 @@ public class FoPanZoomWindow : FoGlyph2D
 
         var (zoom1, panx, pany) = await PanZoomService.TranslateAndScale(ctx, page);
         await page.RenderConcise(ctx, zoom, region);
-
+       
+       
         await _hitTestService.RenderQuadTree(ctx, false);
-
         await ctx.RestoreAsync();
+
+
+
 
         PostDraw?.Invoke(ctx, this);
 
@@ -132,9 +134,10 @@ public class FoPanZoomWindow : FoGlyph2D
 
         //await page.RenderConcise(ctx, zoom, page.Rect());       
         await page.RenderDetailed(ctx, tick, deep);
-
-        await _hitTestService.RenderQuadTree(ctx, true);
         await ctx.RestoreAsync();
+
+        //do not let PanZoomService.TranslateAndScale change the ctx
+        await _hitTestService.RenderQuadTree(ctx, true);
     }
 
     public override async Task<bool> RenderDetailed(Canvas2DContext ctx, int tick, bool deep = true)

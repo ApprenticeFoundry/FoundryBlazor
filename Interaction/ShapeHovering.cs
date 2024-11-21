@@ -1,6 +1,8 @@
 
-using FoundryBlazor.Canvas;
+ 
 using BlazorComponentBus;
+using FoundryBlazor.PubSub;
+using FoundryBlazor.Shared;
 
 
 namespace FoundryBlazor.Shape;
@@ -9,29 +11,45 @@ namespace FoundryBlazor.Shape;
 public class ShapeHovering : BaseInteraction
 {
     public ShapeHovering(
-            InteractionStyle style,
             int priority,
-            FoDrawing2D draw,
+            string cursor,
+            IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ): base(style,priority,draw,pubsub,panzoom,select,manager,hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
+        ToolType = ToolManagement.InteractionStyle<ShapeHovering>();
     }
 
     public override bool MouseMove(CanvasMouseArgs args)
     {
+        //var list = new List<ShapeHoverUIEvent>();
+        var panzoomservice = GetPanZoomService();
+        var loc = panzoomservice.HitLocation(args);
 
-        lastHover?.ForEach(child => child.HoverDraw = null);
-        lastHover?.ForEach(child => child.LocalMouseHover(args, null));
+        lastHover?.ForEach(child =>
+        {
+            child.ClearHoverDraw();
+            //list.Add(new ShapeHoverUIEvent(child));
+        });
+        lastHover?.ForEach(child => child.LocalMouseHover(args, loc, null));
 
-        var loc = panZoomService.HitRectStart(args);
-        lastHover = pageManager!.FindGlyph(loc);
 
-        lastHover.ForEach(child => child.HoverDraw = OnHover);
-        lastHover.ForEach(child => child.LocalMouseHover(args, OnSubHover));
+
+        var hit = panzoomservice.HitRectStart(args);
+        lastHover = GetHitTestService().FindGlyph(hit);
+
+        lastHover.ForEach(child =>
+        {
+            child.SetHoverDraw(OnHover!);
+            //list.Add(new ShapeHoverUIEvent(child));
+        });
+        lastHover.ForEach(child => child.LocalMouseHover(args, loc, OnSubHover));
+
+
+        //SRS do you realy want to send events for every hover?
+        //list.ForEach(item => pubsub.Publish(item));    
+
         return true;
     }
 

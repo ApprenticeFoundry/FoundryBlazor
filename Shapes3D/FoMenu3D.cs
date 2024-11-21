@@ -3,11 +3,10 @@ using System.Linq;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
 using BlazorThreeJS.Menus;
 
 namespace FoundryBlazor.Shape;
@@ -45,7 +44,7 @@ public class FoMenu3D : FoPanel3D, IFoMenu
         return this;
     }
 
-    public bool DrawMenu3D(Scene ctx)
+    public bool DrawMenu3D(Scene scene)
     {
         var buttons = Buttons().Select((item) =>
         {
@@ -67,7 +66,7 @@ public class FoMenu3D : FoPanel3D, IFoMenu
             Position = Position ?? new Vector3(0, 0, 0),
         };
 
-        ctx.Add(menu);
+        scene.AddChild(menu);
         return true;
     }
 

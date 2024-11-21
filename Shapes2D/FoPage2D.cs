@@ -1,18 +1,16 @@
 ﻿
 using System.Drawing;
-using System.Linq;
 
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Extensions;
-using IoBTMessage.Units;
-using Radzen.Blazor.Rendering;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
+using FoundryRulesAndUnits.Units;
 
 namespace FoundryBlazor.Shape;
 
 
-public interface IFoPage2D
+public interface IFoPage2D : ITreeNode
 {
-
     int MapToPageXScale(Length value);
     int MapToPageYScale(Length value);
 
@@ -21,7 +19,9 @@ public interface IFoPage2D
     double MapToModelXLoc(int value);
     double MapToModelYLoc(int value);
     string CalculateTitle(string title);
+    (int, int) DefaultDropLocation(double fraction=1.0);
 }
+
 
 public class FoPage2D : FoGlyph2D, IFoPage2D
 {
@@ -34,10 +34,10 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
     public Length PageHeight { get; set; } = new Length(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = new Length(1.0, "m"); //inches
+    public Length GridMajorH { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorH { get; set; } = new Length(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = new Length(1.0, "m"); //inches
+    public Length GridMajorV { get; set; } = new Length(5.0, "cm"); //inches
     public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
 
     public int ScaleAxisX { get; set; } = 1;
@@ -59,11 +59,12 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     protected FoCollection<FoGlyph2D> Shapes2D = new();
 
 
-    public override Rectangle Rect()
+    public override Rectangle HitTestRect()
     {
-        var pt = new Point(PinX, PinY);
-        var sz = new Size(Width, Height);
-        var result = new Rectangle(pt, sz);
+        // var pt = new Point(PinX, PinY);
+        // var sz = new Size(Width, Height);
+        // var result = new Rectangle(pt, sz);
+        var result = new Rectangle(PinX, PinY, Width, Height);
         return result;
     }
 
@@ -80,8 +81,32 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         ResetLocalPin((obj) => 0, (obj) => 0);
         HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
         VRuler2D = new FoVerticalRuler2D(Scale2D, this);
+        CalculateTitle();
     }
 
+    public FoPage2D ResetScale(Length drawing, Length world)
+    {
+        Scale2D.Drawing = drawing;
+        Scale2D.World = world;
+        HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
+        VRuler2D = new FoVerticalRuler2D(Scale2D, this);
+        CalculateTitle();
+        return this;
+    }
+
+    public override IEnumerable<ITreeNode> GetTreeChildren()
+    {
+        var list = new List<ITreeNode>();
+        foreach (var item in Shapes1D.Values())
+        {
+            list.Add(item);
+        }
+        foreach (var item in Shapes2D.Values())
+        {
+            list.Add(item);
+        }
+        return list;
+    }
 
     public int MapToPageXScale(Length value)
     {
@@ -96,7 +121,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var m = PageMargin.AsPixels();
         var loc = m + MapToPageXScale(value);
-        var result = m + ZeroPointX.AsPixels() + ScaleAxisX * loc;
+        var result = m + ZeroPointX.AsPixels() + (ScaleAxisX * loc);
         // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;
     }
@@ -114,7 +139,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     {
         var m = PageMargin.AsPixels();
         var loc = MapToPageYScale(value);
-        var result = m + ZeroPointY.AsPixels() + ScaleAxisY * loc;
+        var result = m + ZeroPointY.AsPixels() + (ScaleAxisY * loc);
         // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
 
         return result;
@@ -137,23 +162,25 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         var result = size * scale;
         return result;
     }
-    public void SetPageLandscape()
+    public FoPage2D SetPageLandscape()
     {
         if (PageWidth < PageHeight)
         {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
+        return this;
     }
-    public void SetPagePortrait()
+    public FoPage2D SetPagePortrait()
     {
         if (PageWidth > PageHeight)
         {
             (PageWidth, PageHeight) = (PageHeight, PageWidth);
         }
+        return this;
     }
 
 
-    public void SetPageSize(double width, double height, string units)
+    public FoPage2D SetPageSize(double width, double height, string units)
     {
         PageWidth.Assign(width, units);
         PageHeight.Assign(height, units);
@@ -162,19 +189,23 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         SetPageAxisX(1, 0, units);
         SetPageAxisY(-1, height, units);
+        CalculateTitle();
+        return this;
     }
-    public void SetPageAxisX(int scale, double loc, string units)
+    public FoPage2D SetPageAxisX(int scale, double loc, string units)
     {
         //set the zero point to the bottom left
         ScaleAxisX = scale;
         ZeroPointX.Assign(loc, units);
+        return this;
     }
 
-    public void SetPageAxisY(int scale, double loc, string units)
+    public FoPage2D SetPageAxisY(int scale, double loc, string units)
     {
         //set the zero point to the bottom left
         ScaleAxisY = scale;
         ZeroPointY.Assign(loc, units);
+        return this;
     }
 
     public List<FoShape1D> AllShapes1D()
@@ -232,20 +263,32 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
     public override bool Smash(bool force)
     {
         if (_matrix == null && !force) return false;
-        $"Smashing Page {Name} {GetType().Name}".WriteInfo(2);
+        //$"Smashing Page {Name} {GetType().Name} force {force}".WriteInfo(2);
 
         return base.Smash(force);
+    }
+
+    public override T CaptureShape<T>(T source, bool inPosition = false)
+    {
+        if (inPosition)
+        {
+            var dx = -LeftEdge();
+            var dy = -TopEdge();
+            source.MoveBy(dx, dy);
+        }
+
+        return AddShape<T>(source);
     }
 
     public T AddShape<T>(T value) where T : FoGlyph2D
     {
         var collection = DynamicSlot(value.GetType());
-        if (string.IsNullOrEmpty(value.Name))
+        if (string.IsNullOrEmpty(value.Key))
         {
-            value.Name = collection.NextItemName();
+            value.Key = collection.NextItemName();
         }
 
-        collection.AddObject(value.Name, value);
+        collection.AddObject(value.Key, value);
 
         if (value is IShape2D)
         {
@@ -258,6 +301,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             // $"IShape1D Added {value.Name}".WriteSuccess();
         }
 
+        FoGlyph2D.ResetHitTesting(true, $"FoPage2D AddShape {value.Key}");
 
         return value;
     }
@@ -285,28 +329,52 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         shape.MarkSelected(false);
         ExtractShapes(shape.GlyphId);
         shape.UnglueAll();
+
+        FoGlyph2D.ResetHitTesting(true, $"FoPage2D DeleteShape {shape.Key}");
     }
 
-    public void InsertShapesToQuadTree(QuadTree<FoGlyph2D> tree, IPanZoomService panzoom)
+    public virtual void InsertShapesToQuadTree(QuadTree<QuadHitTarget> tree, IPanZoomService panzoom)
     {
         //Shapes1D.ForEach(child => tree.Insert(child)); 
-        // var count = Shapes2D.Count();
+
+        var count = Shapes2D.Count();
+        // $"PAGE:: InsertShapesToQuadTree {Name} {count} items".WriteInfo(2);
         foreach (var item in Shapes2D.Values())
         {
             if (!item.IsSelectable())
                 continue;
 
-            var rect = item.Rect();
-            tree.Insert(item, rect);
+            var rect = item.HitTestRect();
+            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            rect = panzoom.TransformRect(rect);
+            var target = QuadTargetExtensions.NewHitTarget(item, rect);
+            // $"Inserting2  {item.Name} {rect} ".WriteSuccess(1);
+            tree.Insert(target);
         }
+        count = Shapes1D.Count();
+        //$"PAGE:: InsertShapesToQuadTree {Name} Shapes1D {count} items".WriteInfo(2);
+        foreach (var item in Shapes1D.Values())
+        {
+            if (!item.IsSelectable())
+                continue;
 
+            var list = item.HitTestSegment();
+            // $"Inserting1  {item.Name} {rect} ".WriteSuccess(1);
+            list = panzoom.TransformPoint(list);
+            for (int i = 0; i < list.Count()-1; i++)
+            {
+                var target = QuadTargetExtensions.NewHitTarget(item, list[i], list[i+1]);
+                tree.Insert(target);
+            }
+        }
     }
 
     public FoPage2D ClearAll()
     {
-        FoGlyph2D.ResetHitTesting = true;
-        Shapes1D.Clear();
+        ResetHitTesting(true, "FoPage ClearAll");
         var menus = Shapes2D.ExtractWhere(child => child is FoMenu2D);
+
+        Shapes1D.Clear();
         Shapes2D.Clear();
 
         foreach (var item in menus)
@@ -328,6 +396,17 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             result.AddRange(found);
 
         return result;
+    }
+
+    public FoGlyph2D? LookupShape2D(string GlyphId)
+    {
+
+        if ( Shapes2D.TryGetValue(GlyphId, out var found))
+            return found;
+
+        var list = Shapes2D.FindWhere(child => child.GlyphIdCompare(GlyphId));
+
+        return list.FirstOrDefault();
     }
 
     public List<FoGlyph2D> ExtractShapes(string GlyphId)
@@ -365,6 +444,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
         await ctx.RestoreAsync();
     }
+
+
 
 
     public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length step, bool major)
@@ -448,8 +529,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await UpdateContext(ctx, tick);
 
         var margin = PageMargin.AsPixels();
-        Width = (PageWidth + 2 * margin).AsPixels();
-        Height = (PageHeight + 2 * margin).AsPixels();
+        Width = (PageWidth + (2 * margin)).AsPixels();
+        Height = (PageHeight + (2 * margin)).AsPixels();
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -459,9 +540,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.FillTextAsync($"Page: {Key}", PinX + 5, PinY + 5);
 
-        $"RenderNoItems Color={Color}".WriteInfo();
+        //$"RenderNoItems Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(1.0F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
@@ -481,8 +562,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await UpdateContext(ctx, 0);
 
         var margin = PageMargin.AsPixels();
-        Width = PageWidth.AsPixels() + 2 * margin;
-        Height = PageHeight.AsPixels() + 2 * margin;
+        Width = PageWidth.AsPixels() + (2 * margin);
+        Height = PageHeight.AsPixels() + (2 * margin);
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
@@ -492,9 +573,9 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         await ctx.SetTextBaselineAsync(TextBaseline.Top);
 
         await ctx.SetFillStyleAsync("Black");
-        await ctx.FillTextAsync($"Page: {Name}", PinX + 5, PinY + 5);
+        await ctx.FillTextAsync($"Page: {Key}", PinX + 5, PinY + 5);
 
-        $"RenderConcise Color={Color}".WriteInfo();
+        //$"RenderConcise Color={Color}".WriteInfo();
         await ctx.SetFillStyleAsync(Color);
         await ctx.SetGlobalAlphaAsync(1.0F);
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
@@ -525,7 +606,7 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
             Title = title;
         else if (string.IsNullOrEmpty(Title))
         {
-            var text = $"Page: {Name} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
+            var text = $"Page: {Key} {Color} | {Scale2D.Display()} | W:{PageWidth.AsString("cm")} x H:{PageHeight.AsString("cm")}  ({PageMargin.AsString("cm")}) |";
             text += $"  px {PageWidth.AsPixels()} x {PageHeight.AsPixels()} ({PageMargin.AsPixels()})";
             Title = text;
         }
@@ -556,8 +637,8 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
 
 
         var margin = PageMargin.AsPixels();
-        var width = PageWidth.AsPixels() + 2.0 * margin;
-        var height = PageHeight.AsPixels() + 2.0 * margin;
+        var width = PageWidth.AsPixels() + (2.0 * margin);
+        var height = PageHeight.AsPixels() + (2.0 * margin);
 
         Width = (int)width;
         Height = (int)height;
@@ -585,4 +666,16 @@ public class FoPage2D : FoGlyph2D, IFoPage2D
         return true;
     }
 
+    public (int, int) DefaultDropLocation(double factor = 1.0)
+    {
+        var pWidth = PageWidth.AsPixels();
+        var pHeight = PageHeight.AsPixels();
+        var m = PageMargin.AsPixels();
+        var size = Scale2D.PixelToDrawing(pHeight - m);
+
+        return (
+            m + (int)(factor * pWidth / 2),
+            m + (int)(factor * pHeight / 2)
+        );
+    }
 }

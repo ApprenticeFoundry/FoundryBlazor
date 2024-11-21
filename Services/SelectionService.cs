@@ -1,4 +1,6 @@
 using BlazorComponentBus;
+using FoundryBlazor.PubSub;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -19,6 +21,7 @@ public interface ISelectionService
     ISelectionService RotateBy(double da);
     ISelectionService ZoomBy(double factor);
     List<FoGlyph2D> Selections();
+    ISelectionService PublishShapeSelectedUIEvent();
 }
 
 public class SelectionService : ISelectionService
@@ -43,12 +46,23 @@ public class SelectionService : ISelectionService
         return this;
     }
 
+    public ISelectionService PublishShapeSelectedUIEvent()
+    {
+        Members.ForEach(item =>
+        {
+            var obj = new ShapeSelectedUIEvent(item);
+            PubSub.Publish<ShapeSelectedUIEvent>(obj);
+        });
+        return this;
+    }
+
     public ISelectionService ClearAll()
     {
         //"ClearAll".WriteLine(ConsoleColor.Green);
         PubSub.Publish<SelectionChanged>(SelectionChanged.Cleared(Members));
 
         Members.ForEach(item => item.MarkSelected(false));
+        PublishShapeSelectedUIEvent();
         Members.Clear();
         return this;
     }
@@ -61,6 +75,8 @@ public class SelectionService : ISelectionService
             if (Members.IndexOf(item) == -1)
                 Members.Add(item);
         });
+        
+        PublishShapeSelectedUIEvent();
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return list;
     }
@@ -71,6 +87,7 @@ public class SelectionService : ISelectionService
         if (Members.IndexOf(item) == -1)
             Members.Add(item);
 
+        PublishShapeSelectedUIEvent();
         PubSub.Publish<SelectionChanged>(SelectionChanged.Changed(Members));
         return item;
     }
@@ -86,18 +103,17 @@ public class SelectionService : ISelectionService
     }
     public void MousePreDelete()
     {
-        Console.WriteLine($"SelectionService MousePreDelete Members.Count={Members.Count}");
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.PreDelete(Members));
     }
     public void MouseReselect()
     {
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Reselected(Members));
     }
     public void MouseDropped()
     {
-        if (Members.Count > 0)
+         if (Members.Count > 0)
             PubSub.Publish<SelectionChanged>(SelectionChanged.Dropped(Members));
     }
 
@@ -108,6 +124,7 @@ public class SelectionService : ISelectionService
     }
     public ISelectionService MoveBy(int dx, int dy)
     {
+       // $"SelectionService.MoveBy({dx},{dy} Members {Members.Count})".WriteSuccess();
         Members.ForEach(item => item.MoveBy(dx, dy));
         return this;
     }

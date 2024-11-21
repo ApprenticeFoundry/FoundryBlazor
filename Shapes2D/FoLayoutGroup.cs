@@ -1,13 +1,13 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : FoGlyph2D
+public class FoLayoutGroup<V,U> : ICanHitTarget where V : FoGlyph2D where U : FoGlyph2D
 {
 
     public double X { get; set; } = 110.0;
@@ -27,6 +27,11 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
         MoveTo(x, y);
     }
 
+    public string GetName()
+    {
+        return _item.Name ?? "No Name";
+    }
+
     public void PurgeMembers()
     {
         _members = new();
@@ -34,13 +39,13 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
 
     public string GroupName()
     {
-        return _item.Name;
+        return _item.Key;
     }
     
     public string SetGroupName(string name)
     {
-        _item.Name = name;
-        return _item.Name;
+        _item.Key = name;
+        return _item.Key;
     }
 
     public List<FoLayoutNode<U>> GetMembers()
@@ -93,9 +98,9 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
         return (dx/distance, dy/distance, distance);
     }
 
-    public Rectangle Rect()
+    public Rectangle HitTestRect()
     {
-        return _item.Rect();
+        return _item.HitTestRect();
     }
 
     public bool IsSmashed()
@@ -166,5 +171,8 @@ public class FoLayoutGroup<V,U> : IHasRectangle where V : FoGlyph2D where U : Fo
         return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
     }
 
-
+    public Point[] HitTestSegment()
+    {
+        throw new NotImplementedException();
+    }
 }

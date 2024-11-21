@@ -1,7 +1,8 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
+using Radzen;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
@@ -63,13 +64,22 @@ public static class TreeLayoutRules
     };
 };
 
+public enum LayoutType 
+{ 
+    None,
+    Horizontal,
+    Vertical,
+}
+
 public class FoLayoutTree<V> where V : FoGlyph2D
 {
+    public LayoutType SuggestedLayout { get; set; } = LayoutType.None;
     public int level = 0;
     public int index = 0;
     public string path = "";
 
     public bool IsExpanded = true;
+    public bool IsVisited = true;   
     private Size _branchSize = new(10, 10);
     private Point _branchULPoint = new(100, 100);
     private BoxLayoutStyle _layoutStyle = BoxLayoutStyle.None;
@@ -85,6 +95,15 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         _item = node;
         this.level = 0;
         this.index = 0;
+    }
+
+    public void ClearVisited()
+    {
+        IsVisited = false;
+    }
+    public void MarkVisited()
+    {
+        IsVisited = true;
     }
 
     public void ClearAll()
@@ -138,7 +157,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         path = index.ToString().PadLeft(2, '0');
         if (_parent != null)
         {
-            path = $"{_parent.ComputePath()}.{path}";
+            path = $"{_parent.ComputeName()}.{path}";
         }
         return path;
     }
@@ -164,7 +183,7 @@ public class FoLayoutTree<V> where V : FoGlyph2D
     {
         if (string.IsNullOrEmpty(name)) return null;
 
-        if (_item.Name == name) return this;
+        if (_item.Key == name) return this;
 
         if (_children != null)
             foreach (var child in _children)
@@ -212,14 +231,21 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         return this;
     }
 
-    public FoLayoutTree<V>? FindRoot()
+    public void VisitAllNodesInTree()
     {
-        if (_parent == null) return this;
-        _parent?.FindRoot();
-        return null;
+        if (IsVisited) return;
+        
+        MarkVisited();
+        _children?.ForEach(item => item.VisitAllNodesInTree());
     }
 
-    public FoLayoutTree<V> FindRoot(FoLayoutTree<V> node)
+    public FoLayoutTree<V> FindRoot()
+    {
+        if (_parent == null) return this;
+        return _parent.FindRoot();
+    }
+
+    public static FoLayoutTree<V> FindRootOf(FoLayoutTree<V> node)
     {
         var found = node;
         while (found._parent != null)
@@ -313,25 +339,28 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         this.ConnectParentChildShapeTree<U>(pageManager, "RIGHT", TreeLayoutRules.LineLayout);
     }
 
-    public void HorizontalLayout(int PinX, int PinY, Point margin)
+    public bool HorizontalLayout(int PinX, int PinY, Point margin)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, TreeLayoutRules.HorizontalLayout);
         this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.HorizontalLayout);
+        return true;
     }
 
-    public void VerticalLayout(int PinX, int PinY, Point margin)
+    public bool VerticalLayout(int PinX, int PinY, Point margin)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, TreeLayoutRules.VerticalLayout);
         this.ComputeNodeBranchLocation(point, margin, TreeLayoutRules.VerticalLayout);
+        return true;
     }
 
-    public void Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules = null)
+    public bool Layout(int PinX, int PinY, Point margin, List<BoxLayoutStyle>? rules = null)
     {
         var point = new Point(PinX, PinY);
         this.ComputeNodeBranchSize(margin, rules);
         this.ComputeNodeBranchLocation(point, margin, rules);
+        return true;
     }
 
     public void ComputeNodeBranchSize(Point margin, List<BoxLayoutStyle>? styleList = null)
@@ -519,6 +548,9 @@ public class FoLayoutTree<V> where V : FoGlyph2D
         if (child != null)
         {
             this._children ??= new List<FoLayoutTree<V>>();
+            if ( _children.Contains(child)) 
+                return child;
+
             this._children.Add(child);
             child._parent = this;
             child.level = level + 1;

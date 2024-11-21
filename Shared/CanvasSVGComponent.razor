@@ -1,0 +1,9 @@
+﻿@inherits CanvasSVGComponentBase
+@using FoundryBlazor.Shared.SVG
+@namespace FoundryBlazor.Shared
+
+<CanvasInputWrapper  CanvasStyle="@GetCanvasStyle()" CanvasWidth="@CanvasWidth" CanvasHeight="@CanvasHeight">
+    <svg width=@CanvasWidth height=@CanvasHeight style="@GetCanvasStyle()">
+        <Page Page="@GetCurrentPage()" />
+    </svg>
+</CanvasInputWrapper>

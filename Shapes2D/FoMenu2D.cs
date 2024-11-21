@@ -1,8 +1,9 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
@@ -12,12 +13,17 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 {
     private string _layout = "H";
 
-
-
     public FoMenu2D(string name) : base(name,100,50,"Purple")
     {
         ShapeDraw = DrawRect;
         ResetLocalPin((obj) => 0, (obj) => 0);
+    }
+
+    public FoMenu2D AddButton(string name, Action action) 
+    {
+        var button = new FoButton2D(name, action);
+        Add<FoButton2D>(button);
+        return this;
     }
 
 
@@ -35,7 +41,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
 
     public string DisplayText()
     {
-        return Name;
+        return Key;
     }
 
 
@@ -82,7 +88,7 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
     public bool MouseHit(CanvasMouseArgs args) 
     {
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
         if ( found != null) {
 
             found.MarkSelected(true);
@@ -91,13 +97,15 @@ public class FoMenu2D : FoGlyph2D, IFoMenu, IShape2D
         return false;
     }
 
-    public override bool LocalMouseHover(CanvasMouseArgs args, Action<Canvas2DContext, FoGlyph2D>? OnHover) 
+    public override bool LocalMouseHover(CanvasMouseArgs args, Rectangle loc, Action<Canvas2DContext, FoGlyph2D>? OnHover) 
     {
-        Members<FoButton2D>().ForEach(child => child.HoverDraw = null);
+        Members<FoButton2D>().ForEach(child => child.ClearHoverDraw());
+
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
-        if ( found != null) {
-            found.HoverDraw = OnHover;
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
+        
+        if ( found != null && OnHover != null) {
+            found.SetHoverDraw(OnHover);
             return true;
         }
 

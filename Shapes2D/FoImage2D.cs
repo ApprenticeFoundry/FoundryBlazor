@@ -1,49 +1,51 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 using Microsoft.AspNetCore.Components;
 
 //  https://learn.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-7.0
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoImage2D : FoGlyph2D, IImage2D
+public class FoImage2D : FoShape2D, IImage2D
 {
     public static bool RefreshImages { get; set; } = true;
 
     private double scaleX = 1.0;
-    public double ScaleX 
-    { 
-        get { return this.scaleX; } 
-        set { this.scaleX = AssignDouble(value, scaleX); } 
+    public double ScaleX
+    {
+        get { return this.scaleX; }
+        set { this.scaleX = AssignDouble(value, scaleX); }
     }
 
 
     private double scaleY = 1.0;
-    public double ScaleY 
-    { 
-        get { return this.scaleY; } 
-        set { this.scaleY = AssignDouble(value, scaleY); } 
+    public double ScaleY
+    {
+        get { return this.scaleY; }
+        set { this.scaleY = AssignDouble(value, scaleY); }
     }
 
     public double ImageWidth { get; set; }
     public double ImageHeight { get; set; }
 
     private string imageUrl = "";
-    public string ImageUrl 
-    { 
-        get { return this.imageUrl; } 
-        set { 
-            this.imageUrl = value; 
-            waitcount = 0; 
-            FoImage2D.RefreshImages = true; 
-        } 
+    public string ImageUrl
+    {
+        get { return this.imageUrl; }
+        set
+        {
+            this.imageUrl = value;
+            waitcount = 0;
+            FoImage2D.RefreshImages = true;
+        }
     }
 
     private ElementReference imageRef;
-    public ElementReference ImageRef 
-    { 
-        get { return this.imageRef; } 
-        set { this.imageRef = value; } 
+    public ElementReference ImageRef
+    {
+        get { return this.imageRef; }
+        set { this.imageRef = value; }
     }
 
     protected int waitcount = 0;
@@ -57,12 +59,18 @@ public class FoImage2D : FoGlyph2D, IImage2D
     public FoImage2D(string name, int width, int height, string color) : base(name, width, height, color)
     {
     }
-    
-    public override FoImage2D ZoomBy(double factor) 
-    { 
-        ShrinkBy(factor); return this; 
+
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Image2D), this);
+        return foDynamicRender;
     }
-    
+
+    public override FoImage2D ZoomBy(double factor)
+    {
+        ShrinkBy(factor); return this;
+    }
+
     public void ShrinkBy(double factor)
     {
         ScaleX *= factor;

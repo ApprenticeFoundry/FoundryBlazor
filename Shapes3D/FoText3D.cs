@@ -1,21 +1,28 @@
 using BlazorThreeJS.Core;
 using BlazorThreeJS.Labels;
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Viewers;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Shape;
 
 public class FoText3D : FoGlyph3D, IShape3D
 {
 
-    private string text = "";
     private LabelText? Label { get; set; }
-    public string Text { get { return this.text; } set { this.text = CreateDetails(AssignText(value, text)); } }
-    public List<string>? Details { get; set; }
 
-    public Vector3? Position { get; set; }
+    public double FontSize { get; set; } = 0.5;
+
+
+    private string _text = "";
+    public string Text
+    {
+        get { return this._text; }
+        set { this._text = CreateDetails(AssignText(value, _text)); }
+    }
+
+    public List<string>? Details { get; set; }
 
     public FoText3D() : base()
     {
@@ -53,21 +60,31 @@ public class FoText3D : FoGlyph3D, IShape3D
 
     public override Vector3 GetPosition(int x = 0, int y = 0, int z = 0)
     {
-        if (Position == null) 
-            return base.GetPosition(x,y,z);
+        if (Position == null)
+            return base.GetPosition(x, y, z);
 
         var result = Position;
         return result;
     }
-    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+
+    public override string GetTreeNodeTitle()
+    {
+        return $"{base.GetTreeNodeTitle()} {Text}";
+    }
+
+    public override bool Render(Scene scene, int tick, double fps, bool deep = true)
     {
         var text = Text ?? "LabelText";
         Label = new LabelText(text)
         {
+            Uuid = GetGlyphId(),
+            Name = GetName(),
             Color = Color ?? "Yellow",
-            Position = GetPosition()
+            Position = GetPosition(),
+            FontSize = FontSize,
         };
-        ctx.Add(Label);
+        scene.AddChild(Label);
+
         return true;
     }
 

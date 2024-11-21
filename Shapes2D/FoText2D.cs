@@ -1,5 +1,8 @@
 using Blazor.Extensions.Canvas.Canvas2D;
+using FoundryBlazor.Shared.SVG;
 
+// https://goldfirestudios.com/canvasinput-html5-canvas-text-input
+// https://blog.steveasleep.com/how-to-draw-multi-line-text-on-an-html-canvas-in-2021
 
 namespace FoundryBlazor.Shape;
 
@@ -34,7 +37,16 @@ public class FoText2D : FoShape2D, IShape2D
 
     public FoText2D(int width, int height, string color) : base("", width, height, color)
     {
-        Text = "Hello Everyone";
+        Text = "";
+    }
+    public FoText2D(string name, int width, int height, string color) : base(name, width, height, color)
+    {
+        Text = name;
+    }
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Text2D), this);
+        return foDynamicRender;
     }
 
     protected string CreateDetails(string details="")
@@ -83,7 +95,6 @@ public class FoText2D : FoShape2D, IShape2D
 
         await ctx.SetFillStyleAsync(TextColor);
         await ctx.FillTextAsync(Text, LeftX() + 5, TopY() + 5);
-
     }
 
 
@@ -127,7 +138,9 @@ public class FoText2D : FoShape2D, IShape2D
         if (IsSelected)
             await DrawWhenSelected(ctx, tick, deep);
 
-
+        if (deep)
+            RenderDeepDetailed(ctx, tick);
+            
         await ctx.RestoreAsync();
         return true;
     }

@@ -1,13 +1,13 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
 
 namespace FoundryBlazor.Shape;
 
 
-public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
+public class FoLayoutNode<V> : ICanHitTarget where V : FoGlyph2D
 {
 
     public double X { get; set; } = 110.0;
@@ -38,9 +38,18 @@ public class FoLayoutNode<V> : IHasRectangle where V : FoGlyph2D
         return (dx/distance, dy/distance, distance);
     }
 
-    public Rectangle Rect()
+    public Rectangle HitTestRect()
     {
-        return _item.Rect();
+        return _item.HitTestRect();
+    }
+    public Point[] HitTestSegment()
+    {
+        return new Point[0];
+    }
+
+    public string GetName()
+    {
+        return _item.Name ?? "No Name";
     }
 
     public bool IsSmashed()

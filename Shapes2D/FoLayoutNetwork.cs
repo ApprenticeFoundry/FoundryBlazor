@@ -2,8 +2,8 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 
 using FoundryBlazor.Extensions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
 using Radzen.Blazor.Rendering;
 using System.Drawing;
 using System.Runtime.ExceptionServices;

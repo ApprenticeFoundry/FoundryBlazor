@@ -1,13 +1,16 @@
+using BlazorThreeJS.Core;
 using BlazorThreeJS.Maths;
-using IoBTMessage.Models;
+using BlazorThreeJS.Objects;
+using BlazorThreeJS.Viewers;
+using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Shape;
 
-public class FoGroup3D : FoGlyph3D
+public class FoGroup3D : FoGlyph3D, IShape3D
 {
 
-    public Vector3? Position { get; set; }
-    public Vector3? BoundingBox { get; set; }
+
+
     public Vector3? Offset { get; set; }
 
 
@@ -17,6 +20,38 @@ public class FoGroup3D : FoGlyph3D
         GetSlot<FoText3D>();
         GetSlot<FoDatum3D>();
         GetSlot<FoRelationship3D>();
+        GetSlot<FoGroup3D>();
+    }
+
+    public FoGroup3D(string name) : base(name)
+    {
+        GetSlot<FoShape3D>();
+        GetSlot<FoText3D>();
+        GetSlot<FoDatum3D>();
+        GetSlot<FoRelationship3D>();
+        GetSlot<FoGroup3D>();
+    }
+
+    public override IEnumerable<ITreeNode> GetTreeChildren()
+    {
+        var list = new List<ITreeNode>();
+        AddFolderIfNotEmpty<FoGroup3D>(list);
+        AddFolderIfNotEmpty<FoShape3D>(list);
+        AddFolderIfNotEmpty<FoText3D>(list);
+        AddFolderIfNotEmpty<FoDatum3D>(list);
+
+        return list;
+    }
+
+    public T AddShape<T>(T value) where T : FoGlyph3D
+    {
+        var collection = Slot<T>();
+        if (string.IsNullOrEmpty(value.Key))
+            value.Key = collection.NextItemName();
+
+
+        collection.AddObject(value.Key, value);
+        return value;
     }
 
     public List<FoDatum3D>? Datums()
@@ -28,7 +63,7 @@ public class FoGroup3D : FoGlyph3D
     {
         return GetMembers<FoShape3D>();
     }
-    
+
     public List<FoText3D>? Labels()
     {
         return GetMembers<FoText3D>();
@@ -41,7 +76,7 @@ public class FoGroup3D : FoGlyph3D
 
     public FoGroup3D EstablishBox(string name, double width = 1.0, double height = 1.0, double depth = 1.0)
     {
-        this.Name = name;
+        this.Key = name;
         BoundingBox = new Vector3(width, height, depth);
         Position = new Vector3();
         Offset = new Vector3();
@@ -50,47 +85,6 @@ public class FoGroup3D : FoGlyph3D
 
 
 
-    public T CreateUsingDTBASE<T>(FoGlyph3D obj) where T : FoGlyph3D
-    {
-        return CreateUsing<T>(obj.Name, obj.GlyphId);
-    }
-
-    public FoShape3D CreateCylinder(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
-    {
-        var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateCylinder(obj.Name, width, height, depth);
-    }
-
-    public FoShape3D CreateBlock(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
-    {
-        var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateBox(obj.Name, width, height, depth);
-    }
-
-    public FoShape3D CreateSphere(FoGlyph3D obj, double width = 1.0, double height = 1.0, double depth = 1.0)
-    {
-        var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateSphere(obj.Name, width, height, depth);
-    }
-
-    public FoShape3D CreateGlb(FoGlyph3D obj, string url, double width = 1.0, double height = 1.0, double depth = 1.0)
-    {
-        var result = CreateUsingDTBASE<FoShape3D>(obj);
-        return result.CreateGlb(url, width, height, depth);
-    }
-
-    public FoText3D CreateLabel(FoGlyph3D obj, string text, double xLoc = 0.0, double yLoc = 0.0, double zLoc = 0.0)
-    {
-        var result = CreateUsingDTBASE<FoText3D>(obj);
-        return result.CreateTextAt(text, xLoc, yLoc, zLoc);
-    }
-
-
-    public FoGroup3D SetPositionTo(Vector3 loc)
-    {
-        Position = loc;
-        return this;
-    }
 
 
 
@@ -133,14 +127,12 @@ public class FoGroup3D : FoGlyph3D
     }
 
 
- 
+
 
     private T CreateItem<T>(string name) where T : FoGlyph3D
     {
-        var found = Activator.CreateInstance<T>() as T;
-        found.Name = name;
-        found.PlatformName = PlatformName;
-        found.GlyphId = Guid.NewGuid().ToString();
+        var found = (Activator.CreateInstance(typeof(T), name) as T)!;
+        //found.GlyphId = Guid.NewGuid().ToString();
         return found;
     }
 
@@ -149,7 +141,7 @@ public class FoGroup3D : FoGlyph3D
     public T CreateUsing<T>(string name, string guid = "") where T : FoGlyph3D
     {
         var found = FindOrCreate<T>(name, true);
-        if (!string.IsNullOrEmpty(guid) )
+        if (!string.IsNullOrEmpty(guid))
             found!.GlyphId = guid;
 
         return found!;
@@ -164,6 +156,30 @@ public class FoGroup3D : FoGlyph3D
             Slot<T>().Add(found);
         }
         return found;
+    }
+
+
+    public override async Task<bool> PreRender(FoArena3D arena, bool deep = true)
+    {
+        var tasks = new List<Task>();
+
+        tasks.AddRange(Members<FoShape3D>().Select(shape => shape.PreRender(arena, deep)));
+        tasks.AddRange(Members<FoText3D>().Select(shape => shape.PreRender(arena, deep)));
+        tasks.AddRange(Members<FoGroup3D>().Select(shape => shape.PreRender(arena, deep)));
+        tasks.AddRange(Members<FoDatum3D>().Select(shape => shape.PreRender(arena, deep)));
+
+
+        await Task.WhenAll(tasks);
+        return true;
+    }
+
+    public override bool Render(Scene scene, int tick, double fps, bool deep = true)
+    {
+        Members<FoShape3D>().ForEach(shape => shape.Render(scene, tick, fps, deep));
+        Members<FoText3D>().ForEach(shape => shape.Render(scene, tick, fps, deep));
+        Members<FoGroup3D>().ForEach(shape => shape.Render(scene, tick, fps, deep));
+        Members<FoDatum3D>().ForEach(shape => shape.Render(scene, tick, fps, deep));
+        return true;
     }
 
 

@@ -1,12 +1,12 @@
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
+ 
+
 using FoundryBlazor.Message;
 using FoundryBlazor.Persistence;
 using FoundryBlazor.Shared;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Client;
+
 
 namespace FoundryBlazor.Shape;
 
@@ -20,17 +20,16 @@ public interface ICommand
     void SendShapeCreate(FoGlyph2D? shape);
     void SendGlue(FoGlue2D? glue);
 
-    HubConnection? GetSignalRHub();
-    bool SetSignalRHub(HubConnection hub, Uri uri, string panid, IToast toast);
+    // HubConnection? GetSignalRHub();
+    // bool SetSignalRHub(HubConnection hub, Uri uri, string panid, IToast toast);
     Uri? GetServerUri();
-    bool HasHub();
-
-    bool StartHub();
-    bool StopHub();
+    // bool HasHub();
+    // bool StartHub();
+    // bool StopHub();
+    //bool IsConnected { get; }
 
     Task<bool> Send(D2D_Base msg);
     ValueTask DisposeAsync();
-    bool IsConnected { get; }
 
     void Save();
     bool Restore();
@@ -41,12 +40,13 @@ public class CommandService : ICommand
     private Uri? ServerUri { get; set; }
     private string UserID { get; set; } = "NO User";
     private bool IsRunning = false;
-    private HubConnection? _DrawingSyncHub;
     protected IDrawing ActiveDrawing { get; init; }
     protected IArena ActiveArena { get; init; }
     protected IToast? Toast { get; set; }
     private D2D_UserMove? UserLocation { get; set; }
     protected ComponentBus PubSub { get; set; }
+
+    //private HubConnection? _DrawingSyncHub;
 
     public CommandService(
         IDrawing drawing,
@@ -69,131 +69,131 @@ public class CommandService : ICommand
         return ActiveArena;
     }
 
-    public bool HasHub()
-    {
-        return _DrawingSyncHub != null;
-    }
-    public HubConnection? GetSignalRHub()
-    {
-        return _DrawingSyncHub;
-    }
+    // public bool HasHub()
+    // {
+    //     return _DrawingSyncHub != null;
+    // }
+    // public HubConnection? GetSignalRHub()
+    // {
+    //     return _DrawingSyncHub;
+    // }
     public Uri? GetServerUri()
     {
         return ServerUri;
     }
-    public bool SetSignalRHub(HubConnection hub, Uri uri, string userid, IToast toast)
-    {
-        if (_DrawingSyncHub != null)
-        {
-            $"tried to Reset Hub of UserID {userid}  CommandService".WriteError();
-            return false;
-        }
+    // public bool SetSignalRHub(HubConnection hub, Uri uri, string userid, IToast toast)
+    // {
+    //     if (_DrawingSyncHub != null)
+    //     {
+    //         $"tried to Reset Hub of UserID {userid}  CommandService".WriteError();
+    //         return false;
+    //     }
 
-        _DrawingSyncHub = hub;
-        ServerUri = uri;
-        UserID = userid;
-        GetDrawing()?.SetUserID(UserID);
-        Toast = toast;
-        $"SetSignalRHub of UserID {UserID} CommandService".WriteNote();
+    //     _DrawingSyncHub = hub;
+    //     ServerUri = uri;
+    //     UserID = userid;
+    //     GetDrawing()?.SetUserID(UserID);
+    //     Toast = toast;
+    //     $"SetSignalRHub of UserID {UserID} CommandService".WriteNote();
 
-        PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
-        {
-            Toast.RenderToast(usertoast);
-            SendSyncMessage(usertoast);
-        });
+    //     PubSub.SubscribeTo<D2D_UserToast>(usertoast =>
+    //     {
+    //         Toast.RenderToast(usertoast);
+    //         SendSyncMessage(usertoast);
+    //     });
 
-        PubSub.SubscribeTo<CanvasMouseArgs>(args =>
-        {
-            if (IsRunning)
-                SendUserMove(args, true); ;
-        });
+    //     PubSub.SubscribeTo<CanvasMouseArgs>(args =>
+    //     {
+    //         if (IsRunning)
+    //             SendUserMove(args, true); ;
+    //     });
 
-        PubSub.SubscribeTo<FoGlyph2D>(args =>
-        {
-            if (IsRunning)
-                SendShapeMoved(args);
-        });
+    //     PubSub.SubscribeTo<FoGlyph2D>(args =>
+    //     {
+    //         if (IsRunning)
+    //             SendShapeMoved(args);
+    //     });
 
-        PubSub.SubscribeTo<D2D_Create>(create =>
-        {
-            SendSyncMessage(create);
-        });
+    //     PubSub.SubscribeTo<D2D_Create>(create =>
+    //     {
+    //         SendSyncMessage(create);
+    //     });
 
-        PubSub.SubscribeTo<D2D_Move>(move =>
-        {
-            SendSyncMessage(move);
-        });
+    //     PubSub.SubscribeTo<D2D_Move>(move =>
+    //     {
+    //         SendSyncMessage(move);
+    //     });
 
-        PubSub.SubscribeTo<D2D_Destroy>(destroy =>
-        {
-            SendSyncMessage(destroy);
-        });
+    //     PubSub.SubscribeTo<D2D_Destroy>(destroy =>
+    //     {
+    //         SendSyncMessage(destroy);
+    //     });
 
 
-        hub.On<string>("Pong", (msg) =>
-         {
-             Toast?.Success($"Pong {msg}");
-         });
+    //     hub.On<string>("Pong", (msg) =>
+    //      {
+    //          Toast?.Success($"Pong {msg}");
+    //      });
 
-        hub.On<D2D_Create>("Create", (create) =>
-         {
-             UpdateCreate(create);
-         });
+    //     hub.On<D2D_Create>("Create", (create) =>
+    //      {
+    //          UpdateCreate(create);
+    //      });
 
-        hub.On<D2D_Glue>("Glue", (glue) =>
-        {
-            UpdateGlue(glue);
-        });
+    //     hub.On<D2D_Glue>("Glue", (glue) =>
+    //     {
+    //         UpdateGlue(glue);
+    //     });
 
-        hub.On<D2D_Unglue>("Unglue", (glue) =>
-        {
-            UpdateUnglue(glue);
-        });
-        hub.On<D2D_Move>("Move", (move) =>
-        {
-            UpdateMove(move);
-        });
+    //     hub.On<D2D_Unglue>("Unglue", (glue) =>
+    //     {
+    //         UpdateUnglue(glue);
+    //     });
+    //     hub.On<D2D_Move>("Move", (move) =>
+    //     {
+    //         UpdateMove(move);
+    //     });
 
-        hub.On<D2D_Destroy>("Destroy", (destroy) =>
-        {
-            UpdateDestroy(destroy);
-        });
+    //     hub.On<D2D_Destroy>("Destroy", (destroy) =>
+    //     {
+    //         UpdateDestroy(destroy);
+    //     });
 
-        hub.On<D2D_UserMove>("UserMove", (usermove) =>
-        {
-            var MyUser = GetDrawing().UpdateOtherUsers(usermove, toast);
-        });
+    //     hub.On<D2D_UserMove>("UserMove", (usermove) =>
+    //     {
+    //         var MyUser = GetDrawing().UpdateOtherUsers(usermove, toast);
+    //     });
 
-        hub.On<D2D_UserToast>("UserToast", (usertoast) =>
-        {
-            toast.RenderToast(usertoast);
-        });
+    //     hub.On<D2D_UserToast>("UserToast", (usertoast) =>
+    //     {
+    //         toast.RenderToast(usertoast);
+    //     });
 
-        return true;
-    }
-    public bool StartHub()
-    {
-        if (!IsRunning)
-        {
-            IsRunning = true;
-            Task.Run(async () => await _DrawingSyncHub!.StartAsync());
-            var note = $"StartHub {IsRunning}..".WriteNote();
-            Toast?.Success(note);
-        }
-        return IsRunning;
-    }
-    public bool StopHub()
-    {
-        if (IsRunning)
-        {
-            IsRunning = false;
-            Task.Run(async () => await _DrawingSyncHub!.StopAsync());
-            var note = $"StopHub {IsRunning}..".WriteNote();
-            Toast?.Error(note);
-        }
-        return IsRunning;
-    }
-    public bool IsConnected => _DrawingSyncHub?.State == HubConnectionState.Connected;
+    //     return true;
+    // }
+    // public bool StartHub()
+    // {
+    //     if (!IsRunning)
+    //     {
+    //         IsRunning = true;
+    //         Task.Run(async () => await _DrawingSyncHub!.StartAsync());
+    //         var note = $"StartHub {IsRunning}..".WriteNote();
+    //         Toast?.Success(note);
+    //     }
+    //     return IsRunning;
+    // }
+    // public bool StopHub()
+    // {
+    //     if (IsRunning)
+    //     {
+    //         IsRunning = false;
+    //         Task.Run(async () => await _DrawingSyncHub!.StopAsync());
+    //         var note = $"StopHub {IsRunning}..".WriteNote();
+    //         Toast?.Error(note);
+    //     }
+    //     return IsRunning;
+    // }
+    // public bool IsConnected => _DrawingSyncHub?.State == HubConnectionState.Connected;
 
 
 
@@ -253,10 +253,11 @@ public class CommandService : ICommand
 
     public async Task Ping(string msg)
     {
+        await Task.CompletedTask;
         var message = $"Ping {msg} {DateTime.Now}";
-        if (IsRunning && _DrawingSyncHub != null)
-            await _DrawingSyncHub.SendAsync("Ping", message);
-        else
+        // if (IsRunning && _DrawingSyncHub != null)
+        //     await _DrawingSyncHub.SendAsync("Ping", message);
+        // else
             $"Command Service {IsRunning} {msg}..  is NOT Sending".WriteNote();
 
     }
@@ -272,16 +273,17 @@ public class CommandService : ICommand
     }
     public async Task<bool> Send(D2D_Base msg)
     {
+        await Task.CompletedTask;
         if (!IsRunning)
             $"Command Service {IsRunning} {msg.Topic()}..  is NOT Sending".WriteNote();
 
-        if (_DrawingSyncHub == null)
-            return false;
+        // if (_DrawingSyncHub == null)
+        //     return false;
 
         //$"Sending {IsRunning} {msg.Topic()}..".WriteNote();
 
-        if (IsRunning)
-            await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
+        // if (IsRunning)
+        //     await _DrawingSyncHub.SendAsync(msg.Topic(), msg);
 
         if (msg is D2D_UserMove)
             return IsRunning;
@@ -293,11 +295,12 @@ public class CommandService : ICommand
 
     public async ValueTask DisposeAsync()
     {
-        if (_DrawingSyncHub is not null)
-        {
-            await _DrawingSyncHub.DisposeAsync();
-        }
-        _DrawingSyncHub = null;
+        await Task.CompletedTask;
+        // if (_DrawingSyncHub is not null)
+        // {
+        //     await _DrawingSyncHub.DisposeAsync();
+        // }
+        // _DrawingSyncHub = null;
     }
 
 
@@ -430,19 +433,19 @@ public class CommandService : ICommand
     public void Save()
     {
         var lastVersion = LastSavedVersionNumber("storage", "model_0000.json");
-        $"lastVersion {lastVersion}".WriteNote();
+        //$"lastVersion {lastVersion}".WriteNote();
 
-        var version = VersionInfo.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
+        var version = VersionPersistence.Generate(lastVersion, "model", "Model Drawing", "steve@gmail.com");
 
         var model = new ModelPersist(version);
         model.PersistPage(CurrentPage());
 
         var json = CodingExtensions.Dehydrate<ModelPersist>(model, false);
-        StorageHelpers.WriteData("storage", version.Filename, json);
+        //StorageHelpers.WriteData("storage", version.Filename, json);
 
         var filename = version.Filename.Replace("json", "zip");
         var compress = json.Compress();
-        StorageHelpers.WriteData("storage", filename, compress);
+        //StorageHelpers.WriteData("storage", filename, compress);
         SendToast(ToastType.Success, $"{version.Filename} is Saved");
     }
 

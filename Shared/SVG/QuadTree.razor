@@ -1,0 +1,35 @@
+@inherits QuadTreeBase
+@using FoundryBlazor.Shared.SVG
+@namespace FoundryBlazor.Shared.SVG
+
+
+<rect x="@Rect().X" y="@Rect().Y" width="@Rect().Width" height="@Rect().Height" fill="none" stroke="green"
+    stroke-width="6">
+</rect>
+
+@if (TopLeftChild != null)
+{
+    <QuadTree TreeNode="@TopLeftChild" />
+}
+
+@if (TopRightChild != null)
+{
+    <QuadTree TreeNode="@TopRightChild" />
+}
+@if (BottomLeftChild != null)
+{
+    <QuadTree TreeNode="@BottomLeftChild" />
+}
+@if (BottomRightChild != null)
+{
+    <QuadTree TreeNode="@BottomRightChild" />
+}
+
+
+@* @foreach (var rect in @HitRectangles())
+{
+<rect x="@rect.X" y="@rect.Y" width="@rect.Width" height="@rect.Height" fill="yellow" style="opacity: 0.75"
+stroke="green" stroke-width="6">
+</rect>
+
+} *@

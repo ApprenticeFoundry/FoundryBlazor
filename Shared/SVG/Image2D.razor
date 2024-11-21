@@ -1,0 +1,10 @@
+@inherits ImageBase
+@namespace FoundryBlazor.Shared.SVG
+
+<g transform="@GetSVGMatrix()">
+    <rect width="@GetWidth()" height="@GetHeight()" rx="4" ry="4" stroke-dasharray="@GetDashArray()" fill="@GetColor()"
+        stroke="@GetStrokeColor()" stroke-width="3" />
+    <foreignObject x="@PaddingX" y="@PaddingY" width="@GetWidth()" height="@GetHeight()">
+        <img controls style="@GetStyle()" src="@GetURL()" />
+    </foreignObject>
+</g>

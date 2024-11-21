@@ -1,6 +1,6 @@
-using FoundryBlazor.Extensions;
+
 using FoundryBlazor.Shape;
-using IoBTMessage.Extensions;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Message;
 

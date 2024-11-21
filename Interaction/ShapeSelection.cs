@@ -1,29 +1,25 @@
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
 public class ShapeSelection : ShapeHovering
 {
 
-
-    private bool isFenceSelecting = false;
-
-
     public ShapeSelection(
-            InteractionStyle style,
             int priority,
-            FoDrawing2D draw,
+            string cursor,
+            IDrawing draw,
             ComponentBus pubsub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ) : base(style, priority, draw, pubsub, panzoom, select, manager, hitTest)
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
+        ToolType = ToolManagement.InteractionStyle<ShapeSelection>();
     }
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
@@ -32,18 +28,19 @@ public class ShapeSelection : ShapeHovering
 
     public override void Abort()
     {
-        isFenceSelecting = false;
+        GetPanZoomService().SetFenceSelecting(false);
     }
 
     public override async Task RenderDrawing(Canvas2DContext ctx, int tick)
     {
-        if (isFenceSelecting)
+        var panZoomService = GetPanZoomService();
+        if (panZoomService.IsFenceSelecting())
         {
             await ctx.BeginPathAsync();
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(3);
             await ctx.SetStrokeStyleAsync("White");
-            var rect = panZoomService.TransformRect(dragArea);
+            var rect = panZoomService.TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }
@@ -51,14 +48,17 @@ public class ShapeSelection : ShapeHovering
 
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        $"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
+        //$"Mouse Down {args.OffsetX} {args.OffsetY}, {args.AltKey} ".WriteSuccess();
 
-        isFenceSelecting = false;
+        var panZoomService = GetPanZoomService();
+        var selectionService = GetSelectionService();
+
+        panZoomService.SetFenceSelecting(false);
         var mustClear = args.ShiftKey == false;
 
 
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = pageManager?.FindGlyph(dragArea);
+        DragArea = panZoomService.HitRectStart(args);
+        var findings = GetHitTestService().FindGlyph(DragArea);
 
         var hitShape = findings?.LastOrDefault();
         hitShape?.OnShapeClick(ClickStyle.MouseDown, args);
@@ -73,9 +73,8 @@ public class ShapeSelection : ShapeHovering
                 selectionService?.MouseFirstSelected();
 
                 //Restart this interaction in Drag Shape mode
-                drawing.SetInteraction(InteractionStyle.ShapeDragging);
-                var interact = drawing.GetInteraction();
-                interact.MouseDown(args);
+                SetInteraction<ShapeDragging>();
+                drawing.Tools().MouseDown(args);
             }
             else
             {
@@ -84,8 +83,7 @@ public class ShapeSelection : ShapeHovering
         }
         else
         {
-
-            isFenceSelecting = true;
+            panZoomService.SetFenceSelecting(true);
             selectionService?.ClearAllWhen(mustClear);
         }
 
@@ -98,11 +96,12 @@ public class ShapeSelection : ShapeHovering
 
     public override bool MouseUp(CanvasMouseArgs args)
     {
-        if (isFenceSelecting)
+        var panZoomService = GetPanZoomService();
+        if (panZoomService.IsFenceSelecting())
         {
-            dragArea = panZoomService.Normalize(dragArea);
+            DragArea = panZoomService.Normalize(DragArea);
 
-            var findings = pageManager?.FindGlyph(dragArea);
+            var findings = GetHitTestService().FindGlyph(DragArea);
             if (findings != null)
             {
                 //anything that intersects
@@ -111,28 +110,29 @@ public class ShapeSelection : ShapeHovering
                 //only findings that are totally inside the fence
                 foreach (var item in findings)
                 {
-                    if (dragArea.Contains(item.Rect()))
-                        selectionService?.AddItem(item);
+                    if (GetDragArea().Contains(item.HitTestRect()))
+                        GetSelectionService().AddItem(item);
                 }
             }
         }
 
-        //dragArea = panZoomService.HitRectStart(args);
-        isFenceSelecting = false;
+        GetPanZoomService().SetFenceSelecting(false);
         //$"ShapeSelection Mouse Up ".WriteLine(ConsoleColor.Green);
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        SetInteraction<ShapeHovering>();
         return true;
     }
     public override bool MouseMove(CanvasMouseArgs args)
     {
-        if (isFenceSelecting)
+
+        var panZoomService = GetPanZoomService();
+        if (panZoomService.IsFenceSelecting())
         {
-            dragArea = panZoomService.HitRectContinue(args, dragArea);
+            DragArea = panZoomService.HitRectContinue(args, DragArea);
         }
-        else if (selectionService.Selections().Count > 0)
+        else if (GetSelectionService().Selections().Count > 0)
         {
-            dragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+            DragArea = panZoomService.HitRectStart(args);
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }

@@ -1,5 +1,5 @@
 using FoundryBlazor.Extensions;
-using Newtonsoft.Json.Linq;
+
 
 namespace FoundryBlazor;
 
@@ -11,6 +11,7 @@ public interface IFoCollection
     List<string> Keys();
     List<U> ValuesOfType<U>();
     bool AddObject(string key, object value);
+    bool RemoveObject(string key);
 }
 
 [System.Serializable]
@@ -42,6 +43,16 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         return false;
     }
 
+    public bool RemoveObject(string key)
+    {
+
+        if (!TryGetValue(key, out T? found))
+        {
+            this.members.Remove(key);
+            return true;
+        }
+        return false;
+    }
     public FoCollection()
     {
         Key = typeof(T).Name;
@@ -82,10 +93,10 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     } 
     public T Add(T value)
     {
-        if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = NextItemName();
+        if ( string.IsNullOrEmpty(value.Key)) {
+            value.Key = NextItemName();
         }
-        return this.Add(value.Name, value);
+        return this.Add(value.Key, value);
     }
     public T Add(string key, T value)
     {
@@ -97,10 +108,10 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     }
     public T Remove(T value)
     {
-        if ( string.IsNullOrEmpty(value.Name)) {
-            value.Name = NextItemName();
+        if ( string.IsNullOrEmpty(value.Key)) {
+            value.Key = NextItemName();
         }
-        return this.Remove(value.Name, value);
+        return this.Remove(value.Key, value);
     }
     public bool Remove(string key)
     {
@@ -128,17 +139,13 @@ public class FoCollection<T>: IFoCollection where T : FoBase
     public List<T> ExtractWhere(Func<T,bool> whereClause)
     {
         var extraction = FindWhere(whereClause);
-        extraction.ForEach(item => this.members.Remove(item.Name));
+        extraction.ForEach(item => this.members.Remove(item.Key));
         return extraction;
     }
     public List<T> FindWhere(Func<T,bool> whereClause)
     {
         var list = Values();
         var extraction = list.Where(item => whereClause(item)).ToList();
-        // foreach (var item in list)
-        // {
-        //     $"FindWhere {item.Name} whereClause = {whereClause(item)}".WriteInfo();
-        // }
         return extraction;
     }
     public void Clear()

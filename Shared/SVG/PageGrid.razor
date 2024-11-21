@@ -1,0 +1,27 @@
+@inherits PageGridBase
+@using FoundryBlazor.Shared.SVG
+@namespace FoundryBlazor.Shared.SVG
+
+@foreach (var line in GetMinortHorizontalGridSVG())
+{
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
+        y2="@line.Y2" />
+}
+
+@foreach (var line in GetMinorVerticalGridSVG())
+{
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" x1="@line.X1" y1="@line.Y1" x2="@line.X2"
+        y2="@line.Y2" />
+}
+
+@foreach (var line in GetMajorHorizontalGridSVG())
+{
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" stroke-width="@MajorAxisStrokeWidth" x1="@line.X1"
+        y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}
+
+@foreach (var line in GetMajorVerticalGridSVG())
+{
+    <line stroke="@StrokeColor" stroke-dasharray="@StrokeDashArray" stroke-width="@MajorAxisStrokeWidth" x1="@line.X1"
+        y1="@line.Y1" x2="@line.X2" y2="@line.Y2" />
+}

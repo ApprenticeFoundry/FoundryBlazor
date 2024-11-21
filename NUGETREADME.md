@@ -1,4 +1,6 @@
-dotnet pack
+dotnet build --configuration Release
+
+dotnet pack --configuration Release  
 
 Login to nuget.org
 

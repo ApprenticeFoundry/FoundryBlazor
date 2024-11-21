@@ -1,18 +1,45 @@
 // this is a tool to load/unload knowledge modules that define projects
 
-using BlazorThreeJS.Maths;
-using BlazorThreeJS.Settings;
+
+
+
+
 using FoundryBlazor.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Models;
+
 
 namespace FoundryBlazor.Shape;
 
+// a World is just of bag o things to draw,  then need to be handed to a arena to do the rendering
+// on to a stage or scene
 
-public class FoWorld3D : FoGlyph3D
+public interface IWorld3D: ITreeNode
+{
+    //public List<FoShape2D>? Shapes();
+    public List<FoGroup3D>? ShapeGroups();
+    public List<FoDatum3D>? Datums();
+    public List<FoShape3D>? ShapeBodies();
+    public List<FoMenu3D>? Menus();
+    public List<FoPanel3D>? Panels();
+    public List<FoText3D>? Labels();
+    public List<FoRelationship3D>? Relationships();
+
+    public T AddGlyph3D<T>(T glyph) where T : FoGlyph3D;
+    public T RemoveGlyph3D<T>(T glyph) where T : FoGlyph3D;
+
+    public string GetName();
+
+    public IWorld3D RemoveDuplicates();
+    public IWorld3D ClearAll();
+    void AddAction(string name, string color, Action action);
+    bool PublishToStage(FoStage3D stage);
+    bool PublishToArena(IArena arena);
+}
+
+public class FoWorld3D : FoGlyph3D, IWorld3D
 {
 
-
-    public FoWorld3D() : base()
+    public FoWorld3D(string name) : base(name)
     {
         GetSlot<FoGroup3D>();
         GetSlot<FoShape3D>();
@@ -21,14 +48,106 @@ public class FoWorld3D : FoGlyph3D
         GetSlot<FoMenu3D>();
         GetSlot<FoPanel3D>();
         GetSlot<FoPathway3D>();
-        GetSlot<FoRelationship3D>();
     }
 
-    public FoWorld3D(UDTO_World source) : this()
+
+
+
+
+    public T AddGlyph3D<T>(T glyph) where T : FoGlyph3D
     {
-        FillFromUDTOWorld(source);
+        if (glyph is FoGroup3D group)
+            Slot<FoGroup3D>()?.Add(group);
+        else if (glyph is FoShape3D shape)
+            Slot<FoShape3D>()?.Add(shape);
+        else if (glyph is FoText3D text)
+            Slot<FoText3D>()?.Add(text);
+        else if (glyph is FoDatum3D datum)
+            Slot<FoDatum3D>()?.Add(datum);
+        else if (glyph is FoMenu3D menu)
+            Slot<FoMenu3D>()?.Add(menu);
+        else if (glyph is FoPanel3D panel)
+            Slot<FoPanel3D>()?.Add(panel);
+        else if (glyph is FoPathway3D pathway)
+            Slot<FoPathway3D>()?.Add(pathway);
+        else
+            throw new Exception("Unknown Glyph Type");
+        
+        return glyph;
     }
 
+    public T RemoveGlyph3D<T>(T glyph) where T : FoGlyph3D
+    {
+        if (glyph is FoGroup3D group)
+            GetSlot<FoGroup3D>()?.Remove(group);
+        if (glyph is FoShape3D shape)
+            GetSlot<FoShape3D>()?.Remove(shape);
+        if (glyph is FoText3D text)
+            GetSlot<FoText3D>()?.Remove(text);
+        if (glyph is FoDatum3D datum)
+            GetSlot<FoDatum3D>()?.Remove(datum);
+        if (glyph is FoMenu3D menu)
+            GetSlot<FoMenu3D>()?.Remove(menu);
+        if (glyph is FoPanel3D panel)
+            GetSlot<FoPanel3D>()?.Remove(panel);
+        if (glyph is FoPathway3D pathway)
+            GetSlot<FoPathway3D>()?.Remove(pathway);
+        return glyph;
+    }
+
+    public IWorld3D ClearAll()
+    {
+        GetSlot<FoGroup3D>()?.Clear();
+        GetSlot<FoShape3D>()?.Clear();
+        GetSlot<FoText3D>()?.Clear();
+        GetSlot<FoDatum3D>()?.Clear();
+        GetSlot<FoMenu3D>()?.Clear();
+        GetSlot<FoPanel3D>()?.Clear();
+        GetSlot<FoPathway3D>()?.Clear();
+        return this;
+    }
+
+    public override IEnumerable<ITreeNode> GetTreeChildren()
+    {
+        var list = new List<ITreeNode>();
+        AddFolderIfNotEmpty<FoGroup3D>(list);
+        AddFolderIfNotEmpty<FoShape3D>(list);
+        AddFolderIfNotEmpty<FoText3D>(list);
+        AddFolderIfNotEmpty<FoDatum3D>(list);
+
+        AddFolderIfNotEmpty<FoMenu3D>(list);
+
+        AddFolderIfNotEmpty<FoPanel3D>(list);
+        AddFolderIfNotEmpty<FoPathway3D>(list);
+        return list;
+    }
+
+    public bool PublishToStage(FoStage3D stage)
+    {
+        GetMembers<FoShape3D>()?.ForEach(shape => stage.AddShape<FoShape3D>(shape));
+        GetMembers<FoGroup3D>()?.ForEach(group => stage.AddShape<FoGroup3D>(group));
+        GetMembers<FoText3D>()?.ForEach(label => stage.AddShape<FoText3D>(label));
+        GetMembers<FoDatum3D>()?.ForEach(datum => stage.AddShape<FoDatum3D>(datum));
+        GetMembers<FoMenu3D>()?.ForEach(menu => stage.AddShape<FoMenu3D>(menu));
+        GetMembers<FoPanel3D>()?.ForEach(panel => stage.AddShape<FoPanel3D>(panel));
+        GetMembers<FoPathway3D>()?.ForEach(pathway => stage.AddShape<FoPathway3D>(pathway));
+
+        return true;
+    }
+
+    public bool PublishToArena(IArena arena)
+    {
+        GetMembers<FoShape3D>()?.ForEach(shape => arena.AddShape<FoShape3D>(shape));
+        GetMembers<FoGroup3D>()?.ForEach(group => arena.AddShape<FoGroup3D>(group));
+        GetMembers<FoText3D>()?.ForEach(label => arena.AddShape<FoText3D>(label));
+        GetMembers<FoDatum3D>()?.ForEach(datum => arena.AddShape<FoDatum3D>(datum));
+        GetMembers<FoMenu3D>()?.ForEach(menu => arena.AddShape<FoMenu3D>(menu));
+        GetMembers<FoPanel3D>()?.ForEach(panel => arena.AddShape<FoPanel3D>(panel));
+        GetMembers<FoPathway3D>()?.ForEach(pathway => arena.AddShape<FoPathway3D>(pathway));
+
+        return true;
+    }
+ 
     public List<FoGroup3D>? ShapeGroups()
     {
         return GetMembers<FoGroup3D>();
@@ -61,115 +180,10 @@ public class FoWorld3D : FoGlyph3D
         return GetMembers<FoRelationship3D>();
     }
 
-    public FoWorld3D FillFromUDTOWorld(UDTO_World world)
-    {
-        world.platforms.ForEach(item =>
-        {
-            var group = new FoGroup3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-            };
-            Slot<FoGroup3D>().Add(group);
-        });
-
-        world.bodies.ForEach(item =>
-        {
-            var pos = item.position;
-            var box = item.boundingBox;
-            var shape3D = new FoShape3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Symbol = item.symbol,
-                Type = item.type,
-                Color = string.IsNullOrEmpty(item.material) ? "Green" : item.material,
-                Position = pos?.LocAsVector3(),
-                Rotation = pos?.AngAsVector3(),
-                BoundingBox = box?.BoxAsVector3(),
-                Scale = box?.ScaleAsVector3(),
-                Pivot = box?.PinAsVector3(),
-            };
-            Slot<FoShape3D>().Add(shape3D);
-            //$"FoShape3D from world {shape3D.Symbol} X = {shape3D.Position?.X}".WriteSuccess();
-            if (item.subSystem != null)
-            {
-                shape3D.Targets = item.subSystem.Targets();
-            }
-
-        });
-
-        world.labels.ForEach(item =>
-        {
-            var pos = item.position;
-            var text3D = new FoText3D()
-            {
-                PlatformName = item.platformName,
-                GlyphId = item.uniqueGuid,
-                Name = item.name,
-                Address = item.address,
-                Position = pos?.LocAsVector3(),
-                Text = item.text,
-                Details = item.details
-            };
-            Slot<FoText3D>().Add(text3D);
-        });
-
-        return this;
-    }
-
-    //public static string GetColor(DT_Target model)
-    //{
-    //    var Color = model.domain switch
-    //    {
-    //        "PIN" => "Pink",
-    //        "PROC" => "Wisteria",
-    //        "DOC" => "Gray",
-    //        "ASST" => "Aqua",
-    //        "CAD" => "Orange",
-    //        "WRLD" => "Green",
-    //        _ => "Yellow",
-    //    };
-    //    return Color;
-    //}
 
 
-    //assume the units are in meters
-    public static void LayoutSystemInSwinlanes(DT_System system, int dx = 0, int dy = 0, int dz = 0)
-    {
-        if (system == null) return;
 
-
-        var targets = system.Targets().OrderBy(item => item.linkCount).ToList();
-        var dict = targets.GroupBy(item => item.domain).ToDictionary(item => item.Key, item => item.ToList());
-
-        var order = new List<string>() { "WRLD", "PIN", "DOC", "PROC", "CAD", "ASST" };
-
-        //set the target locations here 
-        var x = 0;
-        var y = 0;
-        var z = 0;
-        foreach (var item in order)
-        {
-            if (dict.ContainsKey(item))
-            {
-                y = 2;
-                foreach (var target in dict[item])
-                {
-                    target.x = x + dx;
-                    target.y = y + dy;
-                    target.z = z + dz;
-                    y += 2;
-                }
-                x += 3;
-            }
-        }
-    }
-
-    public FoWorld3D RemoveDuplicates()
+    public IWorld3D RemoveDuplicates()
     {
 
         var platforms = ShapeGroups()?.GroupBy(i => i.GlyphId).Select(g => g.First()).ToList();

@@ -1,12 +1,12 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryBlazor.Extensions;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
 public class FoConnector1D : FoShape1D, IShape1D
 {
-    public LineLayoutStyle Layout { get; set; } = LineLayoutStyle.None;
 
     public Action<Canvas2DContext, FoConnector1D> DrawHorizontalFirst = async (ctx, obj) =>
     {
@@ -85,17 +85,49 @@ public class FoConnector1D : FoShape1D, IShape1D
          SetupDrawSelected();
     }
 
+    public override Point[] HitTestSegment()
+    {
+        var dx = Math.Abs(x2 - x1);
+        var dy = Math.Abs(y2 - y1);
+        
+        var mat = GetMatrix();
+        var p1 = mat.TransformToPoint(0, 0);
+        var p4 = mat.TransformToPoint(dx, dy);
+
+        switch (Layout)
+        {
+            case LineLayoutStyle.HorizontalFirst:
+                {
+                    var p2 = mat.TransformToPoint(dx, 0);
+                    return new Point[] { p1, p2, p4 };
+                }
+
+            case LineLayoutStyle.VerticalFirst:
+                {
+                    var p3 = mat.TransformToPoint(0, dy);
+                    return new Point[] { p1, p3, p4 };
+                }
+        }
+        return new Point[] { p1, p4 };
+    }
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {
         await ctx.SaveAsync();
 
-        if (Layout == LineLayoutStyle.HorizontalFirst)
-            DrawHorizontalFirst?.Invoke(ctx, this);
-        else if (Layout == LineLayoutStyle.VerticalFirst)
-            DrawVerticalFirst.Invoke(ctx, this);
-        else if (Layout == LineLayoutStyle.Straight)
-            await DrawStraight(ctx, Color, tick);
+        switch (Layout)
+        {
+            case LineLayoutStyle.HorizontalFirst:
+                DrawHorizontalFirst?.Invoke(ctx, this);
+                break;
+            case LineLayoutStyle.VerticalFirst:
+                DrawVerticalFirst.Invoke(ctx, this);
+                break;
+            case LineLayoutStyle.Straight:
+            case LineLayoutStyle.None:
+                await DrawStraight(ctx, Color, tick);
+                break;
+        }
 
         //await DrawTruePin(ctx);
         await ctx.RestoreAsync();

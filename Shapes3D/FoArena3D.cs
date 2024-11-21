@@ -1,48 +1,49 @@
 using BlazorComponentBus;
 using BlazorThreeJS.Enums;
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Scenes;
 using BlazorThreeJS.Viewers;
-using FoundryBlazor.Canvas;
-using FoundryBlazor.Extensions;
 using FoundryBlazor.PubSub;
+using FoundryBlazor.Shared;
 using FoundryBlazor.Solutions;
-using IoBTMessage.Extensions;
-using IoBTMessage.Models;
+using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Models;
+using FoundryRulesAndUnits.Units;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor;
 
 namespace FoundryBlazor.Shape;
 
-public interface IArena
+public interface IArena: ITreeNode
 {
-    void SetViewer(Viewer viewer, Scene scene);
-    Task RenderArena(Scene scene, int tick, double fps);
+    void SetScene(Scene scene);
+
     Task ClearArena();
     Task UpdateArena();
-    void SetDoCreate(Action<CanvasMouseArgs> action);
+    //void SetDoCreate(Action<CanvasMouseArgs> action);
 
-    bool RenderDrawingToScene(IDrawing drawing);
-    bool RenderWorld3DToScene(FoWorld3D world);
-    bool RenderWorld3D(FoWorld3D world);
     Task<bool> PreRender(FoGlyph3D glyph);
 
-    //FoWorld3D MapToWorld3D(UDTO_World world);
+    FoStage3D SetCurrentStage(FoStage3D stage);
+    void AddAction(string name, string color, Action action);
 
     V AddShape<V>(V shape) where V : FoGlyph3D;
+    V RemoveShape<V>(V shape) where V : FoGlyph3D;
 
+T   EstablishStage<T>(string name) where T : FoStage3D;
+    IStageManagement Stages();
+    List<FoStage3D> GetAllStages();
     FoStage3D CurrentStage();
-    FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count);
-    FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL);
+    Scene CurrentScene();
+
     void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav);
 
 }
 public class FoArena3D : FoGlyph3D, IArena
 {
-    public Viewer? Viewer3D { get; set; }
+
     public Scene? Scene { get; set; }
     private IStageManagement StageManager { get; set; }
-
     public ComponentBus PubSub { get; set; }
 
     public Action<CanvasMouseArgs>? DoCreate { get; set; }
@@ -52,62 +53,116 @@ public class FoArena3D : FoGlyph3D, IArena
         ComponentBus pubSub)
     {
         StageManager = manager;
+
         PubSub = pubSub;
+    }
+    public FoStage3D SetCurrentStage(FoStage3D stage)
+    {
+        StageManager.SetCurrentStage(stage);
+        //stage.InitScene(CurrentScene());
+        //PanZoomService.ReadFromPage(page);
+        return stage;
+    }
+    public T EstablishStage<T>(string name) where T : FoStage3D
+    {
+        var stage = StageManager.EstablishStage<T>(name, this) as T;
+        return (T)stage;
     }
 
     public FoStage3D CurrentStage()
     {
-        var stage = StageManager.CurrentStage();
+        var stage = StageManager.GetCurrentStage();
+        if ( stage == null)
+            StageManager.EstablishStage<FoStage3D>("Stage-1", this);
+
+        stage = StageManager.GetCurrentStage()!;
         return stage;
     }
-
-    public async Task RenderArena(Scene scene, int tick, double fps)
+    public IStageManagement Stages()
     {
-        await StageManager.RenderDetailed(scene, tick, fps);
-
-        //if the stage is dirty call to update
-        //$"Arean Render Scene {tick}".WriteInfo();
+        return StageManager;
     }
+    public List<FoStage3D> GetAllStages()
+    {
+        return StageManager.GetAllStages();
+    }
+
+    public override IEnumerable<ITreeNode> GetTreeChildren()
+    {
+        var list = new List<ITreeNode>();
+        foreach (var item in GetAllStages())
+        {
+            list.Add(item);
+        }
+
+        return list;
+    }
+
+
 
     public V AddShape<V>(V shape) where V : FoGlyph3D
     {
+        var stage = CurrentStage();
+        var scene = CurrentScene();
+
+        shape.OnDelete = (FoGlyph3D item) =>
+        {
+            item.DeleteFromStage(stage, scene);
+            PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("FoArena3D:RemoveShape"));
+
+        };
         return StageManager.AddShape<V>(shape);
+    }
+
+    public V RemoveShape<V>(V shape) where V : FoGlyph3D
+    {   
+        //SRS you might need to test all scenes and stages
+
+        var scene = CurrentScene();
+        var stage = CurrentStage();
+        shape.DeleteFromStage(stage, scene);
+
+        PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("FoArena3D:RemoveShape"));
+        return shape;
     }
 
     public async Task ClearArena()
     {
-        if (Viewer3D == null) return;
 
-        //"ClearArena".WriteInfo();
-        await Viewer3D.ClearSceneAsync();
-        await UpdateArena();
+        "ClearArena".WriteInfo();
+        var stage = CurrentStage();
+        stage.ClearStage();
+
+        var scene = CurrentScene();
+        await scene.ClearScene();
     }
 
     public async Task UpdateArena()
     {
-        if (Viewer3D == null) return;
-
-        //"UpdateArena".WriteInfo();
-        await Viewer3D.UpdateScene();
+        "UpdateArena".WriteInfo();
+        var stage = CurrentStage();
+        var scene = CurrentScene();
+        await stage.RenderToScene(scene);
     }
-    public void SetViewer(Viewer viewer, Scene scene)
+
+    public void SetScene(Scene scene)
     {
-        Viewer3D = viewer;
+        if ( Scene == scene || scene == null)
+            return;
+
+        var lastName = Scene?.Name ?? "None";
         Scene = scene;
-        CurrentStage().InitScene(scene);
+        $"SetSceneAndViewer {Name} was {lastName} is now: {scene.Title}".WriteSuccess();
     }
 
-    public Viewer CurrentViewer()
-    {
-        return Viewer3D!;
-    }
+
     public Scene CurrentScene()
     {
         return Scene!;
     }
     public async Task<bool> PreRender(FoGlyph3D glyph)
     {
-        return await glyph.PreRender(this, Viewer3D!);
+        return await glyph.PreRender(this);
     }
 
     public virtual void CreateMenus(IWorkspace space, IJSRuntime js, NavigationManager nav)
@@ -136,62 +191,25 @@ public class FoArena3D : FoGlyph3D, IArena
         }
     }
 
-
-
-    public FoWorld3D StressTest3DModelFromFile(string folder, string filename, string baseURL, int count)
+    public override IEnumerable<TreeNodeAction> GetTreeNodeActions()
     {
-        var name = Path.GetFileNameWithoutExtension(filename);
-
-
-        var world3D = new UDTO_World();
-        var data = new MockDataMaker();
-        var url = Path.Join(baseURL, folder, filename);
-
-        var root = new DT_Hero();
-
-        for (int i = 0; i < count; i++)
+        var result = base.GetTreeNodeActions().ToList();
+        result.AddAction("Clear", "btn-danger", () =>
         {
-            root.name = $"{name}-{i}";
-            var shape = world3D.CreateGlb(root, url, 1, 2, 3);
-            shape.EstablishLoc(data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), data.GenerateDouble(-5, 5), "m");
-            shape.EstablishAng(data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), data.GenerateDouble(0, 360), "r");
-        };
+            Task.Run(async () => await ClearArena());
+        });
 
-
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
-
-        //PostRenderplatform
-
-        return world;
+        result.AddAction("Update", "btn-success", () =>
+        {
+           Task.Run(async () => await UpdateArena());
+        });
+        
+        return result;
     }
 
 
 
-    public FoWorld3D Load3DModelFromFile(UDTO_Body spec, string folder, string filename, string baseURL)
-    {
-        var name = Path.GetFileNameWithoutExtension(filename);
-
-        var url = Path.Join(baseURL, folder, filename);
-
-        var root = new DT_Hero
-        {
-            name = name,
-            guid = spec.uniqueGuid,
-        };
-
-
-        var world3D = new UDTO_World();
-        var body = world3D.CreateGlb(root, url);
-        body.boundingBox = spec.boundingBox;
-        body.position = spec.position;
-
-        var world = new FoWorld3D(world3D);
-        RenderWorld3D(world);
-
-        return world;
-    }
-
+ 
 
 
     public bool RenderDrawingToScene(IDrawing drawing)
@@ -251,7 +269,7 @@ public class FoArena3D : FoGlyph3D, IArena
                 var h = (double)shape.Height / pixels;
                 var x = (double)shape.PinX / pixels;
                 var y = (double)shape.PinY / pixels;
-                var panel = new FoPanel3D(shape.Name)
+                var panel = new FoPanel3D(shape.Key)
                 {
                     Width = w,
                     Height = h,
@@ -292,89 +310,63 @@ public class FoArena3D : FoGlyph3D, IArena
         return true;
     }
 
-    public bool RenderWorld3D(FoWorld3D world)
-    {
-        if (world == null) return false;
+    // public void RenderWorld3D(IWorld3D world)
+    // {
+    //     if (world == null) return;
 
-        $"RenderWorld {world.Name}".WriteNote();
+    //     $"RenderWorld {world.GetTreeNodeTitle()}".WriteNote();
 
-        PreRenderWorld3D(world);
-        return RenderWorld3DToScene(world);
-    }
-
-
-    public void PreRenderWorld3D(FoWorld3D? world)
-    {
-        $"PreRenderWorld world={world}".WriteInfo();
-        if (world == null)
-        {
-            $"world is empty or viewer is not preent".WriteError();
-            return;
-        }
-
-        var bodies = world.ShapeBodies();
-        if (bodies != null)
-            PreRenderShape3D(bodies);
-    }
+    //     Task.Run(async () =>
+    //     {
+    //         await PreRenderWorld3D(world);
+    //         RenderWorld3DToScene(world);
+    //         await UpdateArena();
+    //     });
+    // }
 
 
-    public bool RenderWorld3DToScene(FoWorld3D? world)
-    {
+    // public async Task PreRenderWorld3D(IWorld3D world)
+    // {
+    //     //$"PreRenderWorld world={world}".WriteInfo();
+    //     if (world == null)
+    //     {
+    //         $"world is empty or viewer is not preent".WriteError();
+    //         return;
+    //     }
 
-        if (world == null || Scene == null)
-        {
-            $"world is empty or viewer is not present".WriteError();
-            return false;
-        }
+    //     var bodies = world.ShapeBodies();
+    //     if (bodies != null)
+    //         await PreRenderGLBClones(bodies);
+    // }
 
- 
-        world.ShapeBodies()?.ForEach(body =>
-        {
-            // $"RenderPlatformToScene Body Name={body.Name} Type={body.Type}".WriteInfo();
-            body.Render(Scene, 0, 0);
-        });
 
-        world.Labels()?.ForEach(label =>
-        {
-            //$"RenderPlatformToScene Label Name={label.Name} Text={label.Text}".WriteInfo();
-            label.Render(Scene, 0, 0);
-        });
-
-        world.Datums()?.ForEach(datum =>
-        {
-            // $"RenderPlatformToScene Datum {datum.Name}".WriteInfo();
-            datum.Render(Scene, 0, 0);
-        });
+   
 
 
 
-        //RefreshUI();
-        //PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("RenderPlatformToScene"));
-        return true;
-    }
+    // public async Task PreRenderGLBClones(List<FoShape3D> shapes)
+    // {
+    //     var glbBodies = shapes.Where((body) => body.Type.Matches("Glb")).ToList();
+    //     var otherBodies = shapes.Where((body) => !body.Type.Matches("Glb")).ToList();
+
+    //     var bodyDict = glbBodies
+    //         .GroupBy(item => item.Url)
+    //         .ToDictionary(group => group.Key, group => group.ToList());
+
+    //     foreach (var keyValuePair in bodyDict)
+    //     {
+    //         await FoShape3D.PreRenderClones(keyValuePair.Value, this,  Import3DFormats.Gltf);
+    //     }
+
+    //     foreach (var body in otherBodies)
+    //     {
+    //         //$"PreRenderPlatform Body {body.Name}".WriteInfo();
+    //         await body.PreRender(this);
+    //     }
+
+    // }
 
 
-    public void PreRenderShape3D(List<FoShape3D> shapes)
-    {
 
-        var glbBodies = shapes.Where((body) => body.Type.Matches("Glb")).ToList();
-        var otherBodies = shapes.Where((body) => !body.Type.Matches("Glb")).ToList();
-
-        var bodyDict = glbBodies
-            .GroupBy(item => item.Symbol)
-            .ToDictionary(group => group.Key, group => group.ToList());
-
-        foreach (var keyValuePair in bodyDict)
-        {
-            FoShape3D.PreRenderClones(keyValuePair.Value, this, Viewer3D!, Import3DFormats.Gltf);
-        }
-
-        foreach (var body in otherBodies)
-        {
-            $"PreRenderPlatform Body {body.Name}".WriteInfo();
-            body.PreRender(this, Viewer3D!);
-        };
-
-    }
 
 }

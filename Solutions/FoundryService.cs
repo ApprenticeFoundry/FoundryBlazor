@@ -1,9 +1,7 @@
-using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
+
 using Microsoft.JSInterop;
 using Radzen;
 
@@ -12,7 +10,7 @@ namespace FoundryBlazor.Solutions;
 public interface IFoundryService
 {
     ICommand Command();
-    DialogService Dialog();
+    IPopupDialog PopupDialog();
     IJSRuntime JS();
     ComponentBus PubSub();
     IToast Toast();
@@ -21,6 +19,9 @@ public interface IFoundryService
     IPanZoomService PanZoom();
     ISelectionService Selection();
     IHitTestService HitTest();
+    IQRCodeService QRCode();
+    IToolManagement Tools();
+    IWorldManager WorldManager();
 }
 
 public class FoundryService : IFoundryService
@@ -29,10 +30,12 @@ public class FoundryService : IFoundryService
     protected ICommand cmd { get; set; }
     protected IDrawing drawing { get; set; }
     protected IArena arena { get; set; }
+    protected IWorldManager manager { get; set; }
     protected IPanZoomService panzoom { get; set; }
     protected ISelectionService selection { get; set; }
     protected IHitTestService hittest { get; set; }
-    protected DialogService dialog { get; set; }
+    protected IQRCodeService qrcode { get; set; }
+    protected IPopupDialog dialog { get; set; }
     protected IJSRuntime js { get; set; }
     protected ComponentBus pubsub { get; set; }
 
@@ -41,10 +44,12 @@ public class FoundryService : IFoundryService
         ICommand command,
         ISelectionService selection,
         IHitTestService hittest,
+        IQRCodeService qrcode,
         IPanZoomService panzoom,
         IDrawing drawing,
         IArena arena,
-        DialogService dialog,
+        IWorldManager manager,
+        IPopupDialog dialog,
         IJSRuntime js,
         ComponentBus pubsub)
     {
@@ -55,9 +60,11 @@ public class FoundryService : IFoundryService
         this.toast = toast;
         this.drawing = drawing;
         this.arena = arena;
+        this.manager = manager;
         this.panzoom = panzoom;
         this.selection = selection;
         this.hittest = hittest;
+        this.qrcode = qrcode;
     }
 
 
@@ -66,7 +73,7 @@ public class FoundryService : IFoundryService
         return cmd;
     }
 
-    public DialogService Dialog()
+    public IPopupDialog PopupDialog()
     {
         return dialog;
     }
@@ -107,5 +114,20 @@ public class FoundryService : IFoundryService
     public ISelectionService Selection()
     {
         return selection;
+    }
+
+    public IQRCodeService QRCode()
+    {
+        return qrcode;
+    }
+
+    public IToolManagement Tools()
+    {
+        return Drawing().Tools();
+    }
+
+    public IWorldManager WorldManager()
+    {
+        return manager;
     }
 }

@@ -1,8 +1,0 @@
-
-@using FoundryBlazor.Dialogs
-@inherits NodeEditorDialogBase
-
-<RadzenCard>
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Side Dialog</RadzenText>
-        <RadzenButton Text="Dialog on Side" Style="width: 100%" ButtonStyle="ButtonStyle.Secondary" Click="@(async args => await DialogService!.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = false, Position = DialogPosition.Right, ShowMask = false }))" />
-</RadzenCard>

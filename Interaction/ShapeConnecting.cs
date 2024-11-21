@@ -1,43 +1,41 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorComponentBus;
-using FoundryBlazor.Canvas;
+ 
 using FoundryBlazor.Extensions;
-
-
+using FoundryBlazor.Shared;
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Shape;
 
 
-public class ShapeConnecting :  ShapeHovering
+public class ShapeConnecting : ShapeHovering
 {
     private bool isConnecting = false;
 
     public Type SourceType { get; set; } = typeof(FoGlyph2D);
     public Type TargetType { get; set; } = typeof(FoGlyph2D);
 
-    public ShapeConnecting (
-            InteractionStyle style,
+    public ShapeConnecting(
             int priority,
-            FoDrawing2D draw,
-            ComponentBus pub,
-            IPanZoomService panzoom,
-            ISelectionService select,
-            IPageManagement manager,
-            IHitTestService hitTest
-        ): base(style,priority,draw,pub,panzoom,select,manager,hitTest)
+            string cursor,
+            IDrawing draw,
+            ComponentBus pubsub,
+            ToolManagement tools
+        ) : base(priority, cursor, draw, pubsub, tools)
     {
+        ToolType = ToolManagement.InteractionStyle<ShapeConnecting>();
     }
     public override void Abort()
-    {     
+    {
         isConnecting = false;
-        lastHover?.ForEach(child => child.HoverDraw = null);
+        lastHover?.ForEach(child => child.ClearHoverDraw());
     }
 
     public override bool IsDefaultTool(CanvasMouseArgs args)
     {
-        dragArea = panZoomService.HitRectStart(args);
-        var findings = ValidDragSource(dragArea);
+        DragArea = GetPanZoomService().HitRectStart(args);
+        var findings = ValidDragSource(DragArea);
         selectedShape = findings.LastOrDefault(); // get one on top
 
         if (findings?.Count == 1 && selectedShape != null)
@@ -56,17 +54,18 @@ public class ShapeConnecting :  ShapeHovering
             await ctx.SetLineDashAsync(new float[] { 50, 10 });
             await ctx.SetLineWidthAsync(1);
             await ctx.SetStrokeStyleAsync("Yellow");
-            var rect = panZoomService.TransformRect(dragArea);
+            var rect = GetPanZoomService().TransformRect(DragArea);
             await ctx.StrokeRectAsync(rect.X, rect.Y, rect.Width, rect.Height);
             await ctx.StrokeAsync();
         }
     }
-       
+
     public override bool MouseDown(CanvasMouseArgs args)
     {
-        if ( selectedShape != null )
+        if (selectedShape != null)
         {
             isConnecting = true;
+             var selectionService = GetSelectionService();
             selectionService?.ClearAllWhen(true);
             selectionService?.AddItem(selectedShape);
         }
@@ -76,17 +75,17 @@ public class ShapeConnecting :  ShapeHovering
 
     private List<FoGlyph2D> ValidDragSource(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = GetHitTestService().FindGlyph(rect);
         var heros = findings!.Where(item => item.GetType() == SourceType);
-        return heros.ToList(); 
+        return heros.ToList();
     }
 
     private List<FoGlyph2D> ValidDropTarget(Rectangle rect)
     {
-        var findings = pageManager?.FindGlyph(rect);
+        var findings = GetHitTestService().FindGlyph(rect);
         var targets = findings!.Where(item => item.GetType() == TargetType);
         //var targets = heros.Where(item => !item.Tag.Matches(TargetType.Name));
-        return targets.ToList(); 
+        return targets.ToList();
     }
 
     public override bool MouseUp(CanvasMouseArgs args)
@@ -94,11 +93,11 @@ public class ShapeConnecting :  ShapeHovering
         if (isConnecting && selectedShape != null)
         {
             isConnecting = false;
-            var over = panZoomService.HitRectStart(args);
+            var over = GetPanZoomService().HitRectStart(args);
             var findings = ValidDropTarget(over);
             var found = findings!.Where(item => item != selectedShape).FirstOrDefault();
 
-            if ( found != null)
+            if (found != null)
             {
                 //link this in the model and force a new layout
                 var msg = new AttachAssetFileEvent()
@@ -112,15 +111,20 @@ public class ShapeConnecting :  ShapeHovering
                 return true;
             }
         }
-        drawing.SetInteraction(InteractionStyle.ShapeHovering);
+        SetInteraction<ShapeHovering>();
         return false;
     }
+
+
+
     public override bool MouseMove(CanvasMouseArgs args)
     {
         //SendUserMove(args, true);
-        if (isConnecting) {
-            dragArea = panZoomService.HitRectStart(args);
-            var move = panZoomService.Movement();
+        var panZoomService = GetPanZoomService();
+        if (isConnecting)
+        {
+            DragArea = panZoomService.HitRectStart(args);
+            var move = panZoomService.MouseDeltaMovement();
 
             drawing.MoveSelectionsBy(move.X, move.Y);
         }
@@ -128,14 +132,14 @@ public class ShapeConnecting :  ShapeHovering
         var over = panZoomService.HitRectStart(args);
         var found = ValidDropTarget(over);
 
-        lastHover?.ForEach(child => child.HoverDraw = null);
+        lastHover?.ForEach(child => child.ClearHoverDraw());
 
-        if ( selectedShape != null)
+        if (selectedShape != null)
         {
             lastHover = found;
-            lastHover.ForEach(child => child.HoverDraw = OnHoverTarget);
+            lastHover.ForEach(child => child.SetHoverDraw(OnHoverTarget!));
         }
-        
+
         return true;
     }
 
@@ -147,7 +151,7 @@ public class ShapeConnecting :  ShapeHovering
         await ctx.SetLineDashAsync(new float[] { 10, 10 });
         await ctx.SetLineWidthAsync(10);
         await ctx.SetStrokeStyleAsync("White");
-        await ctx.StrokeRectAsync(-5, -5, obj.Width+10, obj.Height+10);
+        await ctx.StrokeRectAsync(-5, -5, obj.Width + 10, obj.Height + 10);
 
         await ctx.RestoreAsync();
     };

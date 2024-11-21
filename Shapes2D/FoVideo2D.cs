@@ -1,6 +1,8 @@
 using System.Drawing;
 using Blazor.Extensions.Canvas.Canvas2D;
-using FoundryBlazor.Canvas;
+ 
+using FoundryBlazor.Shared;
+using FoundryBlazor.Shared.SVG;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -8,7 +10,7 @@ using Microsoft.JSInterop;
 //  https://www.mikesdotnetting.com/article/361/resize-images-before-uploading-in-blazor-web-assembly
 namespace FoundryBlazor.Shape;
 
-public class FoVideo2D : FoGlyph2D, IImage2D
+public class FoVideo2D : FoShape2D, IImage2D
 {
     // TODO: can we figure out how to inject JsRuntime?
     public IJSRuntime? JsRuntime { get; set; }
@@ -138,7 +140,7 @@ public class FoVideo2D : FoGlyph2D, IImage2D
     public bool MouseHit(CanvasMouseArgs args)
     {
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
 
         if (found != null)
         {
@@ -150,14 +152,16 @@ public class FoVideo2D : FoGlyph2D, IImage2D
         return false;
     }
 
-    public override bool LocalMouseHover(CanvasMouseArgs args, Action<Canvas2DContext, FoGlyph2D>? OnHover)
+    public override bool LocalMouseHover(CanvasMouseArgs args, Rectangle loc, Action<Canvas2DContext, FoGlyph2D>? OnHover)
     {
-        Members<FoButton2D>().ForEach(child => child.HoverDraw = null);
+        Members<FoButton2D>().ForEach(child => child.ClearHoverDraw());
+
         var pt = new Point(args.OffsetX - LeftEdge(), args.OffsetY - TopEdge());
-        var found = Members<FoButton2D>().Where(item => item.Rect().Contains(pt)).FirstOrDefault();
-        if (found != null)
+        var found = Members<FoButton2D>().Where(item => item.HitTestRect().Contains(pt)).FirstOrDefault();
+        
+        if (found != null && OnHover != null)
         {
-            found.HoverDraw = OnHover;
+            found.SetHoverDraw(OnHover);
             return true;
         }
 
@@ -196,7 +200,7 @@ public class FoVideo2D : FoGlyph2D, IImage2D
 
     private async void RunJavascript(string action)
     {
-        if (JsRuntime != null) 
+        if (JsRuntime != null)
             await JsRuntime.InvokeVoidAsync($"window.VideoManager.{action}", Id);
     }
 
@@ -211,4 +215,9 @@ public class FoVideo2D : FoGlyph2D, IImage2D
 
     }
 
+    public override FoDynamicRender GetDynamicRender()
+    {
+        foDynamicRender ??= new FoDynamicRender(typeof(Video2D), this);
+        return foDynamicRender;
+    }
 }

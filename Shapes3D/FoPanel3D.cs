@@ -1,25 +1,24 @@
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Scenes;
+using BlazorThreeJS.Viewers;
 using BlazorThreeJS.Menus;
 using FoundryBlazor.Extensions;
 using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Objects;
 using BlazorThreeJS.Materials;
+using BlazorThreeJS.Core;
 
 namespace FoundryBlazor.Shape;
 
 public class FoPanel3D : FoGlyph3D, IShape3D
 {
-    public Vector3? Position { get; set; }
-    public Vector3? Pivot { get; set; }
-    public Euler? Rotation { get; set; }
+
     public List<string> TextLines { get; set; } = new();
     private TextPanel? TextPanel { get; set; }
     private PanelGroup? PanelGroup { get; set; }
 
     public string DisplayText()
     {
-        return Name;
+        return Key;
     }
 
     public FoPanel3D() { }
@@ -92,38 +91,51 @@ public class FoPanel3D : FoGlyph3D, IShape3D
         return Panels().Select((item) => item.EstablishPanel3D()).ToList();
     }
 
-    private List<Mesh> ChildConnections()
+    private List<Object3D> ChildConnections()
     {
         return Connections().Select((item) => item.EstablishPathway3D()).ToList();
     }
 
+    public bool UpdateTextLines(List<string> lines)
+    {
+        TextLines = lines;
+        //"Update label text".WriteSuccess();
+        if (TextPanel != null)
+        {
+            TextPanel.TextLines = TextLines;
+            return true;
+        }
+
+        return false;
+    }
 
 
-    public override bool Render(Scene ctx, int tick, double fps, bool deep = true)
+
+    public override bool Render(Scene scene, int tick, double fps, bool deep = true)
     {
         //$"RenderPanel {Name} {Position?.X} {Position?.Y}  {Position?.Z}".WriteNote();
 
         if (IsVisible)
         {
             TextPanel = EstablishPanel3D();
-            ctx.Add(TextPanel);
+            scene.AddChild(TextPanel);
         }
         else
         {
             if (TextPanel != null)
-                ctx.Remove(TextPanel);
+                scene.RemoveChild(TextPanel);
             TextPanel = null;
         }
 
-        if ( HasPanels())
+        if (HasPanels())
         {
             PanelGroup = EstablishGroup3D();
-            ctx.Add(PanelGroup);
+            scene.AddChild(PanelGroup);
         }
         else
         {
             if (PanelGroup != null)
-                ctx.Remove(PanelGroup);
+                scene.RemoveChild(PanelGroup);
             PanelGroup = null;
         }
         return true;

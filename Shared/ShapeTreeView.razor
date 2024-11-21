@@ -1,0 +1,21 @@
+
+@inherits ShapeTreeBase
+
+
+@namespace FoundryBlazor.Shared
+
+<ul>
+    <button class="btn btn-primary" @onclick="() => OnRefresh()">Refresh</button>
+    @* <button class="btn btn-success" @onclick="() => AddScene()">Include Scene</button>
+    <button class="btn btn-success" @onclick="() => AddWorld()">Include Worlds</button> *@
+
+
+
+    <ShapeTreeItem 
+        Items="@GetAllNodes()" 
+        OnSelect="item => Console.WriteLine(item.GetTreeNodeTitle())">
+    </ShapeTreeItem>
+</ul>
+
+
+

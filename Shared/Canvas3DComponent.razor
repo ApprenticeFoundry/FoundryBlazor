@@ -2,12 +2,6 @@
 @using BlazorThreeJS.Viewers
 @inherits Canvas3DComponentBase
 
-<div style=@StyleCanvas Width=@CanvasWidth Height=@CanvasHeight >
-  <AnimationHelper @ref="AnimationHelperReference" RenderFrame="RenderFrame"  >
-        <Viewer @ref="ThreeJSView3D" ViewerSettings=@GetSettings() Scene=@GetActiveScene()  />
-   </AnimationHelper>
+<div id="worldHolder" style="@GetCanvasStyle()" Width="@CanvasWidth" Height="@CanvasHeight">
+    <ViewerThreeD SceneName=@SceneName @ref="ViewerReference" ViewerSettings=@Settings3D ActiveScene=@Scene3D  CanvasWidth="@CanvasWidth" CanvasHeight="@CanvasHeight"/>
 </div>
-
-
-
-

@@ -1,0 +1,23 @@
+@inherits MouseTrackerBase
+@using FoundryBlazor.Shared.SVG
+@namespace FoundryBlazor.Shared.SVG
+
+
+@* <rect x="@X1()" y="@Y1()" width="50" height="50" fill="green" stroke="White">
+</rect> *@
+
+@foreach (var rect in GetSearches())
+{
+    <rect x="@rect.X" y="@rect.Y" width="@rect.Width" height="@rect.Height" fill="none" stroke="Red">
+    </rect>
+}
+
+<QuadTree TreeNode="@GetTreeNode()"></QuadTree>
+
+@if (IsFenceSelecting())
+{
+    var rec = GetFence();
+    <rect x="@rec.X" y="@rec.Y" width="@rec.Width" height="@rec.Height" fill="none" stroke-width="6"  stroke="White"
+        stroke-dasharray="10 10">
+    </rect>
+}

@@ -1,9 +1,9 @@
 using FoundryBlazor.Extensions;
-
+using FoundryRulesAndUnits.Extensions;
 
 namespace FoundryBlazor.Persistence;
 
-public class VersionInfo // : FoBase
+public class VersionPersistence // : FoBase
 {
     public string? Name { get; set; }
     public string Title { get; set; }
@@ -25,20 +25,20 @@ public class VersionInfo // : FoBase
     public string? FutureVersion { get; set; }
     public string? TimeStamp { get; set; }
 
-    public VersionInfo()
+    public VersionPersistence()
     {
         Version = "";
         Filename = "";
         Title = "";
     }
 
-    public VersionInfo ShallowCopy()
+    public VersionPersistence ShallowCopy()
     {
-        var result = (VersionInfo)this.MemberwiseClone();
+        var result = (VersionPersistence)this.MemberwiseClone();
         return result;
     }
 
-    public VersionInfo GenerateNewVersion()
+    public VersionPersistence GenerateNewVersion()
     {
         var version = IncrementVersion(Version);
 
@@ -96,11 +96,11 @@ public class VersionInfo // : FoBase
         return filename;
     }
 
-    public static VersionInfo Generate(string previous, string name, string title, string author)
+    public static VersionPersistence Generate(string previous, string name, string title, string author)
     {
         var version = IncrementVersion(!string.IsNullOrEmpty(previous) ? previous : "0000");
         var filename = CleanToFilename(name);
-        var info = new VersionInfo
+        var info = new VersionPersistence
         {
             Title = title,
             Name = name,
@@ -113,15 +113,15 @@ public class VersionInfo // : FoBase
         return info;
     }
 
-    public static List<VersionInfo> FilterByLatestVersion(List<VersionInfo> source)
+    public static List<VersionPersistence> FilterByLatestVersion(List<VersionPersistence> source)
     {
         var dict = source
             .OrderByDescending(obj => obj.Filename!)
             .GroupBy(obj => obj.Name ?? obj.Title!)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        var list = new List<VersionInfo>();
-        foreach (KeyValuePair<string, List<VersionInfo>> entry in dict)
+        var list = new List<VersionPersistence>();
+        foreach (KeyValuePair<string, List<VersionPersistence>> entry in dict)
         {
             list.Add(entry.Value.First());
         }

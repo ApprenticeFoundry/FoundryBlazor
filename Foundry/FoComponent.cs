@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using System.Reflection;
-using static System.Reflection.Metadata.BlobBuilder;
+using FoundryRulesAndUnits.Models;
+using System.Text.Json.Serialization;
 
 namespace FoundryBlazor;
 
 public interface IFoComponent
 {
     bool HasSlot<T>() where T : FoBase;
+    bool RemoveSlot<T>() where T : FoBase;
     T Establish<T>(string key) where T : FoBase;
     T? Find<T>(string key) where T : FoBase;
     List<T> Members<T>() where T : FoBase;
@@ -50,16 +50,22 @@ public class SlotGroups: Dictionary<string, object>
 
 public class FoComponent : FoBase, IFoComponent
 {
-    public string ClassType { get; init; }
+    public string? Name { get; set; }
+
+    [JsonPropertyName("@type")]
+    public string Type { get; init; }
     private SlotGroups Slots { get; set; } = new();
 
-    public FoComponent(string name = "") : base(name)
+    public Func<FoComponent?> GetParent = () => null;
+
+    public FoComponent(string key = "") : base(key)
     {
-        ClassType = GetType().Name;
+        Type = GetType().Name;
     }
 
-    public virtual bool OpenEdit() { return false; }
-    public virtual bool OpenCreate() { return false; }
+    public Func<bool> OpenCreater { get; set; } = null!;
+    public Func<bool> OpenEditor { get; set; } = null!;
+    public Func<bool> OpenViewer { get; set; } = null!;
 
 
     public virtual IFoCollection DynamicSlot(Type type)
@@ -68,6 +74,21 @@ public class FoComponent : FoBase, IFoComponent
         return found;
     }
 
+    public T? GetParentOfType<T>() where T : FoComponent
+    {
+        if ( this is T)
+            return this as T;
+
+
+        var parent = GetParent();
+        if ( parent == null)
+            return null;
+            
+        if ( parent is T)
+            return parent as T;
+
+        return parent.GetParentOfType<T>();
+    }
 
     public virtual FoCollection<T> Slot<T>() where T : FoBase
     {
@@ -79,6 +100,16 @@ public class FoComponent : FoBase, IFoComponent
     {
         var key = typeof(T).Name;
         return Slots.ContainsKey(key);
+    }
+    public bool RemoveSlot<T>() where T : FoBase
+    {
+        var key = typeof(T).Name;
+        if (Slots.ContainsKey(key) )
+        {
+            Slots.Remove(key);
+            return true;
+        }
+        return false;
     }
 
     public virtual FoCollection<T>? GetSlot<T>() where T : FoBase
@@ -103,7 +134,10 @@ public class FoComponent : FoBase, IFoComponent
     public virtual T Remove<T>(T value) where T : FoBase
     {
         var target = GetSlot<T>();
-        target?.Remove(value);
+        if (target == null)
+            return value;
+
+        target.Remove(value);
         return value;
     }
 
@@ -130,6 +164,18 @@ public class FoComponent : FoBase, IFoComponent
         return (found as T)!;
     }
 
+    public virtual List<T>? ExtractWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.ExtractWhere(whereClause);
+    }
+
+    public virtual List<T>? FindWhere<T>(Func<T, bool> whereClause) where T : FoBase
+    {
+        var target = GetSlot<T>();
+        return target?.FindWhere(whereClause);
+    }
+    
     public virtual List<T>? GetMembers<T>() where T : FoBase
     {
         FoCollection<T>? target = GetSlot<T>();
@@ -148,10 +194,44 @@ public class FoComponent : FoBase, IFoComponent
         FoCollection<T> target = Slot<T>();
         if (target.TryGetValue(key, out T? found) == false)
         {
-            found = Activator.CreateInstance<T>();
-            found.Name = key;
+            found = (Activator.CreateInstance(typeof(T),key) as T)!;
             target.Add(key, found);
         }
         return (found as T)!;
     }
+
+
+
+    protected ITreeNode FolderOf<T>() where T : FoBase
+    {
+        var count = Members<T>().Count;
+        var name = typeof(T).Name.Replace("Fo", "");
+        
+        if ( name.EndsWith("y"))
+            name = name[..^1] + "ies";
+        else if ( !name.EndsWith("es"))
+            name += "s";
+
+        var folder = new FoFolder(name);
+
+        Members<T>().ForEach(item =>
+        {
+            folder.AddChild(item);
+        });
+        return folder;
+    }
+
+    public void AddFolderIfNotEmpty<T>(List<ITreeNode> list, bool skip=true) where T : FoBase
+    {
+        var count = GetMembers<T>()?.Count ?? 0;
+        if ( count == 0)
+            return;
+
+        var folder = FolderOf<T>();
+        if ( skip )
+            list.AddRange(folder.GetTreeChildren());
+        else
+            list.Add(folder);  
+    }
+
 }
