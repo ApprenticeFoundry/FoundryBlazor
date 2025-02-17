@@ -4,6 +4,7 @@ using BlazorThreeJS.Geometires;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
+using FoundryRulesAndUnits.Extensions;
 
 
 namespace FoundryBlazor.Shape;
@@ -58,13 +59,23 @@ public class FoPipe3D : FoShape3D, IPipe3D
         return this;
     }
 
+    public FoPipe3D CreateLine(string name)
+    {
+        GeomType = "Line";
+        Key = name;
+        return this;
+    }
+
     public (bool success, List<Vector3>? path) ComputePath3D()
     {
         var (f1, v1) = FromShape3D?.HitPosition() ?? (false, null!);
         var (f2, v2) = ToShape3D?.HitPosition() ?? (false, null!);
 
         if (!f1 || !f2) 
+        {
+            $"Cannot ComputePath3D FromShape3D: {FromShape3D?.GetName()} ToShape3D: {ToShape3D?.GetName()}".WriteError();
             return (false, null);
+        }
 
         var path = new List<Vector3>()
         {
@@ -73,6 +84,10 @@ public class FoPipe3D : FoShape3D, IPipe3D
             // new(v2.X, v1.Y, v2.Z),
             v2
         };
+        // foreach (var item in path)
+        // {
+        //     $"ComputePath3D: {item.X} {item.Y} {item.Z}".WriteSuccess();
+        // }
         return (true, path);
     }
 
@@ -96,8 +111,13 @@ public class FoPipe3D : FoShape3D, IPipe3D
 
         var (success, Path3D) = ComputePath3D();
 
-        if (!success) 
-            return new Mesh3D();
+        if (!success)
+        {
+            Path3D = new List<Vector3>() {
+                new(1,2,3),
+                new(10,20,30)
+            };
+        }
 
         var geometry = new TubeGeometry(Radius, Path3D!, 8, 64);
         var mesh = CreateMesh(geometry);
@@ -114,8 +134,13 @@ public class FoPipe3D : FoShape3D, IPipe3D
         var mesh = CreateMesh(geometry);
         return mesh;
     }
+
     public Mesh3D AsLine()
     {
+        var (success, Link3D) = ComputePath3D();
+        if ( Path3D.Count < 2 && success)
+            Path3D.AddRange(Link3D!);
+
         var list = new List<Vector3>(Path3D);
         if ( Closed )
             list.Add(Path3D[0]);

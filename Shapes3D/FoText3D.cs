@@ -11,11 +11,11 @@ namespace FoundryBlazor.Shape;
 public class FoText3D : FoShape3D, IShape3D
 {
 
-    public Text3DAlign TextAlign { get; set; } = Text3DAlign.Left;
+    public Text3DAlign TextAlign { get; set; } = Text3DAlign.Center;
     public Text3DAnchor AnchorX { get; set; } = Text3DAnchor.Center;
     public Text3DAnchor AnchorY { get; set; } = Text3DAnchor.Middle;
 
-    public double fontsize { get; set; } = 0.5;
+    private double fontsize { get; set; } = 0.1;
     public double FontSize 
     { 
         get { return this.fontsize; } 

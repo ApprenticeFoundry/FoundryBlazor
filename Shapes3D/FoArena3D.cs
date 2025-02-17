@@ -22,7 +22,7 @@ public interface IArena: ITreeNode
     void ClearArena();
     void UpdateArena();
 
-
+    bool ComputeHitBoundaries(Action OnComplete);
     FoStage3D SetCurrentStage(FoStage3D stage);
     void AddAction(string name, string color, Action action);
 
@@ -53,6 +53,17 @@ public class FoArena3D : FoGlyph3D, IArena
         StageManager = manager;
 
         PubSub = pubSub;
+    }
+
+    public bool ComputeHitBoundaries(Action OnComplete)
+    {
+        var (success, scene) = CurrentScene();
+
+        if (!success) 
+            return false;
+
+        scene.UpdateHitBoundaries(OnComplete);
+        return true;
     }
 
     public FoStage3D SetCurrentStage(FoStage3D stage)
