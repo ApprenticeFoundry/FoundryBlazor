@@ -66,7 +66,7 @@ public class FoPipe3D : FoShape3D, IPipe3D
         return this;
     }
 
-    public (bool success, List<Vector3>? path) ComputePath3D()
+    public virtual (bool success, List<Vector3>? path) ComputePath3D()
     {
         var (f1, v1) = FromShape3D?.HitPosition() ?? (false, null!);
         var (f2, v2) = ToShape3D?.HitPosition() ?? (false, null!);
@@ -84,10 +84,7 @@ public class FoPipe3D : FoShape3D, IPipe3D
             // new(v2.X, v1.Y, v2.Z),
             v2
         };
-        // foreach (var item in path)
-        // {
-        //     $"ComputePath3D: {item.X} {item.Y} {item.Z}".WriteSuccess();
-        // }
+
         return (true, path);
     }
 

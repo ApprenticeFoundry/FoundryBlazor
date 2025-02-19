@@ -4,6 +4,7 @@ namespace FoundryBlazor.Shape;
 public class FoSpec3D
 {
     public string Name { get; set; } = "";
+    public string Title { get; set; } = "";
     public string GlyphId { get; set; } = "";
     public string Color { get; set; } = "Green";
     public double Opacity { get; set; } = 1.0;
