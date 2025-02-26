@@ -66,6 +66,8 @@ public class FoComponent : FoBase, IFoComponent
     public string Type { get; init; }
     private SlotGroups Slots { get; set; } = new();
 
+
+    [JsonIgnore]
     public Func<FoComponent?> GetParent = () => null;
 
     public FoComponent(string key = "") : base(key)
@@ -73,8 +75,13 @@ public class FoComponent : FoBase, IFoComponent
         Type = GetType().Name;
     }
 
+    [JsonIgnore]
     public Func<bool> OpenCreater { get; set; } = null!;
+        
+    [JsonIgnore]
     public Func<bool> OpenEditor { get; set; } = null!;
+    
+    [JsonIgnore]
     public Func<bool> OpenViewer { get; set; } = null!;
 
 

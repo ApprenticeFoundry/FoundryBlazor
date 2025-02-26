@@ -4,6 +4,7 @@ using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using Unglide;
 
 namespace FoundryBlazor.Shape;
@@ -133,9 +134,13 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
 
 
 
-
+    [JsonIgnore]
     public Func<FoGlyph2D, int> LocPinX = (obj) => obj.Width / 2;
+
+    [JsonIgnore]
     public Func<FoGlyph2D, int> LocPinY = (obj) => obj.Height / 2;
+    
+    [JsonIgnore]
     public Func<FoGlyph2D, double> RotationZ = (obj) => obj.Angle;
 
     public int LeftEdge() { return PinX - LocPinX(this); }
