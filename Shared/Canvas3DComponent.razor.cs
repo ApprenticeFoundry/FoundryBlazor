@@ -14,7 +14,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
+public class Canvas3DComponentBase : ComponentBase //, IAsyncDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }
@@ -24,7 +24,6 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
     [Parameter] public int CanvasWidth { get; set; } = 2500;
     [Parameter] public int CanvasHeight { get; set; } = 4000;
 
-    //[Parameter] public ViewerSettings? Settings3D { get; set; }
 
     [Parameter,EditorRequired] public string? SceneName { get; set; }
 
@@ -70,7 +69,8 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
                 Ctx = scene; 
                 Ctx?.SetAfterUpdateAction((s,j)=>
                 {
-                    PubSub?.Publish<RefreshUIEvent>(new RefreshUIEvent("Canvas3DComponentBase"));
+                    // for now do not do this
+                    // PubSub?.Publish<RefreshUIEvent>(new RefreshUIEvent("Canvas3DComponentBase"));
                 });
             }
 
@@ -80,24 +80,24 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        try
-        {
-            if ( Ctx == null ) return;
-            Ctx?.SetAfterUpdateAction((s,j)=> {});
-            Ctx = null;
+    // public async ValueTask DisposeAsync()
+    // {
+    //     try
+    //     {
+    //         if ( Ctx == null ) return;
+    //         Ctx?.SetAfterUpdateAction((s,j)=> {});
+    //         Ctx = null;
 
-            "Canvas3DComponentBase DisposeAsync".WriteInfo();
-            PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
-            GC.SuppressFinalize(this);
-            await ValueTask.CompletedTask;
-        }
-        catch (Exception ex)
-        {
-            $"Canvas3DComponentBase DisposeAsync Exception {ex.Message}".WriteError();
-        }
-    }
+    //         "Canvas3DComponentBase DisposeAsync".WriteInfo();
+    //         PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
+    //         GC.SuppressFinalize(this);
+    //         await ValueTask.CompletedTask;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         $"Canvas3DComponentBase DisposeAsync Exception {ex.Message}".WriteError();
+    //     }
+    // }
     public void Render()
     {
         var arena = Workspace?.GetArena();
