@@ -14,15 +14,15 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas3DComponentBase : ComponentBase //, IAsyncDisposable
+public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
 
     [Parameter] public string CanvasStyle { get; set; } = "width:max-content; border:1px solid black;cursor:default";
-    [Parameter] public int CanvasWidth { get; set; } = 2500;
-    [Parameter] public int CanvasHeight { get; set; } = 4000;
+    [Parameter] public int CanvasWidth { get; set; } = 250;
+    [Parameter] public int CanvasHeight { get; set; } = 400;
 
 
     [Parameter,EditorRequired] public string? SceneName { get; set; }
@@ -46,7 +46,10 @@ public class Canvas3DComponentBase : ComponentBase //, IAsyncDisposable
         return style;
     }
 
-
+    protected override void OnInitialized()
+    {
+        $"Canvas3DComponentBase {SceneName} OnInitialized".WriteInfo();
+    }
 
     public (bool, Scene3D) GetActiveScene() 
     {
@@ -62,15 +65,14 @@ public class Canvas3DComponentBase : ComponentBase //, IAsyncDisposable
     {
         if (firstRender)
         {
-            //$"Canvas3DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
+            $"Canvas3DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
             var (found, scene) = GetActiveScene();
             if (found)
             {
                 Ctx = scene; 
                 Ctx?.SetAfterUpdateAction((s,j)=>
                 {
-                    // for now do not do this
-                    // PubSub?.Publish<RefreshUIEvent>(new RefreshUIEvent("Canvas3DComponentBase"));
+                    PubSub?.Publish<RefreshUIEvent>(new RefreshUIEvent("Canvas3DComponentBase"));
                 });
             }
 
@@ -80,24 +82,25 @@ public class Canvas3DComponentBase : ComponentBase //, IAsyncDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    // public async ValueTask DisposeAsync()
-    // {
-    //     try
-    //     {
-    //         if ( Ctx == null ) return;
-    //         Ctx?.SetAfterUpdateAction((s,j)=> {});
-    //         Ctx = null;
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if ( Ctx == null ) return;
+            Ctx?.SetAfterUpdateAction((s,j)=> {});
+            Ctx = null;
 
-    //         "Canvas3DComponentBase DisposeAsync".WriteInfo();
-    //         PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
-    //         GC.SuppressFinalize(this);
-    //         await ValueTask.CompletedTask;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         $"Canvas3DComponentBase DisposeAsync Exception {ex.Message}".WriteError();
-    //     }
-    // }
+            "Canvas3DComponentBase DisposeAsync".WriteInfo();
+            PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
+            GC.SuppressFinalize(this);
+            await ValueTask.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            $"Canvas3DComponentBase DisposeAsync Exception {ex.Message}".WriteError();
+        }
+    }
+
     public void Render()
     {
         var arena = Workspace?.GetArena();

@@ -55,7 +55,7 @@
 
 <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
-    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="18.0.0" />
+    <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="18.1.0" />
 </ItemGroup>
 
 
