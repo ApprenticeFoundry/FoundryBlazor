@@ -33,7 +33,7 @@ public class FoWorkbook : FoComponent, IWorkbook
     protected IWorkspace Workspace { get; set; }
     protected ICommand Command { get; set; }
     protected IFoundryService FoundryService { get; set; }
-    protected IPopupDialog PopupDialog { get; set; }
+    //protected IPopupDialog PopupDialog { get; set; }
     protected IJSRuntime JsRuntime { get; set; }
     protected ComponentBus PubSub { get; set; }
 
@@ -47,7 +47,7 @@ public class FoWorkbook : FoComponent, IWorkbook
         Workspace = space;
         FoundryService = foundry;
         Command = foundry.Command();
-        PopupDialog = foundry.PopupDialog();
+        //PopupDialog = foundry.PopupDialog();
         JsRuntime = foundry.JS();
         PubSub = foundry.PubSub();
         QRCode = foundry.QRCode();

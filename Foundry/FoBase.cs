@@ -1,5 +1,6 @@
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
+using System.Text.Json.Serialization;
 
 namespace FoundryBlazor;
 
@@ -10,13 +11,16 @@ public class FoBase: ITreeNode
     protected StatusBitArray StatusBits = new();
     private ControlParameters? metaData { get; set; }
 
+    [JsonIgnore] 
     public bool IsActive { get; set; } = false;
 
+    [JsonIgnore] 
     public bool IsVisible
     {
         get { return this.StatusBits.IsVisible; }
         set { this.StatusBits.IsVisible = value; }
     }
+    [JsonIgnore] 
     public bool ShouldRender { 
         get { return this.StatusBits.ShouldRender; } 
         set { this.StatusBits.ShouldRender = value; } 
@@ -24,6 +28,7 @@ public class FoBase: ITreeNode
 
 
     
+    [JsonIgnore] 
     public bool IsDirty
     {
         get { return this.StatusBits.IsDirty; }
@@ -82,11 +87,14 @@ public class FoBase: ITreeNode
         return metaData!;
     }
 
+    [JsonIgnore] 
     public bool Selectable 
     { 
         get { return this.StatusBits.IsSelectable; } 
         set { this.StatusBits.IsSelectable = value; } 
     }
+    
+    [JsonIgnore] 
     public bool IsSelected
     {
         get { return this.StatusBits.IsSelected; }
