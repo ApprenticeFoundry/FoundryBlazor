@@ -8,6 +8,25 @@ using FoundryRulesAndUnits.Units;
 namespace FoundryBlazor.Shape;
 
 /// <summary>
+/// Represents a coordinate used for grid generation
+/// </summary>
+public record SortedCoord
+{
+    public double Value { get; init; }
+    public bool IsFromShape { get; init; }
+    public string Source { get; init; }
+
+    public SortedCoord(double value, bool isFromShape = false, string source = "")
+    {
+        Value = value;
+        IsFromShape = isFromShape;
+        Source = source;
+    }
+    
+    public static implicit operator double(SortedCoord coord) => coord.Value;
+}
+
+/// <summary>
 /// Represents a line segment with start and end points
 /// </summary>
 public record LineSegment
@@ -20,7 +39,6 @@ public record LineSegment
         Start = start;
         End = end;
     }
-
 }
 
 public record LineIntersection
@@ -588,15 +606,15 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var bottomBound = margin + PageHeight.AsPixels();
         
         // Make sure we include page boundaries
-        if (sortedXCoords.Count == 0 || sortedXCoords.Min() > leftBound)
-            sortedXCoords.Insert(0, leftBound);
-        if (sortedXCoords.Count == 0 || sortedXCoords.Max() < rightBound)
-            sortedXCoords.Add(rightBound);
+        if (sortedXCoords.Count == 0 || sortedXCoords.Min(c => c.Value) > leftBound)
+            sortedXCoords.Insert(0, new SortedCoord(leftBound, false, "Left Page Boundary"));
+        if (sortedXCoords.Count == 0 || sortedXCoords.Max(c => c.Value) < rightBound)
+            sortedXCoords.Add(new SortedCoord(rightBound, false, "Right Page Boundary"));
             
-        if (sortedYCoords.Count == 0 || sortedYCoords.Min() > topBound)
-            sortedYCoords.Insert(0, topBound);
-        if (sortedYCoords.Count == 0 || sortedYCoords.Max() < bottomBound)
-            sortedYCoords.Add(bottomBound);
+        if (sortedYCoords.Count == 0 || sortedYCoords.Min(c => c.Value) > topBound)
+            sortedYCoords.Insert(0, new SortedCoord(topBound, false, "Top Page Boundary"));
+        if (sortedYCoords.Count == 0 || sortedYCoords.Max(c => c.Value) < bottomBound)
+            sortedYCoords.Add(new SortedCoord(bottomBound, false, "Bottom Page Boundary"));
         
         // Generate all intersection points
         var intersectionPoints = new List<Point>();
@@ -604,7 +622,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         {
             foreach (var y in sortedYCoords)
             {
-                intersectionPoints.Add(new Point((int)x, (int)y));
+                intersectionPoints.Add(new Point((int)x.Value, (int)y.Value));
             }
         }
         
@@ -668,40 +686,69 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.RestoreAsync();
     }
 
-    private (List<double> sortedXCoords, List<double> sortedYCoords) SortedCoordsShape2D()
+    // public virtual Point[] HitTestSegment(int margin = 0)
+    // {
+    //     var mat = GetMatrix();
+    //     var p1 = mat.TransformToPoint(0-margin, 0-margin);
+    //     var p2 = mat.TransformToPoint(Width+margin, 0-margin);
+    //     var p3 = mat.TransformToPoint(Width+margin, Height+margin);
+    //     var p4 = mat.TransformToPoint(0-margin, Height+margin);
+    //     return new Point[] { p1, p2, p3, p4 };
+    // }
+
+    private (List<SortedCoord> sortedXCoords, List<SortedCoord> sortedYCoords) SortedCoordsShape2D()
     {
         // Collect all unique X and Y coordinates from the boundaries of all shapes
-        HashSet<double> xCoordinates = new();
-        HashSet<double> yCoordinates = new();
+        HashSet<SortedCoord> xCoordinates = new(new SortedCoordComparer());
+        HashSet<SortedCoord> yCoordinates = new(new SortedCoordComparer());
 
         // Get all 2D shapes on the page
         var shapes = AllShapes2D();
 
         foreach (var shape in shapes)
         {
-            Matrix2D matrix = shape.GetMatrix();
-            Point pin = matrix.TransformToPoint(shape.Width / 2, shape.Height / 2);
-            xCoordinates.Add(pin.X);
-            yCoordinates.Add(pin.Y);
+            var matrix = shape.GetMatrix();
+            var pin = matrix.TransformToPoint(shape.Width / 2, shape.Height / 2);
+            
+            // Add center point coordinates
+            xCoordinates.Add(new SortedCoord(pin.X, true, $"Center:{shape.Name}"));
+            yCoordinates.Add(new SortedCoord(pin.Y, true, $"Center:{shape.Name}"));
 
             // Get all boundary points from the SpacialBox2D
-            foreach (var point in shape.HitTestSegment(8))
+            var boundaryPoints = shape.HitTestSegment(8);
+
+            foreach (var point in boundaryPoints)
             {
-                xCoordinates.Add(point.X);
-                yCoordinates.Add(point.Y);
+                xCoordinates.Add(new SortedCoord(point.X, true, $"Boundary of {shape.Name}"));
+                yCoordinates.Add(new SortedCoord(point.Y, true, $"Boundary of {shape.Name}"));
             }
         }
 
         // Sort coordinates for consistent grid generation
-        var sortedXCoords = xCoordinates.OrderBy(x => x).ToList();
-        var sortedYCoords = yCoordinates.OrderBy(y => y).ToList();
+        var sortedXCoords = xCoordinates.OrderBy(coord => coord.Value).ToList();
+        var sortedYCoords = yCoordinates.OrderBy(coord => coord.Value).ToList();
         return (sortedXCoords, sortedYCoords);
+    }
+    
+    // Comparer for SortedCoord to ensure we don't add duplicates to the HashSet
+    private class SortedCoordComparer : IEqualityComparer<SortedCoord>
+    {
+        public bool Equals(SortedCoord x, SortedCoord y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
+            return Math.Abs(x.Value - y.Value) < 0.001;
+        }
+
+        public int GetHashCode(SortedCoord obj)
+        {
+            return obj.Value.GetHashCode();
+        }
     }
 
     /// <summary>
     /// Generates line segments for a grid that aligns with shape boundaries.
-    /// Creates horizontal and vertical line segments accounting for all intersections.
-    /// Excludes line segments that overlap with 2D shapes.
+    /// Creates horizontal and vertical line segments between all adjacent intersections.
     /// </summary>
     /// <returns>A tuple with lists of line segments and intersection points</returns>
     public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineNetwork()
@@ -717,62 +764,53 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var bottomBound = margin + PageHeight.AsPixels();
         
         // Make sure we include page boundaries
-        if (sortedXCoords.Count == 0 || sortedXCoords.Min() > leftBound)
-            sortedXCoords.Insert(0, leftBound);
-        if (sortedXCoords.Count == 0 || sortedXCoords.Max() < rightBound)
-            sortedXCoords.Add(rightBound);
+        if (sortedXCoords.Count == 0 || sortedXCoords.Min(c => c.Value) > leftBound)
+            sortedXCoords.Insert(0, new SortedCoord(leftBound, false, "Left Page Boundary"));
+        if (sortedXCoords.Count == 0 || sortedXCoords.Max(c => c.Value) < rightBound)
+            sortedXCoords.Add(new SortedCoord(rightBound, false, "Right Page Boundary"));
             
-        if (sortedYCoords.Count == 0 || sortedYCoords.Min() > topBound)
-            sortedYCoords.Insert(0, topBound);
-        if (sortedYCoords.Count == 0 || sortedYCoords.Max() < bottomBound)
-            sortedYCoords.Add(bottomBound);
+        if (sortedYCoords.Count == 0 || sortedYCoords.Min(c => c.Value) > topBound)
+            sortedYCoords.Insert(0, new SortedCoord(topBound, false, "Top Page Boundary"));
+        if (sortedYCoords.Count == 0 || sortedYCoords.Max(c => c.Value) < bottomBound)
+            sortedYCoords.Add(new SortedCoord(bottomBound, false, "Bottom Page Boundary"));
         
         // Lists to store the resulting line segments
         var Segments = new List<LineSegment>();
         var Intersections = new Dictionary<(int x,int y), LineIntersection>();
         
-        // Get all 2D shapes for collision detection
-        var shapes = AllShapes2D();
-        
         // Generate horizontal line segments (lines that go from left to right)
         foreach (var y in sortedYCoords)
         {
+            // Process EVERY horizontal segment (not skipping any)
             for (int i = 0; i < sortedXCoords.Count - 1; i++)
             {
                 var startX = sortedXCoords[i];
                 var endX = sortedXCoords[i + 1];
-
-                // Skip this segment if it intersects with any shape
-                if (!IntersectsWithAnyShape(startX, y, endX, y, shapes))
-                {
-                    var start = FindOrCreateIntersection(startX, y, Intersections);
-                    var end = FindOrCreateIntersection(endX, y, Intersections);
-                    var segment = new LineSegment(start, end);
-                    start.Segments.Add(segment);
-                    end.Segments.Add(segment);
-                    Segments.Add(segment);
-                }
+                
+                var start = FindOrCreateIntersection(startX.Value, y.Value, Intersections);
+                var end = FindOrCreateIntersection(endX.Value, y.Value, Intersections);
+                var segment = new LineSegment(start, end);
+                start.Segments.Add(segment);
+                end.Segments.Add(segment);
+                Segments.Add(segment);
             }
         }
         
         // Generate vertical line segments (lines that go from top to bottom)
         foreach (var x in sortedXCoords)
         {
+            // Process EVERY vertical segment (not skipping any)
             for (int i = 0; i < sortedYCoords.Count - 1; i++)
             {
                 var startY = sortedYCoords[i];
                 var endY = sortedYCoords[i + 1];
                 
-                // Skip this segment if it intersects with any shape
-                if (!IntersectsWithAnyShape(x, startY, x, endY, shapes))
-                {
-                    var start = FindOrCreateIntersection(x, startY, Intersections);
-                    var end = FindOrCreateIntersection(x, endY, Intersections);
-                    var segment = new LineSegment(start, end);
-                    start.Segments.Add(segment);
-                    end.Segments.Add(segment);
-                    Segments.Add(segment);
-                }
+                var start = FindOrCreateIntersection(x.Value, startY.Value, Intersections);
+                var end = FindOrCreateIntersection(x.Value, endY.Value, Intersections);
+                var segment = new LineSegment(start, end);
+                start.Segments.Add(segment);
+                end.Segments.Add(segment);
+                Segments.Add(segment);
             }
         }
         
@@ -782,66 +820,6 @@ public class FoPage2D : FoGlyph2D, IPage2D
         return (Segments, filteredIntersections);
     }
     
-    /// <summary>
-    /// Checks if a line segment intersects with any shape on the page
-    /// </summary>
-    /// <param name="x1">Starting x-coordinate of the line segment</param>
-    /// <param name="y1">Starting y-coordinate of the line segment</param>
-    /// <param name="x2">Ending x-coordinate of the line segment</param>
-    /// <param name="y2">Ending y-coordinate of the line segment</param>
-    /// <param name="shapes">List of shapes to check against</param>
-    /// <returns>True if the line segment intersects with any shape, false otherwise</returns>
-    private bool IntersectsWithAnyShape(double x1, double y1, double x2, double y2, List<FoShape2D> shapes)
-    {
-        foreach (var shape in shapes)
-        {
-            // Get the bounding box of the shape
-            var rect = shape.HitTestRect();
-            
-            // Skip shapes that aren't visible or have zero size
-            if (!shape.IsVisible || rect.Width <= 0 || rect.Height <= 0)
-                continue;
-                
-            // For horizontal lines (y1 == y2)
-            if (Math.Abs(y1 - y2) < 0.001)
-            {
-                // Check if the line y-coordinate is within the rectangle's y range
-                if (y1 >= rect.Y && y1 <= rect.Y + rect.Height)
-                {
-                    // Check if the line segment overlaps with the rectangle's x range
-                    double minX = Math.Min(x1, x2);
-                    double maxX = Math.Max(x1, x2);
-                    
-                    if (!(maxX < rect.X || minX > rect.X + rect.Width))
-                    {
-                        // Horizontal line intersects with this shape
-                        return true;
-                    }
-                }
-            }
-            // For vertical lines (x1 == x2)
-            else if (Math.Abs(x1 - x2) < 0.001)
-            {
-                // Check if the line x-coordinate is within the rectangle's x range
-                if (x1 >= rect.X && x1 <= rect.X + rect.Width)
-                {
-                    // Check if the line segment overlaps with the rectangle's y range
-                    double minY = Math.Min(y1, y2);
-                    double maxY = Math.Max(y1, y2);
-                    
-                    if (!(maxY < rect.Y || minY > rect.Y + rect.Height))
-                    {
-                        // Vertical line intersects with this shape
-                        return true;
-                    }
-                }
-            }
-        }
-        
-        // No intersection found with any shape
-        return false;
-    }
-
     private LineIntersection FindOrCreateIntersection(double startX, double y, Dictionary<(int x, int y), LineIntersection> intersections)
     {
         // Use the dictionary to find the intersection point
