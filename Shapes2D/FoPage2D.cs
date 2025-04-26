@@ -701,8 +701,9 @@ public class FoPage2D : FoGlyph2D, IPage2D
     /// <summary>
     /// Generates line segments for a grid that aligns with shape boundaries.
     /// Creates horizontal and vertical line segments accounting for all intersections.
+    /// Excludes line segments that overlap with 2D shapes.
     /// </summary>
-    /// <returns>A tuple with lists of horizontal and vertical line segments</returns>
+    /// <returns>A tuple with lists of line segments and intersection points</returns>
     public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineNetwork()
     {
         // Get sorted coordinates from shape boundaries
@@ -730,6 +731,9 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var Segments = new List<LineSegment>();
         var Intersections = new Dictionary<(int x,int y), LineIntersection>();
         
+        // Get all 2D shapes for collision detection
+        var shapes = AllShapes2D();
+        
         // Generate horizontal line segments (lines that go from left to right)
         foreach (var y in sortedYCoords)
         {
@@ -738,10 +742,16 @@ public class FoPage2D : FoGlyph2D, IPage2D
                 var startX = sortedXCoords[i];
                 var endX = sortedXCoords[i + 1];
 
-                var start = FindOrCreateIntersection(startX, y, Intersections);
-                var end = FindOrCreateIntersection(endX, y, Intersections);
-                var segment = new LineSegment(start, end);
-                Segments.Add(segment);
+                // Skip this segment if it intersects with any shape
+                if (!IntersectsWithAnyShape(startX, y, endX, y, shapes))
+                {
+                    var start = FindOrCreateIntersection(startX, y, Intersections);
+                    var end = FindOrCreateIntersection(endX, y, Intersections);
+                    var segment = new LineSegment(start, end);
+                    start.Segments.Add(segment);
+                    end.Segments.Add(segment);
+                    Segments.Add(segment);
+                }
             }
         }
         
@@ -753,20 +763,88 @@ public class FoPage2D : FoGlyph2D, IPage2D
                 var startY = sortedYCoords[i];
                 var endY = sortedYCoords[i + 1];
                 
-                var start = FindOrCreateIntersection(x, startY, Intersections);
-                var end = FindOrCreateIntersection(x, endY, Intersections);
-                var segment = new LineSegment(start, end);
-                Segments.Add(segment);
-                // Create a vertical line segment from (x, startY) to (x, endY)
+                // Skip this segment if it intersects with any shape
+                if (!IntersectsWithAnyShape(x, startY, x, endY, shapes))
+                {
+                    var start = FindOrCreateIntersection(x, startY, Intersections);
+                    var end = FindOrCreateIntersection(x, endY, Intersections);
+                    var segment = new LineSegment(start, end);
+                    start.Segments.Add(segment);
+                    end.Segments.Add(segment);
+                    Segments.Add(segment);
+                }
             }
         }
         
-        return (Segments, Intersections.Values.ToList());
+        // Filter out intersections that don't have any segments
+        var filteredIntersections = Intersections.Values.Where(i => i.Segments.Count > 0).ToList();
+        
+        return (Segments, filteredIntersections);
+    }
+    
+    /// <summary>
+    /// Checks if a line segment intersects with any shape on the page
+    /// </summary>
+    /// <param name="x1">Starting x-coordinate of the line segment</param>
+    /// <param name="y1">Starting y-coordinate of the line segment</param>
+    /// <param name="x2">Ending x-coordinate of the line segment</param>
+    /// <param name="y2">Ending y-coordinate of the line segment</param>
+    /// <param name="shapes">List of shapes to check against</param>
+    /// <returns>True if the line segment intersects with any shape, false otherwise</returns>
+    private bool IntersectsWithAnyShape(double x1, double y1, double x2, double y2, List<FoShape2D> shapes)
+    {
+        foreach (var shape in shapes)
+        {
+            // Get the bounding box of the shape
+            var rect = shape.HitTestRect();
+            
+            // Skip shapes that aren't visible or have zero size
+            if (!shape.IsVisible || rect.Width <= 0 || rect.Height <= 0)
+                continue;
+                
+            // For horizontal lines (y1 == y2)
+            if (Math.Abs(y1 - y2) < 0.001)
+            {
+                // Check if the line y-coordinate is within the rectangle's y range
+                if (y1 >= rect.Y && y1 <= rect.Y + rect.Height)
+                {
+                    // Check if the line segment overlaps with the rectangle's x range
+                    double minX = Math.Min(x1, x2);
+                    double maxX = Math.Max(x1, x2);
+                    
+                    if (!(maxX < rect.X || minX > rect.X + rect.Width))
+                    {
+                        // Horizontal line intersects with this shape
+                        return true;
+                    }
+                }
+            }
+            // For vertical lines (x1 == x2)
+            else if (Math.Abs(x1 - x2) < 0.001)
+            {
+                // Check if the line x-coordinate is within the rectangle's x range
+                if (x1 >= rect.X && x1 <= rect.X + rect.Width)
+                {
+                    // Check if the line segment overlaps with the rectangle's y range
+                    double minY = Math.Min(y1, y2);
+                    double maxY = Math.Max(y1, y2);
+                    
+                    if (!(maxY < rect.Y || minY > rect.Y + rect.Height))
+                    {
+                        // Vertical line intersects with this shape
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        // No intersection found with any shape
+        return false;
     }
 
     private LineIntersection FindOrCreateIntersection(double startX, double y, Dictionary<(int x, int y), LineIntersection> intersections)
     {
-        //can you do the right thing here and use the dictionary to find the intersection point
+        // Use the dictionary to find the intersection point
         var key = ((int)startX, (int)y);
         if (!intersections.TryGetValue(key, out var intersection))
         {
