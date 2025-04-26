@@ -12,20 +12,15 @@ namespace FoundryBlazor.Shape;
 /// </summary>
 public record LineSegment
 {
-    public Point Start { get; init; }
-    public Point End { get; init; }
+    public LineIntersection Start { get; init; }
+    public LineIntersection End { get; init; }
 
-    public LineSegment(Point start, Point end)
+    public LineSegment(LineIntersection start, LineIntersection end)
     {
         Start = start;
         End = end;
     }
 
-    public LineSegment(int startX, int startY, int endX, int endY)
-    {
-        Start = new Point(startX, startY);
-        End = new Point(endX, endY);
-    }
 }
 
 public record LineIntersection
@@ -644,34 +639,31 @@ public class FoPage2D : FoGlyph2D, IPage2D
     {
         await ctx.SaveAsync();
 
-        // Get line segments for the grid
-        var (horizontalSegments, verticalSegments) = GenerateGridLineSegments();
+        // Get line segments and intersections for the grid
+        var (segments, intersections) = GenerateGridLineSegments();
 
         // Set up styling for grid lines
         await ctx.SetLineWidthAsync(lineWidth);
         await ctx.SetLineDashAsync(new float[] { 3, 2 });
         await ctx.SetStrokeStyleAsync(lineColor);
 
-        // Draw all horizontal line segments
-        foreach (var segment in horizontalSegments)
+        // Draw all line segments
+        foreach (var segment in segments)
         {
             await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(segment.Start.X, segment.Start.Y);
-            await ctx.LineToAsync(segment.End.X, segment.End.Y);
-            await ctx.StrokeAsync();
-        }
-
-        // Draw all vertical line segments
-        foreach (var segment in verticalSegments)
-        {
-            await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(segment.Start.X, segment.Start.Y);
-            await ctx.LineToAsync(segment.End.X, segment.End.Y);
+            await ctx.MoveToAsync(segment.Start.Center.X, segment.Start.Center.Y);
+            await ctx.LineToAsync(segment.End.Center.X, segment.End.Center.Y);
             await ctx.StrokeAsync();
         }
         
-        // Draw intersection points (4-pixel circles)
-        await RenderGridIntersectionPoints(ctx, "DarkBlue", 2);
+        // Draw intersection points
+        await ctx.SetFillStyleAsync("DarkBlue");
+        foreach (var intersection in intersections)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.ArcAsync(intersection.Center.X, intersection.Center.Y, 2, 0, 2 * Math.PI);
+            await ctx.FillAsync();
+        }
 
         await ctx.RestoreAsync();
     }
@@ -711,7 +703,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
     /// Creates horizontal and vertical line segments accounting for all intersections.
     /// </summary>
     /// <returns>A tuple with lists of horizontal and vertical line segments</returns>
-    public (List<LineSegment> HorizontalSegments, List<LineSegment> VerticalSegments) GenerateGridLineSegments()
+    public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineSegments()
     {
         // Get sorted coordinates from shape boundaries
         var (sortedXCoords, sortedYCoords) = SortedCoordsShape2D();
@@ -735,8 +727,8 @@ public class FoPage2D : FoGlyph2D, IPage2D
             sortedYCoords.Add(bottomBound);
         
         // Lists to store the resulting line segments
-        var horizontalSegments = new List<LineSegment>();
-        var verticalSegments = new List<LineSegment>();
+        var Segments = new List<LineSegment>();
+        var Intersections = new Dictionary<(int x,int y), LineIntersection>();
         
         // Generate horizontal line segments (lines that go from left to right)
         foreach (var y in sortedYCoords)
@@ -745,12 +737,11 @@ public class FoPage2D : FoGlyph2D, IPage2D
             {
                 var startX = sortedXCoords[i];
                 var endX = sortedXCoords[i + 1];
-                
-                // Create a horizontal line segment from (startX, y) to (endX, y)
-                horizontalSegments.Add(new LineSegment(
-                    new Point((int)startX, (int)y),
-                    new Point((int)endX, (int)y)
-                ));
+
+                var start = FindOrCreateIntersection(startX, y, Intersections);
+                var end = FindOrCreateIntersection(endX, y, Intersections);
+                var segment = new LineSegment(start, end);
+                Segments.Add(segment);
             }
         }
         
@@ -762,15 +753,27 @@ public class FoPage2D : FoGlyph2D, IPage2D
                 var startY = sortedYCoords[i];
                 var endY = sortedYCoords[i + 1];
                 
+                var start = FindOrCreateIntersection(x, startY, Intersections);
+                var end = FindOrCreateIntersection(x, endY, Intersections);
+                var segment = new LineSegment(start, end);
+                Segments.Add(segment);
                 // Create a vertical line segment from (x, startY) to (x, endY)
-                verticalSegments.Add(new LineSegment(
-                    new Point((int)x, (int)startY),
-                    new Point((int)x, (int)endY)
-                ));
             }
         }
         
-        return (horizontalSegments, verticalSegments);
+        return (Segments, Intersections.Values.ToList());
+    }
+
+    private LineIntersection FindOrCreateIntersection(double startX, double y, Dictionary<(int x, int y), LineIntersection> intersections)
+    {
+        //can you do the right thing here and use the dictionary to find the intersection point
+        var key = ((int)startX, (int)y);
+        if (!intersections.TryGetValue(key, out var intersection))
+        {
+            intersection = new LineIntersection(new Point((int)startX, (int)y));
+            intersections[key] = intersection;
+        }
+        return intersection;
     }
 
     public async Task<bool> RenderNoItems(Canvas2DContext ctx, int tick)
