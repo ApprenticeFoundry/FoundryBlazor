@@ -116,7 +116,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var scale = Scale2D.ScaleToDrawing();
         var pos = scale * value;
         var result = pos.AsPixels();
-        // $"PageXScale PW: {PageWidth} W: {value} D: {pos} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        $"PageXScale PW: {PageWidth} W: {value} D: {pos} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;
     }
 
@@ -125,7 +125,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var m = PageMargin.AsPixels();
         var loc = m + MapToPageXScale(value);
         var result = m + ZeroPointX.AsPixels() + (ScaleAxisX * loc);
-        // $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        $"PageXLoc PW: {PageWidth} W: {value} M: {m}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;
     }
 
@@ -134,7 +134,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var scale = Scale2D.ScaleToDrawing();
         var pos = scale * value;
         var result = pos.AsPixels();
-        //$"PageYScale PH: {PageHeight} W: {value} D: {pos}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        $"PageYScale PH: {PageHeight} W: {value} D: {pos}  [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
         return result;
     }
 
@@ -143,7 +143,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         var m = PageMargin.AsPixels();
         var loc = MapToPageYScale(value);
         var result = m + ZeroPointY.AsPixels() + (ScaleAxisY * loc);
-        // $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
+        $"PageYLoc {PageHeight} {PageHeight.AsPixels()} W: {value} M: {m} L: {loc} [{result} px]  {Scale2D.Display()}".WriteLine(ConsoleColor.Blue);
 
         return result;
     }
@@ -151,6 +151,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
     public double MapToModelXLoc(int value)
     {
         var m = PageMargin.AsPixels();
+        var pWidth = PageHeight.AsPixels(); //measure from the left
         var size = Scale2D.PixelToDrawing(value - m);
         var scale = Scale2D.ScaleToWorld();
         var result = size * scale;
@@ -158,9 +159,9 @@ public class FoPage2D : FoGlyph2D, IPage2D
     }
     public double MapToModelYLoc(int value)
     {
-        var pHeight = PageHeight.AsPixels();
+        var pHeight = PageHeight.AsPixels(); //measure from the bottom
         var m = PageMargin.AsPixels();
-        var size = Scale2D.PixelToDrawing(pHeight - value - m);
+        var size = Scale2D.PixelToDrawing(pHeight + m - value);
         var scale = Scale2D.ScaleToWorld();
         var result = size * scale;
         return result;
@@ -544,81 +545,76 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.RestoreAsync();
     }
 
-    /// <summary>
-    /// Generates a grid based on the boundaries of all shapes on the page
-    /// </summary>
-    /// <returns>Task representing the asynchronous operation</returns>
-    public async Task DrawShapeBoundaryGrid(Canvas2DContext ctx, string lineColor = "Yellow", float lineWidth = 0.5f)
+
+    public async Task RenderShapeBoundaryGrid(Canvas2DContext ctx, string lineColor = "Yellow", float lineWidth = 3.5f)
     {
         await ctx.SaveAsync();
 
-        // Collect all unique X and Y coordinates from the boundaries of all shapes
-        HashSet<double> xCoordinates = new();
-        HashSet<double> yCoordinates = new();
-        
-        // Get all 2D shapes on the page
-        var shapes = AllShapes2D();
-        
-        foreach (var shape in shapes)
-        {
-            // Create a SpacialBox2D instance using the constructor that takes a FoShape2D
-            var spacialBox = new SpacialBox2D(shape);
-            
-            // Get the shape's transformation matrix
-            Matrix2D matrix = shape.GetMatrix();
-            
-            // Get all boundary points from the SpacialBox2D
-            foreach (var point in spacialBox.AllBoundaries)
-            {
-                // Transform the local coordinates to global using the shape's matrix
-                Point globalPoint = matrix.TransformToPoint((int)point.X, (int)point.Y);
-                
-                // Map from screen coordinates to model coordinates
-                double modelX = MapToModelXLoc(globalPoint.X);
-                double modelY = MapToModelYLoc(globalPoint.Y);
-                
-                xCoordinates.Add(modelX);
-                yCoordinates.Add(modelY);
-            }
-        }
-        
-        // Sort coordinates for consistent grid generation
-        var sortedXCoords = xCoordinates.OrderBy(x => x).ToList();
-        var sortedYCoords = yCoordinates.OrderBy(y => y).ToList();
-        
+        var (sortedXCoords, sortedYCoords) = SortedCoordsShape2D();
+
         var dMargin = PageMargin.AsPixels();
         var dWidth = PageWidth.AsPixels() + dMargin;
         var dHeight = PageHeight.AsPixels() + dMargin;
-        
+
         await ctx.SetLineWidthAsync(lineWidth);
         await ctx.SetLineDashAsync(new float[] { 3, 2 });
         await ctx.SetStrokeStyleAsync(lineColor);
-        
+
         // Draw horizontal lines at each unique Y coordinate
         foreach (var y in sortedYCoords)
         {
             // Convert model coordinates to page coordinates
-            var pageY = MapToPageYLoc(new Length(y, "m"));
-            
+            var pageY = y; // MapToPageYLoc(new Length(y, "m"));
+
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(dMargin, pageY);
             await ctx.LineToAsync(dWidth, pageY);
             await ctx.StrokeAsync();
         }
-        
+
         // Draw vertical lines at each unique X coordinate
         foreach (var x in sortedXCoords)
         {
             // Convert model coordinates to page coordinates
-            var pageX = MapToPageXLoc(new Length(x, "m"));
-            
+            var pageX = x; // MapToPageXLoc(new Length(x, "m"));
+
             await ctx.BeginPathAsync();
             await ctx.MoveToAsync(pageX, dMargin);
             await ctx.LineToAsync(pageX, dHeight);
             await ctx.StrokeAsync();
         }
-        
+
         await ctx.RestoreAsync();
+    }
+
+    private (List<double> sortedXCoords, List<double> sortedYCoords) SortedCoordsShape2D()
+    {
+        // Collect all unique X and Y coordinates from the boundaries of all shapes
+        HashSet<double> xCoordinates = new();
+        HashSet<double> yCoordinates = new();
+
+        // Get all 2D shapes on the page
+        var shapes = AllShapes2D();
+
+        foreach (var shape in shapes)
+        {
+            Matrix2D matrix = shape.GetMatrix();
+            Point pin = matrix.TransformToPoint(shape.Width / 2, shape.Height / 2);
+            xCoordinates.Add(pin.X);
+            yCoordinates.Add(pin.Y);
+
+            // Get all boundary points from the SpacialBox2D
+            foreach (var point in shape.HitTestSegment())
+            {
+                xCoordinates.Add(point.X);
+                yCoordinates.Add(point.Y);
+            }
+        }
+
+        // Sort coordinates for consistent grid generation
+        var sortedXCoords = xCoordinates.OrderBy(x => x).ToList();
+        var sortedYCoords = yCoordinates.OrderBy(y => y).ToList();
+        return (sortedXCoords, sortedYCoords);
     }
 
     public async Task<bool> RenderNoItems(Canvas2DContext ctx, int tick)
@@ -649,6 +645,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
+        await RenderShapeBoundaryGrid(ctx);
 
         await ctx.RestoreAsync();
         return true;
@@ -682,6 +679,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
+        await RenderShapeBoundaryGrid(ctx);
 
         //$"REC {region.X} {region.Y} {region.Width} {region.Height} ---".WriteLine(ConsoleColor.Blue);
 
@@ -755,6 +753,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
+        await RenderShapeBoundaryGrid(ctx);
 
         //await DrawFancyPin(ctx);
 
