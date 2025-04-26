@@ -715,7 +715,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
             yCoordinates.Add(new SortedCoord(pin.Y, true, $"Center:{shape.Name}"));
 
             // Get all boundary points from the SpacialBox2D
-            var boundaryPoints = shape.HitTestSegment(8);
+            var boundaryPoints = shape.HitTestSegment(10);
 
             foreach (var point in boundaryPoints)
             {
@@ -748,7 +748,8 @@ public class FoPage2D : FoGlyph2D, IPage2D
 
     /// <summary>
     /// Generates line segments for a grid that aligns with shape boundaries.
-    /// Creates horizontal and vertical line segments between all adjacent intersections.
+    /// Creates horizontal and vertical line segments between all adjacent intersections,
+    /// but skips any line segments where either coordinate name starts with "Center".
     /// </summary>
     /// <returns>A tuple with lists of line segments and intersection points</returns>
     public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineNetwork()
@@ -781,11 +782,13 @@ public class FoPage2D : FoGlyph2D, IPage2D
         // Generate horizontal line segments (lines that go from left to right)
         foreach (var y in sortedYCoords)
         {
-            // Process EVERY horizontal segment (not skipping any)
+
             for (int i = 0; i < sortedXCoords.Count - 1; i++)
             {
                 var startX = sortedXCoords[i];
                 var endX = sortedXCoords[i + 1];
+                
+
                 
                 var start = FindOrCreateIntersection(startX.Value, y.Value, Intersections);
                 var end = FindOrCreateIntersection(endX.Value, y.Value, Intersections);
@@ -794,16 +797,19 @@ public class FoPage2D : FoGlyph2D, IPage2D
                 end.Segments.Add(segment);
                 Segments.Add(segment);
             }
+            
         }
         
         // Generate vertical line segments (lines that go from top to bottom)
         foreach (var x in sortedXCoords)
         {
-            // Process EVERY vertical segment (not skipping any)
+
             for (int i = 0; i < sortedYCoords.Count - 1; i++)
             {
                 var startY = sortedYCoords[i];
                 var endY = sortedYCoords[i + 1];
+                
+
                 
                 var start = FindOrCreateIntersection(x.Value, startY.Value, Intersections);
                 var end = FindOrCreateIntersection(x.Value, endY.Value, Intersections);
@@ -812,6 +818,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
                 end.Segments.Add(segment);
                 Segments.Add(segment);
             }
+            
         }
         
         // Filter out intersections that don't have any segments
