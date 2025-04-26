@@ -28,6 +28,17 @@ public record LineSegment
     }
 }
 
+public record LineIntersection
+{
+    public Point Center { get; init; }
+    public List<LineSegment> Segments { get; init; } = new List<LineSegment>();
+
+    public LineIntersection(Point loc)
+    {
+        Center = loc;
+    }
+}
+
 public interface IPage2D : ITreeNode
 {
     int MapToPageXScale(Length value);
