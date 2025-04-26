@@ -640,7 +640,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.SaveAsync();
 
         // Get line segments and intersections for the grid
-        var (segments, intersections) = GenerateGridLineSegments();
+        var (segments, intersections) = GenerateGridLineNetwork();
 
         // Set up styling for grid lines
         await ctx.SetLineWidthAsync(lineWidth);
@@ -661,7 +661,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         foreach (var intersection in intersections)
         {
             await ctx.BeginPathAsync();
-            await ctx.ArcAsync(intersection.Center.X, intersection.Center.Y, 2, 0, 2 * Math.PI);
+            await ctx.ArcAsync(intersection.Center.X, intersection.Center.Y, 5, 0, 5 * Math.PI);
             await ctx.FillAsync();
         }
 
@@ -685,7 +685,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
             yCoordinates.Add(pin.Y);
 
             // Get all boundary points from the SpacialBox2D
-            foreach (var point in shape.HitTestSegment())
+            foreach (var point in shape.HitTestSegment(8))
             {
                 xCoordinates.Add(point.X);
                 yCoordinates.Add(point.Y);
@@ -703,7 +703,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
     /// Creates horizontal and vertical line segments accounting for all intersections.
     /// </summary>
     /// <returns>A tuple with lists of horizontal and vertical line segments</returns>
-    public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineSegments()
+    public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineNetwork()
     {
         // Get sorted coordinates from shape boundaries
         var (sortedXCoords, sortedYCoords) = SortedCoordsShape2D();

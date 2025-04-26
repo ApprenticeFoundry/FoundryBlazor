@@ -85,11 +85,11 @@ public class FoConnector1D : FoShape1D, IShape1D
          SetupDrawSelected();
     }
 
-    public override Point[] HitTestSegment()
+    public override Point[] HitTestSegment(int margin = 0)
     {
         var dx = Math.Abs(x2 - x1);
         var dy = Math.Abs(y2 - y1);
-        
+
         var mat = GetMatrix();
         var p1 = mat.TransformToPoint(0, 0);
         var p4 = mat.TransformToPoint(dx, dy);
@@ -110,6 +110,7 @@ public class FoConnector1D : FoShape1D, IShape1D
         }
         return new Point[] { p1, p4 };
     }
+
 
     public override async Task Draw(Canvas2DContext ctx, int tick)
     {

@@ -18,7 +18,7 @@ public interface ICanHitTarget
 {
     string GetName();
     Rectangle HitTestRect();
-    Point[] HitTestSegment();
+    Point[] HitTestSegment(int margin = 0);
     bool IsSmashed();
 }
 

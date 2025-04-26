@@ -171,7 +171,7 @@ public class FoLayoutGroup<V,U> : ICanHitTarget where V : FoGlyph2D where U : Fo
         return new Point(pt.X + shape.LocPinX(shape), pt.Y + shape.LocPinY(shape));
     }
 
-    public Point[] HitTestSegment()
+    public Point[] HitTestSegment(int margin=0)
     {
         throw new NotImplementedException();
     }

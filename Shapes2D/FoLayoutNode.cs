@@ -42,7 +42,7 @@ public class FoLayoutNode<V> : ICanHitTarget where V : FoGlyph2D
     {
         return _item.HitTestRect();
     }
-    public Point[] HitTestSegment()
+    public Point[] HitTestSegment(int margin = 0)
     {
         return new Point[0];
     }

@@ -352,15 +352,16 @@ public class FoGlyph2D : FoComponent, IGlyph2D, IRender
         return false;
     }
 
-    public virtual Point[] HitTestSegment()
+    public virtual Point[] HitTestSegment(int margin = 0)
     {
         var mat = GetMatrix();
-        var p1 = mat.TransformToPoint(0, 0);
-        var p2 = mat.TransformToPoint(Width, 0);
-        var p3 = mat.TransformToPoint(Width, Height);
-        var p4 = mat.TransformToPoint(0, Height);
-        return [p1, p2, p3, p4];
+        var p1 = mat.TransformToPoint(0-margin, 0-margin);
+        var p2 = mat.TransformToPoint(Width+margin, 0-margin);
+        var p3 = mat.TransformToPoint(Width+margin, Height+margin);
+        var p4 = mat.TransformToPoint(0-margin, Height+margin);
+        return new Point[] { p1, p2, p3, p4 };
     }
+
     
     public virtual Rectangle HitTestRect()
     {
