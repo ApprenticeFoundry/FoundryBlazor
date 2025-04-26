@@ -31,7 +31,18 @@ public class SpacialBox2D
         Pivot = new Point2D(HalfWidth, HalfHeight);
     }
 
+    public SpacialBox2D(FoShape2D source, string units = "m")
+    {
+        Width = source.Width;
+        Height = source.Height;
+        Units = units;
+        HalfWidth = Width / 2;
+        HalfHeight = Height / 2;
+        Pivot = new Point2D(source.LocPinX(source), source.LocPinY(source));
+    }
+
     public Point2D Center => new(HalfWidth, HalfHeight);
+
 
     public Point2D LeftTop => new(0, Height);
     public Point2D RightTop => new(Width, Height);
@@ -94,4 +105,16 @@ public class SpacialBox2D
     };
 
     public List<Point2D> EdgeCenters => LocalEdgeCenters.Select(v => v - Pivot).ToList();
+
+    public List<Point2D> AllBoundaries => new List<Point2D>
+    {
+        LeftTop,
+        RightTop,
+        LeftBottom,
+        RightBottom,
+        LeftEdgeCenter,
+        RightEdgeCenter,
+        TopEdgeCenter,
+        BottomEdgeCenter
+    }.Select(v => v - Pivot).ToList();
 }

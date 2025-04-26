@@ -1,5 +1,4 @@
-﻿
-using System.Drawing;
+﻿using System.Drawing;
 
 using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryRulesAndUnits.Extensions;
@@ -545,6 +544,83 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.RestoreAsync();
     }
 
+    /// <summary>
+    /// Generates a grid based on the boundaries of all shapes on the page
+    /// </summary>
+    /// <returns>Task representing the asynchronous operation</returns>
+    public async Task DrawShapeBoundaryGrid(Canvas2DContext ctx, string lineColor = "Yellow", float lineWidth = 0.5f)
+    {
+        await ctx.SaveAsync();
+
+        // Collect all unique X and Y coordinates from the boundaries of all shapes
+        HashSet<double> xCoordinates = new();
+        HashSet<double> yCoordinates = new();
+        
+        // Get all 2D shapes on the page
+        var shapes = AllShapes2D();
+        
+        foreach (var shape in shapes)
+        {
+            // Create a SpacialBox2D instance using the constructor that takes a FoShape2D
+            var spacialBox = new SpacialBox2D(shape);
+            
+            // Get the shape's transformation matrix
+            Matrix2D matrix = shape.GetMatrix();
+            
+            // Get all boundary points from the SpacialBox2D
+            foreach (var point in spacialBox.AllBoundaries)
+            {
+                // Transform the local coordinates to global using the shape's matrix
+                Point globalPoint = matrix.TransformToPoint((int)point.X, (int)point.Y);
+                
+                // Map from screen coordinates to model coordinates
+                double modelX = MapToModelXLoc(globalPoint.X);
+                double modelY = MapToModelYLoc(globalPoint.Y);
+                
+                xCoordinates.Add(modelX);
+                yCoordinates.Add(modelY);
+            }
+        }
+        
+        // Sort coordinates for consistent grid generation
+        var sortedXCoords = xCoordinates.OrderBy(x => x).ToList();
+        var sortedYCoords = yCoordinates.OrderBy(y => y).ToList();
+        
+        var dMargin = PageMargin.AsPixels();
+        var dWidth = PageWidth.AsPixels() + dMargin;
+        var dHeight = PageHeight.AsPixels() + dMargin;
+        
+        await ctx.SetLineWidthAsync(lineWidth);
+        await ctx.SetLineDashAsync(new float[] { 3, 2 });
+        await ctx.SetStrokeStyleAsync(lineColor);
+        
+        // Draw horizontal lines at each unique Y coordinate
+        foreach (var y in sortedYCoords)
+        {
+            // Convert model coordinates to page coordinates
+            var pageY = MapToPageYLoc(new Length(y, "m"));
+            
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(dMargin, pageY);
+            await ctx.LineToAsync(dWidth, pageY);
+            await ctx.StrokeAsync();
+        }
+        
+        // Draw vertical lines at each unique X coordinate
+        foreach (var x in sortedXCoords)
+        {
+            // Convert model coordinates to page coordinates
+            var pageX = MapToPageXLoc(new Length(x, "m"));
+            
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(pageX, dMargin);
+            await ctx.LineToAsync(pageX, dHeight);
+            await ctx.StrokeAsync();
+        }
+        
+        await ctx.RestoreAsync();
+    }
+
     public async Task<bool> RenderNoItems(Canvas2DContext ctx, int tick)
     {
         if (!IsVisible) return false;
@@ -703,4 +779,6 @@ public class FoPage2D : FoGlyph2D, IPage2D
             m + (int)(factor * pHeight / 2)
         );
     }
+
+    
 }
