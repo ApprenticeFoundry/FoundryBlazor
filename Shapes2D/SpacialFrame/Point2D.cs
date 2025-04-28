@@ -14,7 +14,7 @@ public readonly struct Point2D : IEquatable<Point2D>
     {
         U = u;
         V = v;
-        Name = "";
+        Name = string.Empty;
     }
 
     public Point2D(double u, double v, string name)
@@ -23,6 +23,27 @@ public readonly struct Point2D : IEquatable<Point2D>
         V = v;
         Name = name;
     }
+
+
+    // Structs are value types, so we need to override equality checks
+    // deconstructing the struct the same way as the class
+    public void Deconstruct(out double u, out double v, out string name)
+    {
+        u = U;
+        v = V;
+        name = Name;
+    }
+
+    // Operator overloads remain useful for structs
+    //public static bool operator ==(Point2D left, Point2D right)
+    //{
+    //    return left.Equals(right);
+    //}
+    
+    //public static bool operator !=(Point2D left, Point2D right)
+    //{
+    //    return !(left == right);
+    //}
 
     public Vector2 AsVector2() => new Vector2(U, V);
 

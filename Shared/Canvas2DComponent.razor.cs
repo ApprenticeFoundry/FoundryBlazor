@@ -18,7 +18,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
 
     [Inject] public IWorkspace? Workspace { get; set; }
     [Inject] private ComponentBus? PubSub { get; set; }
-    
+
     [Inject] protected IFoundryService? FoundryService { get; set; }
     [Inject] protected IJSRuntime? _jsRuntime { get; set; }
 
@@ -26,8 +26,8 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
     [Parameter] public int CanvasHeight { get; set; } = 1200;
 
     [Parameter] public bool WithAnimations { get; set; } = true;
-    [Parameter,EditorRequired] public string? SceneName { get; set; }
-    
+    [Parameter, EditorRequired] public string? SceneName { get; set; }
+
     public int tick { get; private set; }
 
     protected BECanvasComponent? BECanvasReference;
@@ -43,7 +43,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
             $"Canvas2DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
 
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize");
- 
+
             var drawing = Workspace!.GetDrawing();
             drawing?.ClearAll();  //we do not want to share the old drawing here
 
@@ -51,7 +51,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
 
             //lets hope the reference to BECanvas was found
             Ctx = await BECanvasReference!.CreateCanvas2DAsync();
- 
+
 
             //CreateTickPlayground();
             //SetDoTugOfWar();
@@ -59,9 +59,9 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
             PubSub?.SubscribeTo<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub?.SubscribeTo<TriggerRedrawEvent>(OnTriggerRedrawEvent);
             FoundryService?.AnimationBus().SubscribeTo<AnimationEvent>(OnAnimationEvent);
- 
+
             await RenderFrame(0);
-            if ( WithAnimations)
+            if (WithAnimations)
                 await DoStart();
 
         }
@@ -72,13 +72,13 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
     {
         try
         {
-            if ( Ctx == null ) return;
+            if (Ctx == null) return;
             Ctx = null;
 
             $"Canvas2DComponentBase {SceneName} DisposeAsync".WriteInfo();
-            if ( WithAnimations)
+            if (WithAnimations)
                 await DoStop();
-                
+
             PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
             PubSub?.UnSubscribeFrom<TriggerRedrawEvent>(OnTriggerRedrawEvent);
             FoundryService?.AnimationBus().UnSubscribeFrom<AnimationEvent>(OnAnimationEvent);
@@ -96,24 +96,30 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
 
     public async Task DoStart()
     {
-        try {
+        try
+        {
 
             $"Canvas2DComponentBase {SceneName} CALLING DO START  AppBrowser.StartAnimation".WriteSuccess();
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             $"Canvas2DComponentBase DoStart Error {ex.Message}".WriteError();
         }
     }
 
     public async Task DoStop()
     {
-        try {
+        try
+        {
 
             $"Canvas2DComponentBase {SceneName} CALLING DO STOP  AppBrowser.StopAnimation".WriteSuccess();
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             $"Canvas2DComponentBase DoStop Error {ex.Message}".WriteError();
         }
     }
@@ -140,7 +146,7 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
 
     public void Render()
     {
-        Task.Run(async () => await RenderFrame(0) );
+        Task.Run(async () => await RenderFrame(0));
     }
 
     public async Task RenderFrame(double fps)
@@ -162,8 +168,8 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
 
         //if you are already rendering then skip it this cycle
         if (drawing.SetCurrentlyRendering(true, tick)) return;
-        await Ctx.BeginBatchAsync();
 
+        await Ctx.BeginBatchAsync();
         try
         {
             await Ctx.SaveAsync();
@@ -171,12 +177,12 @@ public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
             Workspace?.RenderWatermark(Ctx, tick);
             await Ctx.RestoreAsync();
         }
-        catch(Exception ex) 
+        catch (Exception ex)
         {
             $"RenderFrame Error {ex.Message}".WriteError();
         }
-
         await Ctx.EndBatchAsync();
+
         drawing.SetCurrentlyRendering(false, tick);
 
         Workspace?.PostRender(tick);

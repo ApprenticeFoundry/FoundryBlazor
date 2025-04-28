@@ -4,53 +4,11 @@ using Blazor.Extensions.Canvas.Canvas2D;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
 using FoundryRulesAndUnits.Units;
+using Microsoft.AspNetCore.Routing;
 
 namespace FoundryBlazor.Shape;
 
-/// <summary>
-/// Represents a coordinate used for grid generation
-/// </summary>
-public record SortedCoord
-{
-    public double Value { get; init; }
-    public bool IsFromShape { get; init; }
-    public string Source { get; init; }
 
-    public SortedCoord(double value, bool isFromShape = false, string source = "")
-    {
-        Value = value;
-        IsFromShape = isFromShape;
-        Source = source;
-    }
-    
-    public static implicit operator double(SortedCoord coord) => coord.Value;
-}
-
-/// <summary>
-/// Represents a line segment with start and end points
-/// </summary>
-public record LineSegment
-{
-    public LineIntersection Start { get; init; }
-    public LineIntersection End { get; init; }
-
-    public LineSegment(LineIntersection start, LineIntersection end)
-    {
-        Start = start;
-        End = end;
-    }
-}
-
-public record LineIntersection
-{
-    public Point Center { get; init; }
-    public List<LineSegment> Segments { get; init; } = new List<LineSegment>();
-
-    public LineIntersection(Point loc)
-    {
-        Center = loc;
-    }
-}
 
 public interface IPage2D : ITreeNode
 {
@@ -105,7 +63,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
     protected FoCollection<FoGlyph2D> Shapes1D = new();
     protected FoCollection<FoGlyph2D> Shapes2D = new();
 
-
+    protected FoLineRouter2D? LineRouter2D { get; set; }
     public override Rectangle HitTestRect()
     {
         // var pt = new Point(PinX, PinY);
@@ -115,12 +73,17 @@ public class FoPage2D : FoGlyph2D, IPage2D
         return result;
     }
 
-
+    public void MarkAsDirty(bool wasDirty, IHitTestService service)
+    {  
+        LineRouter2D?.MarkAsDirty(wasDirty,service);
+    }
+    
     public FoPage2D(string name, string color) : base(name, color)
     {
         ResetLocalPin((obj) => 0, (obj) => 0);
         HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
         VRuler2D = new FoVerticalRuler2D(Scale2D, this);
+        LineRouter2D = new FoLineRouter2D(this);
     }
 
     public FoPage2D(string name, int width, int height, string color) : base(name, width, height, color)
@@ -128,6 +91,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         ResetLocalPin((obj) => 0, (obj) => 0);
         HRuler2D = new FoHorizontalRuler2D(Scale2D, this);
         VRuler2D = new FoVerticalRuler2D(Scale2D, this);
+        LineRouter2D = new FoLineRouter2D(this);
         CalculateTitle();
     }
 
@@ -589,255 +553,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.RestoreAsync();
     }
 
-    /// <summary>
-    /// Generates intersection points between all horizontal and vertical grid lines
-    /// </summary>
-    /// <returns>A list of points representing all grid intersections</returns>
-    public List<Point> GenerateGridIntersectionPoints()
-    {
-        // Get sorted coordinates from shape boundaries
-        var (sortedXCoords, sortedYCoords) = SortedCoordsShape2D();
-        
-        // Add page boundaries if they're not already included
-        var margin = PageMargin.AsPixels();
-        var leftBound = margin;
-        var rightBound = margin + PageWidth.AsPixels();
-        var topBound = margin;
-        var bottomBound = margin + PageHeight.AsPixels();
-        
-        // Make sure we include page boundaries
-        if (sortedXCoords.Count == 0 || sortedXCoords.Min(c => c.Value) > leftBound)
-            sortedXCoords.Insert(0, new SortedCoord(leftBound, false, "Left Page Boundary"));
-        if (sortedXCoords.Count == 0 || sortedXCoords.Max(c => c.Value) < rightBound)
-            sortedXCoords.Add(new SortedCoord(rightBound, false, "Right Page Boundary"));
-            
-        if (sortedYCoords.Count == 0 || sortedYCoords.Min(c => c.Value) > topBound)
-            sortedYCoords.Insert(0, new SortedCoord(topBound, false, "Top Page Boundary"));
-        if (sortedYCoords.Count == 0 || sortedYCoords.Max(c => c.Value) < bottomBound)
-            sortedYCoords.Add(new SortedCoord(bottomBound, false, "Bottom Page Boundary"));
-        
-        // Generate all intersection points
-        var intersectionPoints = new List<Point>();
-        foreach (var x in sortedXCoords)
-        {
-            foreach (var y in sortedYCoords)
-            {
-                intersectionPoints.Add(new Point((int)x.Value, (int)y.Value));
-            }
-        }
-        
-        return intersectionPoints;
-    }
 
-    /// <summary>
-    /// Draws a small circle at each grid intersection point
-    /// </summary>
-    public async Task RenderGridIntersectionPoints(Canvas2DContext ctx, string circleColor = "Blue", int radius = 2)
-    {
-        // Get all intersection points
-        var intersectionPoints = GenerateGridIntersectionPoints();
-        
-        await ctx.SaveAsync();
-        
-        // Set fill style for circles
-        await ctx.SetFillStyleAsync(circleColor);
-        
-        // Draw a circle at each intersection point
-        foreach (var point in intersectionPoints)
-        {
-            await ctx.BeginPathAsync();
-            await ctx.ArcAsync(point.X, point.Y, radius, 0, 2 * Math.PI);
-            await ctx.FillAsync();
-        }
-        
-        await ctx.RestoreAsync();
-    }
-
-    public async Task RenderShapeBoundaryGrid(Canvas2DContext ctx, string lineColor = "Yellow", float lineWidth = 3.5f)
-    {
-        await ctx.SaveAsync();
-
-        // Get line segments and intersections for the grid
-        var (segments, intersections) = GenerateGridLineNetwork();
-
-        // Set up styling for grid lines
-        await ctx.SetLineWidthAsync(lineWidth);
-        await ctx.SetLineDashAsync(new float[] { 3, 2 });
-        await ctx.SetStrokeStyleAsync(lineColor);
-
-        // Draw all line segments
-        foreach (var segment in segments)
-        {
-            await ctx.BeginPathAsync();
-            await ctx.MoveToAsync(segment.Start.Center.X, segment.Start.Center.Y);
-            await ctx.LineToAsync(segment.End.Center.X, segment.End.Center.Y);
-            await ctx.StrokeAsync();
-        }
-        
-        // Draw intersection points
-        await ctx.SetFillStyleAsync("DarkBlue");
-        foreach (var intersection in intersections)
-        {
-            await ctx.BeginPathAsync();
-            await ctx.ArcAsync(intersection.Center.X, intersection.Center.Y, 5, 0, 5 * Math.PI);
-            await ctx.FillAsync();
-        }
-
-        await ctx.RestoreAsync();
-    }
-
-    // public virtual Point[] HitTestSegment(int margin = 0)
-    // {
-    //     var mat = GetMatrix();
-    //     var p1 = mat.TransformToPoint(0-margin, 0-margin);
-    //     var p2 = mat.TransformToPoint(Width+margin, 0-margin);
-    //     var p3 = mat.TransformToPoint(Width+margin, Height+margin);
-    //     var p4 = mat.TransformToPoint(0-margin, Height+margin);
-    //     return new Point[] { p1, p2, p3, p4 };
-    // }
-
-    private (List<SortedCoord> sortedXCoords, List<SortedCoord> sortedYCoords) SortedCoordsShape2D()
-    {
-        // Collect all unique X and Y coordinates from the boundaries of all shapes
-        HashSet<SortedCoord> xCoordinates = new(new SortedCoordComparer());
-        HashSet<SortedCoord> yCoordinates = new(new SortedCoordComparer());
-
-        // Get all 2D shapes on the page
-        var shapes = AllShapes2D();
-
-        foreach (var shape in shapes)
-        {
-            var matrix = shape.GetMatrix();
-            var pin = matrix.TransformToPoint(shape.Width / 2, shape.Height / 2);
-            
-            // Add center point coordinates
-            xCoordinates.Add(new SortedCoord(pin.X, true, $"Center:{shape.Name}"));
-            yCoordinates.Add(new SortedCoord(pin.Y, true, $"Center:{shape.Name}"));
-
-            // Get all boundary points from the SpacialBox2D
-            var boundaryPoints = shape.HitTestSegment(10);
-
-            foreach (var point in boundaryPoints)
-            {
-                xCoordinates.Add(new SortedCoord(point.X, true, $"Boundary of {shape.Name}"));
-                yCoordinates.Add(new SortedCoord(point.Y, true, $"Boundary of {shape.Name}"));
-            }
-        }
-
-        // Sort coordinates for consistent grid generation
-        var sortedXCoords = xCoordinates.OrderBy(coord => coord.Value).ToList();
-        var sortedYCoords = yCoordinates.OrderBy(coord => coord.Value).ToList();
-        return (sortedXCoords, sortedYCoords);
-    }
-    
-    // Comparer for SortedCoord to ensure we don't add duplicates to the HashSet
-    private class SortedCoordComparer : IEqualityComparer<SortedCoord>
-    {
-        public bool Equals(SortedCoord x, SortedCoord y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (x is null || y is null) return false;
-            return Math.Abs(x.Value - y.Value) < 0.001;
-        }
-
-        public int GetHashCode(SortedCoord obj)
-        {
-            return obj.Value.GetHashCode();
-        }
-    }
-
-    /// <summary>
-    /// Generates line segments for a grid that aligns with shape boundaries.
-    /// Creates horizontal and vertical line segments between all adjacent intersections,
-    /// but skips any line segments where either coordinate name starts with "Center".
-    /// </summary>
-    /// <returns>A tuple with lists of line segments and intersection points</returns>
-    public (List<LineSegment> Segments, List<LineIntersection> Intersections) GenerateGridLineNetwork()
-    {
-        // Get sorted coordinates from shape boundaries
-        var (sortedXCoords, sortedYCoords) = SortedCoordsShape2D();
-        
-        // Add page boundaries if they're not already included
-        var margin = PageMargin.AsPixels();
-        var leftBound = margin;
-        var rightBound = margin + PageWidth.AsPixels();
-        var topBound = margin;
-        var bottomBound = margin + PageHeight.AsPixels();
-        
-        // Make sure we include page boundaries
-        if (sortedXCoords.Count == 0 || sortedXCoords.Min(c => c.Value) > leftBound)
-            sortedXCoords.Insert(0, new SortedCoord(leftBound, false, "Left Page Boundary"));
-        if (sortedXCoords.Count == 0 || sortedXCoords.Max(c => c.Value) < rightBound)
-            sortedXCoords.Add(new SortedCoord(rightBound, false, "Right Page Boundary"));
-            
-        if (sortedYCoords.Count == 0 || sortedYCoords.Min(c => c.Value) > topBound)
-            sortedYCoords.Insert(0, new SortedCoord(topBound, false, "Top Page Boundary"));
-        if (sortedYCoords.Count == 0 || sortedYCoords.Max(c => c.Value) < bottomBound)
-            sortedYCoords.Add(new SortedCoord(bottomBound, false, "Bottom Page Boundary"));
-        
-        // Lists to store the resulting line segments
-        var Segments = new List<LineSegment>();
-        var Intersections = new Dictionary<(int x,int y), LineIntersection>();
-        
-        // Generate horizontal line segments (lines that go from left to right)
-        foreach (var y in sortedYCoords)
-        {
-
-            for (int i = 0; i < sortedXCoords.Count - 1; i++)
-            {
-                var startX = sortedXCoords[i];
-                var endX = sortedXCoords[i + 1];
-                
-
-                
-                var start = FindOrCreateIntersection(startX.Value, y.Value, Intersections);
-                var end = FindOrCreateIntersection(endX.Value, y.Value, Intersections);
-                var segment = new LineSegment(start, end);
-                start.Segments.Add(segment);
-                end.Segments.Add(segment);
-                Segments.Add(segment);
-            }
-            
-        }
-        
-        // Generate vertical line segments (lines that go from top to bottom)
-        foreach (var x in sortedXCoords)
-        {
-
-            for (int i = 0; i < sortedYCoords.Count - 1; i++)
-            {
-                var startY = sortedYCoords[i];
-                var endY = sortedYCoords[i + 1];
-                
-
-                
-                var start = FindOrCreateIntersection(x.Value, startY.Value, Intersections);
-                var end = FindOrCreateIntersection(x.Value, endY.Value, Intersections);
-                var segment = new LineSegment(start, end);
-                start.Segments.Add(segment);
-                end.Segments.Add(segment);
-                Segments.Add(segment);
-            }
-            
-        }
-        
-        // Filter out intersections that don't have any segments
-        var filteredIntersections = Intersections.Values.Where(i => i.Segments.Count > 0).ToList();
-        
-        return (Segments, filteredIntersections);
-    }
-    
-    private LineIntersection FindOrCreateIntersection(double startX, double y, Dictionary<(int x, int y), LineIntersection> intersections)
-    {
-        // Use the dictionary to find the intersection point
-        var key = ((int)startX, (int)y);
-        if (!intersections.TryGetValue(key, out var intersection))
-        {
-            intersection = new LineIntersection(new Point((int)startX, (int)y));
-            intersections[key] = intersection;
-        }
-        return intersection;
-    }
 
     public async Task<bool> RenderNoItems(Canvas2DContext ctx, int tick)
     {
@@ -867,7 +583,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
-        await RenderShapeBoundaryGrid(ctx);
+        //await RenderShapeBoundaryGrid(ctx);
 
         await ctx.RestoreAsync();
         return true;
@@ -901,7 +617,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
-        await RenderShapeBoundaryGrid(ctx);
+
 
         //$"REC {region.X} {region.Y} {region.Width} {region.Height} ---".WriteLine(ConsoleColor.Blue);
 
@@ -975,13 +691,16 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await ctx.FillRectAsync(margin, margin, PageWidth.AsPixels(), PageHeight.AsPixels());
 
         await RenderGrid(ctx);
-        await RenderShapeBoundaryGrid(ctx);
+        //await RenderShapeBoundaryGrid(ctx);
 
         //await DrawFancyPin(ctx);
 
 
         Shapes1D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
         Shapes2D.ForEach(async child => await child.RenderDetailed(ctx, tick, deep));
+
+        if (LineRouter2D != null)
+            await LineRouter2D.RenderGrid(ctx);
 
 
         await ctx.RestoreAsync();
@@ -1001,5 +720,5 @@ public class FoPage2D : FoGlyph2D, IPage2D
         );
     }
 
-    
+
 }

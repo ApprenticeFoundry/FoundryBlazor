@@ -10,6 +10,7 @@ namespace FoundryBlazor.Shape;
 public interface IHitTestService
 {
     bool Insert(QuadHitTarget target);
+    bool FindGlyph(int x, int y);
     List<FoGlyph2D> FindGlyph(Rectangle rect);
     List<FoGlyph2D> FindGlyphExclude(Rectangle rect, FoGlyph2D? exclude);
     List<QuadHitTarget> AllShapesEverywhere();
@@ -19,6 +20,7 @@ public interface IHitTestService
     void SetCanvasSizeInPixels(int width, int height);
     List<Rectangle> GetSearches();
     QuadTree<QuadHitTarget> GetTree();
+    int Count() => GetTree()?.Count ?? 0;
 
 }
 
@@ -32,8 +34,7 @@ public class HitTestService : IHitTestService
     private Size CanvasSize = new(100, 100);
     private Rectangle CanvasRectangle = new(50, 50, 500, 500);
 
-    public HitTestService(
-        IPanZoomService panzoom)
+    public HitTestService(IPanZoomService panzoom)
     {
         _panzoom = panzoom;
     }
@@ -89,6 +90,18 @@ public class HitTestService : IHitTestService
         Tree?.Insert(target);
         return Tree != null;
     }
+
+    public bool FindGlyph(int x, int y)
+    {
+        var rect = new Rectangle(x, y, 1, 1);
+        rect = _panzoom.TransformRect(rect);
+
+        List<QuadHitTarget> list = new();
+        Tree?.QueryObjects(rect, ref list);
+
+        return list.Count != 0;
+    }
+
 
     public List<FoGlyph2D> FindGlyph(Rectangle rect)
     {

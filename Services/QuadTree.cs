@@ -75,11 +75,8 @@ public class QuadTree<T> where T : QuadHitTarget
         source.Clear(true);
         quadTreeCache.Enqueue(source);
        // $"Smash QuadTree {cashe.Count}".WriteNote();
-        return null;
+        return null; //MUST RETURN NULL TO CLEAR THE CALLING VARIABLE
     }
-
-
-
 
 
  
@@ -387,10 +384,12 @@ public class QuadTree<T> where T : QuadHitTarget
     // }
 
 
-    public void QueryObjects(Rectangle range, ref List<QuadHitTarget> results)
+    public bool QueryObjects(Rectangle range, ref List<QuadHitTarget> results)
     {
         // We can't do anything if the results list doesn't exist
-        if (results == null) return;
+        if (results == null) 
+            return false;
+            
         //$"Tree Query Objects {m_rect} CT:{Members().Count} {range}".WriteInfo(2);
         
         if (range.Contains(QuadRect))
@@ -401,7 +400,7 @@ public class QuadTree<T> where T : QuadHitTarget
             {
                 // if line hit is withing range select that QuadHitTarget
                 member.IsIntersectedBy(range, 10.0);
-            }           
+            }     
         }
         else if (range.IntersectsWith(QuadRect))
         {
@@ -415,8 +414,7 @@ public class QuadTree<T> where T : QuadHitTarget
                     results.Add(member);
             }
 
-
-                    
+        
             // Get the objects for the search rectangle from the children
             if ( HasSubTrees() )
             {
@@ -426,7 +424,7 @@ public class QuadTree<T> where T : QuadHitTarget
                 m_childBR?.QueryObjects(range, ref results);
             }
         }
-        
+        return results.Count > 0;   
     }
 
 

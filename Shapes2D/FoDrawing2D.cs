@@ -84,7 +84,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
     public bool ShowStats { get; set; } = false;
     private int TrueCanvasWidth = 0;
     private int TrueCanvasHeight = 0;
-    private bool RenderHitTestTree = false;
+    private bool RenderHitTestTree = true;
     private bool PauseAnimation = false;
     private bool ClearBeforeRender = true;
     public int PauseRefreshCountdown { get; set; } = 3;
@@ -552,6 +552,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             RefreshHitTesting(PanZoomWindow());
 
         var page = PageManager.CurrentPage();
+        page.MarkAsDirty(wasDirty, HitTestService);
         //$"RenderDrawing {page.Name} {page.Title} ".WriteSuccess();
 
         if ( ClearBeforeRender)
