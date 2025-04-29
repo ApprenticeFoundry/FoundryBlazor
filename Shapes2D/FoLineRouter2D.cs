@@ -7,7 +7,7 @@ using FoundryRulesAndUnits.Units;
 
 namespace FoundryBlazor.Shape;
 
-public record LineSegment
+public class LineSegment
 {
     public LineIntersection Start { get; set; }
     public LineIntersection End { get; set; }
@@ -28,7 +28,7 @@ public record LineSegment
 
 
 
-public record LineIntersection
+public class LineIntersection
 {
     public Point2D Center { get; set; } = new Point2D(0, 0);
     public List<LineSegment> Segments { get; init; } = new List<LineSegment>();
@@ -52,6 +52,8 @@ public record LineIntersection
     }
     public double X => Center.U;
     public double Y => Center.V;
+    public string Name => Center.Name;
+    public int Count => Segments.Count;
 }
 
 public class FoLineRouter2D
@@ -81,10 +83,11 @@ public class FoLineRouter2D
 
     public void Clear()
     {
+        $"Clear Smash Line Segments".WriteSuccess();
         foreach (var item in Segments)
             SmashLineSegment(item);
 
-
+        $"Clear Smash Intersection".WriteSuccess();
         foreach (var item in IntersectionsByPoint.Values)
             SmashIntersection(item);
 
@@ -104,25 +107,36 @@ public class FoLineRouter2D
         
         // Get line segments and intersections for the grid
 
-        GenerateGridLineNetwork();
+        if (Segments.Count == 0)
+            GenerateGridLineNetwork();
 
         // Set up styling for grid lines
         await ctx.SetLineWidthAsync(lineWidth);
         await ctx.SetStrokeStyleAsync(lineColor);
 
         // Draw all line segments
-        // foreach (var segment in Segments)
-        // {
-        //     await ctx.BeginPathAsync();
-        //     await ctx.MoveToAsync(segment.Start.X, segment.Start.Y);
-        //     await ctx.LineToAsync(segment.End.X, segment.End.Y);
-        //     await ctx.StrokeAsync();
-        // }
+        foreach (var segment in Segments)
+        {
+            await ctx.BeginPathAsync();
+            await ctx.MoveToAsync(segment.Start.X, segment.Start.Y);
+            await ctx.LineToAsync(segment.End.X, segment.End.Y);
+            await ctx.StrokeAsync();
+        }
         
         // // Draw intersection points
-        await ctx.SetFillStyleAsync("DarkBlue");
         foreach (var intersection in IntersectionsByPoint.Values)
         {
+            //select a color based on the number of segments there cam be as many as 4
+            var color = intersection.Count switch
+            {
+                1 => "DarkBlue",
+                2 => "DarkGreen",
+                3 => "DarkOrange",
+                4 => "DarkRed",
+                _ => "Black"
+            };
+
+            await ctx.SetFillStyleAsync(color);
             await ctx.BeginPathAsync();
             await ctx.ArcAsync(intersection.X, intersection.Y, 5, 0, 5 * Math.PI);
             await ctx.FillAsync();
@@ -152,18 +166,7 @@ public class FoLineRouter2D
         return found;
     }
 
-    public static LineSegment NewLineSegment(LineIntersection start, LineIntersection end)
-    {
-        if (SegmentCache.Count > 0)
-        {
-            var segment = SegmentCache.Dequeue();
-            segment.Start = start;
-            segment.End = end;
-            return segment;
-        }
-        $"New Line Segment Created {start.Center.U} {start.Center.V} {end.Center.U} {end.Center.V}".WriteLine(ConsoleColor.Red);
-        return new LineSegment(start, end);
-    }
+
 
     public static LineSegment? SmashLineSegment(LineSegment segment)
     {
