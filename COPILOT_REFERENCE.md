@@ -1,5 +1,7 @@
 # FoundryBlazor Library - Copilot Reference Guide
 
+please create a reference document for this library that a copilot could use to make decisions about calling functions or integrating this library
+
 ## Overview
 
 FoundryBlazor is a sophisticated Blazor library that provides Visio-like diagramming and graphics capabilities with both 2D and 3D rendering support. It integrates Three.js for 3D graphics and provides a comprehensive framework for building interactive diagramming applications in Blazor.
