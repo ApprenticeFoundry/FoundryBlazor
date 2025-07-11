@@ -60,7 +60,7 @@
 
 
  <ItemGroup>
-  <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="5.3.0" />
+  <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="6.1.0" />
   <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
   <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 
