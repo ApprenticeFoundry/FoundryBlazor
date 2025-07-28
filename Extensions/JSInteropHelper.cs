@@ -21,12 +21,12 @@ namespace eDesignStudio.Components
             {
                 Debug.WriteLine($"JavaScript disconnection occurred: {ex.Message}");
                 // You can log additional details here
-                return default;
+                return default!;
             }
             catch (TaskCanceledException)
             {
                 Debug.WriteLine("JavaScript interop call was canceled");
-                return default;
+                return default!;
             }
             catch (Exception ex)
             {
