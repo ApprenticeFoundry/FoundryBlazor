@@ -50,7 +50,7 @@ public class QRCodeService : IQRCodeService
         var qrCodeImage = qrCode.GetGraphic(20);
 
         var bitmap = SKBitmap.Decode(qrCodeImage);
-        var resized = bitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.Medium);
+        var resized = bitmap.Resize(new SKImageInfo(width, height), SKSamplingOptions.Default);
         var png = resized.Encode(SKEncodedImageFormat.Png, 2);
 
         // using var memoryStream = new MemoryStream();

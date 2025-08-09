@@ -2,7 +2,7 @@ using Blazor.Extensions.Canvas.Canvas2D;
 
 using FoundryRulesAndUnits.Extensions;
 using System.Drawing;
-using System.Linq.Dynamic.Core.CustomTypeProviders;
+//using System.Linq.Dynamic.Core.CustomTypeProviders;
 
 namespace FoundryBlazor.Shape;
 
