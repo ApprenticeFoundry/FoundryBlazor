@@ -84,9 +84,8 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         var stage = StageManager.GetCurrentStage();
         if ( stage == null)
-            StageManager.EstablishStage<FoStage3D>("Stage-1", this);
+            return StageManager.EstablishStage<FoStage3D>("Stage-1", this);
 
-        stage = StageManager.GetCurrentStage()!;
         return stage;
     }
 
@@ -118,7 +117,6 @@ public class FoArena3D : FoGlyph3D, IArena
     {
         var stage = CurrentStage();
 
-
         //$"AddShapeToStage {shape.Name}".WriteInfo();
 
         stage.AddShape<V>(shape);
@@ -126,7 +124,6 @@ public class FoArena3D : FoGlyph3D, IArena
         {
             item.DeleteFromStage(stage);
             PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("FoArena3D:RemoveShape"));
-
         };
 
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("FoArena3D:AddShape"));
@@ -143,15 +140,15 @@ public class FoArena3D : FoGlyph3D, IArena
         //SRS you might need to test all scenes and stages
 
         var stage = CurrentStage();
+        shape.SetDeleteValue3D();
         shape.DeleteFromStage(stage);
-
         PubSub!.Publish<RefreshUIEvent>(new RefreshUIEvent("FoArena3D:RemoveShape"));
         return shape;
     }
 
     public void ClearArena()
     {
-        "ClearArena".WriteInfo();
+        //"ClearArena calls clear stage".WriteInfo();
         var stage = CurrentStage();
         stage.ClearStage();
     }

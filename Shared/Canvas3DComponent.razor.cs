@@ -48,7 +48,7 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
 
     protected override void OnInitialized()
     {
-        $"Canvas3DComponentBase {SceneName} OnInitialized".WriteInfo();
+        //$"Canvas3DComponentBase {SceneName} OnInitialized".WriteInfo();
     }
 
     public (bool, Scene3D) GetActiveScene() 
@@ -65,7 +65,7 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
     {
         if (firstRender)
         {
-            $"Canvas3DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
+            //  $"Canvas3DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
             var (found, scene) = GetActiveScene();
             if (found)
             {
@@ -90,7 +90,7 @@ public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
             Ctx?.SetAfterUpdateAction((s,j)=> {});
             Ctx = null;
 
-            "Canvas3DComponentBase DisposeAsync".WriteInfo();
+            //"Canvas3DComponentBase DisposeAsync".WriteInfo();
             PubSub?.UnSubscribeFrom<RefreshUIEvent>(OnRefreshUIEvent);
             GC.SuppressFinalize(this);
             await ValueTask.CompletedTask;

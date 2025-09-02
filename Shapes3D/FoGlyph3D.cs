@@ -123,7 +123,19 @@ public class FoGlyph3D : FoComponent
     }
 
 
+    public void SetDeleteValue3D()
+    {
+        if (Value3D != null)
+        {
+            // if (Value3D.ShouldDelete())
+            //     $"Marked for deletion again {Value3D.Name}".WriteWarning();
+            // else
+            //     $"Marked for deletion {Value3D.Name}".WriteInfo();
 
+            Value3D.SetShouldDelete(true);
+            Value3D.SetDirty(true);
+        }
+    }
 
     public void SetAnimationUpdate(Action<Object3D, int, double> update)
     {
@@ -138,7 +150,7 @@ public class FoGlyph3D : FoComponent
         {
             Value3D.SetDirty(value);
 
-            $"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
+            //$"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
         }
     }
 
@@ -209,11 +221,9 @@ public class FoGlyph3D : FoComponent
 
     public virtual void DeleteFromStage(FoStage3D stage)
     {
-        $"Deleting {GetTreeNodeTitle()}".WriteWarning();
+        //$"Deleting {GetTreeNodeTitle()}".WriteWarning();
 
-        $"DeleteFromStage {Key} Object3D".WriteInfo();
- 
-
+        //$"DeleteFromStage {Key} FoGlyph3D".WriteInfo();
         stage.RemoveShape<FoGlyph3D>(this);
     }
 

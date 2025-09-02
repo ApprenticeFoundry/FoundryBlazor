@@ -127,13 +127,26 @@ public class FoStage3D : FoGlyph3D, IStage
     
     public FoStage3D ClearStage()
     {
+        //"ClearStage All Slots".WriteInfo();
+        var lists = AllSlotsOfType<FoGlyph3D>();
+        foreach (var collection in lists)
+        {
+            //$"ClearStage {collection.TypeSpec.Name}  {collection.Count()}".WriteInfo();
+            var items = collection.ValuesOfType<FoGlyph3D>().ToList();
+            foreach (var item in items)
+            {
+                item.SetDeleteValue3D();
+                item.OnDelete?.Invoke(item);
+            }
+        }   
+        foreach (var slot in AllSlots())
+            slot.Clear();
 
-       return this;
+        return this;
     }
 
     public FoStage3D UpdateStage()
     {
-
        return this;
     }
 
@@ -151,7 +164,6 @@ public class FoStage3D : FoGlyph3D, IStage
 
     public T AddShape<T>(T value) where T : FoGlyph3D
     {
-
         var collection = DynamicSlot(value.GetType());
         if (string.IsNullOrEmpty(value.Key))
             value.Key = collection.NextItemName();
@@ -193,10 +205,4 @@ public class FoStage3D : FoGlyph3D, IStage
 
         return true;
     }
-
-
-
- 
-
-
 }

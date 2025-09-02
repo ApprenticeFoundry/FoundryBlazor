@@ -51,7 +51,7 @@ public class SlotGroups: Dictionary<string, IFoCollection>
         return [.. Values.Where(item => typeof(U).IsAssignableFrom(item.TypeSpec))];
     }
 
-        public List<IFoCollection> AllSlots() 
+    public List<IFoCollection> AllSlots() 
     {
         return [.. Values];
     }

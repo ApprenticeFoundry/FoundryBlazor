@@ -35,8 +35,15 @@ public class StageManagementService : FoComponent, IStageManagement
     {
         get
         {
+            if (_stage == null)
+                $"Get Active Stage is null".WriteInfo();
+
+            //var count = StageCount();
+            //$"Get StageManager has {count} stages".WriteInfo();
+            //$"Get Active Stage has key [{_stage?.Key}]".WriteInfo();
+
             if (_stage?.IsActive != true)
-                $"Get Active Stage {_stage?.Key} is broken".WriteInfo();
+                $"Stage is not marked as Active".WriteInfo();
 
             return _stage!;
         }
@@ -45,6 +52,7 @@ public class StageManagementService : FoComponent, IStageManagement
             GetAllStages().ForEach(stage => stage.IsActive = false);
             _stage = value;
             _stage.IsActive = true;
+            //$"Set Active Stage  key= [{_stage.Key}]".WriteInfo();
         }
     }
 
@@ -67,9 +75,6 @@ public class StageManagementService : FoComponent, IStageManagement
     {
         return Members<FoStage3D>().Count;
     }
-
-
-
 
 
     public void ClearAll()
@@ -105,10 +110,11 @@ public class StageManagementService : FoComponent, IStageManagement
     {
         if (_stage == null || !_stage.GetName().Matches(name))
         {
+            $"Establishing Stage {name}".WriteInfo();
             var found = Members<FoStage3D>().Where(stage => stage.GetName().Matches(name)).FirstOrDefault();
             if (found == null)
             {
-                found = Activator.CreateInstance(typeof(T), name,10,10,10,"Red") as FoStage3D;
+                found = Activator.CreateInstance(typeof(T), name, 10, 10, 10, "Red") as FoStage3D;
                 found!.GetParent = () => parent;
                 AddStage(found);
             }
@@ -119,7 +125,7 @@ public class StageManagementService : FoComponent, IStageManagement
     }
     public FoStage3D? GetCurrentStage()
     {
-       return ActiveStage;
+       return _stage;
     }
 
     public FoStage3D SetCurrentStage(FoStage3D stage)
@@ -127,7 +133,6 @@ public class StageManagementService : FoComponent, IStageManagement
         if (_stage == stage && _stage.IsActive)
             return _stage;
 
-        stage.IsActive = true;
         ActiveStage = stage;
 
         //force refresh of hit testing

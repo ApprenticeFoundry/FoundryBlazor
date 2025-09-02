@@ -56,8 +56,13 @@ public class PageManagementService : FoComponent, IPageManagement
     {
         get
         {
-            if (_page?.IsActive != true)
-                $"Get Active Page {_page?.Key} is broken".WriteInfo();
+            if ( _page == null )
+                $"Get Active Page is null".WriteInfo();
+
+            //$"Get Active Page has key [{_page?.Key}]".WriteInfo();
+
+            if (_page!.IsActive != true)
+                $"Page is not marked as Active".WriteInfo();
 
             return _page!;
         }
@@ -66,6 +71,7 @@ public class PageManagementService : FoComponent, IPageManagement
             GetAllPages().ForEach(page => page.IsActive = false);
             _page = value;
             _page.IsActive = true;
+            //$"Set Active Page  key= [{_page.Key}]".WriteInfo();
         }
     }
 

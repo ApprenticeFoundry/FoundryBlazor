@@ -13,6 +13,7 @@ public interface IFoCollection
     List<U> ValuesOfType<U>();
     bool AddObject(string key, object value);
     bool RemoveObject(string key);
+    void Clear();
 }
 
 [System.Serializable]
