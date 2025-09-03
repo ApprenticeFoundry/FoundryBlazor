@@ -60,13 +60,13 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Apply Euler rotations using Vector3D</summary>
-    public static Matrix3D RotateEuler(this Matrix3D matrix, Vector3D eulerAngles, bool inRadians = false)
+    public static Matrix3D RotateEuler(this Matrix3D matrix, FoVector3D eulerAngles, bool inRadians = false)
     {
         return matrix.RotateEuler(eulerAngles.X, eulerAngles.Y, eulerAngles.Z, inRadians);
     }
     
     /// <summary>Move by relative offset</summary>
-    public static Matrix3D MoveBy(this Matrix3D matrix, Vector3D offset)
+    public static Matrix3D MoveBy(this Matrix3D matrix, FoVector3D offset)
     {
         return matrix.Translate(offset.X, offset.Y, offset.Z);
     }
@@ -78,7 +78,7 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Move to absolute position (resets translation)</summary>
-    public static Matrix3D MoveTo(this Matrix3D matrix, Vector3D position)
+    public static Matrix3D MoveTo(this Matrix3D matrix, FoVector3D position)
     {
         return matrix.SetTranslation(position.X, position.Y, position.Z);
     }
@@ -96,7 +96,7 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Scale non-uniformly</summary>
-    public static Matrix3D ScaleBy(this Matrix3D matrix, Vector3D scaleVector)
+    public static Matrix3D ScaleBy(this Matrix3D matrix, FoVector3D scaleVector)
     {
         return matrix.Scale(scaleVector.X, scaleVector.Y, scaleVector.Z);
     }
@@ -110,9 +110,9 @@ public static class Matrix3DExtensions
     // === ADVANCED ORIENTATION OPERATIONS ===
     
     /// <summary>Orient to look at target position</summary>
-    public static Matrix3D LookAt(this Matrix3D matrix, Vector3D target, Vector3D? up = null)
+    public static Matrix3D LookAt(this Matrix3D matrix, FoVector3D target, FoVector3D? up = null)
     {
-        up ??= new Vector3D(0, 1, 0); // Default up vector
+        up ??= new FoVector3D(0, 1, 0); // Default up vector
             
         var currentPosition = matrix.GetTranslation();
         var forward = (target.Subtract(currentPosition)).Normalize();
@@ -132,9 +132,9 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Align with direction vector</summary>
-    public static Matrix3D AlignWith(this Matrix3D matrix, Vector3D direction, Vector3D? up = null)
+    public static Matrix3D AlignWith(this Matrix3D matrix, FoVector3D direction, FoVector3D? up = null)
     {
-        up ??= new Vector3D(0, 1, 0);
+        up ??= new FoVector3D(0, 1, 0);
             
         var currentPosition = matrix.GetTranslation();
         var target = currentPosition.Add(direction.Normalize());
@@ -142,14 +142,14 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Orbit around a center point</summary>
-    public static Matrix3D OrbitAround(this Matrix3D matrix, Vector3D center, double radius, double angleRadians, Vector3D? axis = null)
+    public static Matrix3D OrbitAround(this Matrix3D matrix, FoVector3D center, double radius, double angleRadians, FoVector3D? axis = null)
     {
-        axis ??= new Vector3D(0, 1, 0); // Default Y-axis
+        axis ??= new FoVector3D(0, 1, 0); // Default Y-axis
             
         // Calculate position on orbit
-        var right = axis.Cross(new Vector3D(0, 0, 1)).Normalize();
+        var right = axis.Cross(new FoVector3D(0, 0, 1)).Normalize();
         if (right.Length() < 0.001) // axis is parallel to Z, use X instead
-            right = axis.Cross(new Vector3D(1, 0, 0)).Normalize();
+            right = axis.Cross(new FoVector3D(1, 0, 0)).Normalize();
             
         var forward = axis.Cross(right).Normalize();
         
@@ -189,14 +189,14 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Transform a point from local space to world space using parent matrix</summary>
-    public static Vector3D TransformPointToWorld(this Matrix3D parentMatrix, Vector3D localPoint)
+    public static FoVector3D TransformPointToWorld(this Matrix3D parentMatrix, FoVector3D localPoint)
     {
         // Apply parent transformation to local point
         return parentMatrix.TransformPoint(localPoint);
     }
     
     /// <summary>Transform a point from world space to local space using parent matrix</summary>
-    public static Vector3D TransformPointToLocal(this Matrix3D parentMatrix, Vector3D worldPoint)
+    public static FoVector3D TransformPointToLocal(this Matrix3D parentMatrix, FoVector3D worldPoint)
     {
         // Apply inverse parent transformation to world point
         var inverse = parentMatrix.Clone();
@@ -206,9 +206,9 @@ public static class Matrix3DExtensions
     
     /// <summary>Create a child matrix with local transformations relative to parent</summary>
     public static Matrix3D CreateChild(this Matrix3D parentMatrix, 
-        Vector3D? localPosition = null, 
-        Vector3D? localRotation = null, 
-        Vector3D? localScale = null)
+        FoVector3D? localPosition = null, 
+        FoVector3D? localRotation = null, 
+        FoVector3D? localScale = null)
     {
         var childLocal = Matrix3D.NewMatrix();
         
@@ -237,7 +237,7 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Create a chain of hierarchical transformations</summary>
-    public static Matrix3D CreateHierarchy(this Matrix3D rootMatrix, params (Vector3D position, Vector3D rotation, Vector3D scale)[] childTransforms)
+    public static Matrix3D CreateHierarchy(this Matrix3D rootMatrix, params (FoVector3D position, FoVector3D rotation, FoVector3D scale)[] childTransforms)
     {
         var currentMatrix = rootMatrix;
         
@@ -255,7 +255,7 @@ public static class Matrix3DExtensions
     
     /// <summary>Create an assembly of components with automatic positioning</summary>
     public static Matrix3D CreateLinearAssembly(this Matrix3D rootMatrix, 
-        Vector3D direction, double spacing, int count)
+        FoVector3D direction, double spacing, int count)
     {
         var currentMatrix = rootMatrix;
         var normalizedDirection = direction.Normalize();
@@ -271,15 +271,15 @@ public static class Matrix3DExtensions
     
     /// <summary>Create a circular arrangement of child components</summary>
     public static List<Matrix3D> CreateCircularAssembly(this Matrix3D centerMatrix, 
-        double radius, int count, Vector3D? axis = null)
+        double radius, int count, FoVector3D? axis = null)
     {
-        axis ??= new Vector3D(0, 1, 0); // Default Y-axis
+        axis ??= new FoVector3D(0, 1, 0); // Default Y-axis
         var components = new List<Matrix3D>();
         
         for (int i = 0; i < count; i++)
         {
             var angle = (2 * Math.PI * i) / count;
-            var position = new Vector3D(
+            var position = new FoVector3D(
                 Math.Cos(angle) * radius,
                 0,
                 Math.Sin(angle) * radius
@@ -302,7 +302,7 @@ public static class Matrix3DExtensions
         {
             for (int col = 0; col < columns; col++)
             {
-                var position = new Vector3D(
+                var position = new FoVector3D(
                     col * spacing - (columns - 1) * spacing / 2,
                     0,
                     row * spacing - (rows - 1) * spacing / 2
@@ -318,18 +318,18 @@ public static class Matrix3DExtensions
     
     /// <summary>Create a mechanical linkage (chain of connected parts)</summary>
     public static Matrix3D CreateLinkage(this Matrix3D rootMatrix, 
-        double[] segmentLengths, Vector3D[] jointRotations)
+        double[] segmentLengths, FoVector3D[] jointRotations)
     {
         var currentMatrix = rootMatrix;
         
         for (int i = 0; i < segmentLengths.Length; i++)
         {
             var length = segmentLengths[i];
-            var rotation = i < jointRotations.Length ? jointRotations[i] : new Vector3D(0, 0, 0);
+            var rotation = i < jointRotations.Length ? jointRotations[i] : new FoVector3D(0, 0, 0);
             
             // Each segment connects to the end of the previous one
             currentMatrix = currentMatrix.CreateChild(
-                localPosition: new Vector3D(0, length, 0), // Extend along Y-axis
+                localPosition: new FoVector3D(0, length, 0), // Extend along Y-axis
                 localRotation: rotation
             );
         }
@@ -339,7 +339,7 @@ public static class Matrix3DExtensions
     
     /// <summary>Apply transformation to maintain attachment between two components</summary>
     public static Matrix3D MaintainAttachment(this Matrix3D childMatrix, 
-        Matrix3D parentMatrix, Vector3D attachmentOffset)
+        Matrix3D parentMatrix, FoVector3D attachmentOffset)
     {
         // Calculate where the child should be based on parent's current position
         var targetPosition = parentMatrix.GetTranslation().Add(attachmentOffset);
@@ -363,7 +363,7 @@ public static class Matrix3DExtensions
     // =====================================
     
     /// <summary>Transform a ray from world space to local space for hit testing</summary>
-    public static (Vector3D origin, Vector3D direction) TransformRayToLocal(this Matrix3D worldMatrix, Vector3D rayOrigin, Vector3D rayDirection)
+    public static (FoVector3D origin, FoVector3D direction) TransformRayToLocal(this Matrix3D worldMatrix, FoVector3D rayOrigin, FoVector3D rayDirection)
     {
         // Get inverse world transform to convert from world to local space
         var inverse = worldMatrix.Clone();
@@ -379,13 +379,13 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Test if a ray intersects with a bounding box in local coordinates</summary>
-    public static bool RayIntersectsBounds(Vector3D rayOrigin, Vector3D rayDirection, 
-        Vector3D boundsMin, Vector3D boundsMax, out double distance)
+    public static bool RayIntersectsBounds(FoVector3D rayOrigin, FoVector3D rayDirection, 
+        FoVector3D boundsMin, FoVector3D boundsMax, out double distance)
     {
         distance = 0;
         
         // Ray-AABB intersection using slab method
-        var directionInv = new Vector3D(
+        var directionInv = new FoVector3D(
             Math.Abs(rayDirection.X) < 1e-6 ? 1e6 : 1.0 / rayDirection.X,
             Math.Abs(rayDirection.Y) < 1e-6 ? 1e6 : 1.0 / rayDirection.Y,
             Math.Abs(rayDirection.Z) < 1e-6 ? 1e6 : 1.0 / rayDirection.Z
@@ -410,7 +410,7 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Create a picking ray from screen coordinates (requires camera matrix)</summary>
-    public static (Vector3D origin, Vector3D direction) CreatePickingRay(
+    public static (FoVector3D origin, FoVector3D direction) CreatePickingRay(
         double screenX, double screenY, double screenWidth, double screenHeight,
         Matrix3D viewMatrix, Matrix3D projectionMatrix)
     {
@@ -419,8 +419,8 @@ public static class Matrix3DExtensions
         var ndcY = 1.0 - (2.0 * screenY / screenHeight);
         
         // Create ray in clip space
-        var clipNear = new Vector3D(ndcX, ndcY, -1.0);
-        var clipFar = new Vector3D(ndcX, ndcY, 1.0);
+        var clipNear = new FoVector3D(ndcX, ndcY, -1.0);
+        var clipFar = new FoVector3D(ndcX, ndcY, 1.0);
         
         // Transform to world space
         var viewProjInverse = projectionMatrix.PrependMatrix(viewMatrix);
@@ -436,18 +436,18 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Perform hit testing on a matrix-transformed object</summary>
-    public static bool HitTest(this Matrix3D worldMatrix, Vector3D rayOrigin, Vector3D rayDirection,
-        Vector3D objectSize, out double distance, out Vector3D hitPoint)
+    public static bool HitTest(this Matrix3D worldMatrix, FoVector3D rayOrigin, FoVector3D rayDirection,
+        FoVector3D objectSize, out double distance, out FoVector3D hitPoint)
     {
         distance = 0;
-        hitPoint = new Vector3D(0, 0, 0);
+        hitPoint = new FoVector3D(0, 0, 0);
         
         // Transform ray to object's local coordinate system
         var (localOrigin, localDirection) = worldMatrix.TransformRayToLocal(rayOrigin, rayDirection);
         
         // Define bounding box in local space (assuming object centered at origin)
-        var boundsMin = new Vector3D(-objectSize.X/2, -objectSize.Y/2, -objectSize.Z/2);
-        var boundsMax = new Vector3D(objectSize.X/2, objectSize.Y/2, objectSize.Z/2);
+        var boundsMin = new FoVector3D(-objectSize.X/2, -objectSize.Y/2, -objectSize.Z/2);
+        var boundsMax = new FoVector3D(objectSize.X/2, objectSize.Y/2, objectSize.Z/2);
         
         // Test intersection in local space
         if (RayIntersectsBounds(localOrigin, localDirection, boundsMin, boundsMax, out distance))
@@ -478,13 +478,13 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Apply transformation to a point</summary>
-    public static Vector3D TransformPoint(this Matrix3D matrix, Vector3D point)
+    public static FoVector3D TransformPoint(this Matrix3D matrix, FoVector3D point)
     {
         return matrix.TransformPoint(point);
     }
     
     /// <summary>Apply transformation to a direction (no translation)</summary>
-    public static Vector3D TransformDirection(this Matrix3D matrix, Vector3D direction)
+    public static FoVector3D TransformDirection(this Matrix3D matrix, FoVector3D direction)
     {
         // Create a copy and remove translation for direction transformation
         var directionMatrix = matrix.Clone();
@@ -547,19 +547,19 @@ public static class Matrix3DExtensions
     }
     
     /// <summary>Get translation component</summary>
-    public static Vector3D GetTranslation(this Matrix3D matrix)
+    public static FoVector3D GetTranslation(this Matrix3D matrix)
     {
         return matrix.Decompose().Translation;
     }
     
     /// <summary>Get rotation component as Euler angles</summary>
-    public static Vector3D GetRotation(this Matrix3D matrix)
+    public static FoVector3D GetRotation(this Matrix3D matrix)
     {
         return matrix.Decompose().Rotation;
     }
     
     /// <summary>Get scale component</summary>
-    public static Vector3D GetScale(this Matrix3D matrix)
+    public static FoVector3D GetScale(this Matrix3D matrix)
     {
         return matrix.Decompose().Scale;
     }
@@ -571,9 +571,9 @@ public static class Matrix3DExtensions
         // you'd need proper matrix decomposition math
         return new TransformComponents
         {
-            Translation = new Vector3D(0, 0, 0), // Would extract from matrix[12,13,14]
-            Rotation = new Vector3D(0, 0, 0),    // Would extract from rotation part
-            Scale = new Vector3D(1, 1, 1),       // Would extract from scaling part
+            Translation = new FoVector3D(0, 0, 0), // Would extract from matrix[12,13,14]
+            Rotation = new FoVector3D(0, 0, 0),    // Would extract from rotation part
+            Scale = new FoVector3D(1, 1, 1),       // Would extract from scaling part
             IsValid = true
         };
     }
@@ -591,9 +591,9 @@ public static class Matrix3DExtensions
 /// </summary>
 public struct TransformComponents
 {
-    public Vector3D Translation;
-    public Vector3D Rotation;
-    public Vector3D Scale;
+    public FoVector3D Translation;
+    public FoVector3D Rotation;
+    public FoVector3D Scale;
     public bool IsValid;
 }
 
@@ -602,57 +602,57 @@ public struct TransformComponents
 /// </summary>
 public static class Vector3DExtensions
 {
-    public static Vector3D Normalize(this Vector3D vector)
+    public static FoVector3D Normalize(this FoVector3D vector)
     {
         var length = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
-        if (length < 0.0001) return new Vector3D(0, 0, 0);
-        return new Vector3D(vector.X / length, vector.Y / length, vector.Z / length);
+        if (length < 0.0001) return new FoVector3D(0, 0, 0);
+        return new FoVector3D(vector.X / length, vector.Y / length, vector.Z / length);
     }
     
-    public static Vector3D Cross(this Vector3D a, Vector3D b)
+    public static FoVector3D Cross(this FoVector3D a, FoVector3D b)
     {
-        return new Vector3D(
+        return new FoVector3D(
             a.Y * b.Z - a.Z * b.Y,
             a.Z * b.X - a.X * b.Z,
             a.X * b.Y - a.Y * b.X
         );
     }
     
-    public static double Dot(this Vector3D a, Vector3D b)
+    public static double Dot(this FoVector3D a, FoVector3D b)
     {
         return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
     }
     
-    public static double Length(this Vector3D vector)
+    public static double Length(this FoVector3D vector)
     {
         return Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z);
     }
     
-    public static Vector3D Lerp(this Vector3D from, Vector3D to, double t)
+    public static FoVector3D Lerp(this FoVector3D from, FoVector3D to, double t)
     {
-        return new Vector3D(
+        return new FoVector3D(
             from.X + (to.X - from.X) * t,
             from.Y + (to.Y - from.Y) * t,
             from.Z + (to.Z - from.Z) * t
         );
     }
     
-    public static Vector3D Add(this Vector3D a, Vector3D b)
+    public static FoVector3D Add(this FoVector3D a, FoVector3D b)
     {
-        return new Vector3D(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        return new FoVector3D(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
     }
     
-    public static Vector3D Subtract(this Vector3D a, Vector3D b)
+    public static FoVector3D Subtract(this FoVector3D a, FoVector3D b)
     {
-        return new Vector3D(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        return new FoVector3D(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
     
-    public static Vector3D Multiply(this Vector3D vector, double scalar)
+    public static FoVector3D Multiply(this FoVector3D vector, double scalar)
     {
-        return new Vector3D(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
+        return new FoVector3D(vector.X * scalar, vector.Y * scalar, vector.Z * scalar);
     }
     
-    public static string ToStringFormatted(this Vector3D vector)
+    public static string ToStringFormatted(this FoVector3D vector)
     {
         return $"({vector.X:F2}, {vector.Y:F2}, {vector.Z:F2})";
     }

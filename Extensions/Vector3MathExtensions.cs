@@ -98,21 +98,7 @@ public static class Vector3MathExtensions
         );
     }
 
-    // ...existing code...
 
-    //euler angles to vector
-    
-
-    // //transform vector by matrix
-    // public static Vector3 ApplyMatrix4(this Vector3 v, Matrix4x4 m)
-    // {
-    //     return new Vector3
-    //     {
-    //         X = v.X * m.Elements[0] + v.Y * m.Elements[4] + v.Z * m.Elements[8] + m.Elements[12],
-    //         Y = v.X * m.Elements[1] + v.Y * m.Elements[5] + v.Z * m.Elements[9] + m.Elements[13],
-    //         Z = v.X * m.Elements[2] + v.Y * m.Elements[6] + v.Z * m.Elements[10] + m.Elements[14]
-    //     };
-    // }
 
 
 }

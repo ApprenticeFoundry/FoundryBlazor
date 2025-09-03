@@ -39,13 +39,13 @@ public class SpacialFrame3D : SpacialBox3D
     }
     
     // Helper method to convert Point3D to Vector3D
-    private Vector3D ToVector3D(Point3D point)
+    private FoVector3D ToVector3D(Point3D point)
     {
-        return new Vector3D(point.X, point.Y, point.Z);
+        return new FoVector3D(point.X, point.Y, point.Z);
     }
     
     // Helper method to convert Vector3D to Point3D
-    private Point3D ToPoint3D(Vector3D vector, string name = "")
+    private Point3D ToPoint3D(FoVector3D vector, string name = "")
     {
         return new Point3D(vector.X, vector.Y, vector.Z, name);
     }

@@ -122,7 +122,7 @@ public class Matrix3D
     }
 
     // Transform a point using the matrix
-    public Vector3D TransformPoint(Vector3D point)
+    public FoVector3D TransformPoint(FoVector3D point)
     {
         double x = point.X * matrix[0] + point.Y * matrix[4] + point.Z * matrix[8] + matrix[12];
         double y = point.X * matrix[1] + point.Y * matrix[5] + point.Z * matrix[9] + matrix[13];
@@ -136,7 +136,7 @@ public class Matrix3D
             z /= w;
         }
 
-        return new Vector3D(x, y, z);
+        return new FoVector3D(x, y, z);
     }
 
     // Multiply two matrices
