@@ -75,7 +75,7 @@ public class SpacialBox3D
         LeftBottomFront,
     };
 
-    public List<Face3D> GetFacesWithNormals()
+    public virtual List<Face3D> GetFacesWithNormals()
     {
         return new List<Face3D>
             {
@@ -237,7 +237,7 @@ public class SpacialBox3D
     public virtual List<Point3D> EdgeCenters => LocalEdgeCenters.Select(v => v - Pivot).ToList();
 
     // Returns all 12 box edges as named Edge3D objects
-    public List<Edge3D> GetEdgesWithNames()
+    public virtual List<Edge3D> GetEdgesWithNames()
     {
         var verts = Vertices;
         var edgeDefs = new (int, int, string)[]

@@ -54,8 +54,17 @@ public class SpacialFrame3D : SpacialBox3D
     private Point3D TransformPoint(Point3D point)
     {
         var vector = ToVector3D(point);
-        var transformed = Transform.TransformPoint(vector);
-        return ToPoint3D(transformed, point.Name);
+        
+        // Convert FoVector3D to BlazorThreeJS.Vector3
+        var blazorVector = new BlazorThreeJS.Maths.Vector3((float)vector.X, (float)vector.Y, (float)vector.Z);
+        
+        // Transform using Transform3
+        var transformedBlazorVector = Transform.TransformPoint(blazorVector);
+        
+        // Convert back to FoVector3D
+        var transformedFoVector = new FoVector3D(transformedBlazorVector.X, transformedBlazorVector.Y, transformedBlazorVector.Z);
+        
+        return ToPoint3D(transformedFoVector, point.Name);
     }
     
     // Helper method to transform a list of points
@@ -65,12 +74,13 @@ public class SpacialFrame3D : SpacialBox3D
     }
     
     // Update the transformation matrix based on current parameters
+    // Order: Scale -> Rotate -> Translate (correct 3D transformation order)
     public void UpdateTransform()
     {
         Transform.Identity()
-            .Translate(X, Y, Z)
-            .Scale(ScaleX, ScaleY, ScaleZ)
-            .RotateEuler(Rx, Ry, Rz);
+            .SetScale(ScaleX, ScaleY, ScaleZ)
+            .RotateEuler(Rx, Ry, Rz)
+            .Translate(X, Y, Z);
     }
     
     // Call this when any transformation parameter changes
@@ -242,5 +252,56 @@ public class SpacialFrame3D : SpacialBox3D
     };
 
     public override List<Point3D> EdgeCenters => TransformPoints(LocalEdgeCenters.Select(v => v - Pivot).ToList());
+
+    // Override to ensure edges use properly transformed coordinates
+    public override List<Edge3D> GetEdgesWithNames()
+    {
+        var verts = Vertices; // These are already transformed - simple!
+        var edgeDefs = new (int, int, string)[]
+        {
+            (0,1,"TopFront"), (1,3,"TopRight"), (3,2,"TopBack"), (2,0,"TopLeft"),
+            (4,5,"BottomFront"), (5,7,"BottomRight"), (7,6,"BottomBack"), (6,4,"BottomLeft"),
+            (0,4,"LeftFront"), (1,5,"RightFront"), (2,6,"LeftBack"), (3,7,"RightBack")
+        };
+        
+        var edges = new List<Edge3D>();
+        foreach (var (i, j, name) in edgeDefs)
+        {
+            // Simple: just use the transformed vertices, let Edge3D calculate its own midpoint
+            edges.Add(new Edge3D(name, verts[i], verts[j]));
+        }
+        return edges;
+    }
+
+    // Override to ensure faces use properly transformed coordinates and rotated normals
+    public override List<Face3D> GetFacesWithNormals()
+    {
+        // Get transformed face vertices
+        var frontFace = FrontFace;
+        var backFace = BackFace;
+        var leftFace = LeftFace;
+        var rightFace = RightFace;
+        var topFace = TopFace;
+        var bottomFace = BottomFace;
+        
+        // Transform the normal vectors according to the frame's rotation
+        var rotMatrix = Matrix3.NewMatrix().Identity().RotateEuler(Rx, Ry, Rz);
+        var frontNormal = rotMatrix.TransformPoint(new Vector3(0, 0, 1));
+        var backNormal = rotMatrix.TransformPoint(new Vector3(0, 0, -1));
+        var leftNormal = rotMatrix.TransformPoint(new Vector3(-1, 0, 0));
+        var rightNormal = rotMatrix.TransformPoint(new Vector3(1, 0, 0));
+        var topNormal = rotMatrix.TransformPoint(new Vector3(0, 1, 0));
+        var bottomNormal = rotMatrix.TransformPoint(new Vector3(0, -1, 0));
+        
+        return new List<Face3D>
+        {
+            new Face3D("Front", frontFace, frontNormal),
+            new Face3D("Back", backFace, backNormal),
+            new Face3D("Left", leftFace, leftNormal),
+            new Face3D("Right", rightFace, rightNormal),
+            new Face3D("Top", topFace, topNormal),
+            new Face3D("Bottom", bottomFace, bottomNormal)
+        };
+    }
 
 }
