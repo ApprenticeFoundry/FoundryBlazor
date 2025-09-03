@@ -75,10 +75,21 @@ public class Edge3D
         {
             var (axis, angle) = GetAxisAngle();
             double ex = 0, ey = 0, ez = 0;
+            
+            // Map the rotation to the dominant axis
             if (Math.Abs(axis.X) > 0.9) ex = angle;
             else if (Math.Abs(axis.Y) > 0.9) ey = angle;
             else if (Math.Abs(axis.Z) > 0.9) ez = angle;
-            return new Euler(ex, ey, ez, "XYZ");
+            else
+            {
+                // For non-axis-aligned rotations, distribute across axes
+                // This is the simplest approach that often works
+                ex = axis.X * angle;
+                ey = axis.Y * angle;
+                ez = axis.Z * angle;
+            }
+            
+            return new Euler((float)ex, (float)ey, (float)ez, "XYZ");
         }
     }
 }
