@@ -4,6 +4,7 @@ using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Objects;
 using FoundryBlazor.Extensions;
+using FoundryBlazor.Shapes3D.SpacialFrame;
 using System.Drawing;
 using System.Xml.Linq;
 
