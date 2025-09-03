@@ -7,6 +7,61 @@ namespace FoundryBlazor.Shape
     public class Face3D
     {
         /// <summary>
+        /// Returns the transform (position, euler, length) for visualizing the face normal as a cylinder (Y axis aligned to normal, base at face center).
+        /// </summary>
+        public (Point3D position, Vector3 norm, Vector3 euler, double length) GetNormalCylinderTransform(double length = 0.4)
+        {
+            var position = Center;
+            var normal = Normal.Normalize();
+            var up = new Vector3(0, 1, 0);
+            var axis = up.Cross(normal);
+            double axisLength = axis.Length();
+            double angle;
+            if (axisLength > 1e-6)
+            {
+                axis = axis.Normalize();
+                angle = Math.Acos(Math.Max(-1.0, Math.Min(1.0, up.Dot(normal))));
+            }
+            else
+            {
+                angle = up.Dot(normal) > 0 ? 0 : Math.PI;
+                axis = new Vector3(1, 0, 0); // Arbitrary axis for 180°
+            }
+
+            // Convert axis-angle to quaternion
+            double halfAngle = angle / 2.0;
+            double sinHalf = Math.Sin(halfAngle);
+            double qx = axis.X * sinHalf;
+            double qy = axis.Y * sinHalf;
+            double qz = axis.Z * sinHalf;
+            double qw = Math.Cos(halfAngle);
+
+            // Convert quaternion to Euler angles (XYZ order)
+            double sqw = qw * qw;
+            double sqx = qx * qx;
+            double sqy = qy * qy;
+            double sqz = qz * qz;
+
+            // Roll (X-axis rotation)
+            double t0 = 2.0 * (qw * qx + qy * qz);
+            double t1 = 1.0 - 2.0 * (sqx + sqy);
+            double roll = Math.Atan2(t0, t1);
+
+            // Pitch (Y-axis rotation)
+            double t2 = 2.0 * (qw * qy - qz * qx);
+            t2 = t2 > 1.0 ? 1.0 : t2;
+            t2 = t2 < -1.0 ? -1.0 : t2;
+            double pitch = Math.Asin(t2);
+
+            // Yaw (Z-axis rotation)
+            double t3 = 2.0 * (qw * qz + qx * qy);
+            double t4 = 1.0 - 2.0 * (sqy + sqz);
+            double yaw = Math.Atan2(t3, t4);
+
+            return (position, normal, new Vector3(roll, pitch, yaw), length);
+        }
+
+        /// <summary>
         /// Returns the transform (midpoint, euler, length) for visualizing the face normal as a line or arrow.
         /// The midpoint is at the center of the face, the euler aligns the local Z axis to the normal, and the length is as specified.
         /// </summary>
@@ -95,7 +150,7 @@ namespace FoundryBlazor.Shape
         {
             return (Center, GetEulerToNormal());
         }
-    
+
         // Width: distance between first and second vertex
         public double Width => Vertices.Count > 1 ?
             Math.Sqrt(Math.Pow(Vertices[0].X - Vertices[1].X, 2) +
