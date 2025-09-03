@@ -12,8 +12,8 @@ namespace FoundryBlazor.Shape;
 
 public class SpacialFrame3D : SpacialBox3D
 {
-    Matrix3D Transform { get; set; } = new Matrix3D();
-    
+    public Transform3 Transform { get; set; } = new Transform3();
+
     // Transformation parameters
     public double X { get; set; } = 0;
     public double Y { get; set; } = 0;
