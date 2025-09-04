@@ -17,23 +17,12 @@ public class Edge3D
         Midpoint = new Point3D(
             (start.X + end.X) / 2,
             (start.Y + end.Y) / 2,
-            (start.Z + end.Z) / 2
+            (start.Z + end.Z) / 2,
+            "Midpoint"
         );
     }
 
-    public Edge3D(string name, Point3D start, Point3D end, Point3D midpoint)
-    {
-        Name = name;
-        Start = start;
-        End = end;
-        Midpoint = object.Equals(midpoint, null)
-            ? new Point3D(
-                (start.X + end.X) / 2,
-                (start.Y + end.Y) / 2,
-                (start.Z + end.Z) / 2
-            )
-            : midpoint;
-    }
+
 
     public double Length => Math.Sqrt(
         Math.Pow(End.X - Start.X, 2) +
@@ -41,11 +30,7 @@ public class Edge3D
         Math.Pow(End.Z - Start.Z, 2)
     );
 
-    public static double VectorLength(BlazorThreeJS.Maths.Vector3 v)
-    {
-        if (v == null) return 0.0;
-        return Math.Sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
-    }
+
 
     // Returns the axis and angle needed to rotate local Y to align with this edge
     public (Vector3 axis, double angle) GetAxisAngle()

@@ -1,16 +1,12 @@
-using BlazorThreeJS.Geometires;
-using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
-using BlazorThreeJS.Objects;
-using FoundryBlazor.Shape;
-using System.Drawing;
-using System.Xml.Linq;
 
 
 
 namespace FoundryBlazor.Shape;
 
-
+//this data is always computed in local space (0,0,0) to (W,H,D) 
+//the SpacialBox3D can then be transformed in 3D space with position 
+//data is never cashed or transformed, always computed on the fly
 public class SpacialBox3D
 {
     public string Units { get; set; } = "m";
@@ -22,7 +18,6 @@ public class SpacialBox3D
     private double HalfHeight { get; set; }
     private double HalfDepth { get; set; }
 
-    public Point3D Pivot { get; set; } = new Point3D(0, 0, 0);
 
     public double Volume => Width * Height * Depth;
 
@@ -37,23 +32,28 @@ public class SpacialBox3D
         HalfWidth = Width / 2;
         HalfHeight = Height / 2;
         HalfDepth = Depth / 2;
-        Pivot = new Point3D(HalfWidth, HalfHeight, HalfDepth);
     }
 
+    public SpacialBox3D(FoSpec3D spec, string units = "m") : this(spec.W, spec.H, spec.D, units)
+    {
+    }
 
+    public SpacialBox3D(FoShape3D glyph, string units = "m") : this(glyph.Width, glyph.Height, glyph.Depth, units)
+    {
+    }
 
-    public Point3D Center => new(HalfWidth, HalfHeight, HalfDepth);
+    public Point3D Center => new(HalfWidth, HalfHeight, HalfDepth, "Center");
 
-    public Point3D LeftTopFront => new(0, Height, Depth);
-    public Point3D RightTopFront => new(Width, Height, Depth);
-    public Point3D LeftBottomFront => new(0, 0, Depth);
-    public Point3D RightBottomFront => new(Width, 0, Depth);
-    public Point3D LeftTopBack => new(0, Height, 0);
-    public Point3D RightTopBack => new(Width, Height, 0);
-    public Point3D LeftBottomBack => new(0, 0, 0);
-    public Point3D RightBottomBack => new(Width, 0, 0);
+    public Point3D LeftTopFront => new(0, Height, Depth, "LeftTopFront");
+    public Point3D RightTopFront => new(Width, Height, Depth, "RightTopFront");
+    public Point3D LeftBottomFront => new(0, 0, Depth, "LeftBottomFront");
+    public Point3D RightBottomFront => new(Width, 0, Depth, "RightBottomFront");
+    public Point3D LeftTopBack => new(0, Height, 0, "LeftTopBack");
+    public Point3D RightTopBack => new(Width, Height, 0, "RightTopBack");
+    public Point3D LeftBottomBack => new(0, 0, 0, "LeftBottomBack");
+    public Point3D RightBottomBack => new(Width, 0, 0, "RightBottomBack");
 
-    public List<Point3D> LocalVertices => new List<Point3D>
+    public List<Point3D> GetLocalVertices() => new List<Point3D>
     {
         LeftTopFront,
         RightTopFront,
@@ -65,203 +65,236 @@ public class SpacialBox3D
         RightBottomBack
     };
 
-    public virtual List<Point3D> Vertices => LocalVertices.Select(v => v - Pivot).ToList();
 
-    public virtual List<Point3D> LocalLeftFace => new List<Point3D>
+    public Face3D GetLocalLeftFace()
     {
-        LeftTopFront,
-        LeftTopBack,
-        LeftBottomBack,
-        LeftBottomFront,
-    };
+        return new Face3D("Left", new List<Point3D>
+        {
+            LeftTopFront,
+            LeftTopBack,
+            LeftBottomBack,
+            LeftBottomFront
+        }, new Vector3(-1, 0, 0));
+    }
 
-    public virtual List<Face3D> GetLocalFacesWithNormals()
+    public Face3D GetLocalRightFace()
+    {
+        return new Face3D("Right", new List<Point3D>
+        {
+            RightTopFront,
+            RightTopBack,
+            RightBottomBack,
+            RightBottomFront
+        }, new Vector3(1, 0, 0));
+    }
+
+    public Face3D GetLocalFrontFace()
+    {
+        return new Face3D("Front", new List<Point3D>
+        {
+            LeftTopFront,
+            RightTopFront,
+            RightBottomFront,
+            LeftBottomFront
+        }, new Vector3(0, 0, 1));
+    }
+
+    public Face3D GetLocalBackFace()
+    {
+        return new Face3D("Back", new List<Point3D>
+        {
+            LeftTopBack,
+            RightTopBack,
+            RightBottomBack,
+            LeftBottomBack
+        }, new Vector3(0, 0, -1));
+    }
+
+    public Face3D GetLocalTopFace()
+    {
+        return new Face3D("Top", new List<Point3D>
+        {
+            LeftTopFront,
+            RightTopFront,
+            RightTopBack,
+            LeftTopBack
+        }, new Vector3(0, 1, 0));
+    }
+
+    public Face3D GetLocalBottomFace()
+    {
+        return new Face3D("Bottom", new List<Point3D>
+        {
+            LeftBottomFront,
+            RightBottomFront,
+            RightBottomBack,
+            LeftBottomBack
+        }, new Vector3(0, -1, 0));
+    }
+
+    public List<Face3D> GetLocalFaces()
     {
         return new List<Face3D>
-            {
-                new Face3D("Front", FrontFace, new Vector3(0,0,1)),
-                new Face3D("Back", BackFace, new Vector3(0,0,-1)),
-                new Face3D("Left", LeftFace, new Vector3(-1,0,0)),
-                new Face3D("Right", RightFace, new Vector3(1,0,0)),
-                new Face3D("Top", TopFace, new Vector3(0,1,0)),
-                new Face3D("Bottom", BottomFace, new Vector3(0,-1,0))
-            };
-    }
-
-    public virtual List<Point3D> LeftFace => LocalLeftFace.Select(v => v - Pivot).ToList();
-
-    public virtual Mesh3D LeftFaceMesh(double thickness, string color)
-    {
-        var geometry = new BoxGeometry(thickness, Height, Depth);
-        var mesh = new Mesh3D
         {
-            Name = "LeftFace",
-            Uuid = Guid.NewGuid().ToString(),
-            Geometry = new BoxGeometry(thickness, Height, Depth),
-            Material = new MeshStandardMaterial() { Color = color },
-            Transform = new Transform3() { Position = new Vector3(-HalfWidth, 0, 0) },
+            GetLocalLeftFace(),
+            GetLocalRightFace(),
+            GetLocalFrontFace(),
+            GetLocalBackFace(),
+            GetLocalTopFace(),
+            GetLocalBottomFace()
         };
-        return mesh;
     }
 
-    public virtual Mesh3D RightFaceMesh(double thickness, string color)
+
+
+
+
+
+    public Point3D LocalFrontFaceCenter => new(HalfWidth, HalfHeight, 0, "front");
+    public Point3D LocalRearFaceCenter => new(HalfWidth, HalfHeight, Depth, "rear");
+    public Point3D LocalLeftFaceCenter => new(0, HalfHeight, HalfDepth, "left");
+    public Point3D LocalRightFaceCenter => new(Width, HalfHeight, HalfDepth, "right");
+    public Point3D LocalTopFaceCenter => new(HalfWidth, Height, HalfDepth, "top");
+    public Point3D LocalBottomFaceCenter => new(HalfWidth, 0, HalfDepth, "bottom");
+
+    public virtual List<Point3D> GetLocalFaceCenters() => new List<Point3D>
     {
-        var geometry = new BoxGeometry(thickness, Height, Depth);
-        var mesh = new Mesh3D
+        LocalFrontFaceCenter,
+        LocalRearFaceCenter,
+        LocalLeftFaceCenter,
+        LocalRightFaceCenter,
+        LocalTopFaceCenter,
+        LocalBottomFaceCenter
+    };
+
+
+
+    public Point3D LocalCenterTopFrontEdge => new Point3D(HalfWidth, Height, Depth, "CenterTopFront");
+    public Point3D LocalCenterTopBackEdge => new Point3D(HalfWidth, Height, 0, "CenterTopBack");
+
+    public Point3D LocalCenterTopLeftEdge => new Point3D(0, Height, HalfDepth, "CenterTopLeft");
+    public Point3D LocalCenterTopRightEdge => new Point3D(Width, Height, HalfDepth, "CenterTopRight");
+
+    public Point3D LocalCenterBottomFrontEdge => new Point3D(HalfWidth, 0, Depth, "CenterBottomFront");
+    public Point3D LocalCenterBottomBackEdge => new Point3D(HalfWidth, 0, 0, "CenterBottomBack");
+
+    public Point3D LocalCenterBottomLeftEdge => new Point3D(0, 0, HalfDepth, "CenterBottomLeft");
+    public Point3D LocalCenterBottomRightEdge => new Point3D(Width, 0, HalfDepth, "CenterBottomRight");
+
+    public Point3D LocalCenterFrontLeftEdge => new Point3D(0, HalfHeight, Depth, "CenterFrontLeft");
+    public Point3D LocalCenterFrontRightEdge => new Point3D(Width, HalfHeight, Depth, "CenterFrontRight");
+
+    public Point3D LocalCenterBackLeftEdge => new Point3D(0, HalfHeight, 0, "CenterBackLeft");
+    public Point3D LocalCenterBackRightEdge => new Point3D(Width, HalfHeight, 0, "CenterBackRight");
+
+    public Point3D LocalCenterTopEdge => new Point3D(HalfWidth, Height, HalfDepth, "CenterTop");
+    public Point3D LocalCenterBottomEdge => new Point3D(HalfWidth, 0, HalfDepth, "CenterBottom");
+
+    public Point3D LocalCenterFrontEdge => new Point3D(HalfWidth, HalfHeight, Depth, "CenterFront");
+    public Point3D LocalCenterBackEdge => new Point3D(HalfWidth, HalfHeight, 0, "CenterBack");
+
+    public virtual List<Point3D> GetLocalEdgeCenters() => new List<Point3D>
+    {
+        LocalCenterTopFrontEdge,
+        LocalCenterTopBackEdge,
+        LocalCenterTopLeftEdge,
+        LocalCenterTopRightEdge,
+        LocalCenterBottomFrontEdge,
+        LocalCenterBottomBackEdge,
+        LocalCenterBottomLeftEdge,
+        LocalCenterBottomRightEdge,
+        LocalCenterFrontLeftEdge,
+        LocalCenterFrontRightEdge,
+        LocalCenterBackLeftEdge,
+        LocalCenterBackRightEdge,
+        LocalCenterTopEdge,
+        LocalCenterBottomEdge,
+        LocalCenterFrontEdge,
+        LocalCenterBackEdge
+    };
+
+    //edges are named in X,Y,Z order so TopFront means Y=Top, Z=Front
+    // and TopLeft means Y=Top, X=Left etc.
+
+    public Edge3D GetLocalEdgeTopFront()
+    {
+        return new Edge3D("TopFront", LeftTopFront, RightTopFront);
+    }
+
+    public Edge3D GetLocalEdgeTopBack()
+    {
+        return new Edge3D("TopBack", LeftTopBack, RightTopBack);
+    }
+
+    public Edge3D GetLocalEdgeTopLeft()
+    {
+        return new Edge3D("LeftTop", LeftTopFront, LeftTopBack);
+    }
+
+    public Edge3D GetLocalEdgeTopRight()
+    {
+        return new Edge3D("RightTop", RightTopFront, RightTopBack);
+    }
+
+    public Edge3D GetLocalEdgeBottomFront()
+    {
+        return new Edge3D("BottomFront", LeftBottomFront, RightBottomFront);
+    }
+
+    public Edge3D GetLocalEdgeBottomBack()
+    {
+        return new Edge3D("BottomBack", LeftBottomBack, RightBottomBack);
+    }
+
+    public Edge3D GetLocalEdgeBottomLeft()
+    {
+        return new Edge3D("LeftBottom", LeftBottomFront, LeftBottomBack);
+    }
+
+    public Edge3D GetLocalEdgeBottomRight()
+    {
+        return new Edge3D("RightBottom", RightBottomFront, RightBottomBack);
+    }
+
+    public Edge3D GetLocalEdgeFrontLeft()
+    {
+        return new Edge3D("LeftFront", LeftBottomFront, LeftTopFront);
+    }
+
+    public Edge3D GetLocalEdgeFrontRight()
+    {
+        return new Edge3D("RightFront", RightBottomFront, RightTopFront);
+    }
+
+    public Edge3D GetLocalEdgeBackLeft()
+    {
+        return new Edge3D("LeftBack", LeftTopBack, LeftBottomBack);
+    }
+
+    public Edge3D GetLocalEdgeBackRight()
+    {
+        return new Edge3D("RightBack", RightTopBack, RightBottomBack);
+    }
+
+    public List<Edge3D> GetLocalEdges()
+    {
+        return new List<Edge3D>
         {
-            Name = "RightFace",
-            Uuid = Guid.NewGuid().ToString(),
-            Geometry = new BoxGeometry(thickness, Height, Depth),
-            Material = new MeshStandardMaterial() { Color = color },
-            Transform = new Transform3() { Position = new Vector3(HalfWidth, 0, 0) },
+            GetLocalEdgeTopFront(),
+            GetLocalEdgeTopBack(),
+            GetLocalEdgeTopLeft(),
+            GetLocalEdgeTopRight(),
+            GetLocalEdgeBottomFront(),
+            GetLocalEdgeBottomBack(),
+            GetLocalEdgeBottomLeft(),
+            GetLocalEdgeBottomRight(),
+            GetLocalEdgeFrontLeft(),
+            GetLocalEdgeFrontRight(),
+            GetLocalEdgeBackLeft(),
+            GetLocalEdgeBackRight()
         };
-        return mesh;
     }
 
-    public virtual List<Point3D> LocalRightFace => new List<Point3D>
-    {
-        RightTopFront,
-        RightTopBack,
-        RightBottomBack,
-        RightBottomFront,
-    };
-
-    public virtual List<Point3D> RightFace => LocalRightFace.Select(v => v - Pivot).ToList();
-
-    public virtual List<Point3D> LocalFrontFace => new List<Point3D>
-    {
-        LeftTopFront,
-        RightTopFront,
-        RightBottomFront,
-        LeftBottomFront,
-    };
-
-    public virtual List<Point3D> FrontFace => LocalFrontFace.Select(v => v - Pivot).ToList();
-
-    public virtual List<Point3D> LocalBackFace => new List<Point3D>
-    {
-        LeftTopBack,
-        RightTopBack,
-        RightBottomBack,
-        LeftBottomBack,
-    };
-
-    public virtual List<Point3D> BackFace => LocalBackFace.Select(v => v - Pivot).ToList();
-
-    public virtual List<Point3D> LocalTopFace => new List<Point3D>
-    {
-        LeftTopFront,
-        RightTopFront,
-        RightTopBack,
-        LeftTopBack,
-    };
-
-    public virtual List<Point3D> TopFace => LocalTopFace.Select(v => v - Pivot).ToList();
-
-    public virtual List<Point3D> LocalBottomFace => new List<Point3D>
-    {
-        LeftBottomFront,
-        RightBottomFront,
-        RightBottomBack,
-        LeftBottomBack,
-    };
-
-    public virtual List<Point3D> BottomFace => LocalBottomFace.Select(v => v - Pivot).ToList();
-
-    public virtual Point3D FrontFaceCenter => new(HalfWidth, HalfHeight, 0, "front");
-    public virtual Point3D RearFaceCenter => new(HalfWidth, HalfHeight, Depth, "rear");
-    public virtual Point3D LeftFaceCenter => new(0, HalfHeight, HalfDepth, "left");
-    public virtual Point3D RightFaceCenter => new(Width, HalfHeight, HalfDepth, "right");
-    public virtual Point3D TopFaceCenter => new(HalfWidth, Height, HalfDepth, "top");
-    public virtual Point3D BottomFaceCenter => new(HalfWidth, 0, HalfDepth, "bottom");
-
-    public virtual List<Point3D> LocalFaceCenters => new List<Point3D>
-    {
-        FrontFaceCenter,
-        RearFaceCenter,
-        LeftFaceCenter,
-        RightFaceCenter,
-        TopFaceCenter,
-        BottomFaceCenter
-    };
-
-    public virtual List<Point3D> FaceCenters => LocalFaceCenters.Select(v => v - Pivot).ToList();
-
-    // === LOCAL COORDINATE METHODS (Clear API) ===
-    public virtual List<Point3D> GetLocalVertices()
-    {
-        return LocalVertices.Select(v => v - Pivot).ToList();
-    }
-
-    public virtual List<Point3D> GetLocalFaceCenters()
-    {
-        return LocalFaceCenters.Select(v => v - Pivot).ToList();
-    }
-
-
-
-    public virtual Point3D EdgeCenterTopFront => new Point3D(HalfWidth, Height, Depth);
-    public virtual Point3D EdgeCenterTopBack => new Point3D(HalfWidth, Height, 0);
-
-    public virtual Point3D EdgeCenterTopLeft => new Point3D(0, Height, HalfDepth);
-    public virtual Point3D EdgeCenterTopRight => new Point3D(Width, Height, HalfDepth);
-
-    public virtual Point3D EdgeCenterBottomFront => new Point3D(HalfWidth, 0, Depth);
-    public virtual Point3D EdgeCenterBottomBack => new Point3D(HalfWidth, 0, 0);
-
-    public virtual Point3D EdgeCenterBottomLeft => new Point3D(0, 0, HalfDepth);
-    public virtual Point3D EdgeCenterBottomRight => new Point3D(Width, 0, HalfDepth);
-
-    public virtual Point3D EdgeCenterFrontLeft => new Point3D(0, HalfHeight, Depth);
-    public virtual Point3D EdgeCenterFrontRight => new Point3D(Width, HalfHeight, Depth);
-
-    public virtual Point3D EdgeCenterBackLeft => new Point3D(0, HalfHeight, 0);
-    public virtual Point3D EdgeCenterBackRight => new Point3D(Width, HalfHeight, 0);
-
-    public virtual Point3D EdgeCenterTop => new Point3D(HalfWidth, Height, HalfDepth);
-    public virtual Point3D EdgeCenterBottom => new Point3D(HalfWidth, 0, HalfDepth);
-
-    public virtual Point3D EdgeCenterFront => new Point3D(HalfWidth, HalfHeight, Depth);
-    public virtual Point3D EdgeCenterBack => new Point3D(HalfWidth, HalfHeight, 0);
-
-
-    public virtual List<Point3D> LocalEdgeCenters => new List<Point3D>
-    {
-        EdgeCenterTopFront,
-        EdgeCenterTopBack,
-        EdgeCenterTopLeft,
-        EdgeCenterTopRight,
-        EdgeCenterBottomFront,
-        EdgeCenterBottomBack,
-        EdgeCenterBottomLeft,
-        EdgeCenterBottomRight,
-        EdgeCenterFrontLeft,
-        EdgeCenterFrontRight,
-        EdgeCenterBackLeft,
-        EdgeCenterBackRight,
-        EdgeCenterTop,
-        EdgeCenterBottom,
-        EdgeCenterFront,
-        EdgeCenterBack
-    };
-
-    public virtual List<Point3D> EdgeCenters => LocalEdgeCenters.Select(v => v - Pivot).ToList();
-
-    // Returns all 12 box edges as named Edge3D objects
-    public virtual List<Edge3D> GetLocalEdgesWithNames()
-    {
-        var verts = Vertices;
-        var edgeDefs = new (int, int, string)[]
-        {
-            (0,1,"TopFront"), (1,3,"TopRight"), (3,2,"TopBack"), (2,0,"TopLeft"),
-            (4,5,"BottomFront"), (5,7,"BottomRight"), (7,6,"BottomBack"), (6,4,"BottomLeft"),
-            (0,4,"LeftFront"), (1,5,"RightFront"), (2,6,"LeftBack"), (3,7,"RightBack")
-        };
-        var edges = new List<Edge3D>();
-        foreach (var (i, j, name) in edgeDefs)
-            edges.Add(new Edge3D(name, verts[i], verts[j]));
-        return edges;
-    }
 }
 
 

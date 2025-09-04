@@ -17,7 +17,6 @@ public class FoGlyph3D : FoComponent
 {
     public string GlyphId { get; set; } = "";
 
-
     public Object3D? Value3D { get; set; }
 
 

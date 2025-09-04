@@ -13,20 +13,23 @@ public readonly struct Point3D : IEquatable<Point3D>
     public readonly double Z { get; }
     public readonly string Name { get; init; }
 
-    public Point3D(double x, double y, double z)
-    {
-        X = x;
-        Y = y;
-        Z = z;
-        Name = "";
-    }
-    public Point3D(double x, double y, double z, string name)
+
+    public Point3D(double x, double y, double z, string name="")
     {
         X = x;
         Y = y;
         Z = z;
         Name = name;
     }
+
+    public Point3D(Vector3 v, string name="")
+    {
+        X = v.X;
+        Y = v.Y;
+        Z = v.Z;
+        Name = name;
+    }
+
 
     public Vector3 AsVector3() => new Vector3(X, Y, Z);
 
@@ -69,7 +72,7 @@ public readonly struct Point3D : IEquatable<Point3D>
         HashCode.Combine(X, Y, Z);
 
     public override string ToString() =>
-        $"Point3D({X}, {Y}, {Z})";
+        $"Point({X:F2}, {Y:F2}, {Z:F2}) {Name}";
 
     // Convenience methods
     public static Point3D Zero => new Point3D(0, 0, 0);
