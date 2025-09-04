@@ -75,7 +75,7 @@ public class SpacialBox3D
         LeftBottomFront,
     };
 
-    public virtual List<Face3D> GetFacesWithNormals()
+    public virtual List<Face3D> GetLocalFacesWithNormals()
     {
         return new List<Face3D>
             {
@@ -187,6 +187,17 @@ public class SpacialBox3D
 
     public virtual List<Point3D> FaceCenters => LocalFaceCenters.Select(v => v - Pivot).ToList();
 
+    // === LOCAL COORDINATE METHODS (Clear API) ===
+    public virtual List<Point3D> GetLocalVertices()
+    {
+        return LocalVertices.Select(v => v - Pivot).ToList();
+    }
+
+    public virtual List<Point3D> GetLocalFaceCenters()
+    {
+        return LocalFaceCenters.Select(v => v - Pivot).ToList();
+    }
+
 
 
     public virtual Point3D EdgeCenterTopFront => new Point3D(HalfWidth, Height, Depth);
@@ -237,7 +248,7 @@ public class SpacialBox3D
     public virtual List<Point3D> EdgeCenters => LocalEdgeCenters.Select(v => v - Pivot).ToList();
 
     // Returns all 12 box edges as named Edge3D objects
-    public virtual List<Edge3D> GetEdgesWithNames()
+    public virtual List<Edge3D> GetLocalEdgesWithNames()
     {
         var verts = Vertices;
         var edgeDefs = new (int, int, string)[]

@@ -254,8 +254,19 @@ public class SpacialFrame3D : SpacialBox3D
 
     public override List<Point3D> EdgeCenters => TransformPoints(LocalEdgeCenters.Select(v => v - Pivot).ToList());
 
+    // === GLOBAL COORDINATE METHODS (Simple API) ===
+    public List<Point3D> GetVertices()
+    {
+        return Vertices; // Already transformed
+    }
+
+    public List<Point3D> GetFaceCenters()
+    {
+        return FaceCenters; // Already transformed
+    }
+
     // Override to ensure edges use properly transformed coordinates
-    public override List<Edge3D> GetEdgesWithNames()
+    public List<Edge3D> GetEdgesWithNames()
     {
         var verts = Vertices; // These are already transformed - simple!
         var edgeDefs = new (int, int, string)[]
@@ -275,7 +286,7 @@ public class SpacialFrame3D : SpacialBox3D
     }
 
     // Override to ensure faces use properly transformed coordinates and rotated normals
-    public override List<Face3D> GetFacesWithNormals()
+    public List<Face3D> GetFacesWithNormals()
     {
         // Get transformed face vertices
         var frontFace = FrontFace;
