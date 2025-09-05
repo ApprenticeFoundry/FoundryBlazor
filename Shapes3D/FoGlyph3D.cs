@@ -2,10 +2,8 @@ using BlazorThreeJS.Core;
 using BlazorThreeJS.Materials;
 using BlazorThreeJS.Maths;
 using BlazorThreeJS.Viewers;
-using FoundryBlazor.Extensions;
 using FoundryRulesAndUnits.Extensions;
 using FoundryRulesAndUnits.Models;
-using FoundryRulesAndUnits.Units;
 using System.Text.Json.Serialization;
 
 

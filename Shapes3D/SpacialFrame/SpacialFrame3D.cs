@@ -12,75 +12,30 @@ namespace FoundryBlazor.Shape;
 
 public class SpacialFrame3D : SpacialBox3D
 {
-    public Transform3 Transform { get; set; } = new Transform3();
-
-    // Transformation parameters
-    public double X { get; set; } = 0;
-    public double Y { get; set; } = 0;
-    public double Z { get; set; } = 0;
-    public double Rx { get; set; } = 0;
-    public double Ry { get; set; } = 0;
-    public double Rz { get; set; } = 0;
-    public double Px { get; set; } = 0;
-    public double Py { get; set; } = 0;
-    public double Pz { get; set; } = 0;
-    public double ScaleX { get; set; } = 1;
-    public double ScaleY { get; set; } = 1;
-    public double ScaleZ { get; set; } = 1;
+    public FoShape3D Source { get; set; } = new FoShape3D();
 
  
-    public SpacialFrame3D(FoSpec3D spec, string units = "m")
-    : base(spec, units)
-    {
-        X = spec.X;
-        Y = spec.Y;
-        Z = spec.Z;
-        Rx = spec.Rx;
-        Ry = spec.Ry;
-        Rz = spec.Rz;
-        Px = spec.Px;
-        Py = spec.Py;
-        Pz = spec.Pz;
-    }
+
 
     public SpacialFrame3D(FoShape3D shape, string units = "m")
     : base(shape, units)
     {
-        X = shape.Width;
-        Y = shape.Height;
-        Z = shape.Depth;
-        Transform = shape.GetTransform();
-        // Rx = shape.Rx;
-        // Ry = shape.Ry;
-        // Rz = shape.Rz;
-        // Px = shape.Px;
-        // Py = shape.Py;
-        // Pz = shape.Pz;
+        Source = shape;
     }
 
-    // Update the transformation matrix based on current parameters
-    // Order: Scale -> Rotate -> Translate (correct 3D transformation order)
-    // With proper pivot point handling
-    public void UpdateTransform()
-    {
-        Transform.Identity()
-            .SetScale(ScaleX, ScaleY, ScaleZ)
-            .SetPivot(new Vector3(Px, Py, Pz))
-            .RotateEuler(Rx, Ry, Rz)
-            .Translate(X, Y, Z);
-    }
+
     
     // Helper method to transform a point using the current Transform matrix
     private Point3D TransformPoint(Point3D point)
     {
         // Convert Point3D directly to BlazorThreeJS.Vector3
-        var blazorVector = new Vector3(point.X, point.Y, point.Z);
+        var vector = point.AsVector3();
         
         // Transform using Transform3
-        var transformedVector = Transform.TransformPoint(blazorVector);
-        
+        var result = Source.GetTransform().TransformPoint(vector);
+
         // Convert back to Point3D with preserved name
-        return new Point3D(transformedVector.X, transformedVector.Y, transformedVector.Z, point.Name);
+        return new Point3D(result.X, result.Y, result.Z, point.Name);
     }
     
     // Helper method to transform a list of points
@@ -90,18 +45,6 @@ public class SpacialFrame3D : SpacialBox3D
     }
     
 
-    
-    // Call this when any transformation parameter changes
-    public void SetTransform(double x, double y, double z, double rx = 0, double ry = 0, double rz = 0, 
-                            double scaleX = 1, double scaleY = 1, double scaleZ = 1,
-                            double px = 0, double py = 0, double pz = 0)
-    {
-        X = x; Y = y; Z = z;
-        Rx = rx; Ry = ry; Rz = rz;
-        ScaleX = scaleX; ScaleY = scaleY; ScaleZ = scaleZ;
-        Px = px; Py = py; Pz = pz;
-        UpdateTransform();
-    }
 
     // === TRANSFORMED GEOMETRY ACCESS METHODS ===
     
@@ -130,22 +73,22 @@ public class SpacialFrame3D : SpacialBox3D
         var localFaces = GetLocalFaces();
         
         // Transform face vertices and normals
-        var transformMatrix = Transform.ToMatrix3();
-        var transformedFaces = new List<Face3D>();
+        var transform = Source.GetTransform();
+        var faces = new List<Face3D>();
         
         foreach (var face in localFaces)
         {
             // Transform vertices
-            var transformedVertices = TransformPoints(face.Vertices);
-            
+            var vertices = TransformPoints(face.Vertices);
+
             // Transform normal vector (rotation only, not translation)
-            var transformedNormal = transformMatrix.TransformDirection(face.Normal);
-            
+            var transformedNormal = transform.TransformDirection(face.Normal);
+
             // Create new transformed face
-            transformedFaces.Add(new Face3D(face.Name, transformedVertices, transformedNormal));
+            faces.Add(new Face3D(face.Name, vertices, transformedNormal));
         }
         
-        return transformedFaces;
+        return faces;
     }
 
     // Get transformed edges
