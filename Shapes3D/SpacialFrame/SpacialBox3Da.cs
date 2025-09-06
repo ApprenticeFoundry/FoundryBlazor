@@ -7,7 +7,7 @@ namespace FoundryBlazor.Shape;
 //this data is always computed in local space (0,0,0) to (W,H,D) 
 //the SpacialBox3D can then be transformed in 3D space with position 
 //data is never cashed or transformed, always computed on the fly
-public class SpacialBox3DPrime
+public class SpacialBox3D
 {
     public string Units { get; set; } = "m";
     public double Width { get; set; } = 1.0;
@@ -23,7 +23,7 @@ public class SpacialBox3DPrime
 
     public double SurfaceArea => 2 * (Width * Height + Height * Depth + Width * Depth);
 
-    public SpacialBox3DPrime(double width, double height, double depth, string units = "m")
+    public SpacialBox3D(double width, double height, double depth, string units = "m")
     {
         Width = width;
         Height = height;
@@ -34,24 +34,24 @@ public class SpacialBox3DPrime
         HalfDepth = Depth / 2;
     }
 
-    public SpacialBox3DPrime(FoSpec3D spec, string units = "m") : this(spec.W, spec.H, spec.D, units)
+    public SpacialBox3D(FoSpec3D spec, string units = "m") : this(spec.W, spec.H, spec.D, units)
     {
     }
 
-    public SpacialBox3DPrime(FoShape3D glyph, string units = "m") : this(glyph.Width, glyph.Height, glyph.Depth, units)
+    public SpacialBox3D(FoShape3D glyph, string units = "m") : this(glyph.Width, glyph.Height, glyph.Depth, units)
     {
     }
 
-    public Point3D Center => new(HalfWidth, HalfHeight, HalfDepth, "Center");
+    public Point3D Center => new(HalfWidth-HalfWidth, HalfHeight-HalfHeight, HalfDepth-HalfDepth, "Center");
 
-    public Point3D LeftTopFront => new(0, Height, Depth, "LeftTopFront");
-    public Point3D RightTopFront => new(Width, Height, Depth, "RightTopFront");
-    public Point3D LeftBottomFront => new(0, 0, Depth, "LeftBottomFront");
-    public Point3D RightBottomFront => new(Width, 0, Depth, "RightBottomFront");
-    public Point3D LeftTopBack => new(0, Height, 0, "LeftTopBack");
-    public Point3D RightTopBack => new(Width, Height, 0, "RightTopBack");
-    public Point3D LeftBottomBack => new(0, 0, 0, "LeftBottomBack");
-    public Point3D RightBottomBack => new(Width, 0, 0, "RightBottomBack");
+    public Point3D LeftTopFront => new(0-HalfWidth, Height-HalfHeight, Depth-HalfDepth, "LeftTopFront");
+    public Point3D RightTopFront => new(Width-HalfWidth, Height-HalfHeight, Depth-HalfDepth, "RightTopFront");
+    public Point3D LeftBottomFront => new(0-HalfWidth, 0-HalfHeight, Depth-HalfDepth, "LeftBottomFront");
+    public Point3D RightBottomFront => new(Width-HalfWidth, 0-HalfHeight, Depth-HalfDepth, "RightBottomFront");
+    public Point3D LeftTopBack => new(0-HalfWidth, Height-HalfHeight, 0-HalfDepth, "LeftTopBack");
+    public Point3D RightTopBack => new(Width-HalfWidth, Height-HalfHeight, 0-HalfDepth, "RightTopBack");
+    public Point3D LeftBottomBack => new(0-HalfWidth, 0-HalfHeight, 0-HalfDepth, "LeftBottomBack");
+    public Point3D RightBottomBack => new(Width-HalfWidth, 0-HalfHeight, 0-HalfDepth, "RightBottomBack");
 
     public List<Point3D> GetLocalVertices() => new List<Point3D>
     {
