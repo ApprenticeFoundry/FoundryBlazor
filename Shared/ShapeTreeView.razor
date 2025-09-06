@@ -4,6 +4,45 @@
 
 @namespace FoundryBlazor.Shared
 
+<script>
+    window.scrollIntoViewIfNeeded = function(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            // Check if element is already visible
+            const rect = element.getBoundingClientRect();
+            const container = element.closest('[style*="overflow"]');
+            
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                
+                // Check if horizontally out of view
+                if (rect.left < containerRect.left || rect.right > containerRect.right) {
+                    element.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest', 
+                        inline: 'center' 
+                    });
+                }
+                // Check if vertically out of view
+                else if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
+                    element.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center', 
+                        inline: 'nearest' 
+                    });
+                }
+            } else {
+                // Fallback: just scroll into view
+                element.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center', 
+                    inline: 'center' 
+                });
+            }
+        }
+    };
+</script>
+
 <ul>
     <button class="btn btn-primary" @onclick="() => OnRefresh()">Refresh</button>
     @* <button class="btn btn-success" @onclick="() => AddScene()">Include Scene</button>
