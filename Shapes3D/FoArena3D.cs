@@ -235,7 +235,7 @@ public class FoArena3D : FoGlyph3D, IArena
 
         var north = new FoPanel3D("-Z Wall")
         {
-            Transform = new Transform3()
+            Transform = new Transform3("-Z")
             {
                 Position = new Vector3(0, 7, -14.8),
                 Rotation = new Euler(0, Math.PI * 0 / 180, 0),
@@ -244,7 +244,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         var south = new FoPanel3D("+Z Wall")
         {
-            Transform = new Transform3()
+            Transform = new Transform3("+Z")
             {
                 Position = new Vector3(0, 7, 14.8),
                 Rotation = new Euler(0, Math.PI * 180 / 180, 0),
@@ -252,7 +252,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         var east = new FoPanel3D("-X Wall")
         {
-            Transform = new Transform3()
+            Transform = new Transform3("-X")
             {
                 Position = new Vector3(-14.8, 7, 0),
                 Rotation = new Euler(0, Math.PI * 90 / 180, 0),
@@ -260,7 +260,7 @@ public class FoArena3D : FoGlyph3D, IArena
         };
         var west = new FoPanel3D("+X Wall")
         {
-            Transform = new Transform3()
+            Transform = new Transform3("+X")
             {
                 Position = new Vector3(14.8, 7, 0),
                 Rotation = new Euler(0, Math.PI * 270 / 180, 0),
@@ -304,7 +304,7 @@ public class FoArena3D : FoGlyph3D, IArena
                     Height = h,
                     Color = shape.Color,
                     // Position = Placement(page.Name, wall.Position!, x, y),
-                    Transform = new Transform3()
+                    Transform = new Transform3(shape.Key)
                     {
                         Position = new Vector3(x - halfW, halfH - y, z),
                     }

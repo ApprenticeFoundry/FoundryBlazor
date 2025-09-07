@@ -23,6 +23,11 @@ public class FoShape3D : FoGlyph3D, IShape3D
     {
     }
 
+    public FoShape3D SetOwner(string owner)
+    {
+        Transform.OwnerName = owner;
+        return this;
+    }
 
 
     public FoShape3D CreateBox(string name, double width, double height, double depth)
@@ -32,7 +37,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     public FoShape3D CreateBoundary(string name, double width, double height, double depth)
     {
@@ -41,7 +46,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     public FoShape3D CreateGroup(string name, double width, double height, double depth)
     {
@@ -50,7 +55,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     public FoShape3D CreateCylinder(string name, double width, double height, double depth)
     {
@@ -59,7 +64,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
 
     //CreateDodecahedron
@@ -70,7 +75,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     //CreateIcosahedron
     public FoShape3D CreateIcosahedron(string name, double width, double height, double depth)
@@ -80,7 +85,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     //CreateOctahedron
     public FoShape3D CreateOctahedron(string name, double width, double height, double depth)
@@ -90,7 +95,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     //CreateTorus
     public FoShape3D CreateTetrahedron(string name, double width, double height, double depth)
@@ -100,7 +105,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     //CreateTorusKnot
     public FoShape3D CreateTorusKnot(string name, double width, double height, double depth)
@@ -110,7 +115,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
   
     public FoShape3D CreateTorus(string name, double width, double height, double depth)
@@ -120,7 +125,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
 
 
@@ -131,7 +136,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
 
     public FoShape3D CreateCircle(string name, double width, double height, double depth)
@@ -141,7 +146,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     public FoShape3D CreatePlane(string name, double width, double height, double depth)
     {
@@ -150,7 +155,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
 
     public FoShape3D CreateRing(string name, double width, double height, double depth)
@@ -160,7 +165,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
 
     public FoShape3D CreateCapsule(string name, double width, double height, double depth)
@@ -170,7 +175,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
     public FoShape3D CreateCone(string name, double width, double height, double depth)
     {
@@ -179,7 +184,7 @@ public class FoShape3D : FoGlyph3D, IShape3D
         Width = width;
         Height = height;
         Depth = depth;
-        return this;
+        return SetOwner(name);
     }
   
 

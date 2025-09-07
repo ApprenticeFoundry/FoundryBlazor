@@ -68,6 +68,13 @@ public readonly struct Point3D : IEquatable<Point3D>
         X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
 
 
+    public double DistanceTo(Point3D other) =>
+        Math.Sqrt(
+            Math.Pow(other.X - X, 2) +
+            Math.Pow(other.Y - Y, 2) +
+            Math.Pow(other.Z - Z, 2)
+        );
+        
     public override int GetHashCode() =>
         HashCode.Combine(X, Y, Z);
 

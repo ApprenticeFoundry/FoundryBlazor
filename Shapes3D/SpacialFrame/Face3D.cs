@@ -40,7 +40,7 @@ public class Face3D
             Uuid = Guid.NewGuid().ToString(),
             Geometry = geometry,
             Material = new MeshStandardMaterial() { Color = color, Opacity = Opacity },
-            Transform = new Transform3() { Position = Center.AsVector3() },
+            Transform = new Transform3(Name) { Position = Center.AsVector3() },
         };
         return mesh;
     }

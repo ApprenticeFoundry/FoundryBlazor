@@ -29,6 +29,7 @@ public class SpacialFrame3D : SpacialBox3D
         
         // Get transform and ENSURE MATRIX IS COMPUTED
         var transform = Source.Transform;
+        $"Transforming Point! for {transform.OwnerName}".WriteNote(2);
 
         // Transform using Transform3 (now guaranteed to have clean matrix)
         var result = transform.TransformPoint(vector);
@@ -40,7 +41,21 @@ public class SpacialFrame3D : SpacialBox3D
     // Helper method to transform a list of points
     private List<Point3D> TransformPoints(List<Point3D> points)
     {
-        return points.Select(TransformPoint).ToList();
+        var transform = Source.Transform;
+        $"Transforming {points.Count} Points for {transform.OwnerName}".WriteNote(2);
+        var result = new List<Point3D>();
+
+        foreach (var point in points)
+        {
+            var vector = point.AsVector3();
+            var data = transform.TransformPoint(vector);
+            var transformedPoint = new Point3D(data.X, data.Y, data.Z, point.Name);
+            result.Add(transformedPoint);
+            $"Vector {point.Name} Was ({vector.X:F2}, {vector.Y:F2}, {vector.Z:F2})".WriteNote(3);
+            $"Vector {point.Name} Now ({data.X:F2}, {data.Y:F2}, {data.Z:F2})".WriteNote(3);
+        }
+
+        return result;
     }
     
 
@@ -93,24 +108,29 @@ public class SpacialFrame3D : SpacialBox3D
     public List<Edge3D> GetEdges()
     {
         var localEdges = GetLocalEdges();
-        var transformedEdges = new List<Edge3D>();
-        
-        foreach (var edge in localEdges)
+        var result = new List<Edge3D>();
+
+        var transform = Source.Transform;
+        $"Transforming {localEdges.Count} Edges for {transform.OwnerName}".WriteNote(2);
+
+        foreach (var localEdge in localEdges)
         {
-            var transformedStart = TransformPoint(edge.Start);
-            var transformedEnd = TransformPoint(edge.End);
-            transformedEdges.Add(new Edge3D(edge.Name, transformedStart, transformedEnd));
+            var points = TransformPoints(localEdge.Points);
+            var edge = new Edge3D(localEdge.Name, points);
+            result.Add(edge);
         }
-        
-        return transformedEdges;
+
+        return result;
     }
 
     // === OVERRIDE FACE CENTER PROPERTIES FOR TRANSFORMATION ===
-    
+
     public  Point3D FrontFaceCenter => TransformPoint(LocalFrontFaceCenter);
     public  Point3D RearFaceCenter => TransformPoint(LocalRearFaceCenter);
     public  Point3D LeftFaceCenter => TransformPoint(LocalLeftFaceCenter);
     public  Point3D RightFaceCenter => TransformPoint(LocalRightFaceCenter);
+        
+    
     public  Point3D TopFaceCenter => TransformPoint(LocalTopFaceCenter);
     public  Point3D BottomFaceCenter => TransformPoint(LocalBottomFaceCenter);
 

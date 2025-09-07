@@ -47,7 +47,7 @@ public class FoGlyph3D : FoComponent
             }
 
 
-            this.transform = AssignTransform(new Transform3(), null);
+            this.transform = AssignTransform(new Transform3(Name ?? GetGlyphId()), null);
             return this.transform;
         }
         set
