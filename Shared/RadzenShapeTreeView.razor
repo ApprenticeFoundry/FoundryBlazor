@@ -1,0 +1,21 @@
+@inherits RadzenShapeTreeViewBase
+@namespace FoundryBlazor.Shared
+
+<div class="radzen-tree-container">
+    <button class="btn btn-primary btn-sm mb-2" @onclick="OnRefresh">Refresh</button>
+    
+    <RadzenTree Data=@TreeData 
+                Change=@OnNodeSelect
+                Expand=@OnNodeExpand
+                Style="width: 100%;">
+        <RadzenTreeLevel TextProperty="DisplayText" 
+                        ChildrenProperty="Children" />
+    </RadzenTree>
+</div>
+
+<style>
+    .radzen-tree-container {
+        height: 100%;
+        overflow: auto;
+    }
+</style>

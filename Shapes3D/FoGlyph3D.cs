@@ -30,33 +30,67 @@ public class FoGlyph3D : FoComponent
         get { return this.geomType; }
         set { this.geomType = AssignText(value, geomType); }
     }
-    protected Transform3? transform = null;
-  
+    private Transform3? transform = null;
+
     public Transform3 Transform
     {
-        get {
-                if (this.transform != null)
+        get
+        {
+            if (this.transform != null)
+            {
+                if (this.transform.IsDirty)
+                {
+                    $"Warning: Accessing Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
                     return this.transform;
-
-                this.transform = AssignTransform(new Transform3(), null);
+                }
                 return this.transform;
             }
-        set { this.transform = AssignTransform(value, transform); }
+
+
+            this.transform = AssignTransform(new Transform3(), null);
+            return this.transform;
+        }
+        set
+        {
+            this.transform = AssignTransform(value, transform);
+        }
     }
 
-    public Transform3 GetTransform()
+    public bool WatchTransformOnChange(Action<Boolean> action)
     {
-        return Transform;
+        if ( this.transform == null )
+            return false;
+
+        this.transform.OnChange = action;
+        return true;
     }
+    public bool WatchTransformOnComputed(Action<Matrix3> action)
+    {
+        if ( this.transform == null )
+            return false;
+
+        this.transform.OnComputed = action;
+        return true;
+    }
+
+    public bool SetTransformUpdateFormula(Func<Transform3, Matrix3> formula)
+    {
+        if ( this.transform == null )
+            return false;
+
+        this.transform.UpdateMatrix3Formula = formula;
+        return true;
+    }
+
 
     public Vector3 GetPosition()
     {
-        return GetTransform().Position;
+        return Transform.Position;
     }
 
     public Euler GetRotation()
     {
-        return GetTransform().Rotation;
+        return Transform.Rotation;
     }
 
 
@@ -78,7 +112,7 @@ public class FoGlyph3D : FoComponent
     public Action<FoGlyph3D>? OnDelete { get; set; }
 
     public List<TreeNodeAction> DefaultActions = [];
- 
+
     public FoGlyph3D() : base("")
     {
     }
@@ -99,7 +133,7 @@ public class FoGlyph3D : FoComponent
     {
         Value3D = obj;
     }
-    
+
     public virtual (bool success, Object3D result) GetValue3D()
     {
         return (Value3D != null, Value3D!);
@@ -136,13 +170,13 @@ public class FoGlyph3D : FoComponent
 
     public void SetAnimationUpdate(Action<Object3D, int, double> update)
     {
-        OnAnimationUpdate = update; 
+        OnAnimationUpdate = update;
     }
 
     public override void SetDirty(bool value, bool deep = true)
     {
         base.SetDirty(value, deep);
-            
+
         if (Value3D != null)
         {
             Value3D.SetDirty(value);
@@ -154,10 +188,10 @@ public class FoGlyph3D : FoComponent
 
     public virtual (bool success, Vector3 path) HitPosition()
     {
-        if ( Value3D != null)
+        if (Value3D != null)
         {
             var boundary = Value3D.HitBoundary;
-            if ( boundary != null)
+            if (boundary != null)
             {
                 var pos = boundary.GetPosition();
                 return (true, pos);
@@ -176,7 +210,7 @@ public class FoGlyph3D : FoComponent
 
 
 
-   public void AddAction(string name, string color, Action action)
+    public void AddAction(string name, string color, Action action)
     {
         DefaultActions.AddAction(name, color, action);
     }
@@ -204,8 +238,8 @@ public class FoGlyph3D : FoComponent
     {
         var result = new List<TreeNodeAction>();
         result.AddRange(DefaultActions);
-        
-        if ( OnDelete != null )
+
+        if (OnDelete != null)
             result.AddAction("Delete", "btn-danger", () =>
             {
                 OnDelete?.Invoke(this);
@@ -228,9 +262,14 @@ public class FoGlyph3D : FoComponent
 
     protected Transform3 AssignTransform(Transform3 newValue, Transform3? oldValue)
     {
-        if ( oldValue == newValue)
+        if (oldValue == newValue)
         {
+            //Shape match dirty flag of the new transform
             SetDirty(newValue.IsDirty);
+            if (newValue.IsDirty)
+            {
+                $"Warning: Re-assigning Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
+            }
             return newValue;
         }
 
@@ -239,7 +278,15 @@ public class FoGlyph3D : FoComponent
         if (oldValue != null)
             oldValue.OnChange = null!;
 
-        newValue.OnChange = (value) => SetDirty(value);
+        //this is designed to propagate changes from the Transform3 to the FoGlyph3D
+        //however if it is used to notify other events we should preserve the original callback
+        //I hope this does not create lots of chained callbacks
+        var originalCallback = newValue.OnChange;
+        newValue.OnChange = (value) =>
+        {
+            SetDirty(value);
+            originalCallback?.Invoke(value);
+        };
         return newValue;
     }
 
@@ -277,7 +324,7 @@ public class FoGlyph3D : FoComponent
         }
 
         return newValue;
-    }   
+    }
 
     public MeshStandardMaterial GetWireframe()
     {
@@ -292,7 +339,7 @@ public class FoGlyph3D : FoComponent
     }
 
 
-    
+
     public virtual MeshStandardMaterial GetMaterial()
     {
         var result = new MeshStandardMaterial()
@@ -314,7 +361,7 @@ public class FoGlyph3D : FoComponent
     {
         //SetDirty(true);
         glyph.GetParent = () => this;
-        if ( !Members<FoGlyph3D>().Contains(glyph))
+        if (!Members<FoGlyph3D>().Contains(glyph))
             Add<FoGlyph3D>(glyph);
 
         return glyph;
@@ -329,10 +376,10 @@ public class FoGlyph3D : FoComponent
 
     public virtual (bool success, Object3D result) ComputeValue3D(Object3D parent)
     {
-        IsDirty = false; 
+        IsDirty = false;
         var (success, result) = GetValue3D();
         if (!success)
-            return (false, null!);    
+            return (false, null!);
 
         parent.AddChild(result);
 
