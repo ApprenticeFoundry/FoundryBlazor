@@ -40,7 +40,7 @@ public class FoGlyph3D : FoComponent
             {
                 if (this.transform.IsDirty)
                 {
-                    $"Warning: Accessing Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
+                    //$"Warning: Accessing Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
                     return this.transform;
                 }
                 return this.transform;
