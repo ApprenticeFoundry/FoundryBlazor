@@ -32,13 +32,6 @@ public class FoBase: ITreeNode
     public bool IsDirty
     {
         get { return this.StatusBits.IsDirty; }
-        set { 
-            this.StatusBits.IsDirty = value; 
-            //if ( value )
-            //{
-            //    $"Key {this.Key} is dirty".WriteNote();
-            //}
-        }
     }
 
     public virtual void SetDirty(bool value, bool deep=true)
@@ -46,7 +39,7 @@ public class FoBase: ITreeNode
         if ( IsDirty == value )
             return;
 
-        IsDirty = value;
+        this.StatusBits.IsDirty = value;
         // if ( deep)
         // {
         //     foreach (var child in children)

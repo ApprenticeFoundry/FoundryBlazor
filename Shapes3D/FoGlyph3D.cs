@@ -176,10 +176,15 @@ public class FoGlyph3D : FoComponent
     public override void SetDirty(bool value, bool deep = true)
     {
         base.SetDirty(value, deep);
+        if ( Value3D == null)
+        {
+            $"Setting FoGlyph3D {Key} dirty to false but Value3D is null".WriteWarning();
+        }
 
         if (Value3D != null)
         {
             Value3D.SetDirty(value);
+            $"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
 
             //$"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
         }
@@ -262,30 +267,30 @@ public class FoGlyph3D : FoComponent
 
     protected Transform3 AssignTransform(Transform3 newValue, Transform3? oldValue)
     {
-        if (oldValue == newValue)
-        {
-            //Shape match dirty flag of the new transform
-            SetDirty(newValue.IsDirty);
-            if (newValue.IsDirty)
-            {
-                $"Warning: Re-assigning Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
-            }
-            return newValue;
-        }
+        // if (oldValue == newValue)
+        // {
+        //     //Shape match dirty flag of the new transform
+        //     SetDirty(newValue.IsDirty);
+        //     if (newValue.IsDirty)
+        //     {
+        //         $"Warning: Re-assigning Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
+        //     }
+        //     return newValue;
+        // }
 
 
         SetDirty(true);  //this is good because it will also mark Valus3D as dirty (which triggers the update)
         if (oldValue != null)
-            oldValue.OnChange = null!;
+            oldValue.NotifyOwnerOfChange = null!;
 
-        //this is designed to propagate changes from the Transform3 to the FoGlyph3D
-        //however if it is used to notify other events we should preserve the original callback
-        //I hope this does not create lots of chained callbacks
-        var originalCallback = newValue.OnChange;
-        newValue.OnChange = (value) =>
+
+        newValue.NotifyOwnerOfChange = (value) =>
         {
+            $"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteNote();
+            //little trick to propagate the dirty flag from the transform to the glyph
+            //$"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {
             SetDirty(value);
-            originalCallback?.Invoke(value);
+            $"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteInfo();
         };
         return newValue;
     }
@@ -376,7 +381,7 @@ public class FoGlyph3D : FoComponent
 
     public virtual (bool success, Object3D result) ComputeValue3D(Object3D parent)
     {
-        IsDirty = false;
+        SetDirty(false);
         var (success, result) = GetValue3D();
         if (!success)
             return (false, null!);
