@@ -45,6 +45,17 @@ public class FoModel3D : FoShape3D
          GeomType = "Model";
     }
 
+    public FoModel3D CreateModel(string name, string url, double width, double height, double depth)
+    {
+        Key = name;
+        Url = url;
+        Width = width;
+        Height = height;
+        Depth = depth;
+        SetOwner(name);
+        return this;
+    }
+
     public Model3D AsModel3D()
     {
         ComputeFormat(Url);

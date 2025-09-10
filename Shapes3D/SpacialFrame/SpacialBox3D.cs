@@ -145,9 +145,11 @@ public class SpacialBox3D
         };
     }
 
-
-
-
+    public List<Vector3> GetLocalNormals()
+    {
+        var normals = GetLocalFaces().Select(f => new Vector3(f.Normal.X, f.Normal.Y, f.Normal.Z)).ToList();
+        return normals;
+    }
 
 
     public Point3D LocalFrontFaceCenter => new(HalfWidth, HalfHeight, 0, "front");

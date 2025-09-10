@@ -25,9 +25,10 @@ public class FoShape3D : FoGlyph3D, IShape3D
 
     public FoShape3D SetOwner(string owner)
     {
-        Transform.OwnerName = owner;
+        Transform!.OwnerName = owner;
         return this;
     }
+
 
 
     public FoShape3D CreateBox(string name, double width, double height, double depth)

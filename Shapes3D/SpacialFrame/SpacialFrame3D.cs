@@ -28,7 +28,7 @@ public class SpacialFrame3D : SpacialBox3D
         var vector = point.AsVector3();
         
         // Get transform and ENSURE MATRIX IS COMPUTED
-        var transform = Source.Transform;
+        var transform = Source.Transform!;
         $"Transforming Point! for {transform.OwnerName}".WriteNote(2);
 
         // Transform using Transform3 (now guaranteed to have clean matrix)
@@ -86,7 +86,7 @@ public class SpacialFrame3D : SpacialBox3D
         var localFaces = GetLocalFaces();
         
         // Transform face vertices and normals
-        var transform = Source.Transform;
+        var transform = Source.Transform!;
         var faces = new List<Face3D>();
         
         foreach (var face in localFaces)
@@ -104,13 +104,29 @@ public class SpacialFrame3D : SpacialBox3D
         return faces;
     }
 
+    public List<Vector3> GetNormals()
+    {
+        var localNormals = GetLocalNormals();
+        var transform = Source.Transform!;
+        var normals = new List<Vector3>();
+        
+        foreach (var normal in localNormals)
+        {
+            // Transform normal vector (rotation only, not translation)
+            var transformedNormal = transform.TransformDirection(normal);
+            normals.Add(transformedNormal);
+        }
+        
+        return normals;
+    }
+
     // Get transformed edges
     public List<Edge3D> GetEdges()
     {
         var localEdges = GetLocalEdges();
         var result = new List<Edge3D>();
 
-        var transform = Source.Transform;
+        var transform = Source.Transform!;
         $"Transforming {localEdges.Count} Edges for {transform.OwnerName}".WriteNote(2);
 
         foreach (var localEdge in localEdges)

@@ -32,27 +32,21 @@ public class FoGlyph3D : FoComponent
     }
     private Transform3? transform = null;
 
-    public Transform3 Transform
+    public Transform3? Transform
     {
         get
         {
-            if (this.transform != null)
-            {
-                if (this.transform.IsDirty)
-                {
-                    //$"Warning: Accessing Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
-                    return this.transform;
-                }
-                return this.transform;
-            }
+            if (transform != null)
+                return transform;
 
 
-            this.transform = AssignTransform(new Transform3(Name ?? GetGlyphId()), null);
-            return this.transform;
+            Transform = new Transform3(Name ?? GetGlyphId());
+            return transform!;
         }
         set
         {
-            this.transform = AssignTransform(value, transform);
+            //$"Setting Transform on FoGlyph3D {Key} ".WriteInfo();
+            transform = AssignTransform(value!, transform);
         }
     }
 
@@ -85,12 +79,12 @@ public class FoGlyph3D : FoComponent
 
     public Vector3 GetPosition()
     {
-        return Transform.Position;
+        return Transform!.Position;
     }
 
     public Euler GetRotation()
     {
-        return Transform.Rotation;
+        return Transform!.Rotation;
     }
 
 
@@ -176,16 +170,14 @@ public class FoGlyph3D : FoComponent
     public override void SetDirty(bool value, bool deep = true)
     {
         base.SetDirty(value, deep);
-        if ( Value3D == null)
-        {
-            $"Setting FoGlyph3D {Key} dirty to false but Value3D is null".WriteWarning();
-        }
+        // if ( Value3D == null)
+        // {
+        //     $"Setting FoGlyph3D {Key} dirty to false but Value3D is null".WriteWarning();
+        // }
 
         if (Value3D != null)
         {
             Value3D.SetDirty(value);
-            $"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
-
             //$"FoGlyph SetDirty Object3D {Value3D.Name} {Value3D.IsDirty}".WriteInfo();
         }
     }
@@ -267,31 +259,32 @@ public class FoGlyph3D : FoComponent
 
     protected Transform3 AssignTransform(Transform3 newValue, Transform3? oldValue)
     {
-        // if (oldValue == newValue)
-        // {
-        //     //Shape match dirty flag of the new transform
-        //     SetDirty(newValue.IsDirty);
-        //     if (newValue.IsDirty)
-        //     {
-        //         $"Warning: Re-assigning Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
-        //     }
-        //     return newValue;
-        // }
+        if (oldValue == newValue)
+        {
+            //Shape match dirty flag of the new transform
+            SetDirty(newValue.IsDirty);
+            if (newValue.IsDirty)
+            {
+                $"Warning: Re-assigning Transform which is dirty on FoGlyph3D {Key}".WriteWarning();
+            }
+            return newValue;
+        }
 
 
         SetDirty(true);  //this is good because it will also mark Valus3D as dirty (which triggers the update)
         if (oldValue != null)
-            oldValue.NotifyOwnerOfChange = null!;
+            oldValue.ClearOwnerNotification();
 
 
-        newValue.NotifyOwnerOfChange = (value) =>
+        newValue.SetOwnerNotification((value) =>
         {
-            $"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteNote();
+            //$"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteNote();
             //little trick to propagate the dirty flag from the transform to the glyph
-            //$"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {
+            //$"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteNote();
+            //little trick to propagate the dirty flag from the transform to the glyph
             SetDirty(value);
-            $"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteInfo();
-        };
+            //$"Transform NotifyOwnerOfChange called with {value} on FoGlyph3D {Key}".WriteInfo();
+        });
         return newValue;
     }
 
