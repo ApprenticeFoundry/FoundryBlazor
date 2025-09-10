@@ -42,13 +42,13 @@ public class SpacialFrame3D : SpacialBox3D
     private List<Point3D> TransformPoints(List<Point3D> points)
     {
         var transform = Source.Transform;
-        $"Transforming {points.Count} Points for {transform.OwnerName}".WriteNote(2);
+        $"Transforming {points.Count} Points for {transform?.OwnerName}".WriteNote(2);
         var result = new List<Point3D>();
 
         foreach (var point in points)
         {
             var vector = point.AsVector3();
-            var data = transform.TransformPoint(vector);
+            var data = transform!.TransformPoint(vector);
             var transformedPoint = new Point3D(data.X, data.Y, data.Z, point.Name);
             result.Add(transformedPoint);
             $"Vector {point.Name} Was ({vector.X:F2}, {vector.Y:F2}, {vector.Z:F2})".WriteNote(3);

@@ -9,6 +9,8 @@ namespace FoundryBlazor.Shape;
 //data is never cashed or transformed, always computed on the fly
 public class SpacialBox3D
 {
+    public FoShape3D Shape { get; }
+
     public string Units { get; set; } = "m";
     public double Width { get; set; } = 1.0;
     public double Height { get; set; } = 1.0;
@@ -40,7 +42,9 @@ public class SpacialBox3D
 
     public SpacialBox3D(FoShape3D glyph, string units = "m") : this(glyph.Width, glyph.Height, glyph.Depth, units)
     {
+        Shape = glyph;
     }
+
 
     public Point3D Center => new(HalfWidth-HalfWidth, HalfHeight-HalfHeight, HalfDepth-HalfDepth, "Center");
 
