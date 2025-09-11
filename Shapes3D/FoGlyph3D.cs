@@ -32,7 +32,7 @@ public class FoGlyph3D : FoComponent
     }
     private Transform3? transform = null;
 
-    public Transform3? Transform
+    public Transform3 Transform
     {
         get
         {
