@@ -11,9 +11,9 @@ public interface IFoCollection
     string NextItemName();
     List<string> Keys();
     List<U> ValuesOfType<U>();
-    List<object> AllValues();
-    List<object> AllValuesOfType(Type type);
-    void ExecuteForEachItem(Action<object> applyClause);
+    List<FoBase> AllValues();
+    List<FoBase> AllValuesOfType(Type type);
+    void ExecuteForEachItem(Action<FoBase> applyClause);
     bool AddObject(string key, object value);
     bool RemoveObject(string key);
     void Clear();
@@ -76,14 +76,14 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         return this.members.Values.ToList<T>();
     }
     
-    public List<object> AllValues()
+    public List<FoBase> AllValues()
     {
-        return this.members.Values.Cast<object>().ToList();
+        return this.members.Values.Cast<FoBase>().ToList();
     }
 
-    public List<object> AllValuesOfType(Type type)
+    public List<FoBase> AllValuesOfType(Type type)
     {
-        return this.members.Values.Where(item => item.GetType() == type || item.GetType().IsSubclassOf(type)).Cast<object>().ToList();
+        return this.members.Values.Where(item => item.GetType() == type || item.GetType().IsSubclassOf(type)).Cast<FoBase>().ToList();
     }
     public List<U> ValuesOfType<U>()
     {
@@ -146,7 +146,7 @@ public class FoCollection<T>: IFoCollection where T : FoBase
         }
         return value;
     }
-    public void ExecuteForEachItem(Action<object> applyClause)
+    public void ExecuteForEachItem(Action<FoBase> applyClause)
     {
         foreach (var item in Values())
         {
