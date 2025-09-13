@@ -1,11 +1,42 @@
 
 # FoundryBlazor
 
-Working to create a complete C# / Blazor diagraming experience for developers.
+A comprehensive C# / Blazor diagramming library that combines 2D and 3D visualization capabilities for developers.
 
-The Blazor demo built for NDC Oslo 2023 is now available as a NuGet package. The library includes .NET 8 and Blazor features. There are new 2D shapes, layout algorithms with glued connections, scaled multi-page diagrams and better 2D/3D integration. The features of Visio, Three.js and CesiumJS are now available in Blazor, both client and server.
+## Overview
 
-https://apprenticefoundry.github.io/
+FoundryBlazor is a powerful diagramming and visualization library that brings together the best features of Visio, Three.js, and CesiumJS into the Blazor ecosystem. Originally demonstrated at NDC Oslo 2023, it's now available as a NuGet package supporting both Blazor Server and WebAssembly applications.
+
+## Features
+
+- **2D Diagramming**: Complete shape library with advanced layout algorithms
+- **3D Integration**: Seamless 2D/3D visualization combining
+- **Glued Connections**: Dynamic connections that maintain relationships during layout changes
+- **Multi-page Diagrams**: Scaled diagrams across multiple pages
+- **Performance Optimized**: Object pooling and efficient rendering
+- **Cross-platform**: Works in both Blazor Server and WebAssembly
+
+## Installation
+
+```bash
+dotnet add package FoundryBlazor
+```
+
+## Quick Start
+
+```csharp
+// Add to your Program.cs
+builder.Services.AddFoundryBlazor();
+
+// Use in your Blazor component
+<FoundryDiagram @ref="diagram">
+    // Your diagram content
+</FoundryDiagram>
+```
+
+## Demo & Examples
+
+Visit our interactive demo: https://apprenticefoundry.github.io/
 
 ## Architecture Documentation
 
@@ -23,3 +54,22 @@ FoundryBlazor uses a compatibility wrapper architecture for 3D matrix operations
 ### Related Projects
 - **BlazorThreeJS**: Provides the core mathematical foundation for 3D operations
 - **Three2025**: Application project demonstrating integrated 3D capabilities
+
+## Requirements
+
+- .NET 8 or higher
+- Blazor Server or WebAssembly
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+## Support
+
+- **Demo**: https://apprenticefoundry.github.io/
+- **Issues**: Submit issues on GitHub for bug reports and feature requests
+- **Documentation**: See the Matrix3D compatibility documentation for technical details
