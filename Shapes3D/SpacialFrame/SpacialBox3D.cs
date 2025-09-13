@@ -27,6 +27,7 @@ public class SpacialBox3D
 
     public SpacialBox3D(double width, double height, double depth, string units = "m")
     {
+        Shape = new FoShape3D("SpacialBox");
         Width = width;
         Height = height;
         Depth = depth;
