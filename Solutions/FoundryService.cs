@@ -105,6 +105,10 @@ public class FoundryService : IFoundryService
     {
         return cmd;
     }
+    public IUnitSystem UnitSystem()
+    {
+        return units;
+    }
 
     public IPopupDialog PopupDialog()
     {

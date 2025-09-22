@@ -28,8 +28,8 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2025</Copyright>
-    <AssemblyVersion>23.1.0</AssemblyVersion>
-    <Version>23.1.0</Version>
+    <AssemblyVersion>23.2.0</AssemblyVersion>
+    <Version>23.2.0</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
