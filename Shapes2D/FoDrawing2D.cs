@@ -462,7 +462,7 @@ public class FoDrawing2D : FoGlyph2D, IDrawing
             PanZoomShape.IsVisible = false;
 
             var page = PageManager.CurrentPage();
-            var pt = new Point(page.PageWidth.AsPixels() / 2, new Length(3.0, "in").AsPixels());
+            var pt = new Point(page.PageWidth.AsPixels() / 2, page.PageHeight.AsPixels() / 4);
             PanZoomShape.MoveTo(pt.X, pt.Y);
         }
         return PanZoomShape;

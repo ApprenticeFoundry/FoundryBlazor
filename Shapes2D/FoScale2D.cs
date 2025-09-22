@@ -5,8 +5,9 @@ namespace FoundryBlazor.Shape;
 
 public class FoScale2D
 {
-    public Length Drawing { get; set; } = new Length(1.0, "cm");  //cm
-    public Length World { get; set; } = new Length(1.0, "m");  //m
+    public static UnitSystem UnitSystem { get; set; } = new UnitSystem();
+    public Length Drawing { get; set; } = UnitSystem.CreateLength(1.0, "cm");  //cm
+    public Length World { get; set; } = UnitSystem.CreateLength(1.0, "m");  //m
 
     public string Display ()
     {
@@ -29,7 +30,10 @@ public class FoScale2D
 
     public double PixelToDrawing(int pixels)
     {
-        var result = Drawing.FromPixels(pixels);
+        //var result = Drawing..FromPixels(pixels);
+        // Convert meters to pixels (96 DPI: 96 pixels per inch, 0.0254 meters per inch)
+        var pixelsPerMeter = 96.0 / 0.0254;
+        var result = (int)Math.Round(pixels / pixelsPerMeter);
         return result;
     }
 }

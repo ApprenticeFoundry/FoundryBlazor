@@ -34,27 +34,28 @@ public class FoPage2D : FoGlyph2D, IPage2D
 {
 
     public PanZoomState PanZoom { get; set; } = new();
+    public static UnitSystem UnitSystem { get; set; } = new();
 
-    public Length PageMargin { get; set; } = new Length(1, "cm");  //inches
-    public Length PageWidth { get; set; } = new Length(50.0, "cm");  //inches
-    public Length PageHeight { get; set; } = new Length(30.0, "cm"); //inches
+    public Length PageMargin { get; set; } = UnitSystem.CreateLength(1, "cm");  //inches
+    public Length PageWidth { get; set; } = UnitSystem.CreateLength(50.0, "cm");  //inches
+    public Length PageHeight { get; set; } = UnitSystem.CreateLength(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = new Length(5.0, "cm"); //inches
-    public Length GridMinorH { get; set; } = new Length(1, "cm"); //inches
+    public Length GridMajorH { get; set; } = UnitSystem.CreateLength(5.0, "cm"); //inches
+    public Length GridMinorH { get; set; } = UnitSystem.CreateLength(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = new Length(5.0, "cm"); //inches
-    public Length GridMinorV { get; set; } = new Length(1, "cm"); //inches
+    public Length GridMajorV { get; set; } = UnitSystem.CreateLength(5.0, "cm"); //inches
+    public Length GridMinorV { get; set; } = UnitSystem.CreateLength(1, "cm"); //inches
 
     public int ScaleAxisX { get; set; } = 1;
-    public Length ZeroPointX { get; set; } = new Length(0.0, "cm");  //cm
+    public Length ZeroPointX { get; set; } = UnitSystem.CreateLength(0.0, "cm");  //cm
     public int ScaleAxisY { get; set; } = 1;
-    public Length ZeroPointY { get; set; } = new Length(0.0, "cm");  //cm
+    public Length ZeroPointY { get; set; } = UnitSystem.CreateLength(0.0, "cm");  //cm
     public string Title { get; set; } = string.Empty;
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
-        Drawing = new Length(1.0, "cm"),
-        World = new Length(1.0, "m")
+        Drawing = UnitSystem.CreateLength(1.0, "cm"),
+        World = UnitSystem.CreateLength(1.0, "m")
     };
 
     public FoHorizontalRuler2D HRuler2D { get; set; }
@@ -564,8 +565,8 @@ public class FoPage2D : FoGlyph2D, IPage2D
         await UpdateContext(ctx, tick);
 
         var margin = PageMargin.AsPixels();
-        Width = (PageWidth + (2 * margin)).AsPixels();
-        Height = (PageHeight + (2 * margin)).AsPixels();
+        Width = (PageWidth + (2 * PageMargin)).AsPixels();
+        Height = (PageHeight + (2 * PageMargin)).AsPixels();
 
         await ctx.SetFillStyleAsync("White");
         await ctx.FillRectAsync(0, 0, Width, Height);
