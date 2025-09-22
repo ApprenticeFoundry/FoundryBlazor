@@ -2,6 +2,7 @@ using BlazorComponentBus;
 using FoundryBlazor.Shape;
 using FoundryBlazor.Shared;
 using FoundryRulesAndUnits.Extensions;
+using FoundryRulesAndUnits.Units;
 using Microsoft.JSInterop;
 using Radzen;
 
@@ -15,6 +16,7 @@ public class AnimationEvent
 public interface IFoundryService
 {
     ICommand Command();
+    IUnitSystem UnitSystem();
     IPopupDialog PopupDialog();
     IJSRuntime JS();
     ComponentBus PubSub();
@@ -34,6 +36,7 @@ public class FoundryService : IFoundryService
 {
     protected IToast toast { get; set; }
     protected ICommand cmd { get; set; }
+    protected IUnitSystem units { get; set; }
     protected IDrawing drawing { get; set; }
     protected IArena arena { get; set; }
     protected IWorldManager manager { get; set; }
@@ -51,6 +54,7 @@ public class FoundryService : IFoundryService
     public FoundryService(
         IToast toast,
         ICommand command,
+        IUnitSystem units,
         ISelectionService selection,
         IHitTestService hittest,
         IQRCodeService qrcode,
@@ -63,6 +67,7 @@ public class FoundryService : IFoundryService
         ComponentBus pubsub)
     {
         this.cmd = command;
+        this.units = units;
         this.dialog = dialog;
         this.js = js;
         this.pubsub = pubsub;
