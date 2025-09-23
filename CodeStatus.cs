@@ -22,11 +22,16 @@ public class CodeStatus
 
 public static class FoundryBlazorExtensions
 {
-    public static IServiceCollection AddFoundryBlazorServices(this IServiceCollection services, EnvConfig envConfig)
+    /// <summary>
+    /// Adds FoundryBlazor services with optional custom configuration
+    /// </summary>
+    public static IServiceCollection AddFoundryBlazorServices(this IServiceCollection services, EnvConfig? envConfig = null)
     {
         //from BlazorThreeJS
         services.AddBlazorThreeJSServices();
         
+        // Use default config if none provided
+        envConfig ??= new EnvConfig("appsettings.json");
         services.AddSingleton<IEnvConfig>(provider => envConfig);
         //Mentor Services
         services.AddScoped<ComponentBus>();

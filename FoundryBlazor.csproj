@@ -13,11 +13,12 @@
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <JsLibRoot>JsLib\</JsLibRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(JsLibRoot)node_modules\**</DefaultItemExcludes>
-    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
-    <EnableDefaultStaticWebAssetItems>false</EnableDefaultStaticWebAssetItems>
+    <!-- Static web assets configuration for NuGet package consumption -->
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <StaticWebAssetBasePath>_content/ApprenticeFoundryBlazor</StaticWebAssetBasePath>
+    
+    <!-- Exclude duplicate files to prevent build errors -->
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
-    <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
-    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
     <RestoreSources>$(RestoreSources);https://api.nuget.org/v3/index.json</RestoreSources>
 
     <Title>Apprentice Foundry Blazor</Title>
@@ -52,16 +53,17 @@
 
   <ItemGroup>
       <None Include="README.md" Pack="true" PackagePath="\" />
+      <None Include="INTEGRATION_GUIDE.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <!-- Static web assets are disabled for this class library -->
-    <!-- Manually include necessary content for packaging -->
-  <!-- <ItemGroup>
-    <Content Include="wwwroot\js\app-lib.js" />
-    <Content Include="wwwroot\css\**" />
-    <Content Include="wwwroot\images\**" />
-    <Content Include="wwwroot\favicon.ico" />
-  </ItemGroup> -->
+  <!-- Explicitly include required static web assets -->
+  <!-- NOTE: Ensure no conflicts with BlazorThreeJS static assets -->
+  <ItemGroup>
+    <Content Include="wwwroot\css\**\*" BuildAction="StaticWebAsset" />
+    <Content Include="wwwroot\js\app-lib.js" BuildAction="StaticWebAsset" />
+    <Content Include="wwwroot\favicon.ico" BuildAction="StaticWebAsset" />
+    <Content Include="wwwroot\images\**\*" BuildAction="StaticWebAsset" />
+  </ItemGroup>
 
 <!-- <ItemGroup> 
   <ProjectReference Include="..\BlazorThreeJS\BlazorThreeJS.csproj" />
