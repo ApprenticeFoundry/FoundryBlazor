@@ -29,8 +29,8 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2025</Copyright>
-    <AssemblyVersion>23.2.0</AssemblyVersion>
-    <Version>23.2.0</Version>
+    <AssemblyVersion>23.3.0</AssemblyVersion>
+    <Version>23.3.0</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
@@ -71,7 +71,7 @@
 
 <ItemGroup>
   <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.9" />
-  <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="22.0.0" />
+  <PackageReference Include="ApprenticeFoundryBlazorThreeJS" Version="23.1.0" />
 </ItemGroup>
 
 
