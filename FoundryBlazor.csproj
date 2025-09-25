@@ -29,8 +29,8 @@
     <PackageId>ApprenticeFoundryBlazor</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Copyright>Copyright © 2025</Copyright>
-    <AssemblyVersion>23.3.0</AssemblyVersion>
-    <Version>23.3.0</Version>
+    <AssemblyVersion>23.4.0</AssemblyVersion>
+    <Version>23.4.0</Version>
     <Authors>Stephen Strong</Authors>
     <Company>Stephen Strong</Company>
     <PackageProjectUrl>https://apprenticefoundry.github.io/</PackageProjectUrl>
@@ -76,7 +76,7 @@
 
 
  <ItemGroup>
-  <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="8.1.0" />
+  <PackageReference Include="ApprenticeFoundryRulesAndUnits" Version="9.0.0" />
   <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
   <PackageReference Include="BlazorComponentBus" Version="2.2.0" />
 

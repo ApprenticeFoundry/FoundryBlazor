@@ -9,9 +9,7 @@ using FoundryRulesAndUnits.Models;
 namespace FoundryBlazor.Shared;
 
 
-
-
-public partial class ShapeTreeItemBase : ComponentBase
+public partial class ShapeTreeItem : ComponentBase
 {
 
     [Inject] private ComponentBus? PubSub { get; set; }

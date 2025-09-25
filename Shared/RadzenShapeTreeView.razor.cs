@@ -5,7 +5,7 @@ using FoundryRulesAndUnits.Models;
 
 namespace FoundryBlazor.Shared;
 
-public partial class RadzenShapeTreeViewBase : ShapeTreeViewBase
+public partial class RadzenShapeTreeView : ShapeTreeView
 {
     protected IEnumerable<TreeNodeWrapper> TreeData => GetTreeData();
 

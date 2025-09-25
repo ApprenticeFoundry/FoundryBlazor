@@ -13,7 +13,7 @@ namespace FoundryBlazor.Shared;
 
 
 
-public class Canvas2DComponentBase : ComponentBase, IAsyncDisposable
+public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }

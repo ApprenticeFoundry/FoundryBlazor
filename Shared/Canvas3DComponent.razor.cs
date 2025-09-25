@@ -14,7 +14,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace FoundryBlazor.Shared;
 
-public class Canvas3DComponentBase : ComponentBase, IAsyncDisposable
+public partial class Canvas3DComponent : ComponentBase, IAsyncDisposable
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }

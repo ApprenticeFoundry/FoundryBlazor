@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class WorkspaceMenuBase : ComponentBase, IDisposable
+public partial class WorkspaceMenu : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }

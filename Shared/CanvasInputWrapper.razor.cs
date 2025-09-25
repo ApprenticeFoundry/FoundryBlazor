@@ -9,7 +9,7 @@ using System.Text;
 
 namespace FoundryBlazor.Shared;
 
-public class CanvasInputWrapperBase : ComponentBase
+public partial class CanvasInputWrapper : ComponentBase
 {
 
     [Inject] public IWorkspace? Workspace { get; set; }

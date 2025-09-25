@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 namespace FoundryBlazor.Shared;
 
-public class WorkspaceCommandBase : ComponentBase, IDisposable
+public partial class WorkspaceCommand : ComponentBase, IDisposable
 {
     [Inject] public NavigationManager? Navigation { get; set; }
     [Inject] protected IJSRuntime? JsRuntime { get; set; }
