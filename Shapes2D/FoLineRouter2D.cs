@@ -63,9 +63,9 @@ public class FoLineRouter2D
     private static readonly Queue<LineSegment> SegmentCache = new();
     private static readonly List<LineSegment> Segments = new();
 
-    public Length PageWidth => Page.PageWidth;
-    public Length PageHeight => Page.PageHeight;
-    public Length PageMargin => Page.PageMargin;
+    public FoScaleDimension PageWidth => Page.PageWidth;
+    public FoScaleDimension PageHeight => Page.PageHeight;
+    public FoScaleDimension PageMargin => Page.PageMargin;
 
     public FoPage2D Page { get; set; }
     public IHitTestService? HitService { get; set; }

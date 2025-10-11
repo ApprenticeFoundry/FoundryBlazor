@@ -50,7 +50,7 @@ public class FoHorizontalRuler2D
         Scale = scale2D;
         Page = page2D;
     }
-    public async Task DrawRuler(Canvas2DContext ctx, Length step, bool major)
+    public async Task DrawRuler(Canvas2DContext ctx, FoScaleDimension step, bool major)
     {
         if ( !IsVisible ) return;
         
@@ -123,7 +123,7 @@ public class FoVerticalRuler2D
         Page = page2D;
     }
 
-    public async Task DrawRuler(Canvas2DContext ctx, Length step, bool major)
+    public async Task DrawRuler(Canvas2DContext ctx, FoScaleDimension step, bool major)
     {
         if ( !IsVisible ) return;
 

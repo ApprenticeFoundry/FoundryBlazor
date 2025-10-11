@@ -34,28 +34,27 @@ public class FoPage2D : FoGlyph2D, IPage2D
 {
 
     public PanZoomState PanZoom { get; set; } = new();
-    public static UnitSystem UnitSystem { get; set; } = new();
 
-    public Length PageMargin { get; set; } = UnitSystem.CreateLength(1, "cm");  //inches
-    public Length PageWidth { get; set; } = UnitSystem.CreateLength(50.0, "cm");  //inches
-    public Length PageHeight { get; set; } = UnitSystem.CreateLength(30.0, "cm"); //inches
+    public FoScaleDimension PageMargin { get; set; } = new FoScaleDimension(1, "cm");  //inches
+    public FoScaleDimension PageWidth { get; set; } = new FoScaleDimension(50.0, "cm");  //inches
+    public FoScaleDimension PageHeight { get; set; } = new FoScaleDimension(30.0, "cm"); //inches
 
-    public Length GridMajorH { get; set; } = UnitSystem.CreateLength(5.0, "cm"); //inches
-    public Length GridMinorH { get; set; } = UnitSystem.CreateLength(1, "cm"); //inches
+    public FoScaleDimension GridMajorH { get; set; } = new FoScaleDimension(5.0, "cm"); //inches
+    public FoScaleDimension GridMinorH { get; set; } = new FoScaleDimension(1, "cm"); //inches
 
-    public Length GridMajorV { get; set; } = UnitSystem.CreateLength(5.0, "cm"); //inches
-    public Length GridMinorV { get; set; } = UnitSystem.CreateLength(1, "cm"); //inches
+    public FoScaleDimension GridMajorV { get; set; } = new FoScaleDimension(5.0, "cm"); //inches
+    public FoScaleDimension GridMinorV { get; set; } = new FoScaleDimension(1, "cm"); //inches
 
     public int ScaleAxisX { get; set; } = 1;
-    public Length ZeroPointX { get; set; } = UnitSystem.CreateLength(0.0, "cm");  //cm
+    public FoScaleDimension ZeroPointX { get; set; } = new FoScaleDimension(0.0, "cm");  //cm
     public int ScaleAxisY { get; set; } = 1;
-    public Length ZeroPointY { get; set; } = UnitSystem.CreateLength(0.0, "cm");  //cm
+    public FoScaleDimension ZeroPointY { get; set; } = new FoScaleDimension(0.0, "cm");  //cm
     public string Title { get; set; } = string.Empty;
 
     public FoScale2D Scale2D { get; set; } = new FoScale2D()
     {
-        Drawing = UnitSystem.CreateLength(1.0, "cm"),
-        World = UnitSystem.CreateLength(1.0, "m")
+        Drawing = new FoScaleDimension(1.0, "cm"),
+        World = new FoScaleDimension(1.0, "m")
     };
 
     public FoHorizontalRuler2D HRuler2D { get; set; }
@@ -96,7 +95,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
         CalculateTitle();
     }
 
-    public FoPage2D ResetScale(Length drawing, Length world)
+    public FoPage2D ResetScale(FoScaleDimension drawing, FoScaleDimension world)
     {
         Scale2D.Drawing = drawing;
         Scale2D.World = world;
@@ -482,7 +481,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
 
 
 
-    public async Task DrawHorizontalGrid(Canvas2DContext ctx, Length step, bool major)
+    public async Task DrawHorizontalGrid(Canvas2DContext ctx, FoScaleDimension step, bool major)
     {
         await ctx.SaveAsync();
 
@@ -518,7 +517,7 @@ public class FoPage2D : FoGlyph2D, IPage2D
     }
 
 
-    public async Task DrawVerticalGrid(Canvas2DContext ctx, Length step, bool major)
+    public async Task DrawVerticalGrid(Canvas2DContext ctx, FoScaleDimension step, bool major)
     {
         await ctx.SaveAsync();
 
