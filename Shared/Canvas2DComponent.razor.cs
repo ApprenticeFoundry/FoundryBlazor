@@ -42,15 +42,32 @@ public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
         {
             $"Canvas2DComponentBase {SceneName} OnAfterRenderAsync".WriteInfo();
 
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize");
+            try
+            {
+                await _jsRuntime!.InvokeVoidAsync("AppBrowser.Initialize");
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("prerendering"))
+            {
+                $"Canvas2DComponentBase {SceneName} Skipping AppBrowser.Initialize during prerendering: {ex.Message}".WriteWarning();
+                // Skip the rest of initialization during prerendering
+                return;
+            }
 
             var drawing = Workspace!.GetDrawing();
             drawing?.ClearAll();  //we do not want to share the old drawing here
 
             drawing?.SetCanvasSizeInPixels(CanvasWidth, CanvasHeight);
 
+            //Check if the reference to BECanvas was found
+            if (BECanvasReference == null)
+            {
+                $"Canvas2DComponentBase {SceneName} BECanvasReference is null on first render, will try again.".WriteWarning();
+                StateHasChanged();
+                return;
+            }
+            
             //lets hope the reference to BECanvas was found
-            Ctx = await BECanvasReference!.CreateCanvas2DAsync();
+            Ctx = await BECanvasReference.CreateCanvas2DAsync();
 
 
             //CreateTickPlayground();
@@ -62,7 +79,17 @@ public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
 
             await RenderFrame(0);
             if (WithAnimations)
-                await DoStart();
+            {
+                // Only start animations if not prerendering (JavaScript is available)
+                try
+                {
+                    await DoStart();
+                }
+                catch (InvalidOperationException ex) when (ex.Message.Contains("prerendering"))
+                {
+                    $"Canvas2DComponentBase {SceneName} Skipping DoStart during prerendering: {ex.Message}".WriteWarning();
+                }
+            }
 
         }
         await base.OnAfterRenderAsync(firstRender);
@@ -83,7 +110,14 @@ public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
             PubSub?.UnSubscribeFrom<TriggerRedrawEvent>(OnTriggerRedrawEvent);
             FoundryService?.AnimationBus().UnSubscribeFrom<AnimationEvent>(OnAnimationEvent);
 
-            await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+            try
+            {
+                await _jsRuntime!.InvokeVoidAsync("AppBrowser.Finalize");
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("prerendering"))
+            {
+                $"Canvas2DComponentBase {SceneName} AppBrowser.Finalize skipped during prerendering: {ex.Message}".WriteWarning();
+            }
 
         }
         catch (Exception ex)
@@ -98,10 +132,12 @@ public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
     {
         try
         {
-
             $"Canvas2DComponentBase {SceneName} CALLING DO START  AppBrowser.StartAnimation".WriteSuccess();
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StartAnimation");
-
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("prerendering"))
+        {
+            $"Canvas2DComponentBase {SceneName} DoStart skipped during prerendering: {ex.Message}".WriteWarning();
         }
         catch (Exception ex)
         {
@@ -113,10 +149,12 @@ public partial class Canvas2DComponent : ComponentBase, IAsyncDisposable
     {
         try
         {
-
             $"Canvas2DComponentBase {SceneName} CALLING DO STOP  AppBrowser.StopAnimation".WriteSuccess();
             await _jsRuntime!.InvokeVoidAsync("AppBrowser.StopAnimation");
-
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("prerendering"))
+        {
+            $"Canvas2DComponentBase {SceneName} DoStop skipped during prerendering: {ex.Message}".WriteWarning();
         }
         catch (Exception ex)
         {

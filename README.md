@@ -80,9 +80,21 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Shape Tree View -->
+        <!-- Action Buttons -->
         <div class="col-3">
-            <div style="height: 600px; border: 1px solid #ccc;">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Actions</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-2 w-100" @onclick="AddRectangle">Add Rectangle</button>
+                    <button class="btn btn-success mb-2 w-100" @onclick="AddCircle">Add Circle</button>
+                    <button class="btn btn-warning mb-2 w-100" @onclick="ClearCanvas">Clear Canvas</button>
+                </div>
+            </div>
+            
+            <!-- Shape Tree View -->
+            <div style="height: 400px; border: 1px solid #ccc;">
                 <ShapeTreeView />
             </div>
         </div>
@@ -95,12 +107,6 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
                                WithAnimations="true" />
         </div>
     </div>
-</div>
-
-<div class="mt-3">
-    <button class="btn btn-primary" @onclick="AddRectangle">Add Rectangle</button>
-    <button class="btn btn-success" @onclick="AddCircle">Add Circle</button>
-    <button class="btn btn-warning" @onclick="ClearCanvas">Clear Canvas</button>
 </div>
 
 @code {
@@ -175,14 +181,6 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
 
 <div class="container-fluid">
     <div class="row">
-        <!-- 3D Canvas -->
-        <div class="col-8">
-            <Canvas3DComponent SceneName="MainCanvas3D"
-                               CanvasWidth="800"
-                               CanvasHeight="600"
-                               WithAnimations="true" />
-        </div>
-        
         <!-- Controls -->
         <div class="col-4">
             <div class="card">
@@ -205,6 +203,14 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
                     </small></p>
                 </div>
             </div>
+        </div>
+        
+        <!-- 3D Canvas -->
+        <div class="col-8">
+            <Canvas3DComponent SceneName="MainCanvas3D"
+                               CanvasWidth="800"
+                               CanvasHeight="600"
+                               WithAnimations="true" />
         </div>
     </div>
 </div>
@@ -278,18 +284,29 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Tree View -->
-        <div class="col-2">
-            <div style="height: 500px;">
+        <!-- Controls and Tree View -->
+        <div class="col-3">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Actions</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-2 w-100" @onclick="SyncViews">Sync 2D → 3D</button>
+                    <button class="btn btn-success mb-2 w-100" @onclick="AddToBoth">Add to Both</button>
+                    <button class="btn btn-warning mb-2 w-100" @onclick="ClearBoth">Clear Both</button>
+                </div>
+            </div>
+            
+            <div style="height: 400px;">
                 <RadzenShapeTreeView />
             </div>
         </div>
         
         <!-- 2D Canvas -->
-        <div class="col-5">
+        <div class="col-4">
             <h5>2D Diagram</h5>
             <Canvas2DComponent SceneName="Combined2D"
-                               CanvasWidth="500" 
+                               CanvasWidth="450" 
                                CanvasHeight="400"
                                WithAnimations="true" />
         </div>
@@ -301,14 +318,6 @@ Add these references to your `_Host.cshtml` (Blazor Server) or `index.html` (Web
                                CanvasWidth="500"
                                CanvasHeight="400"
                                WithAnimations="true" />
-        </div>
-    </div>
-    
-    <div class="row mt-3">
-        <div class="col-12">
-            <button class="btn btn-primary me-2" @onclick="SyncViews">Sync 2D → 3D</button>
-            <button class="btn btn-success me-2" @onclick="AddToBoth">Add to Both</button>
-            <button class="btn btn-warning me-2" @onclick="ClearBoth">Clear Both</button>
         </div>
     </div>
 </div>

@@ -6,8 +6,8 @@ namespace FoundryBlazor.Shape;
 public class FoScale2D
 {
     public static UnitSystem UnitSystem { get; set; } = new UnitSystem();
-    public Length Drawing { get; set; } = UnitSystem.CreateLength(1.0, "cm");  //cm
-    public Length World { get; set; } = UnitSystem.CreateLength(1.0, "m");  //m
+    public FoScaleDimension Drawing { get; set; } = new FoScaleDimension(1.0, "cm");  //cm
+    public FoScaleDimension World { get; set; } = new FoScaleDimension(1.0, "m");  //m
 
     public string Display ()
     {
